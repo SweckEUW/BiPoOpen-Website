@@ -1,15 +1,14 @@
 <script setup lang="ts">
 // import AppHeader from './components/shared/AppHeader.vue';
 import { onBeforeMount } from 'vue'
+import router from './router.js';
 
 onBeforeMount(() => {
   let path = localStorage.getItem('path');
   if(path){
     localStorage.removeItem('path');
-    this.$router.push(path);
+    router.push(path);
   }
-
-  // Test
 })
 </script>
 
