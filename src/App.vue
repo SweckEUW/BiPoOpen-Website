@@ -1,5 +1,7 @@
-<script setup lang="ts">
-// import AppHeader from './components/shared/AppHeader.vue';
+<script lang="ts" setup>
+import AppHeader from './components/shared/AppHeader.vue';
+// import AppFooter from './components/shared/AppFooter.vue';
+
 import { onBeforeMount } from 'vue'
 import router from './router.js';
 
@@ -16,12 +18,12 @@ onBeforeMount(() => {
 	<transition name="fadeStart" appear>
 		<div>
 			<!-- App header -->
-			<!-- <AppHeader/> -->
+			<AppHeader/>
 
 			<!-- Render active component contents with vue transition -->
 			<router-view v-slot="{ Component }">
 				<transition name="fade" mode="out-in">
-					<component :is="Component" class="Page"/>
+					<component :is="Component"/>
 				</transition>
 			</router-view>
 
@@ -45,17 +47,14 @@ body{
 #app{
 	overflow-x: hidden;
 }
-.Page{
-	margin-top: 200px;
-	padding-bottom: 100px;
-	min-height: calc(100vh - 300px - 80px);
-}
+
 .fadeStart-enter-active, .fadeStart-leave-active {
   transition: 1s opacity 0s ease;
 }
 .fadeStart-enter-from,.fadeStart-leave-to {
   opacity: 0;
 }
+
 /* Transition Animations */
 .fade-enter-active {
 	animation: coming 0.4s;
@@ -82,23 +81,6 @@ body{
 	to {
 		transform: translateX(0px);
 		opacity: 1;
-	}
-}
-/*DESKTOP SMALL*/
-@media (width <= 1200px) { 
-    h1{
-        font-size: 100px;
-    }
-}
-/*MOBILE*/
-@media (width <= 900px){
-	.Page{
-		margin-top: 130px;
-		padding-bottom: 30px;
-	}
-	h1{
-		font-size: 50px;
-		margin-bottom: 20px;
 	}
 }
 </style>
