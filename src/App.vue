@@ -8,6 +8,8 @@ onBeforeMount(() => {
     localStorage.removeItem('path');
     this.$router.push(path);
   }
+
+  // Test
 })
 </script>
 
