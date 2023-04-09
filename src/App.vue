@@ -22,9 +22,9 @@ onBeforeMount(() => {
 
 			<!-- Render active component contents with vue transition -->
 			<router-view v-slot="{ Component }">
-				<transition name="fade" mode="out-in">
+				<!-- <transition name="fade" mode="out-in"> -->
 					<component :is="Component"/>
-				</transition>
+				<!-- </transition> -->
 			</router-view>
 
 			<!-- App footer -->
@@ -46,6 +46,11 @@ body{
 }
 #app{
 	overflow-x: hidden;
+}
+
+a{
+	text-decoration: none;
+	color: black;
 }
 
 .fadeStart-enter-active, .fadeStart-leave-active {

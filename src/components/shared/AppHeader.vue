@@ -22,7 +22,7 @@ const scrollToTop = () => {
 <template>
 	<div class="AppHeader">
 
-		<div>Weck BiPo Open 2023</div>
+		<router-link to="/" @click="scrollToTop()">Weck BiPo Open 2023</router-link>
 
 		<!-- <div class="ap-left">
 			<router-link to="/" @click="scrollToTop()">[Simon Weck]</router-link>
@@ -74,7 +74,7 @@ const scrollToTop = () => {
 .ap-burger-menu{
 	display: none;
 }
-a{
+/* a{
 	display: inline-block;
 	cursor: pointer;
 	transition: .3s color ease;
@@ -94,17 +94,17 @@ a:last-child{
 }
 a:hover{
 	color: rgb(160, 160, 160);
-}
+} */
 /*MOBILE*/
 @media (width <= 900px){
 	.AppHeader{
 		top: 4px;
 	}
-	a{
+	/* a{
 		font-size: 28px;
 		margin: 0px !important;
 		margin-bottom: 40px !important;
-	}
+	} */
 	.ap-right{
 		display: none;
 	}
