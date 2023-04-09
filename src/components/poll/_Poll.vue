@@ -14,9 +14,10 @@
     justify-content: center;
     margin-top: 80px;
     margin-bottom: 50px;
+    height: calc(100vh - 80px - 50px);
 }
 iframe{
-    height: 980px;
+    height: 100%;
     max-width: 640px; 
     width: 800px;
     border-radius: 10px;
@@ -26,7 +27,6 @@ iframe{
 @media (width <= 900px){
 	iframe{
         width: 90%;
-        height: 1050px;
 	}
 }
 </style>
