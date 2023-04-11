@@ -1,13 +1,24 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from '@/components/home/_Home.vue'
+
 const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component: () => import(/* webpackChunkName: "Home" */ './components/home/_Home.vue'),
+		component: Home,
 		meta: {
 			title: 'Weck BiPo Open 2023',
 		},
-	}
+	},
+
+	{
+		path: '/Umfrage',
+		name: 'Umfrage',
+		component: () => import(/* webpackChunkName: "Home" */ '@/components/poll/_Poll.vue'),
+		meta: {
+			title: 'Weck BiPo Open 2023 - Umfrage',
+		},
+	},
 ];
 
 const router = createRouter({
@@ -15,14 +26,6 @@ const router = createRouter({
 	routes
 });
 
-export default router;
-
-/**
- * Below code will display the component/active page title
- * Powered by: Nangialai Stoman
- */
-
-// This callback runs before every route change, including on page load.
 router.beforeEach((to, from, next) => {
 	// This goes through the matched routes from last to first, finding the closest route with a title.
 	// e.g., if we have `/some/deep/nested/route` and `/some`, `/deep`, and `/nested` have titles,
@@ -45,22 +48,22 @@ router.beforeEach((to, from, next) => {
 
 	// If a route with a title was found, set the document (page) title to that value.
 	if (nearestWithTitle) {
-		document.title = nearestWithTitle.meta.title;
+		(document as any).title = nearestWithTitle.meta.title;
 	} else if (previousNearestWithMeta) {
-		document.title = previousNearestWithMeta.meta.title;
+		(document as any).title = previousNearestWithMeta.meta.title;
 	}
 
 	// Remove any stale meta tags from the document using the key attribute we set below.
 	Array.from(
 		document.querySelectorAll('[data-vue-router-controlled]')
-	).map((el) => el.parentNode.removeChild(el));
+	).map((el:any) => el.parentNode.removeChild(el));
 
 	// Skip rendering meta tags if there are none.
 	if (!nearestWithMeta) return next();
 
 	// Turn the meta tag definitions into actual elements in the head.
-	nearestWithMeta.meta.metaTags
-		.map((tagDef) => {
+	(nearestWithMeta as any).meta.metaTags
+		.map((tagDef:any) => {
 			const tag = document.createElement('meta');
 
 			Object.keys(tagDef).forEach((key) => {
@@ -73,7 +76,9 @@ router.beforeEach((to, from, next) => {
 			return tag;
 		})
 		// Add the meta tags to the document head.
-		.forEach((tag) => document.head.appendChild(tag));
+		.forEach((tag:any) => document.head.appendChild(tag));
 
 	next();
 });
+
+export default router;
