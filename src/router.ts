@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/home/_Home.vue'
+import Plan from '@/components/plan/_Plan.vue'
+import Poll from '@/components/poll/_Poll.vue'
 
 const routes = [
 	{
@@ -14,7 +16,7 @@ const routes = [
 	{
 		path: '/Umfrage',
 		name: 'Umfrage',
-		component: () => import(/* webpackChunkName: "Poll" */ '@/components/poll/_Plan.vue'),
+		component: Poll,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
 		},
@@ -23,7 +25,7 @@ const routes = [
 	{
 		path: '/Plan',
 		name: 'plan',
-		component: () => import(/* webpackChunkName: "Poll" */ '@/components/plan/_Plan.vue'),
+		component: Plan,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Plan',
 		},
