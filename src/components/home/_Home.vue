@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import axios from "axios";
 
-const response = await axios.get("http://localhost:8000");
+const response = await axios.get("https://bipoopen-backend.vercel.app/");
 const data = response.data;
 console.log(data);
 </script>
