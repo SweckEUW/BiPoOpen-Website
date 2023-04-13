@@ -14,9 +14,18 @@ const routes = [
 	{
 		path: '/Umfrage',
 		name: 'Umfrage',
-		component: () => import(/* webpackChunkName: "Poll" */ '@/components/poll/_Poll.vue'),
+		component: () => import(/* webpackChunkName: "Poll" */ '@/components/poll/_Plan.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
+		},
+	},
+
+	{
+		path: '/Plan',
+		name: 'plan',
+		component: () => import(/* webpackChunkName: "Poll" */ '@/components/plan/_Plan.vue'),
+		meta: {
+			title: 'Weck BiPo Open 2023 - Plan',
 		},
 	},
 ];
