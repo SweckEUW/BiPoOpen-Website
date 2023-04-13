@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const getIcon = (icon:string) => {
-	return new URL(`/src/assets/icons/${icon}.png`, import.meta.url);
-}
+// const getIcon = (icon:string) => {
+// 	return new URL(`/src/assets/icons/${icon}.png`, import.meta.url);
+// }
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const getIcon = (icon:string) => {
 		<div class="af-imprint">
 			<p>@2023 Simon Weck</p>
 			<p>|</p>
-			<router-link tag="p" to="/Imprint" class="af-link">Imprint/Privacy Policy</router-link>
+			<router-link to="/Imprint" class="af-link">Imprint/Privacy Policy</router-link>
 		</div>
 	</div>
 </template>
