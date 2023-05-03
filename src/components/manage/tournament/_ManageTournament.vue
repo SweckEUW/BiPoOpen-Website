@@ -3,12 +3,8 @@
 </script>
 
 <template>
-    <h1>Coming Soon</h1>
+   <h1>{{$route.params.id}}</h1>
 </template>
 
 <style scoped>
-h1{
-    width: 100%;
-    text-align: center;
-}
 </style>

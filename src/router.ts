@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/home/_Home.vue'
 import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
+import Manage from '@/components/manage/_Manage.vue'
+import ManageTournament from '@/components/manage/tournament/_ManageTournament.vue'
+import Teamanmeldung from '@/components/Teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
 	{
@@ -24,12 +27,40 @@ const routes = [
 
 	{
 		path: '/Plan',
-		name: 'plan',
+		name: 'Plan',
 		component: Plan,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Plan',
 		},
 	},
+
+	{
+		path: '/Teamanmeldung',
+		name: 'Teamanmeldung',
+		component: Teamanmeldung,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Teamanmeldung',
+		},
+	},
+
+	{
+		path: '/Manage',
+		name: 'Manage',
+		component: Manage,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		},
+	},
+
+	{
+		path: '/Manage/:id',
+		name: 'ManageTournament',
+		component: ManageTournament,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		},
+	},
+	
 ];
 
 const router = createRouter({

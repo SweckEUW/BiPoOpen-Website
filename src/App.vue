@@ -1,36 +1,38 @@
 <script lang="ts" setup>
-import AppHeader from './components/shared/AppHeader.vue';
-// import AppFooter from './components/shared/AppFooter.vue';
+import AppHeader from '@/components/shared/AppHeader.vue';
+// import AppFooter from '@/components/shared/AppFooter.vue';
 
 import { onBeforeMount } from 'vue'
 import router from './router.js';
+import axios from "axios";
 
 onBeforeMount(() => {
-  let path = localStorage.getItem('path');
-  if(path){
-    localStorage.removeItem('path');
-    router.push(path);
-  }
+	// Configure Axios
+	axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL;
+
+	// Redirect
+	let path = localStorage.getItem('path');
+	if(path){
+		localStorage.removeItem('path');
+		router.push(path);
+	}
 })
 </script>
 
 <template>
-	<transition name="fadeStart" appear>
-		<div>
-			<!-- App header -->
-			<AppHeader/>
+	<!-- App header -->
+	<AppHeader/>
 
-			<!-- Render active component contents with vue transition -->
-			<router-view v-slot="{ Component }">
-				<!-- <transition name="fade" mode="out-in"> -->
-					<component :is="Component"/>
-				<!-- </transition> -->
-			</router-view>
+	<div class="Page">
+		<router-view v-slot="{ Component }">
+			<transition name="fade-page" mode="out-in">
+				<component :is="Component"/>
+			</transition>
+		</router-view>
+	</div>
 
-			<!-- App footer -->
-			<!-- <AppFooter/> -->
-		</div>
-	</transition>
+	<!-- App footer -->
+	<!-- <AppFooter/> -->
 </template>
 
 <style>
@@ -52,21 +54,19 @@ a{
 	text-decoration: none;
 	color: black;
 }
-
-.fadeStart-enter-active, .fadeStart-leave-active {
-  transition: 1s opacity 0s ease;
-}
-.fadeStart-enter-from,.fadeStart-leave-to {
-  opacity: 0;
+.Page{
+	margin-top: 100px;
+	padding-bottom: 100px;
+	min-height: calc(100vh - 300px - 80px);
 }
 
 /* Transition Animations */
-.fade-enter-active {
+.fade-page-enter-active {
 	animation: coming 0.4s;
 	animation-delay: 0.2s;
 	opacity: 0;
 }
-.fade-leave-active {
+.fade-page-leave-active {
 	animation: going 0.4s;
 }
 @keyframes going {
@@ -87,5 +87,13 @@ a{
 		transform: translateX(0px);
 		opacity: 1;
 	}
+}
+
+/* Fade Transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>
