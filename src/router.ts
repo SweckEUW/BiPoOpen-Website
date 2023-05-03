@@ -4,7 +4,7 @@ import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
 import Manage from '@/components/manage/_Manage.vue'
 import ManageTournament from '@/components/manage/tournament/_ManageTournament.vue'
-import Teamanmeldung from '@/components/Teamanmeldung/_Teamanmeldung.vue'
+import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
 	{
