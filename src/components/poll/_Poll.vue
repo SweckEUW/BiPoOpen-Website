@@ -12,9 +12,7 @@
 .strawpoll-embed{
     display: flex;
     justify-content: center;
-    margin-top: 80px;
-    margin-bottom: 50px;
-    height: calc(100vh - 80px - 50px);
+    height: calc(100vh - 200px);
 }
 iframe{
     height: 100%;

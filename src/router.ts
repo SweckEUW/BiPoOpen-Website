@@ -4,6 +4,7 @@ import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
 import Manage from '@/components/manage/_Manage.vue'
 import ManageTournament from '@/components/manage/tournament/_ManageTournament.vue'
+import Teamanmeldung from '@/components/Teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
 	{
@@ -34,6 +35,15 @@ const routes = [
 	},
 
 	{
+		path: '/Teamanmeldung',
+		name: 'Teamanmeldung',
+		component: Teamanmeldung,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Teamanmeldung',
+		},
+	},
+
+	{
 		path: '/Manage',
 		name: 'Manage',
 		component: Manage,
@@ -50,15 +60,7 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Manage',
 		},
 	},
-
-	// {
-	// 	path: '/Manage/:id/Something',
-	// 	name: 'ManageTournament',
-	// 	component: ManageTournament,
-	// 	meta: {
-	// 		title: 'Weck BiPo Open 2023 - Manage',
-	// 	},
-	// },
+	
 ];
 
 const router = createRouter({

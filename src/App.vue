@@ -55,7 +55,7 @@ a{
 	color: black;
 }
 .Page{
-	margin-top: 200px;
+	margin-top: 100px;
 	padding-bottom: 100px;
 	min-height: calc(100vh - 300px - 80px);
 }
