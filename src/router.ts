@@ -4,7 +4,7 @@ import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
 import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
 import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
-import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
+// import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
 	{
@@ -35,15 +35,6 @@ const routes = [
 	},
 
 	{
-		path: '/Teamanmeldung',
-		name: 'Teamanmeldung',
-		component: Teamanmeldung,
-		meta: {
-			title: 'Weck BiPo Open 2023 - Teamanmeldung',
-		},
-	},
-
-	{
 		path: '/Manage',
 		name: 'Manage',
 		component: ManageTournaments,
@@ -60,6 +51,15 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Manage',
 		},
 	},
+
+	// {
+	// 	path: '/Teamanmeldung',
+	// 	name: 'Teamanmeldung',
+	// 	component: Teamanmeldung,
+	// 	meta: {
+	// 		title: 'Weck BiPo Open 2023 - Teamanmeldung',
+	// 	},
+	// },
 	
 ];
 
