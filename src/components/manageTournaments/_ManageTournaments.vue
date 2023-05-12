@@ -14,7 +14,11 @@ const getTournaments = async () => {
 getTournaments();
 
 const createTournament = async () => {
-    let response = await axios.post("/createTournament", {name: tournamentName.value});
+    let tournament = {
+        name: tournamentName.value,
+        teams: [],
+    }
+    let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);
     if(response.data.success){
         await getTournaments();
@@ -38,7 +42,7 @@ let tournamentName = ref();
         <Transition name="fade">
             <Modal v-if="showModal">
                 <template #title>Neues Turnier erstellen</template>
-                <template #input>
+                <template #template>
                     <div>Turniername</div>
                     <input type="text" v-model="tournamentName">
                 </template>

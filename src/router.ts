@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/home/_Home.vue'
 import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
-import Manage from '@/components/manage/_Manage.vue'
-import ManageTournament from '@/components/manage/tournament/_ManageTournament.vue'
+import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
+import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
 import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
@@ -46,7 +46,7 @@ const routes = [
 	{
 		path: '/Manage',
 		name: 'Manage',
-		component: Manage,
+		component: ManageTournaments,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
 		},
@@ -55,7 +55,7 @@ const routes = [
 	{
 		path: '/Manage/:id',
 		name: 'ManageTournament',
-		component: ManageTournament,
+		component: ManageSingleTournament,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
 		},

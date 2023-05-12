@@ -51,13 +51,15 @@ body{
 }
 
 a{
-	text-decoration: none;
-	color: black;
+	text-decoration: none !important;
+	color: black !important; 
 }
 .Page{
+	margin: auto;
 	margin-top: 100px;
 	padding-bottom: 100px;
 	min-height: calc(100vh - 300px - 80px);
+	width: 90%;
 }
 
 /* Transition Animations */
