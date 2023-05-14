@@ -16,7 +16,40 @@ getTournaments();
 const createTournament = async () => {
     let tournament = {
         name: tournamentName.value,
-        teams: [],
+        settings: {
+            groupPhase: {
+                fixedGroupAmmount: 8,
+            },
+            koPhase: {
+                ammountOfAdvancingTeams: 2
+            }
+        },
+        teams: [
+            {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
+            {name: "Grün Weiß Altglas", players: ["Joel Kiwitt", "René Manke"]},
+            {name: "Team MöpMöp", players: ["Leon Rose", "Jonas Weck"]},
+            {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
+            {name: "Eintracht Prügel", players: ["Alexander Borsix", "Björn Harz"]},
+            {name: "Team Sunburn", players: ["David Jones", "Marco Radziej"]},
+            {name: "Schauf & Berger", players: ["Jens Schauf", "Marius Berger"]},
+            {name: "Sex-Touristen", players: ["Marius Grote", "Leonard Südbrock"]},
+            {name: "AS Koma", players: ["Antonio Melechi", "Yannick ?"]},
+            {name: "Die Beatmungsgeräte", players: ["Sham Hasso", "Nur-Sena Yildiz"]},
+            {name: "Taktisches Vorrundenaus", players: ["Giulia Sanio", "Jana Meerbecker"]},
+            {name: "Für Gigolo", players: ["Stefan Linke", "Marvin Brinkrolf"]},
+            {name: "Team Anime", players: ["Paul Falkenreck", "Anica Hollenbeck"]},
+            {name: "Peter Pong & Trinkerbell", players: ["Svenja Förster", "Pascal Kurz"]},
+            {name: "Rosenbaum & Grahl", players: ["Cornelius Rosenbaum", "Hanna Grahl"]},
+            {name: "Die Narren", players: ["Matthias Weck", "Lennard Kaffitz"]},
+            {name: "One Punsh Bitches", players: ["Fritz Falkenreck", "Jenny ?"]},
+            {name: "Breuker & Heuser", players: ["Leon Breuker", "Ruben Heuser"]},
+            {name: "Müller & Straub", players: ["Anna Müller", "Leo Straub"]},
+            {name: "Wohlfahrt & Brandt", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
+            {name: "Becker & Gödde", players: ["Jannick Becker", "Steffen Gödde"]},
+            {name: "Langer & ?", players: ["Michelle Langer", "Maya ?"]},
+            {name: "Steinkemper & ?", players: ["Alexander Steinkemper", "?"]},
+            {name: "Junker & ?", players: ["Peter Junger", "?"]}
+        ],
     }
     let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);

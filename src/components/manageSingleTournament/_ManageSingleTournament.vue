@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ParticipantsTab from '@/components/manageSingleTournament/ParticipantsTab.vue';
+import LayoutTab from '@/components/manageSingleTournament/LayoutTab.vue';
+import GameScheduleTab from '@/components/manageSingleTournament/GameScheduleTab.vue';
 
 import axios from "axios";
 import { ref } from "vue"
@@ -38,13 +40,13 @@ getTournament();
       <!-- Content -->
       <div class="tab-content" id="myTabContent">
          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-            <ParticipantsTab :tournament="tournament"/>
+            <ParticipantsTab/>
          </div>
          <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-            
+            <LayoutTab/>  
          </div>
          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-            
+            <GameScheduleTab/>
          </div>
       </div>
 

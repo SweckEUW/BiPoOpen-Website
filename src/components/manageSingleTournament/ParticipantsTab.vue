@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import { ref } from "vue"
+import {ref} from "vue"
 import {useRoute} from "vue-router";
 
 import Modal from '@/components/shared/Modal.vue';
@@ -21,7 +21,6 @@ const clearInputs = () => {
    player1Input.value = "";
    player2Input.value = "";
 }
-
 
 let showModalCreateTeam = ref(false);
 const toggleModalCreateTeam = () => {
@@ -47,7 +46,7 @@ const toggleModalEditTeam = (team?: any) => {
 let teamnameInput = ref("");
 let player1Input = ref("");
 let player2Input = ref("");
-   const addTeam = async () => {
+const addTeam = async () => {
    let teamname = teamnameInput.value;
    let players = [player1Input.value, player2Input.value];
    let response = await axios.post("/addTeam", {tournamentID: tournament.value._id, team: {name: teamname, players: players}})
