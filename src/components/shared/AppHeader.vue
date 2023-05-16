@@ -24,16 +24,6 @@ const scrollToTop = () => {
 
 		<router-link to="/" @click="scrollToTop()">Weck BiPo Open 2023</router-link>
 
-		<!-- <div class="ap-left">
-			<router-link to="/" @click="scrollToTop()">[Simon Weck]</router-link>
-		</div>
-		
-		<div class="ap-right">
-			<router-link to="/Work">[Work]</router-link>
-			<router-link to="/About">[About Me]</router-link>
-			<router-link to="/Contact">[Contact]</router-link>
-		</div>
-
 		<div class="ap-burger" @click="toggleBurgerMenu()">
 			<div class="bar1"></div>
 			<div class="bar2"></div>
@@ -42,12 +32,10 @@ const scrollToTop = () => {
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-burger-menu" v v-show="showBurger">
-				<div class="ap-burger" @click="toggleBurgerMenu()"/>
-				<router-link @click="toggleBurgerMenu()" to="/Work">[Work]</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/About">[About Me]</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/Contact">[Contact]</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/Zeitplan">Zeitplan</router-link>
 			</div>
-		</transition> -->
+		</transition>
 
 	</div>
 </template>
@@ -74,17 +62,16 @@ const scrollToTop = () => {
 .ap-burger-menu{
 	display: none;
 }
-/* a{
+a{
 	display: inline-block;
 	cursor: pointer;
 	transition: .3s color ease;
 	text-align: center;
-    color: white;
+    color: white !important; 
     text-shadow: 0px 0px 10px rgba(0,0,0,0.6), 0px 0px 5px rgba(0,0,0,0.6);
 	margin: 0;
-	margin-bottom: 50px;
-	margin: 0 15px;
-	font-size: 1.5vw;
+	margin-bottom: 20px;
+	font-size: 30px !important;
 }
 a:first-child{
 	margin-left: 0;
@@ -94,7 +81,8 @@ a:last-child{
 }
 a:hover{
 	color: rgb(160, 160, 160);
-} */
+}
+
 /*MOBILE*/
 @media (width <= 900px){
 	.AppHeader{
@@ -114,6 +102,7 @@ a:hover{
 		position: absolute;
 		right: 0;
 		z-index: 99;
+		top: 24px;
 	}
 	.ap-burger-menu{
 		display: block;

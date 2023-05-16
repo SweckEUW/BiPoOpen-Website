@@ -3,12 +3,10 @@
 </script>
 
 <template>
-    <h1>Coming Soon</h1>
+    <div>
+        
+    </div>
 </template>
 
 <style scoped>
-h1{
-    width: 100%;
-    text-align: center;
-}
 </style>

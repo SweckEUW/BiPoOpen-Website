@@ -2,9 +2,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/home/_Home.vue'
 import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
-import Manage from '@/components/manage/_Manage.vue'
-import ManageTournament from '@/components/manage/tournament/_ManageTournament.vue'
-import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
+import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
+import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
+import Schedule from '@/components/schedule/_Schedule.vue'
+import Standings from '@/components/standings/_Standings.vue'
+// import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
 	{
@@ -13,7 +15,7 @@ const routes = [
 		component: Home,
 		meta: {
 			title: 'Weck BiPo Open 2023',
-		},
+		}
 	},
 
 	{
@@ -22,7 +24,7 @@ const routes = [
 		component: Poll,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
-		},
+		}
 	},
 
 	{
@@ -31,35 +33,53 @@ const routes = [
 		component: Plan,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Plan',
-		},
-	},
-
-	{
-		path: '/Teamanmeldung',
-		name: 'Teamanmeldung',
-		component: Teamanmeldung,
-		meta: {
-			title: 'Weck BiPo Open 2023 - Teamanmeldung',
-		},
+		}
 	},
 
 	{
 		path: '/Manage',
 		name: 'Manage',
-		component: Manage,
+		component: ManageTournaments,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
-		},
+		}
 	},
 
 	{
 		path: '/Manage/:id',
 		name: 'ManageTournament',
-		component: ManageTournament,
+		component: ManageSingleTournament,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
-		},
+		}
 	},
+
+	{
+		path: '/Zeitplan',
+		name: 'Schedule',
+		component: Schedule,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	},
+
+	{
+		path: '/Platzierungen',
+		name: 'Standings',
+		component: Standings,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	}
+
+	// {
+	// 	path: '/Teamanmeldung',
+	// 	name: 'Teamanmeldung',
+	// 	component: Teamanmeldung,
+	// 	meta: {
+	// 		title: 'Weck BiPo Open 2023 - Teamanmeldung',
+	// 	},
+	// },
 	
 ];
 

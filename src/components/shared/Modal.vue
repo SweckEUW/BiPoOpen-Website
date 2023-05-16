@@ -7,7 +7,7 @@
         <div class="mo-container">
             <div class="mo-title"><slot name="title">Title</slot></div>
 
-            <div class="mo-input"><slot name="input">Title</slot></div>
+            <div class="mo-template"><slot name="template">Content</slot></div>
 
             <div class="mo-buttons">
                 <div class="mo-button" style="margin-right: 5px" v-if="$slots.cancle"><slot name="cancle">Cancle</slot></div>
@@ -27,6 +27,7 @@
     width: 100vw;
     height: 100vh;
     top: 0;
+    left: 0;
     background: rgba(0, 0, 0, 0.8);
 }
 .mo-container{
@@ -40,19 +41,32 @@
     margin-bottom: 20px;
 }
 
-/* Input */
-.mo-input div{
+/* Template */
+.mo-template div{
     font-size: 18px;
 }
-.mo-input input{
+.mo-template input{
     color: black;
     margin-bottom: 20px;
-    width: calc(100% - 10px);     /* Padding left & right 5 px */
+    width: 100%;     /* Padding left & right 5 px */
     padding: 5px;
     border: 1px solid black;
     border-radius: 2px;
     font-size: 18px;
     outline: none;
+}
+.mo-template button{
+    background: purple;
+    padding: 20px;
+    cursor: pointer;
+    color: white;
+    text-align: center;
+    width: 100%;
+    border: none;
+    margin-bottom: 20px;
+}
+.mo-template button:hover{
+    background: rgb(75, 0, 75);
 }
 
 /* Buttons */

@@ -50,7 +50,7 @@ getTeams();
         <div class="ta-answers">
             <div class="ta-form-title">Angemeldete Teams</div>
 
-            <div v-for="team in teams" :key="team._id" class="ta-answer-team">
+            <div v-for="team in teams" class="ta-answer-team">
                 <div>
                     <div class="ta-answer-heading">Teamname:</div>
                     <div class="ta-answer-data">{{ team.name }}</div>
@@ -80,7 +80,7 @@ getTeams();
 
 /* Form */
 .ta-form{
-    width: 300px;
+    width: 500px;
 }
 .ta-form-title{
     font-size: 24px;
@@ -117,8 +117,8 @@ getTeams();
 
 /* Answers */
 .ta-answers{
+    width: 500px;
     margin-top: 50px;
-    width: 90%;
     font-size: 17px;
 }
 .ta-answer-team{
@@ -139,7 +139,9 @@ getTeams();
 @media (width <= 900px){
 	.ta-form{
         width: 90%;
-        font-size: 20px;
+    }
+    .ta-answers{
+        width: 90%;
     }
 }
 </style>
