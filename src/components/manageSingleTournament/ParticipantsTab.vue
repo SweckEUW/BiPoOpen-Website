@@ -1,20 +1,10 @@
 <script setup lang="ts">
 import axios from "axios";
 import {ref} from "vue"
-import {useRoute} from "vue-router";
 
 import Modal from '@/components/shared/Modal.vue';
 
-const route = useRoute();
-let tournament = ref({name: "", teams: []});
-const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      tournament.value = response.data.tournaments.find((tournament: any) => tournament.name == route.params.id.replaceAll("-"," "));
-   }     
-}
-getTournament();
+const props = defineProps(['getTournament','tournament'])
 
 const clearInputs = () => {
    teamnameInput.value = "";
@@ -49,10 +39,10 @@ let player2Input = ref("");
 const addTeam = async () => {
    let teamname = teamnameInput.value;
    let players = [player1Input.value, player2Input.value];
-   let response = await axios.post("/addTeam", {tournamentID: tournament.value._id, team: {name: teamname, players: players}})
+   let response = await axios.post("/addTeam", {tournamentID: props.tournament._id, team: {name: teamname, players: players}})
    console.log(response.data.message);
    if(response.data.success){
-      getTournament();
+      props.getTournament();
       toggleModalCreateTeam();
    }
 }
@@ -61,19 +51,19 @@ let selectedTeam = ref();
 const editTeam = async () => {
    let teamname = teamnameInput.value;
    let players = [player1Input.value, player2Input.value];
-   let response = await axios.post("/editTeam", {tournamentID: tournament.value._id, selectedTeamName: selectedTeam.value.name, team: {name: teamname, players: players}})
+   let response = await axios.post("/editTeam", {tournamentID: props.tournament._id, selectedTeamName: selectedTeam.value.name, team: {name: teamname, players: players}})
    console.log(response.data.message);
    if(response.data.success){
-      getTournament();
+      props.getTournament();
       toggleModalEditTeam();
    }
 }
 
 const removeTeam = async () => {
-   let response = await axios.post("/removeTeam", {tournamentID: tournament.value._id, selectedTeamName: selectedTeam.value.name});
+   let response = await axios.post("/removeTeam", {tournamentID: props.tournament._id, selectedTeamName: selectedTeam.value.name});
    console.log(response.data.message);
    if(response.data.success){
-      getTournament();
+      props.getTournament();
       toggleModalEditTeam();
    }
 }
@@ -141,11 +131,11 @@ const removeTeam = async () => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team, id) in tournament.teams" :key="team.name" @click="toggleModalEditTeam(team)">
+            <tr v-for="(team, id) in props.tournament?.teams" @click="toggleModalEditTeam(team)">
                <th scope="row">{{ id + 1 }}</th>
                <td>{{team.name}}</td>
                <td>
-                  <span v-for="player in team.players" :key="player" style="margin-right: 15px">{{player}}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px">{{player}}</span>
                </td>
             </tr>
          </tbody>

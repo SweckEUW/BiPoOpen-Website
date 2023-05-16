@@ -13,10 +13,10 @@ axios.get("https://bipoopen-backend.vercel.app/teams").then(response =>{ //http:
 <template>
     <div class="Page">
         <h1>Teams</h1>
-        <div v-for="team in teams" :key="team._id">
+        <div v-for="team in teams">
             <div>{{ "Name: " + team.name }}</div>
             <div style="display: inline">Players: </div>
-            <div v-for="(player,index) in team.players" :key="player" style="display: inline">{{ player + (index < team.players.length-1 ? ", " : "") }}</div>
+            <div v-for="(player,index) in team.players" style="display: inline">{{ player + (index < team.players.length-1 ? ", " : "") }}</div>
         </div>
     </div>
 </template>

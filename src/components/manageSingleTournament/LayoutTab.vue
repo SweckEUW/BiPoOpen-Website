@@ -1,53 +1,77 @@
 <script setup lang="ts">
 import axios from "axios";
-import {ref} from "vue"
-import {useRoute} from "vue-router";
+import Sortable from "sortablejs";
 
-const route = useRoute();
-let tournament = ref({name: "", teams: []});
-const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      tournament.value = response.data.tournaments.find((tournament: any) => tournament.name == route.params.id.replaceAll("-"," "));
-   }     
+const props = defineProps(['getTournament','tournament'])
+
+const onDragEnd = async () => {
+   // 1. Construct Groups Array from DOM
+   let groups:any = [];
+
+   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+   for (let i = 0; i < groupAmmount; i++){
+      let teams:any = [];
+      let groupDOM:any = document.getElementById("Group-"+i);
+      let tbody:any = groupDOM.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+      for (let y = 0; y < tbody.length; y++) {
+
+         let playersDOM = tbody[y].getElementsByTagName("td")[1].getElementsByTagName("span");
+         let players:any = [];
+         for (let x = 0; x < playersDOM.length; x++)
+            players.push(playersDOM[x].innerText);
+
+         teams.push({
+            name: tbody[y].getElementsByTagName("td")[0].innerText,
+            players: players
+         });
+      }
+
+      groups.push({teams: teams});
+   }
+
+   // 2. Set Groups in Database
+   setGroups(groups);
 }
-getTournament();
 
-const setGroups = async () => {
-   await getTournament();
+const initSortable = () => {
+   setTimeout(() => {
+      let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+      for (let i = 0; i < groupAmmount; i++){
+         let groupDOM:any = document.getElementById("Group-"+i);
+         let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
+         new Sortable(tbody, {
+            animation: 150,
+            group: 'shared',
+            onEnd: onDragEnd,
+         });
+      }
+   }, 500);
+}
+initSortable();
+
+const generateGroups = async () => {
+   await props.getTournament();
 
    // Generate Groups
    let groups:any = [];
-   let teams:any = shuffleArray(tournament.value.teams);
+   let teams:any = shuffleArray(props.tournament.teams);
 
    // Case: Fixed ammount of Groups
-   let groupAmmount:number = tournament.value.settings.groupPhase.fixedGroupAmmount;
+   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
    for (let i = 0; i < groupAmmount; i++)
-      groups.push([]);
+      groups.push({teams: []});
    for (let i = 0; i < teams.length; i++)
-      groups[i%groupAmmount].push(teams[i]);
+      groups[i%groupAmmount].teams.push(teams[i]);
    
+   // Set Groups in Database
+   setGroups(groups);
+}
 
-   // // Case: Fixed ammount of Players in Group
-   // let groupSize:number = tournament.value.settings.groupPhase.groupSize;
-   // let group:any = [];
-   // for (let i = 0; i < teams.length; i++) {
-   //    group.push(teams[i]);
-   //    if(i % groupSize == groupSize-1){
-   //       groups.push(group);
-   //       group = [];
-   //    }
-   // }
-   // // Edgecase: Teams not perfectly 
-   // if(teams.length % groupSize == 0){
-
-   // }
-   
-   let response = await axios.post("/setGroups", {tournamentID: tournament.value._id, groups: groups})
+const setGroups = async (groups:any) => {
+   let response = await axios.post("/setGroups", {tournamentID: props.tournament._id, groups: groups})
    console.log(response.data.message);
    if(response.data.success){
-      getTournament();
+      props.getTournament();
    }     
 }
 
@@ -69,15 +93,15 @@ const shuffleArray = (array:any) => {
       <!-- TODO: Einstellung von Optionen (Gruppengröße) -->
       <!-- <div>{{"Teilnehmer pro Gruppe: " + tournament.value?.settings.groupPhase.groupSize}}</div> -->
       
-      <div class="lt-button" @click="setGroups()">Gruppen Generieren</div>
+      <div class="lt-button" @click="generateGroups()">Gruppen Generieren</div>
 
       <!-- Groups -->
       <div class="lt-groups">
-         <div style="margin-bottom: 20px; font-size: 28px;">Groups</div>
+         <div style="margin-bottom: 20px; font-size: 28px;">Gruppen</div>
 
          <div class="lt-groups-container">
 
-            <table class="table table-hover caption-top" v-for="(group,index) in tournament.groups" :key="index">
+            <table class="table table-hover caption-top" v-for="(group,index) in props.tournament?.groupPhase?.groups" :id="'Group-' + index" :key="index">
                <caption>{{"Gruppe "+ (index + 1)}}</caption>
                <thead>
                   <tr>
@@ -87,11 +111,11 @@ const shuffleArray = (array:any) => {
                   </tr>
                </thead>
                <tbody>
-                  <tr v-for="(team, id) in group" :key="id">
-                     <th scope="row">{{id + 1}}</th>
+                  <tr v-for="(team,id) in group.teams" :key="team">
+                     <th scope="row">{{id+1}}</th>
                      <td>{{team.name}}</td>
                      <td>
-                        <span v-for="player in team.players" :key="player" style="margin-right: 15px">{{player}}</span>
+                        <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{player}}</span>
                      </td>
                   </tr>
                </tbody>
@@ -117,7 +141,11 @@ const shuffleArray = (array:any) => {
 .lt-groups{
    margin-top: 50px;
 }
-.lt-groups-container{
-   /* display: flex; */
+table {
+   table-layout: fixed;
+   word-wrap: break-word;
+}
+th:first-of-type{
+   width: 100px;
 }
 </style>

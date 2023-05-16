@@ -16,12 +16,9 @@ getTournaments();
 const createTournament = async () => {
     let tournament = {
         name: tournamentName.value,
-        settings: {
-            groupPhase: {
-                fixedGroupAmmount: 8,
-            },
-            koPhase: {
-                ammountOfAdvancingTeams: 2
+        groupPhase: {
+            settings: {
+                fixedGroupAmmount: 8
             }
         },
         teams: [
@@ -70,7 +67,7 @@ let tournamentName = ref();
 <template>
     <div class="Manage">
         <div class="ma-create" @click="toggleModal()">Neues Turnier erstellen</div>
-        <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament._id">{{ tournament.name }}</router-link>
+        <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments">{{ tournament.name }}</router-link>
 
         <Transition name="fade">
             <Modal v-if="showModal">

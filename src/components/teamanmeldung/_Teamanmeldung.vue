@@ -50,7 +50,7 @@ getTeams();
         <div class="ta-answers">
             <div class="ta-form-title">Angemeldete Teams</div>
 
-            <div v-for="team in teams" :key="team._id" class="ta-answer-team">
+            <div v-for="team in teams" class="ta-answer-team">
                 <div>
                     <div class="ta-answer-heading">Teamname:</div>
                     <div class="ta-answer-data">{{ team.name }}</div>
