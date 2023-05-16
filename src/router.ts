@@ -4,6 +4,8 @@ import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
 import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
 import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
+import Schedule from '@/components/schedule/_Schedule.vue'
+import Standings from '@/components/standings/_Standings.vue'
 // import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
@@ -13,7 +15,7 @@ const routes = [
 		component: Home,
 		meta: {
 			title: 'Weck BiPo Open 2023',
-		},
+		}
 	},
 
 	{
@@ -22,7 +24,7 @@ const routes = [
 		component: Poll,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
-		},
+		}
 	},
 
 	{
@@ -31,7 +33,7 @@ const routes = [
 		component: Plan,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Plan',
-		},
+		}
 	},
 
 	{
@@ -40,7 +42,7 @@ const routes = [
 		component: ManageTournaments,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
-		},
+		}
 	},
 
 	{
@@ -49,8 +51,26 @@ const routes = [
 		component: ManageSingleTournament,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
-		},
+		}
 	},
+
+	{
+		path: '/Zeitplan',
+		name: 'Schedule',
+		component: Schedule,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	},
+
+	{
+		path: '/Platzierungen',
+		name: 'Standings',
+		component: Standings,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	}
 
 	// {
 	// 	path: '/Teamanmeldung',
