@@ -93,7 +93,7 @@ const shuffleArray = (array:any) => {
       <!-- TODO: Einstellung von Optionen (Gruppengröße) -->
       <!-- <div>{{"Teilnehmer pro Gruppe: " + tournament.value?.settings.groupPhase.groupSize}}</div> -->
       
-      <div class="lt-button" @click="generateGroups()">Gruppen Generieren</div>
+      <div class="bp-button" @click="generateGroups()">Gruppen Generieren</div>
 
       <!-- Groups -->
       <div class="lt-groups">
@@ -127,17 +127,6 @@ const shuffleArray = (array:any) => {
 </template>
 
 <style scoped>
-.lt-button{
-   padding: 20px;
-   background: purple;
-   cursor: pointer;
-   color: white;
-   text-align: center;
-   margin-bottom: 50px;
-}
-.lt-button:hover{
-   background: rgb(80, 0, 80);
-}
 .lt-groups{
    margin-top: 50px;
 }

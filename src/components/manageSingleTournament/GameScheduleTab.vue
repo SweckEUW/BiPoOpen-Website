@@ -85,7 +85,7 @@ const shuffleArray = (array:any) => {
 <template>
    <div class="GameScheduleTab">
 
-      <div class="gst-button" @click="generateMatches()">Matches Generieren</div>
+      <div class="bp-button" @click="generateMatches()">Matches Generieren</div>
 
       <table class="table table-hover caption-top" v-for="tableIndex in props.tournament?.groupPhase?.settings.fixedGroupAmmount" :key="tableIndex" :id="'Match-Table-' + tableIndex">
          <caption>{{ "Tisch " +  tableIndex}}</caption>
@@ -100,10 +100,10 @@ const shuffleArray = (array:any) => {
          <tbody>
             <tr v-for="(match,matchIndex) in props.tournament?.groupPhase.matches[tableIndex-1]" :key="props.tournament?.groupPhase.matches[tableIndex-1][matchIndex]">
                <td scope="row">{{matchIndex+1}}</td>
-               <td :style="{'color' : match.result ? match.result.team1 > match.result.team2 ? 'green' : 'red' : ''}">{{match.team1.name}}</td>
+               <td :style="{'color' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{match.team1.name}}</td>
                <td v-if="!match.result">{{"vs"}}</td>
-               <td v-else>{{match.result.team1 + " - " + match.result.team2}}</td>
-               <td :style="{'color' : match.result ? match.result.team2 > match.result.team1 ? 'green' : 'red' : ''}">{{match.team2.name}}</td>
+               <td v-else>{{match.result.team1Score + " - " + match.result.team2Score}}</td>
+               <td :style="{'color' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{match.team2.name}}</td>
             </tr>
          </tbody>
       </table>
@@ -112,18 +112,6 @@ const shuffleArray = (array:any) => {
 </template>
 
 <style scoped>
-.gst-button{
-   padding: 20px;
-   background: purple;
-   cursor: pointer;
-   color: white;
-   text-align: center;
-   margin-bottom: 50px;
-}
-.gst-button:hover{
-   background: rgb(80, 0, 80);
-}
-
 table {
    table-layout: fixed;
    word-wrap: break-word;

@@ -72,7 +72,7 @@ const removeTeam = async () => {
 <template>
    <div class="ParticipantsTab">
       
-      <div class="pt-create" @click="toggleModalCreateTeam()">Team hinzufügen</div>
+      <div class="bp-button" @click="toggleModalCreateTeam()">Team hinzufügen</div>
 
       <!-- Add -->
       <Transition name="fade">
@@ -145,15 +145,4 @@ const removeTeam = async () => {
 </template>
 
 <style scoped>
-.pt-create{
-   padding: 20px;
-   background: purple;
-   cursor: pointer;
-   color: white;
-   text-align: center;
-   margin-bottom: 50px;
-}
-.pt-create:hover{
-   background: rgb(80, 0, 80);
-}
 </style>

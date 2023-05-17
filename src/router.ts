@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/home/_Home.vue'
-import Plan from '@/components/plan/_Plan.vue'
 import Poll from '@/components/poll/_Poll.vue'
 import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
 import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
 import Schedule from '@/components/schedule/_Schedule.vue'
 import Standings from '@/components/standings/_Standings.vue'
+import MVP from '@/components/mvp/_MVP.vue'
 // import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 const routes = [
@@ -24,15 +24,6 @@ const routes = [
 		component: Poll,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
-		}
-	},
-
-	{
-		path: '/Plan',
-		name: 'Plan',
-		component: Plan,
-		meta: {
-			title: 'Weck BiPo Open 2023 - Plan',
 		}
 	},
 
@@ -59,7 +50,7 @@ const routes = [
 		name: 'Schedule',
 		component: Schedule,
 		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
+			title: 'Weck BiPo Open 2023 - Zeitplan',
 		}
 	},
 
@@ -68,7 +59,16 @@ const routes = [
 		name: 'Standings',
 		component: Standings,
 		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
+			title: 'Weck BiPo Open 2023 - Platzierungen',
+		}
+	},
+
+	{
+		path: '/MVP',
+		name: 'MVP',
+		component: MVP,
+		meta: {
+			title: 'Weck BiPo Open 2023 - MVP',
 		}
 	}
 

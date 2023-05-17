@@ -5,7 +5,7 @@ import GameScheduleTab from '@/components/manageSingleTournament/GameScheduleTab
 import ResultsTab from '@/components/manageSingleTournament/ResultsTab.vue';
 
 import axios from "axios";
-import { ref } from "vue"
+import {ref} from "vue"
 import {useRoute} from "vue-router";
 
 const route = useRoute();
@@ -23,7 +23,7 @@ getTournament();
 
 <template>
    <div class="ManageTournament">
-      <h1>{{tournament.name}}</h1>
+      <h1>{{ 'Turnier: ' + tournament.name}}</h1>
 
       <!-- Tabs -->
       <ul class="nav nav-tabs" id="myTab" role="tablist">

@@ -38,6 +38,13 @@ onBeforeMount(() => {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100&display=swap');
 
+:root {
+  --main-color: red;
+  --main-color-hover: rgb(87, 0, 0);
+  --result-red: rgb(252, 98, 98);
+  --result-green: rgb(135, 206, 118);
+}
+
 body{
 	font-family: Overpass, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
@@ -52,7 +59,6 @@ body{
 
 a{
 	text-decoration: none !important;
-	color: black !important; 
 }
 .Page{
 	margin: auto;
@@ -60,6 +66,19 @@ a{
 	padding-bottom: 100px;
 	min-height: calc(100vh - 300px - 80px);
 	width: 90%;
+}
+
+.bp-button{
+	padding: 20px;
+	background: var(--main-color);
+	cursor: pointer;
+	color: white;
+	text-align: center;
+	margin-bottom: 50px;
+	transition: .3s background ease;
+}
+.bp-button:hover{
+	background: var(--main-color-hover);
 }
 
 /* Transition Animations */
