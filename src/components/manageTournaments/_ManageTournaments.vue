@@ -43,9 +43,17 @@ const createTournament = async () => {
             {name: "Müller & Straub", players: ["Anna Müller", "Leo Straub"]},
             {name: "Wohlfahrt & Brandt", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
             {name: "Becker & Gödde", players: ["Jannick Becker", "Steffen Gödde"]},
-            {name: "Langer & ?", players: ["Michelle Langer", "Maya ?"]},
+            {name: "Blau wie der Ozean", players: ["Michelle Langer", "Maya ?"]},
             {name: "Steinkemper & ?", players: ["Alexander Steinkemper", "?"]},
-            {name: "Junker & ?", players: ["Peter Junger", "?"]}
+            {name: "Junker & ?", players: ["Peter Junger", "?"]},
+            {name: "Pohlmann & Raik", players: ["Philipp Pohlman", "Raik"]},
+            {name: "Kreimer & Düser", players: ["Nico Kreimer", "Mats Düser"]},
+            {name: "Bierus Pongus", players: ["Matthias Gunter", "FassMartin"]},
+            {name: "Sanio & Happening", players: ["Marie Sanio", "Philip Happening"]},
+            {name: "Schmipf & ?", players: ["Eduard Schmipf", "?"]},
+            {name: "Seidel & ?", players: ["Robert Seidel", "?"]},
+            {name: "Förster & ?", players: ["Saskia Förster", "?"]},
+            {name: "Heitmann & Ossenbrink", players: ["Alexander Heitmann", "Jens Ossenbrink"]}
         ],
     }
     let response = await axios.post("/createTournament", tournament);
@@ -66,7 +74,8 @@ let tournamentName = ref();
 
 <template>
     <div class="Manage">
-        <div class="ma-create" @click="toggleModal()">Neues Turnier erstellen</div>
+        <div class="bp-button" @click="toggleModal()">Neues Turnier erstellen</div>
+        
         <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments">{{ tournament.name }}</router-link>
 
         <Transition name="fade">
@@ -93,17 +102,6 @@ let tournamentName = ref();
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-.ma-create{
-    padding: 20px;
-    background: purple;
-    cursor: pointer;
-    color: white;
-    text-align: center;
-    margin-bottom: 50px;
-}
-.ma-create:hover{
-    background: rgb(80, 0, 80);
 }
 .ma-tournament{
     padding: 20px;

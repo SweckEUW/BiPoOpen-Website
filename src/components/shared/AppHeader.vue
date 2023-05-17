@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { Router } from "vue-router";
 import router from '../../router.js';
 
 let showBurger = ref(false);
@@ -22,7 +21,15 @@ const scrollToTop = () => {
 <template>
 	<div class="AppHeader">
 
-		<router-link to="/" @click="scrollToTop()">Weck BiPo Open 2023</router-link>
+		<div class="ap-left">
+			<router-link to="/" @click="scrollToTop()">Weck BiPo Open 2023</router-link>
+		</div>
+		
+		<div class="ap-right">
+			<router-link to="/Platzierungen">Platzierungen</router-link>
+			<router-link to="/Zeitplan">Zeitplan</router-link>
+			<router-link to="/MVP">MVP</router-link>
+		</div>
 
 		<div class="ap-burger" @click="toggleBurgerMenu()">
 			<div class="bar1"></div>
@@ -34,6 +41,7 @@ const scrollToTop = () => {
 			<div class="ap-burger-menu" v v-show="showBurger">
 				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Zeitplan">Zeitplan</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/MVP">MVP</router-link>
 			</div>
 		</transition>
 
@@ -67,11 +75,12 @@ a{
 	cursor: pointer;
 	transition: .3s color ease;
 	text-align: center;
-    color: white !important; 
+    color: white;
     text-shadow: 0px 0px 10px rgba(0,0,0,0.6), 0px 0px 5px rgba(0,0,0,0.6);
 	margin: 0;
-	margin-bottom: 20px;
-	font-size: 30px !important;
+	margin-bottom: 50px;
+	margin: 0 15px;
+	font-size: 1.5vw;
 }
 a:first-child{
 	margin-left: 0;
@@ -88,11 +97,11 @@ a:hover{
 	.AppHeader{
 		top: 4px;
 	}
-	/* a{
+	a{
 		font-size: 28px;
 		margin: 0px !important;
 		margin-bottom: 40px !important;
-	} */
+	}
 	.ap-right{
 		display: none;
 	}
@@ -102,7 +111,6 @@ a:hover{
 		position: absolute;
 		right: 0;
 		z-index: 99;
-		top: 24px;
 	}
 	.ap-burger-menu{
 		display: block;

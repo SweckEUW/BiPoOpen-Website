@@ -56,7 +56,7 @@
     outline: none;
 }
 .mo-template button{
-    background: purple;
+    background: var(--main-color);
     padding: 20px;
     cursor: pointer;
     color: white;
@@ -66,7 +66,7 @@
     margin-bottom: 20px;
 }
 .mo-template button:hover{
-    background: rgb(75, 0, 75);
+    background: var(--main-color-hover);
 }
 
 /* Buttons */
@@ -78,13 +78,13 @@
     flex-grow: 1;
 }
 .mo-button div{
-    background: purple;
+    background: var(--main-color);
     padding: 20px;
     cursor: pointer;
     color: white;
     text-align: center;
 }
 .mo-button div:hover{
-    background: rgb(75, 0, 75);
+    background: var(--main-color-hover);
 }
 </style>
