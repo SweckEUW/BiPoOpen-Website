@@ -97,7 +97,7 @@ tbody tr:nth-of-type(2){
 }
 table td:nth-child(3) span{
     margin-right: 15px; 
-    display: inline-block;
+    display: block;
 }
 
 /*MOBILE*/
@@ -109,13 +109,16 @@ table td:nth-child(3) span{
         width: 120px;
         max-width: 120px;
     }
+    table td:nth-child(3), table th:nth-child(3){
+        display: none;
+    }
     table td:nth-child(3) span{
         margin-bottom: 4px;
         margin-right: 0px;
     }
     table td:nth-child(6){
         width: 60px;
-        max-width: 60px;
+        min-width: 60px;
     }
     caption{
         font-size: 22px;

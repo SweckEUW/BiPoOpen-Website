@@ -19,11 +19,11 @@
 
 <style>
 .Modal{
-    position: absolute;
+    position: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2;
+    z-index: 99;
     width: 100vw;
     height: 100vh;
     top: 0;

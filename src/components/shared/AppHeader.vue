@@ -50,13 +50,14 @@ const scrollToTop = () => {
 
 <style scoped>
 .AppHeader{
-	width: 90%;
+	width: 100%;
 	z-index: 99;
-	padding: 20px 0px;
 	position: fixed;
-	top: 30px;
+	top: 0px;
 	filter: drop-shadow(0px 0px 100px rgba(255, 255, 255, 0.295));
-	margin: 0 5%;
+	padding: 20px 5%;
+	padding-top: 50px;
+	background: white;
 }
 .ap-left{
 	float: left;
@@ -95,12 +96,21 @@ a:hover{
 /*MOBILE*/
 @media (width <= 900px){
 	.AppHeader{
-		top: 4px;
+		padding-top: 20px;
+		padding: 15px 2.5%;
 	}
 	a{
-		font-size: 28px;
+		font-size: 32px;
 		margin: 0px !important;
-		margin-bottom: 40px !important;
+		margin-bottom: 35px !important;
+	}
+	.ap-left a{
+		font-size: 20px;
+		margin-top: 4px !important;
+		margin-bottom: 0px !important;
+	}
+	.ap-left a:hover{
+		color: black;
 	}
 	.ap-right{
 		display: none;
@@ -109,7 +119,7 @@ a:hover{
 		display: block;
 		float: right;
 		position: absolute;
-		right: 0;
+		right: 2.5%;
 		z-index: 99;
 	}
 	.ap-burger-menu{
@@ -118,8 +128,8 @@ a:hover{
 		height: 100vh;
 		position: absolute;
 		z-index: 2;
-		left: -20px;
-    	top: -5px;
+		left: 0;
+    	top: 0;
 		display: flex;
 		justify-content: center;
 		align-items: center;

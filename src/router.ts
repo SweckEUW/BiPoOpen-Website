@@ -1,14 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/components/home/_Home.vue'
-import Poll from '@/components/poll/_Poll.vue'
-import ManageTournaments from '@/components/manageTournaments/_ManageTournaments.vue'
-import ManageSingleTournament from '@/components/manageSingleTournament/_ManageSingleTournament.vue'
-import Schedule from '@/components/schedule/_Schedule.vue'
-import Standings from '@/components/standings/_Standings.vue'
-import MVP from '@/components/mvp/_MVP.vue'
+
+// Frontend
+import Home from '@/components/frontend/routes/_Home.vue'
+import Poll from '@/components/frontend/routes/_Poll.vue'
+import Schedule from '@/components/frontend/routes/_Schedule.vue'
+import Standings from '@/components/frontend/routes/_Standings.vue'
+import MVP from '@/components/frontend/routes/_MVP.vue'
 // import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
+// Backend
+import ManageTournaments from '@/components/backend/routes/_ManageTournaments.vue'
+import ManageSingleTournament from '@/components/backend/routes/_ManageSingleTournament.vue'
+
 const routes = [
+	// Frontend
 	{
 		path: '/',
 		name: 'Home',
@@ -17,7 +22,6 @@ const routes = [
 			title: 'Weck BiPo Open 2023',
 		}
 	},
-
 	{
 		path: '/Umfrage',
 		name: 'Umfrage',
@@ -26,25 +30,6 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Umfrage',
 		}
 	},
-
-	{
-		path: '/Manage',
-		name: 'Manage',
-		component: ManageTournaments,
-		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
-		}
-	},
-
-	{
-		path: '/Manage/:id',
-		name: 'ManageTournament',
-		component: ManageSingleTournament,
-		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
-		}
-	},
-
 	{
 		path: '/Zeitplan',
 		name: 'Schedule',
@@ -53,7 +38,6 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Zeitplan',
 		}
 	},
-
 	{
 		path: '/Platzierungen',
 		name: 'Standings',
@@ -62,7 +46,6 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Platzierungen',
 		}
 	},
-
 	{
 		path: '/MVP',
 		name: 'MVP',
@@ -70,8 +53,7 @@ const routes = [
 		meta: {
 			title: 'Weck BiPo Open 2023 - MVP',
 		}
-	}
-
+	},
 	// {
 	// 	path: '/Teamanmeldung',
 	// 	name: 'Teamanmeldung',
@@ -80,7 +62,24 @@ const routes = [
 	// 		title: 'Weck BiPo Open 2023 - Teamanmeldung',
 	// 	},
 	// },
-	
+
+	// Backend
+	{
+		path: '/Manage',
+		name: 'Manage',
+		component: ManageTournaments,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	},
+	{
+		path: '/Manage/:id',
+		name: 'ManageTournament',
+		component: ManageSingleTournament,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Manage',
+		}
+	},
 ];
 
 const router = createRouter({

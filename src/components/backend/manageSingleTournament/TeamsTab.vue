@@ -125,17 +125,17 @@ const removeTeam = async () => {
       <table class="table table-hover">
          <thead>
             <tr>
-               <th scope="col">#</th>
-               <th scope="col">Teamname</th>
-               <th scope="col">Spieler</th>
+               <th>#</th>
+               <th>Teamname</th>
+               <th>Spieler</th>
             </tr>
          </thead>
          <tbody>
             <tr v-for="(team, id) in props.tournament?.teams" @click="toggleModalEditTeam(team)">
-               <th scope="row">{{ id + 1 }}</th>
-               <td>{{team.name}}</td>
+               <td>{{ id + 1 }}</td>
+               <td>{{ team.name }}</td>
                <td>
-                  <span v-for="player in team.players" style="margin-right: 15px">{{player}}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px">{{ player }}</span>
                </td>
             </tr>
          </tbody>
@@ -145,4 +145,19 @@ const removeTeam = async () => {
 </template>
 
 <style scoped>
+.bp-button{
+   margin-top: 20px;
+}
+
+table{
+   text-align: center;
+}
+table th{
+   font-size: 20px;
+   font-weight: bold;
+}
+table td:nth-child(1){
+   max-width: 20px;
+   width: 20px;
+}
 </style>
