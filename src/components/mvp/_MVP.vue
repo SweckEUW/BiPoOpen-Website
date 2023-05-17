@@ -15,7 +15,7 @@ const getTournament = async () => {
 getTournament();
 
 
-let players = ref([]);
+let players = ref();
 const getPlayers = () => {
     let playersTMP = [];
     let teams = tournament.value.teams;

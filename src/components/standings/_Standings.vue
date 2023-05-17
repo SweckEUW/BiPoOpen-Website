@@ -66,7 +66,7 @@ window.addEventListener("resize", () => {
                 <tr v-for="(team,i) in group.teams" :key="team">
                     <td>{{ i+1 }}</td>
                     <td>{{team.name}}</td>
-                    <td><span v-for="player in team.players" style="margin-right: 15px; width: 70px; display: inline-block;" :key="player">{{player}}</span></td>
+                    <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
                     <td>{{ getAmmountOfWinsFromTeam(tournament, team.name) }}</td>
                     <td>{{ getAmmountOfMatchesFromPlayer(tournament, team.players[0]) }}</td>
                     <td>{{ getAmmountOfHitsFromTeam(tournament, team) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, team) }}</td>
@@ -95,6 +95,10 @@ tbody tr:nth-of-type(2){
     background: silver;
     color: white;
 }
+table td:nth-child(3) span{
+    margin-right: 15px; 
+    display: inline-block;
+}
 
 /*MOBILE*/
 @media (width <= 900px){
@@ -104,6 +108,10 @@ tbody tr:nth-of-type(2){
     table td:nth-child(2){
         width: 120px;
         max-width: 120px;
+    }
+    table td:nth-child(3) span{
+        margin-bottom: 4px;
+        margin-right: 0px;
     }
     table td:nth-child(6){
         width: 60px;

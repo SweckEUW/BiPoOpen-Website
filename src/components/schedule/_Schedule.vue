@@ -29,16 +29,26 @@ onUnmounted(() => {
          <thead>
             <tr>
                <th>Team 1</th>
-               <th></th>
+               <th>vs.</th>
                <th>Team 2</th>
             </tr>
          </thead>
          <tbody>
             <tr v-for="(match,matchIndex) in tournament?.groupPhase.matches[tableIndex-1]" :key="tournament?.groupPhase.matches[tableIndex-1][matchIndex]">
-               <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{match.team1.name}}</td>
+               <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+                  <div>{{match.team1.name}}</div>
+                  <div v-for="player in match.team1.players">{{ player }}</div>
+               </td>
                <td v-if="!match.result">{{"vs"}}</td>
-               <td v-else>{{match.result.team1Score + " - " + match.result.team2Score}}</td>
-               <td :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{match.team2.name}}</td>
+               <td v-else class="sc-result">
+                  <div>{{match.result.team1Score + " - " + match.result.team2Score}}</div>
+                  <div>{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
+                  <div>{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
+               </td>
+               <td :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+                  <div>{{match.team2.name}}</div>
+                  <div v-for="player in match.team2.players">{{ player }}</div>
+               </td>
             </tr>
          </tbody>
       </table>
@@ -72,25 +82,43 @@ table td{
 table td:nth-child(1){
    text-align: right;
 }
+table td:nth-child(1) div, table td:nth-child(3) div, .sc-result{
+   height: 20px;
+   font-size: 14px;
+   font-style: italic;
+   color: rgb(87, 87, 87);
+}
+table td:nth-child(1) div:first-child, table td:nth-child(3) div:first-child, .sc-result div:first-child{
+   height: 55px;
+   font-size: 18px;
+   font-weight: bold;
+   color: rgb(56, 56, 56);
+   font-style: normal;
+   margin-bottom: 5px;
+}
 table td:nth-child(2){
    width: 60px;
    text-align: center;
 }
+
 table td:nth-child(3){
    text-align: left;
 }
-
 /*MOBILE*/
 @media (width <= 900px){
    table *{
       font-size: 14px;
       width: auto;
    }
-   table td:nth-child(2){
-      width: 150px;
-   }
    caption{
       font-size: 22px;
+   }
+   table td:nth-child(2){
+      width: 200px;
+   }
+   table td:nth-child(1) div:first-child, table td:nth-child(3) div:first-child, .sc-result div:first-child{
+      font-size: 14px;
+      height: 40px;
    }
 }
 </style>

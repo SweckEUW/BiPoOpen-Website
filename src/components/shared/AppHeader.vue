@@ -39,8 +39,8 @@ const scrollToTop = () => {
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-burger-menu" v v-show="showBurger">
-				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Zeitplan">Zeitplan</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/MVP">MVP</router-link>
 			</div>
 		</transition>
@@ -75,8 +75,8 @@ a{
 	cursor: pointer;
 	transition: .3s color ease;
 	text-align: center;
-    color: white;
-    text-shadow: 0px 0px 10px rgba(0,0,0,0.6), 0px 0px 5px rgba(0,0,0,0.6);
+    color: black;
+    text-shadow: 0px 0px 10px rgba(0,0,0,0.4), 0px 0px 5px rgba(0,0,0,0.3);
 	margin: 0;
 	margin-bottom: 50px;
 	margin: 0 15px;
@@ -126,14 +126,19 @@ a:hover{
 		flex-direction: column;
 		background-color: rgba(0, 0, 0, 0.9);
 	}
+	.ap-burger-menu a{
+		color: white;
+	}
 	.bar1, .bar2, .bar3 {
 		width: 35px;
 		height: 4px;
-		background-color: #ffffff;
-		filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.6)) drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
+		background-color: black;
+		filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5)) drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
 		margin: 6px 0;
 		transition: 0.4s;
-		border-radius: 5px;
+	}
+	.change .bar1, .change .bar2, .change .bar3{
+		background: white;
 	}
 	.change .bar1 {
 		transform: translate(0, 10px) rotate(-45deg);
