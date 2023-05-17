@@ -62,7 +62,7 @@ a{
 }
 .Page{
 	margin: auto;
-	margin-top: 100px;
+	margin-top: 150px;
 	padding-bottom: 100px;
 	min-height: calc(100vh - 300px - 80px);
 	width: 90%;
@@ -116,5 +116,11 @@ a{
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+@media (width <= 900px){
+	.Page{
+		margin-top: 80px;
+		width: 95%;
+	}
 }
 </style>
