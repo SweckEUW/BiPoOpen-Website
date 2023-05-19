@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import axios from "axios";
 import Sortable from "sortablejs";
-import {ref, onMounted} from "vue"
+import { ref, onMounted } from "vue"
+import { getGroups, setGroups, generateRandomGroups, generateRandomMatches } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
@@ -33,99 +33,39 @@ const onDragEnd = async () => {
    }
 
    // 2. Set Groups in Database
-   setGroups(groups);
+   let success:boolean = await setGroups(props.tournament._id, groups);
+   if(success){
+      await props.getTournament();
+      initSortable();
+   }
 }
 
 const initSortable = () => {
-   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
-   for (let i = 0; i < groupAmmount; i++){
-      let groupDOM:any = document.getElementById("Group-"+i);
-      let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
-      new Sortable(tbody, {
-         animation: 150,
-         group: 'shared',
-         // onEnd: onDragEnd,
-      });
-   }
+   // setTimeout(() => {
+   //    let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+   //    for (let i = 0; i < groupAmmount; i++){
+   //       let groupDOM:any = document.getElementById("Group-"+i);
+   //       let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
+   //       new Sortable(tbody, {
+   //          animation: 150,
+   //          group: 'shared',
+   //          // onEnd: onDragEnd,
+   //       });
+   //    }
+   // }, 0);
 }
 
 onMounted(() => {
-   setTimeout(() => { initSortable() }, 0);
+   if(props.tournament.groupPhase.groups)
+      initSortable();
 });
 
 const generateGroups = async () => {
+   await generateRandomGroups(props.tournament);
    await props.getTournament();
-
-   // Generate Groups
-   let groups:any = [];
-   let teams:any = shuffleArray(props.tournament.teams);
-
-   // Case: Fixed ammount of Groups
-   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
-   for (let i = 0; i < groupAmmount; i++)
-      groups.push({teams: []});
-   for (let i = 0; i < teams.length; i++)
-      groups[i%groupAmmount].teams.push(teams[i]);
-   
-   // Set Groups in Database
-   await setGroups(groups);
-
-   generateMatches();
-}
-
-const setGroups = async (groups:any) => {
-   let response = await axios.post("/setGroups", {tournamentID: props.tournament._id, groups: groups})
-   console.log(response.data.message);
-   if(response.data.success){
-      props.getTournament();
-   }     
-}
-
-const generateMatches = async () => {
+   await generateRandomMatches(props.tournament);
    await props.getTournament();
-
-   // Generate Matches
-   let matches:any = [];
-   let groups = props.tournament.groupPhase.groups;
-
-   for (let i = 0; i < groups.length; i++) {
-      let matchesForGroup = [];
-      let teams = groups[i].teams;
-
-      for (let x = 0; x < teams.length; x++){
-         for (let y = x+1; y < teams.length; y++) {
-            let match = {team1: teams[y], team2: teams[x]};
-            matchesForGroup.push(match);
-         }
-      }
-
-      if(teams.length == 3){
-         let length = matchesForGroup.length;
-         for (let x = 0; x < length; x++)
-            matchesForGroup.push(matchesForGroup[x]);
-      }
-
-      matches.push(shuffleArray(matchesForGroup));
-   }
-
-   // Set Groups in Database
-   let response = await axios.post("/setMatches", {tournamentID: props.tournament._id, matches: matches})
-   console.log(response.data.message);
-   if(response.data.success){
-      props.getTournament();
-      toggleModal();
-   }     
-}
-
-const shuffleArray = (array:any) => {
-   for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-   }
-
-   return array;
+   toggleModal();
 }
 
 let showModal = ref(false);
@@ -138,23 +78,23 @@ const toggleModal = () => {
    <div class="LayoutTab">
 
       <Transition name="fade">
-            <Modal v-if="showModal">
-                <template #title>Gruppen auslosen</template>
-                <template #template>
-                  <p style="text-align: center">Sicher das die Gruppen ausgelost werden sollen?<br>Dadurch wird der Spielplan neu generiert und der alte gelöscht!</p>
-                </template>
-                <template #cancle>
-                    <div @click="toggleModal()">Abbrechen</div>
-                </template>
-                <template #confirm>
-                    <div @click="generateGroups()">Auslosen</div>
-                </template>
-            </Modal>
-        </Transition>
+         <Modal v-if="showModal">
+               <template #title>Gruppen auslosen</template>
+               <template #template>
+               <p style="text-align: center">Sicher das die Gruppen ausgelost werden sollen?<br>Dadurch wird der Spielplan neu generiert und der alte gelöscht!</p>
+               </template>
+               <template #cancle>
+                  <div @click="toggleModal()">Abbrechen</div>
+               </template>
+               <template #confirm>
+                  <div @click="generateGroups()">Auslosen</div>
+               </template>
+         </Modal>
+      </Transition>
 
       <div class="bp-button" @click="toggleModal()">Gruppen auslosen</div>
 
-      <table class="table table-hover caption-top" v-for="(group,index) in props.tournament?.groupPhase?.groups" :id="'Group-' + index" :key="index">
+      <table class="table table-hover caption-top" v-for="(group,index) in getGroups(props.tournament)" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ (index + 1)}}</caption>
          <thead>
             <tr>

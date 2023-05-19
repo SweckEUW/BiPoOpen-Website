@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import axios from "axios";
-import {ref} from "vue"
+import { ref } from "vue"
+import { addTeam, editTeam, removeTeam } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
@@ -36,33 +36,29 @@ const toggleModalEditTeam = (team?: any) => {
 let teamnameInput = ref("");
 let player1Input = ref("");
 let player2Input = ref("");
-const addTeam = async () => {
-   let teamname = teamnameInput.value;
-   let players = [player1Input.value, player2Input.value];
-   let response = await axios.post("/addTeam", {tournamentID: props.tournament._id, team: {name: teamname, players: players}})
-   console.log(response.data.message);
-   if(response.data.success){
-      props.getTournament();
+
+const addTeamButton = async () => {
+   let team:any = {name: teamnameInput.value, players: [player1Input.value, player2Input.value]}
+   let success:boolean = await addTeam(props.tournament._id, team);
+   if(success){
+      await props.getTournament();
       toggleModalCreateTeam();
    }
 }
 
 let selectedTeam = ref();
-const editTeam = async () => {
-   let teamname = teamnameInput.value;
-   let players = [player1Input.value, player2Input.value];
-   let response = await axios.post("/editTeam", {tournamentID: props.tournament._id, selectedTeamName: selectedTeam.value.name, team: {name: teamname, players: players}})
-   console.log(response.data.message);
-   if(response.data.success){
-      props.getTournament();
+const editTeamButton = async () => {
+   let team:any = {name: teamnameInput.value, players: [player1Input.value, player2Input.value], _id: selectedTeam.value._id}
+   let success:boolean = await editTeam(props.tournament._id, team);
+   if(success){
+      await props.getTournament();
       toggleModalEditTeam();
    }
 }
 
-const removeTeam = async () => {
-   let response = await axios.post("/removeTeam", {tournamentID: props.tournament._id, selectedTeamName: selectedTeam.value.name});
-   console.log(response.data.message);
-   if(response.data.success){
+const removeTeamButton = async () => {
+   let success:boolean = await removeTeam(props.tournament._id, selectedTeam.value._id);
+   if(success){
       props.getTournament();
       toggleModalEditTeam();
    }
@@ -92,7 +88,7 @@ const removeTeam = async () => {
                     <div @click="toggleModalCreateTeam()">Abbrechen</div>
                 </template>
                 <template #confirm>
-                    <div @click="addTeam()">Hinzufügen</div>
+                    <div @click="addTeamButton()">Hinzufügen</div>
                 </template>
             </Modal>
         </Transition>
@@ -111,13 +107,13 @@ const removeTeam = async () => {
                     <div>Spieler 2</div>
                     <input type="text" v-model="player2Input">
 
-                    <button @click="removeTeam()">Team löschen</button>
+                    <button @click="removeTeamButton()">Team löschen</button>
                 </template>
                 <template #cancle>
                     <div @click="toggleModalEditTeam()">Abbrechen</div>
                 </template>
                 <template #confirm>
-                    <div @click="editTeam()">Bearbeiten</div>
+                    <div @click="editTeamButton()">Bearbeiten</div>
                 </template>
             </Modal>
         </Transition>
@@ -131,11 +127,11 @@ const removeTeam = async () => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team, id) in props.tournament?.teams" @click="toggleModalEditTeam(team)">
+            <tr v-for="(team, id) in props.tournament?.teams" @click="toggleModalEditTeam(team)" :key="team.name">
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>
-                  <span v-for="player in team.players" style="margin-right: 15px">{{ player }}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{ player }}</span>
                </td>
             </tr>
          </tbody>

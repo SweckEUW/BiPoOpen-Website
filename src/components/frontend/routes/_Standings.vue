@@ -1,37 +1,15 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref, onUnmounted } from "vue"
-import { getAmmountOfWinsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfHitsFromTeam, getAmmountOfEnemyHitsFromTeam, getHitDifferenceFromTeam } from "@/util/tournamentFunctions.js"
+import { getGroups, getTournamentByName, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 
 let tournament = ref();
+let groups = ref();
 const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      tournament.value = response.data.tournaments[0];
-      sortGroups();
-   }
+   let tournamentName = "Weck BiPo Open 2023";
+   tournament.value = await getTournamentByName(tournamentName);
+   groups.value = getGroupsWithStats(tournament.value);
 }
 getTournament();
-
-// Sort after wins
-const sortGroups = () => {
-    let groupsTMP:any = [];
-    tournament.value.groupPhase.groups.forEach((group:any) => {
-        group.teams = group.teams.sort((team1:any, team2:any) => {
-            let score1 = getAmmountOfWinsFromTeam(tournament.value, team1.name);
-            let score2 = getAmmountOfWinsFromTeam(tournament.value, team2.name);
-            if(score1 == score2){
-                return getHitDifferenceFromTeam(tournament.value, team2) - getHitDifferenceFromTeam(tournament.value, team1);
-            }else{
-                return score2 - score1;
-            }
-            
-        });
-        groupsTMP.push(group);
-    });
-    tournament.value.groupPhase.groups = groupsTMP;
-}
 
 let updateInterval = setInterval(() => {
    getTournament();
@@ -48,9 +26,9 @@ window.addEventListener("resize", () => {
 </script>
 
 <template>
-    <div>
-        <table class="table table-hover caption-top" v-for="(group,index) in tournament?.groupPhase?.groups" :key="index">
-            <caption>{{"Gruppe "+ (index + 1)}}</caption>
+    <div v-if="tournament">
+        <table class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
+            <caption>{{"Gruppe " + index}}</caption>
             <thead>
                 <tr>
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
@@ -63,14 +41,14 @@ window.addEventListener("resize", () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(team,i) in group.teams" :key="team">
+                <tr v-for="(team,i) in groups[index-1].teams" :key="team">
                     <td>{{ i+1 }}</td>
                     <td>{{team.name}}</td>
                     <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
-                    <td>{{ getAmmountOfWinsFromTeam(tournament, team.name) }}</td>
-                    <td>{{ getAmmountOfMatchesFromPlayer(tournament, team.players[0]) }}</td>
-                    <td>{{ getAmmountOfHitsFromTeam(tournament, team) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, team) }}</td>
-                    <td>{{ getHitDifferenceFromTeam(tournament, team) }}</td>
+                    <td>{{ team.wins }}</td>
+                    <td>{{ team.games }}</td>
+                    <td>{{ team.score }}</td>
+                    <td>{{ team.scoreDifference }}</td>
                 </tr>
             </tbody>
         </table>

@@ -1,40 +1,51 @@
 <script setup lang="ts">
-import axios from "axios";
 import {ref} from "vue"
 import Sortable from "sortablejs";
 import {onMounted} from "vue"
+import { getMatches, setMatches, setGameResult } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
 const props = defineProps(['getTournament','tournament'])
 
 const onDragEnd = async (evt:any) => {
-   let tmp = props.tournament.groupPhase.matches;
-   let matches = tmp;
+   let matches = props.tournament.groupPhase.matches;
    let groupIndex = parseInt(evt.srcElement.parentElement.getElementsByTagName("caption")[0].innerText.split(" ")[1]) - 1;
    let matchesInGroup = matches[groupIndex];
    let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
    matchesInGroup.splice(evt.newIndex, 0, movedMatch[0]);
-
-   setMatches(matches);
-}
-
-const initSortable = () => {
-   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
-   for (let i = 1; i < groupAmmount+1; i++){
-      let groupDOM:any = document.getElementById("Match-Table-"+i);
-      let tbody:any = groupDOM?.getElementsByTagName("tbody")[0];
-      new Sortable(tbody, {
-         animation: 150,
-         group: "_" + i ,
-         onEnd: onDragEnd,
-      });
+   
+   let success:boolean = await setMatches(props.tournament._id, matches);
+   if(success){
+      await props.getTournament();
+      initSortable();
    }
 }
 
+const initSortable = () => {
+   setTimeout(() => { 
+      let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+      for (let i = 1; i < groupAmmount+1; i++){
+         let groupDOM:any = document.getElementById("Match-Table-"+i);
+         let tbody:any = groupDOM?.getElementsByTagName("tbody")[0];
+         new Sortable(tbody, {
+            animation: 150,
+            group: "_" + i ,
+            onEnd: onDragEnd,
+         });
+      }
+   }, 0);
+}
+
 onMounted(() => {
-   setTimeout(() => { initSortable() }, 0);
+   if(props.tournament.groupPhase.groups)
+      initSortable();
 });
+
+const setResult = async () => {
+   await setGameResult(props.tournament, selectedMatch.value, team1Player1Score.value, team1Player2Score.value, team2Player1Score.value, team2Player2Score.value);
+   toggleModal();
+}
 
 const clearInputs = () => {
    team1Player1Score = ref();
@@ -64,41 +75,6 @@ const toggleModal = (match?:any) => {
    }
       
    showModal.value = !showModal.value;
-}
-
-const setGameResult = async () => {
-   let result = {
-      team1Score: (team1Player1Score ? team1Player1Score.value : 0) + (team1Player2Score ? team1Player2Score.value : 0),
-      team1Player1Score: team1Player1Score.value, 
-      team1Player2Score: team1Player2Score.value, 
-
-      team2Score: (team1Player2Score ? team2Player1Score.value : 0) + (team2Player2Score ? team2Player2Score.value : 0),
-      team2Player1Score: team2Player1Score.value, 
-      team2Player2Score: team2Player2Score.value
-   }
-   let matches = props.tournament.groupPhase.matches;
-
-   // Find selectedMatch in matches and add result 
-   for (let i = 0; i < matches.length; i++) {
-      for (let x = 0; x < matches[i].length; x++) {
-         let match = matches[i][x];
-         if(match == selectedMatch.value){
-            matches[i][x] = selectedMatch.value;
-            matches[i][x].result = result;
-         }
-      }
-   }
-
-   await setMatches(matches);
-   toggleModal();  
-}
-
-const setMatches = async (matches:any) => {
-   let response = await axios.post("/setMatches", {tournamentID: props.tournament._id, matches: matches})
-   console.log(response.data.message);
-   if(response.data.success){
-      props.getTournament();
-   }     
 }
 </script>
 
@@ -148,12 +124,12 @@ const setMatches = async (matches:any) => {
                <div @click="toggleModal()">Abbrechen</div>
             </template>
             <template #confirm>
-               <div @click="setGameResult()">Eintragen</div>
+               <div @click="setResult()">Eintragen</div>
             </template>
          </Modal>
       </Transition>
 
-      <table class="table table-hover caption-top" v-for="tableIndex in tournament?.groupPhase?.settings.fixedGroupAmmount" :key="tableIndex" :id="'Match-Table-'+tableIndex">
+      <table class="table table-hover caption-top" v-for="tableIndex in tournament.groupPhase.settings.fixedGroupAmmount" :key="tableIndex" :id="'Match-Table-'+tableIndex">
          <caption>{{ "Tisch " +  tableIndex}}</caption>
          <thead>
             <tr>
@@ -164,11 +140,11 @@ const setMatches = async (matches:any) => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(match,matchIndex) in tournament?.groupPhase.matches[tableIndex-1]" :key="tournament?.groupPhase.matches[tableIndex-1][matchIndex]">
+            <tr v-for="(match,matchIndex) in getMatches(props.tournament)[tableIndex-1]" :key="getMatches(props.tournament)[tableIndex-1][matchIndex]">
                <td>{{ matchIndex + 1 }}</td>
                <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{match.team1.name}}</div>
-                  <div v-for="player in match.team1.players">{{ player }}</div>
+                  <div v-for="player in match.team1.players" :key="player">{{ player }}</div>
                </td>
                <td v-if="!match.result" @click="toggleModal(match)">
                   <div class="bp-button rt-button">Eintragen</div>
@@ -180,23 +156,11 @@ const setMatches = async (matches:any) => {
                </td>
                <td :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{match.team2.name}}</div>
-                  <div v-for="player in match.team2.players">{{ player }}</div>
+                  <div v-for="player in match.team2.players" :key="player">{{ player }}</div>
                </td>
             </tr>
          </tbody>
       </table>
-
-      <!-- <div class="rt-table" v-for="tableIndex in props.tournament?.groupPhase?.settings.fixedGroupAmmount" :key="tableIndex">
-         <div>{{ "Tisch " +  tableIndex}}</div>
-         <div class="rt-group">
-            <div v-for="(match,matchIndex) in props.tournament?.groupPhase.matches[tableIndex-1]" :key="props.tournament?.groupPhase.matches[tableIndex-1][matchIndex]">
-               <div class="rt-team" :style="{'color': match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{ match.team1.name }}</div>
-               <div class="bp-button rt-button" v-if="!match.result" @click="toggleModal(match)">Eintragen</div>
-               <div class="bp-button rt-button rt-result" v-else @click="toggleModal(match)">{{ match.result.team1Score + " - " + match.result.team2Score }}</div>
-               <div class="rt-team" :style="{'color': match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{ match.team2.name }}</div>
-            </div>
-         </div>
-      </div> -->
 
    </div>
 </template>

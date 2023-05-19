@@ -1,21 +1,19 @@
 <script setup lang="ts">
+import {ref} from "vue"
+import {useRoute} from "vue-router";
+import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
+
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
 import GroupsTab from '@/components/backend/manageSingleTournament/GroupsTab.vue';
 import GamesScheduleTab from '@/components/backend/manageSingleTournament/GamesScheduleTab.vue';
 
-import axios from "axios";
-import {ref} from "vue"
-import {useRoute} from "vue-router";
+let tournament = ref();
 
 const route = useRoute();
-let tournament = ref();
 const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      // @ts-ignore
-      tournament.value = response.data.tournaments.find((tournament: any) => tournament.name == route.params.id.replaceAll("-"," "));
-   }
+   // @ts-ignore 
+   let tournamentName = route.params.id.replaceAll("-"," ");
+   tournament.value = await getTournamentByName(tournamentName);
 }
 getTournament();
 </script>
