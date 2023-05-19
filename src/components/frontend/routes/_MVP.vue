@@ -1,43 +1,15 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref, onUnmounted } from "vue"
-import { getAmmoungHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfEnemyHitsFromTeam } from "@/util/tournamentFunctions.js"
+import { getTournamentByName, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
 
 let tournament = ref();
+let players = ref();
 const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      tournament.value = response.data.tournaments[0];
-      getPlayers();
-   }
+   let tournamentName = "Weck BiPo Open 2023";
+   tournament.value = await getTournamentByName(tournamentName);
+   players.value = getPlayersWithStats(tournament.value);
 }
 getTournament();
-
-
-let players = ref();
-const getPlayers = () => {
-    let playersTMP = [];
-    let teams = tournament.value.teams;
-    for (let i = 0; i < teams.length; i++) {
-        for (let x = 0; x < teams[i].players.length; x++) {
-            playersTMP.push({
-                name: teams[i].players[x],
-                score: getAmmoungHitsFromPlayer(tournament.value, teams[i].players[x]),
-                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament.value, teams[i].players[x]),
-                team: teams[i]
-            }); 
-        }
-    }
-
-    playersTMP.sort((player1, player2) => {
-        let score1 = player1.ammountOfMatches == 0 ? 0 : player1.score / player1.ammountOfMatches;
-        let score2 = player2.ammountOfMatches == 0 ? 0 : player2.score / player2.ammountOfMatches;
-        return score2 - score1;
-    });
-    players.value = playersTMP;
-    
-}
 
 let updateInterval = setInterval(() => {
    getTournament();
@@ -67,13 +39,13 @@ window.addEventListener("resize", () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(player,index) in players" :key="index">
+                <tr v-for="(player, index) in players" :key="index">
                     <td>{{ index + 1 }}</td>
                     <td>{{ player.name }}</td>
                     <td>{{ player.ammountOfMatches }}</td>
                     <td>{{ player.score }}</td>
                     <td>{{ (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2) }}</td>
-                    <td>{{ Math.ceil(getAmmountOfEnemyHitsFromTeam(tournament, player.team) / 2) }}</td>
+                    <td>{{ player.ammountOfDrunkenCups }}</td>
                 </tr>
             </tbody>
         </table>

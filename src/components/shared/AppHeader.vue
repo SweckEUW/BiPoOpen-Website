@@ -27,8 +27,8 @@ const scrollToTop = () => {
 		
 		<div class="ap-right">
 			<router-link to="/Platzierungen">Platzierungen</router-link>
-			<router-link to="/Zeitplan">Zeitplan</router-link>
-			<router-link to="/MVP">MVP</router-link>
+			<router-link to="/Spielplan">Spielplan</router-link>
+			<router-link to="/MVP">Most Valuable Player</router-link>
 		</div>
 
 		<div class="ap-burger" @click="toggleBurgerMenu()">
@@ -39,9 +39,9 @@ const scrollToTop = () => {
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-burger-menu" v v-show="showBurger">
-				<router-link @click="toggleBurgerMenu()" to="/Zeitplan">Zeitplan</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/Spielplan">Spielplan</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/MVP">MVP</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/MVP">Most Valuable Player</router-link>
 			</div>
 		</transition>
 
@@ -65,6 +65,9 @@ const scrollToTop = () => {
 .ap-right{
 	float: right;
 }
+.ap-right a{
+	font-size: 20px;
+}
 .ap-burger{
 	display: none;
 }
@@ -81,7 +84,7 @@ a{
 	margin: 0;
 	margin-bottom: 50px;
 	margin: 0 15px;
-	font-size: 1.5vw;
+	font-size: 24px;
 }
 a:first-child{
 	margin-left: 0;

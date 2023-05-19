@@ -60,6 +60,7 @@ const createTournament = async () => {
     console.log(response.data.message);
     if(response.data.success){
         await getTournaments();
+        tournamentName = ref();
         toggleModal();
     }
 }

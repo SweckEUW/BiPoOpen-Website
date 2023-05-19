@@ -31,11 +31,11 @@ const routes = [
 		}
 	},
 	{
-		path: '/Zeitplan',
+		path: '/Spielplan',
 		name: 'Schedule',
 		component: Schedule,
 		meta: {
-			title: 'Weck BiPo Open 2023 - Zeitplan',
+			title: 'Weck BiPo Open 2023 - Spielplan',
 		}
 	},
 	{

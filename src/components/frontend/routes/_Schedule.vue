@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref, onUnmounted } from "vue"
+import { getMatches } from "@/util/tournamentUtilFunctions.js";
+import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 
 let tournament = ref();
 const getTournament = async () => {
-   let response = await axios.get("/tournaments")
-   console.log(response.data.message);
-   if(response.data.success){
-      tournament.value = response.data.tournaments[0];
-   }
+   let tournamentName = "Weck BiPo Open 2023";
+   tournament.value = await getTournamentByName(tournamentName);
 }
 getTournament();
 
-// let updateInterval = setInterval(() => {
-//    getTournament();
-// }, 10000);
+let updateInterval = setInterval(() => {
+   getTournament();
+}, 10000);
 
-// onUnmounted(() => {
-//    clearInterval(updateInterval);
-// });
+onUnmounted(() => {
+   clearInterval(updateInterval);
+});
 </script>
 
 <template>
     <div class="Schedule">
 
-      <table class="table table-hover caption-top" v-for="tableIndex in tournament?.groupPhase?.settings.fixedGroupAmmount" :key="tableIndex">
+      <table class="table table-hover caption-top" v-for="tableIndex in tournament?.groupPhase.settings.fixedGroupAmmount" :key="tableIndex">
          <caption>{{ "Tisch " +  tableIndex}}</caption>
          <thead>
             <tr>
@@ -35,7 +33,7 @@ getTournament();
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(match,matchIndex) in tournament?.groupPhase.matches[tableIndex-1]" :key="tournament?.groupPhase.matches[tableIndex-1][matchIndex]">
+            <tr v-for="(match,matchIndex) in getMatches(tournament)[tableIndex-1]" :key="getMatches(tournament)[tableIndex-1][matchIndex]">
                <td>{{ matchIndex + 1 }}</td>
                <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{ match.team1.name }}</div>
