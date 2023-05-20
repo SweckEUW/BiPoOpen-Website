@@ -244,15 +244,17 @@ export const updateMatchesKOPhase = async (tournament:any) => {
                 }
             }
         }else{ // Next Stages
-            for (let x = 0; x < stage.length/2; x++) { 
-                let match1 = matches[i-1][x*2];
-                let match2 = matches[i-1][x*2 + 1];
-                
-                let matchTMP = stage[x*2];
-                if(match1.result)
-                    matchTMP.team1ID = match1.team1Score > match1.team2Score ? match1.team1ID : match1.team2ID;
-                if(match2.result)
-                    matchTMP.team2ID = match2.team1Score > match2.team2Score ? match2.team1ID : match2.team2ID;
+            for (let x = 0; x < stage.length; x++) { 
+                let matchTMP = stage[x];
+
+                // let match1 = matches[i-1][x*2];
+                // let match2 = matches[i-1][x*2 + 1];
+
+
+                // if(match1.result)
+                //     matchTMP.team1ID = match1.team1Score > match1.team2Score ? match1.team1ID : match1.team2ID;
+                // if(match2.result)
+                //     matchTMP.team2ID = match2.team1Score > match2.team2Score ? match2.team1ID : match2.team2ID;
                       
                 matchesTMP[i].push(matchTMP); 
             }   
