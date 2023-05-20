@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted } from "vue"
-import { getGroups, setGroups, generateRandomGroups, generateRandomMatches } from "@/util/tournamentUtilFunctions.js";
+import { getGroups, setGroups, generateRandomGroups, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
@@ -63,7 +63,9 @@ onMounted(() => {
 const generateGroups = async () => {
    await generateRandomGroups(props.tournament);
    await props.getTournament();
-   await generateRandomMatches(props.tournament);
+   await generateRandomMatchesGroupPhase(props.tournament);
+   await props.getTournament();
+   await initMatchesKOPhase(props.tournament);
    await props.getTournament();
    toggleModal();
 }

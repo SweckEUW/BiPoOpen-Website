@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getMatches } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 
 let tournament = ref();
@@ -33,21 +33,21 @@ onUnmounted(() => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(match,matchIndex) in getMatches(tournament)[tableIndex-1]" :key="getMatches(tournament)[tableIndex-1][matchIndex]">
-               <td>{{ matchIndex + 1 }}</td>
+            <tr v-for="(match,matchIndex) in getMatchesGroupPhase(tournament)[tableIndex-1]" :key="matchIndex">
+               <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{ matchIndex + 1 }}</td>
                <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{ match.team1.name }}</div>
-                  <div v-for="player in match.team1.players">{{ player }}</div>
+                  <div v-for="player in match.team1.players" :key="player">{{ player }}</div>
                </td>
                <td v-if="!match.result">vs.</td>
-               <td v-else class="sc-result">
+               <td v-else class="sc-result" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : ''}">
                   <div>{{ match.result.team1Score + " - " + match.result.team2Score }}</div>
                   <div>{{ match.result.team1Player1Score + " - " + match.result.team2Player1Score }}</div>
                   <div>{{ match.result.team1Player2Score + " - " + match.result.team2Player2Score }}</div>
                </td>
                <td :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{ match.team2.name }}</div>
-                  <div v-for="player in match.team2.players">{{ player }}</div>
+                  <div v-for="player in match.team2.players" :key="player">{{ player }}</div>
                </td>
             </tr>
          </tbody>

@@ -41,8 +41,8 @@ onBeforeMount(() => {
 :root {
   --main-color: red;
   --main-color-hover: rgb(87, 0, 0);
-  --result-red: rgb(252, 98, 98);
-  --result-green: rgb(135, 206, 118);
+  --result-red: rgb(253, 165, 165);
+  --result-green: rgb(192, 250, 178);
 }
 
 body{
@@ -51,10 +51,6 @@ body{
 	-moz-osx-font-smoothing: grayscale;
 	scrollbar-width: none;
 	margin: 0;
-	overflow-x: hidden;
-}
-#app{
-	overflow-x: hidden;
 }
 
 a{

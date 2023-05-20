@@ -35,7 +35,7 @@ window.addEventListener("resize", () => {
                     <th>{{ windowWidth > 900 ? 'Spiele' : 'Sp.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Treffer pro Spiel' : 'Trf. pro Sp.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Gtr. Becher'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getrunk. Becher'}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -80,7 +80,13 @@ tbody tr:nth-of-type(3){
     table *{
         font-size: 15px;
     }
-    table td:nth-of-type(2){
+    table th:nth-of-type(1), table td:nth-of-type(1){
+        max-width: 30px;
+        width: 30px;
+        padding-left: 2px;
+        padding-right: 10px;
+    }
+    table th:nth-of-type(2), table td:nth-of-type(2){
         max-width: 100px;
         width: 100px;
     }
