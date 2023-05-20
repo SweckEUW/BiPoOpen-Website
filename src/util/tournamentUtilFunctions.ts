@@ -42,6 +42,7 @@ export const getGroups = (tournament:any) => {
             groups[i].teams.push(teamTMP);
         });
     });
+
     return groups;
 }
 
@@ -96,8 +97,8 @@ export const getGroupsWithStats = (tournament:any) => {
     return groups;
 }
 
-// MATCHES
-export const getMatches = (tournament:any) => {
+// MATCHES GROUP
+export const getMatchesGroupPhase = (tournament:any) => {
     if(!tournament.groupPhase.matches)
         return [];
 
@@ -111,16 +112,17 @@ export const getMatches = (tournament:any) => {
             matches[i].push(matchTMP);
         });
     });
+
     return matches;
 }
 
-export const setMatches = async (tournamentID:any, matches:any) => {
-    let response = await axios.post("/setMatches", {tournamentID: tournamentID, matches: matches})
+export const setMatchesGroupPhase = async (tournamentID:any, matches:any) => {
+    let response = await axios.post("/setMatchesGroupPhase", {tournamentID: tournamentID, matches: matches})
     console.log(response.data.message);
     return response.data.success  
 }
 
-export const generateRandomMatches = async (tournament:any) => {
+export const generateRandomMatchesGroupPhase = async (tournament:any) => {
     let matches:any = [];
     let groups = tournament.groupPhase.groups;
  
@@ -144,10 +146,10 @@ export const generateRandomMatches = async (tournament:any) => {
         matches.push(shuffleArray(matchesForGroup));
     }
 
-    await setMatches(tournament._id,matches);
+    await setMatchesGroupPhase(tournament._id,matches);
 }
 
-export const setGameResult = async (tournament:any, selectedMatch:any, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
+export const setGameResultGroupPhase = async (tournament:any, selectedMatch:any, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
     let result = {
        team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
        team1Player1Score: team1Player1Score, 
@@ -157,9 +159,125 @@ export const setGameResult = async (tournament:any, selectedMatch:any, team1Play
        team2Player1Score: team2Player1Score, 
        team2Player2Score: team2Player2Score
     }
-    let matches = tournament.groupPhase.matches;
- 
+
     // Find selectedMatch in matches and add result 
+    let matches = tournament.groupPhase.matches;
+    for (let i = 0; i < matches.length; i++) {
+       for (let x = 0; x < matches[i].length; x++) {
+          let match = matches[i][x];
+          if(match == selectedMatch){
+            matches[i][x] = selectedMatch;
+            matches[i][x].result = result;
+          }
+       }
+    }
+
+    await setMatchesGroupPhase(tournament._id, matches);
+    await updateMatchesKOPhase(tournament);
+}
+
+// MATCHES KO-PHASE
+export const getMatchesKOPhase = (tournament:any) => {
+    if(!tournament.koPhase.matches)
+        return [];     
+
+    let matches:any = [];
+    tournament.koPhase.matches.forEach((stage:any, i:number) => {
+        matches.push([]);
+        stage.forEach((match:any) => {
+            let matchTMP = match;
+            matchTMP.team1 = tournament.teams.find((team:any) => team._id == match.team1ID);
+            matchTMP.team2 = tournament.teams.find((team:any) => team._id == match.team2ID);
+            matches[i].push(matchTMP);
+        });
+    });
+
+    return matches;
+}
+
+export const setMatchesKOPhase = async (tournamentID:any, matches:any) => {
+    let response = await axios.post("/setMatchesKOPhase", {tournamentID: tournamentID, matches: matches})
+    console.log(response.data.message);
+    return response.data.success  
+}
+
+export const initMatchesKOPhase = async (tournament:any) => {
+    let matches:any = [];
+    let teamsInKOPhase = tournament.koPhase.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
+    let stages = Math.log2(teamsInKOPhase);
+    for (let i = 0; i < stages; i++){
+        let ammountOfMatches = teamsInKOPhase/(Math.pow(2,i+1));
+        matches.push([]);
+        for (let x = 0; x < ammountOfMatches/2; x++) {
+            if(i == 0){
+                matches[i].push({placeHolderTeam1: "1. Platz - Gruppe " + (x*2 + 1), placeHolderTeam2: "2. Platz - Gruppe "  + (x*2 + 2)});
+                matches[i].push({placeHolderTeam1: "2. Platz - Gruppe "  + (x*2 + 1), placeHolderTeam2: "1. Platz - Gruppe "  + (x*2 + 2)});
+            }else{
+                matches[i].push({placeHolderTeam1: "TBA", placeHolderTeam2: "TBA"});
+                matches[i].push({placeHolderTeam1: "TBA", placeHolderTeam2: "TBA"});
+            }
+        }
+    }
+
+    await setMatchesKOPhase(tournament._id, matches);
+}
+
+export const updateMatchesKOPhase = async (tournament:any) => {
+    let matchesTMP:any = [];
+    let matches:any = tournament.koPhase.matches;
+    let groups:any = getGroupsWithStats(tournament);
+    matches.forEach((stage:any, i:number) => {
+        matchesTMP.push([]);
+
+        if(i == 0) { // First Stage 
+            for (let x = 0; x < stage.length/2; x++) { 
+                for (let y = 0; y < tournament.koPhase.settings.advancingTeamsPerGroup; y++) {
+                    let matchTMP = stage[x*2+y];
+
+                    if(!tournament.groupPhase.matches[x*2].find((match:any) => !match.result))
+                        matchTMP.team1ID = groups[x*2].teams[y]._id;
+                    
+                    if(!tournament.groupPhase.matches[x*2 + 1].find((match:any) => !match.result))
+                        matchTMP.team2ID = groups[x*2 + 1].teams[y == 0 ? 1 : 0]._id;
+
+                    matchesTMP[i].push(matchTMP); 
+                }
+            }
+        }else{ // Next Stages
+            for (let x = 0; x < stage.length; x++) { 
+                let matchTMP = stage[x];
+
+                // let match1 = matches[i-1][x*2];
+                // let match2 = matches[i-1][x*2 + 1];
+
+
+                // if(match1.result)
+                //     matchTMP.team1ID = match1.team1Score > match1.team2Score ? match1.team1ID : match1.team2ID;
+                // if(match2.result)
+                //     matchTMP.team2ID = match2.team1Score > match2.team2Score ? match2.team1ID : match2.team2ID;
+                      
+                matchesTMP[i].push(matchTMP); 
+            }   
+        }
+    });
+
+    await setMatchesKOPhase(tournament._id, matchesTMP);
+}
+
+// KO-PHASE
+export const setGameResultKOPhase = async (tournament:any, selectedMatch:any, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
+    let result = {
+       team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
+       team1Player1Score: team1Player1Score, 
+       team1Player2Score: team1Player2Score, 
+ 
+       team2Score: (team1Player2Score ? team2Player1Score : 0) + (team2Player2Score ? team2Player2Score : 0),
+       team2Player1Score: team2Player1Score, 
+       team2Player2Score: team2Player2Score
+    }
+
+    // Find selectedMatch in matches and add result 
+    let matches = tournament.koPhase.matches;
     for (let i = 0; i < matches.length; i++) {
        for (let x = 0; x < matches[i].length; x++) {
           let match = matches[i][x];
@@ -170,9 +288,11 @@ export const setGameResult = async (tournament:any, selectedMatch:any, team1Play
        }
     }
  
-    await setMatches(tournament._id, matches);
+    await setMatchesKOPhase(tournament._id, matches);
+    await updateMatchesKOPhase(tournament);
 }
 
+// PLAYERS
 export const getPlayersWithStats = (tournament:any) => {
     let players = [];
     let teams = tournament.teams;

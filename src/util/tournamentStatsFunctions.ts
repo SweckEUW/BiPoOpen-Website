@@ -1,8 +1,8 @@
-import { getMatches } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 
 export const getAmmountOfWinsFromTeam = (tournament:any, teamName:any) => {
     let wins:number = 0;
-    let matches = getMatches(tournament);
+    let matches = getMatchesGroupPhase(tournament);
     matches.forEach((group:any) => {
         group.forEach((match:any) => {
             if(match.result){
@@ -27,7 +27,7 @@ export const getAmmountOfHitsFromTeam = (tournament:any, team:any) => {
 
 export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:any) => { 
     let score = 0;
-    let matches = getMatches(tournament);
+    let matches = getMatchesGroupPhase(tournament);
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
@@ -56,7 +56,7 @@ export const getAmmountOfEnemyHitsFromTeam = (tournament:any, team:any) => {
 
 export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any) => { 
     let score = 0;
-    let matches = getMatches(tournament);
+    let matches = getMatchesGroupPhase(tournament);
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
@@ -84,7 +84,7 @@ export const getHitDifferenceFromTeam = (tournament:any, team:any) => {
 
 export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:any) => { 
     let ammountOfMatches = 0;
-    let matches = getMatches(tournament);
+    let matches = getMatchesGroupPhase(tournament);
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){

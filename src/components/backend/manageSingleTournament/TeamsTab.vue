@@ -152,6 +152,9 @@ table th{
    font-size: 20px;
    font-weight: bold;
 }
+table td{
+   cursor: pointer;
+}
 table td:nth-child(1){
    max-width: 20px;
    width: 20px;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-let headerImg:string = new URL(`/src/assets/2022/pictures/header.jpeg`, import.meta.url).href;
+let headerImg:string = new URL(`/src/assets/header.jpeg`, import.meta.url).href;
 </script>
 
 <template>
@@ -11,7 +11,7 @@ let headerImg:string = new URL(`/src/assets/2022/pictures/header.jpeg`, import.m
 <style scoped>
 .h-header{
     width: 100%;
-    height: 80vh;
+    height: 50vh;
     object-fit: cover;
 }
 </style>

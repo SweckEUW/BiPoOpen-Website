@@ -21,12 +21,17 @@ const createTournament = async () => {
                 fixedGroupAmmount: 8
             }
         },
+        koPhase: {
+            settings: {
+                advancingTeamsPerGroup: 2
+            }
+        },
         teams: [
             {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
             {name: "Grün Weiß Altglas", players: ["Joel Kiwitt", "René Manke"]},
             {name: "Team MöpMöp", players: ["Leon Rose", "Jonas Weck"]},
             {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
-            {name: "Eintracht Prügel", players: ["Alexander Borsix", "Björn Harz"]},
+            {name: "Eintracht Prügel", players: ["Alexander Borsig", "Björn Harz"]},
             {name: "Team Sunburn", players: ["David Jones", "Marco Radziej"]},
             {name: "Schauf & Berger", players: ["Jens Schauf", "Marius Berger"]},
             {name: "Sex-Touristen", players: ["Marius Grote", "Leonard Südbrock"]},
@@ -77,7 +82,7 @@ let tournamentName = ref();
     <div class="Manage">
         <div class="bp-button" @click="toggleModal()">Neues Turnier erstellen</div>
         
-        <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments">{{ tournament.name }}</router-link>
+        <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
 
         <Transition name="fade">
             <Modal v-if="showModal">
