@@ -78,10 +78,10 @@ export const getGroupsWithStats = (tournament:any) => {
         groups.push({teams: []});
         group.teams.forEach((team:any) => {
             let teamTMP = team;
-            teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name);
-            teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0]);
-            teamTMP.score = getAmmountOfHitsFromTeam(tournament, teamTMP) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, teamTMP)
-            teamTMP.scoreDifference = getHitDifferenceFromTeam(tournament, teamTMP);
+            teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, true);
+            teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], true);
+            teamTMP.score = getAmmountOfHitsFromTeam(tournament, teamTMP, true) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, teamTMP, true)
+            teamTMP.scoreDifference = getHitDifferenceFromTeam(tournament, teamTMP, true);
             groups[i].teams.push(teamTMP);
         });
     });
@@ -89,14 +89,10 @@ export const getGroupsWithStats = (tournament:any) => {
     // Sort after wins and hit difference
     groups.forEach((group:any) => {
         group.teams = group.teams.sort((team1:any, team2:any) => {
-            let score1 = getAmmountOfWinsFromTeam(tournament, team1.name);
-            let score2 = getAmmountOfWinsFromTeam(tournament, team2.name);
-            if(score1 == score2){
-                return getHitDifferenceFromTeam(tournament, team2) - getHitDifferenceFromTeam(tournament, team1);
-            }else{
-                return score2 - score1;
-            }
-            
+            if(team1.wins == team2.wins)
+                return team2.scoreDifference - team1.scoreDifference;
+            else
+                return team2.wins - team1.wins;
         });
     });
 
@@ -306,10 +302,10 @@ export const getPlayersWithStats = (tournament:any) => {
         for (let x = 0; x < teams[i].players.length; x++) {
             players.push({
                 name: teams[i].players[x],
-                score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x]),
-                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x]),
+                score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false),
+                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false),
                 team: teams[i],
-                ammountOfDrunkenCups: Math.ceil(getAmmountOfEnemyHitsFromTeam(tournament, teams[i]) / 2)
+                ammountOfDrunkenCups: Math.ceil(getAmmountOfEnemyHitsFromTeam(tournament, teams[i], false) / 2)
             }); 
         }
     }
