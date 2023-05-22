@@ -14,7 +14,7 @@ defineProps(['getTournament','tournament','isBackend'])
             <div class="gsk-stage">
                <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
                   <div class="gsk-match-table">{{ "Tisch " + (matchIndex + 1) }}</div>
-                  <MatchElement style="width: 600px; height: 115px;" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
+                  <MatchElement class="gsk-matchElement" :class="{'gsk-matchElement-stage1': stageIndex == 0}" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
                </div>
             </div>
          </div>
@@ -51,5 +51,29 @@ defineProps(['getTournament','tournament','isBackend'])
 }
 .gsk-match-table{
    margin-bottom: 5px;
+}
+.gsk-matchElement{
+   width: 600px; 
+   height: 90px;
+}
+.gsk-matchElement-stage1{
+   height: 115px;
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+   .gsk-matchElement{
+      width: 90vw; /* 2PX Border*/
+      height: 125px;
+   }
+   .gsk-match{
+      padding: 5px;
+      margin: 5px;
+      margin-top: 0px;
+      margin-left: 0px;
+   }
+   .gsk-matchElement-stage1{
+      height: 140px;
+   }
 }
 </style>
