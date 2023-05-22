@@ -31,13 +31,12 @@ const toggleModal = () => {
          </div>
 
          <!-- Result -->
-         <div v-if="!match.result && !isBackend || !match.team1 || !match.team2" class="mt-result">vs.</div>
+         <div v-if="!match.result && !isBackend || !match.team1 || !match.team2" class="mt-vs">vs.</div>
          
-         <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button mt-result" @click="toggleModal()">Eintragen</div>
+         <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">Eintragen</div>
 
          <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" :style="{
             'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : '',
-            'paddingTop' : stageIndex == 0 ? '31px' : ''
          }">
             <div class="mt-result-team">{{match.result.team1Score + " - " + match.result.team2Score}}</div>
             <div class="mt-result-player">{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
@@ -64,6 +63,7 @@ const toggleModal = () => {
    align-items: center;
    white-space: nowrap;
    width: 100%;
+   height: 100%;
 }
 .mt-index{
    width: 40px;
@@ -79,8 +79,9 @@ const toggleModal = () => {
    display: flex;
    flex-direction: column;
    justify-content: center;
+   align-self: stretch;
 }
-.mt-team, .mt-result{
+.mt-team, .mt-result, .mt-vs, .mt-button{
    padding: 10px;
 }
 .mt-team-name, .mt-result-team{
@@ -95,14 +96,22 @@ const toggleModal = () => {
    font-style: italic;
    color: rgb(87, 87, 87);
 }
-.mt-result{
+.mt-result, .mt-v, .mt-button{
    text-align: center;
    width: 200px;
+   align-self: stretch;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+}
+.mt-result{
+   justify-content: flex-end;
 }
 .mt-button{
    font-size: 16px;
    margin: 0 20px;
    width: calc(200px - 40px);    /* width from .mt-result - margin */
+   
 }
 
 /*MOBILE*/
