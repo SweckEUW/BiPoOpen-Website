@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted } from "vue"
-import { getGroups, setGroups, generateRandomGroups, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { getGroups, setGroups, generateRandomGroups,getTeamFromID , setGameResultGroupPhase, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
 
@@ -67,6 +68,16 @@ const generateGroups = async () => {
    await props.getTournament();
    await initMatchesKOPhase(props.tournament);
    await props.getTournament();
+
+   // DEBUG!
+   // props.tournament.groupPhase.matches.forEach(groupMatches => {
+   //    groupMatches.forEach(match => {
+   //       match.team1 = getTeamFromID(props.tournament, match.team1ID)
+   //       match.team2 = getTeamFromID(props.tournament, match.team2ID)
+   //       setGameResultGroupPhase(props.tournament, match, 5, 5, 2, 2);
+   //    });
+   // });
+
    toggleModal();
 }
 
@@ -96,8 +107,8 @@ const toggleModal = () => {
 
       <div class="bp-button" @click="toggleModal()">Gruppen auslosen</div>
 
-      <table class="table table-hover caption-top" v-for="(group,index) in getGroups(props.tournament)" :key="index" :id="'Group-' + index">
-         <caption>{{"Gruppe "+ (index + 1)}}</caption>
+      <table class="table table-hover caption-top" v-for="(group,index) in getGroups(tournament)" :key="index" :id="'Group-' + index">
+         <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
          <thead>
             <tr>
                <th>#</th>

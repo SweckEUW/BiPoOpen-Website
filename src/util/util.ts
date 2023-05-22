@@ -7,4 +7,14 @@ export const shuffleArray = (array:any) => {
     }
  
     return array;
- }
+}
+
+export const convertNumberToCharacter = (num:number) => {
+   return num
+      .toString()    // convert number to string
+      .split('')     // convert string to array of characters
+      .map(Number)   // parse characters as numbers
+      .map(n => (n || 10) + 64)   // convert to char code, correcting for J
+      .map(c => String.fromCharCode(c))   // convert char codes to strings
+      .join('');     // join values together
+}

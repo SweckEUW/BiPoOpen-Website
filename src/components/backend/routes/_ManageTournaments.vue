@@ -14,7 +14,7 @@ const getTournaments = async () => {
 getTournaments();
 
 const createTournament = async () => {
-    let tournament = {
+    let tournament:any = {
         name: tournamentName.value,
         groupPhase: {
             settings: {
@@ -26,41 +26,44 @@ const createTournament = async () => {
                 advancingTeamsPerGroup: 2
             }
         },
-        teams: [
-            {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
-            {name: "Grün Weiß Altglas", players: ["Joel Kiwitt", "René Manke"]},
-            {name: "Team MöpMöp", players: ["Leon Rose", "Jonas Weck"]},
-            {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
-            {name: "Eintracht Prügel", players: ["Alexander Borsig", "Björn Harz"]},
-            {name: "Team Sunburn", players: ["David Jones", "Marco Radziej"]},
-            {name: "Schauf & Berger", players: ["Jens Schauf", "Marius Berger"]},
-            {name: "Sex-Touristen", players: ["Marius Grote", "Leonard Südbrock"]},
-            {name: "AS Koma", players: ["Antonio Melechi", "Yannick ?"]},
-            {name: "Die Beatmungsgeräte", players: ["Sham Hasso", "Nur-Sena Yildiz"]},
-            {name: "Taktisches Vorrundenaus", players: ["Giulia Sanio", "Jana Meerbecker"]},
-            {name: "Für Gigolo", players: ["Stefan Linke", "Marvin Brinkrolf"]},
-            {name: "Team Anime", players: ["Paul Falkenreck", "Anica Hollenbeck"]},
-            {name: "Peter Pong & Trinkerbell", players: ["Svenja Förster", "Pascal Kurz"]},
-            {name: "Rosenbaum & Grahl", players: ["Cornelius Rosenbaum", "Hanna Grahl"]},
-            {name: "Die Narren", players: ["Matthias Weck", "Lennard Kaffitz"]},
-            {name: "One Punsh Bitches", players: ["Fritz Falkenreck", "Jenny ?"]},
-            {name: "Breuker & Heuser", players: ["Leon Breuker", "Ruben Heuser"]},
-            {name: "Müller & Straub", players: ["Anna Müller", "Leo Straub"]},
-            {name: "Wohlfahrt & Brandt", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
-            {name: "Becker & Gödde", players: ["Jannick Becker", "Steffen Gödde"]},
-            {name: "Blau wie der Ozean", players: ["Michelle Langer", "Maya ?"]},
-            {name: "Steinkemper & ?", players: ["Alexander Steinkemper", "?"]},
-            {name: "Junker & ?", players: ["Peter Junger", "?"]},
-            {name: "Pohlmann & Raik", players: ["Philipp Pohlman", "Raik"]},
-            {name: "Kreimer & Düser", players: ["Nico Kreimer", "Mats Düser"]},
-            {name: "Bierus Pongus", players: ["Matthias Gunter", "FassMartin"]},
-            {name: "Sanio & Happening", players: ["Marie Sanio", "Philip Happening"]},
-            {name: "Schmipf & ?", players: ["Eduard Schmipf", "?"]},
-            {name: "Seidel & ?", players: ["Robert Seidel", "?"]},
-            {name: "Förster & ?", players: ["Saskia Förster", "?"]},
-            {name: "Heitmann & Ossenbrink", players: ["Alexander Heitmann", "Jens Ossenbrink"]}
-        ],
     }
+
+    // DEBUG!
+    tournament.teams = [
+        {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
+        {name: "Grün Weiß Altglas", players: ["Joel Kiwitt", "René Manke"]},
+        {name: "Team MöpMöp", players: ["Leon Rose", "Jonas Weck"]},
+        {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
+        {name: "Eintracht Prügel", players: ["Alexander Borsig", "Björn Harz"]},
+        {name: "Team Sunburn", players: ["David Jones", "Marco Radziej"]},
+        {name: "Schauf & Berger", players: ["Jens Schauf", "Marius Berger"]},
+        {name: "Sex-Touristen", players: ["Marius Grote", "Leonard Südbrock"]},
+        {name: "AS Koma", players: ["Antonio Melechi", "Yannick ?"]},
+        {name: "Die Beatmungsgeräte", players: ["Sham Hasso", "Nur-Sena Yildiz"]},
+        {name: "Taktisches Vorrundenaus", players: ["Giulia Sanio", "Jana Meerbecker"]},
+        {name: "Für Gigolo", players: ["Stefan Linke", "Marvin Brinkrolf"]},
+        {name: "Team Anime", players: ["Paul Falkenreck", "Anica Hollenbeck"]},
+        {name: "Peter Pong & Trinkerbell", players: ["Svenja Förster", "Pascal Kurz"]},
+        {name: "Rosenbaum & Grahl", players: ["Cornelius Rosenbaum", "Hanna Grahl"]},
+        {name: "Die Narren", players: ["Matthias Weck", "Lennard Kaffitz"]},
+        {name: "One Punsh Bitches", players: ["Fritz Falkenreck", "Jenny ?"]},
+        {name: "Breuker & Heuser", players: ["Leon Breuker", "Ruben Heuser"]},
+        {name: "Müller & Straub", players: ["Anna Müller", "Leo Straub"]},
+        {name: "Wohlfahrt & Brandt", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
+        {name: "Becker & Gödde", players: ["Jannick Becker", "Steffen Gödde"]},
+        {name: "Blau wie der Ozean", players: ["Michelle Langer", "Maya ?"]},
+        {name: "Steinkemper & ?", players: ["Alexander Steinkemper", "?"]},
+        {name: "Junker & ?", players: ["Peter Junger", "?"]},
+        {name: "Pohlmann & Raik", players: ["Philipp Pohlman", "Raik"]},
+        {name: "Kreimer & Düser", players: ["Nico Kreimer", "Mats Düser"]},
+        {name: "Bierus Pongus", players: ["Matthias Gunter", "FassMartin"]},
+        {name: "Sanio & Happening", players: ["Marie Sanio", "Philip Happening"]},
+        {name: "Schmipf & ?", players: ["Eduard Schmipf", "?"]},
+        {name: "Seidel & ?", players: ["Robert Seidel", "?"]},
+        {name: "Förster & ?", players: ["Saskia Förster", "?"]},
+        {name: "Heitmann & Ossenbrink", players: ["Alexander Heitmann", "Jens Ossenbrink"]}
+    ]
+
     let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);
     if(response.data.success){

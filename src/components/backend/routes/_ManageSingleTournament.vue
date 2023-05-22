@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {ref} from "vue"
-import {useRoute} from "vue-router";
+import { ref } from "vue"
+import { useRoute } from "vue-router";
 import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
