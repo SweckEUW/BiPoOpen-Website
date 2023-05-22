@@ -3,19 +3,18 @@ import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
 import MatchElement from '@/components/shared/MatchElement.vue';
 
-defineProps(['tournament'])
+defineProps(['getTournament','tournament','isBackend'])
 </script>
 
 <template>
-   <div class="ScheduleKO">
-
+   <div class="GameScheduleKO">
       <div class="gsk-matches">
-         <div v-for="(stage,i) in getMatchesKOPhase(tournament)" :key="i">
-            <div class="gsk-round">{{ "Runde " + (i + 1) }}</div>
+         <div v-for="(stage, stageIndex) in getMatchesKOPhase(tournament)" :key="stageIndex">
+            <div class="gsk-round">{{ "Runde " + (stageIndex + 1) }}</div>
             <div class="gsk-stage">
-               <div class="gsk-match" v-for="(match,x) in stage" :key="x">
-                  <div class="gsk-match-table">{{ "Tisch " + (x + 1) }}</div>
-                  <MatchElement :match="match" :index="i" :isBackend="false"/>
+               <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
+                  <div class="gsk-match-table">{{ "Tisch " + (matchIndex + 1) }}</div>
+                  <MatchElement style="width: 600px; height: 115px;" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
                </div>
             </div>
          </div>
@@ -52,14 +51,5 @@ defineProps(['tournament'])
 }
 .gsk-match-table{
    margin-bottom: 5px;
-}
-
-/* Remove arrows from input field */
-input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
 }
 </style>

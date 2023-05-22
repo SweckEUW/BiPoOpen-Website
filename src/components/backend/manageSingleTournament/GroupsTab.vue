@@ -1,32 +1,24 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted } from "vue"
-import { getGroups, setGroups, generateRandomGroups,getTeamFromID , setGameResultGroupPhase, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { getGroups, setGroups, generateRandomGroups, getTeamFromID, getTeamFromName, setGameResultGroupPhase, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
 
 const props = defineProps(['getTournament','tournament'])
 
-const onDragEnd = async () => {
+const changeGroups = async () => {
    // 1. Construct Groups Array from DOM
    let groups:any = [];
 
    let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
-   for (let i = 0; i < groupAmmount; i++){
+   for (let i = 0; i < groupAmmount; i++){ // Loop over all Groups
       let teams:any = [];
-      let groupDOM:any = document.getElementById("Group-"+i);
-      let tbody:any = groupDOM.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-      for (let y = 0; y < tbody.length; y++) {
-
-         let playersDOM = tbody[y].getElementsByTagName("td")[1].getElementsByTagName("span");
-         let players:any = [];
-         for (let x = 0; x < playersDOM.length; x++)
-            players.push(playersDOM[x].innerText);
-
+      let teamsDomElment:any = document.getElementById("Group-"+i)?.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
+      for (let y = 0; y < teamsDomElment.length; y++) {
          teams.push({
-            name: tbody[y].getElementsByTagName("td")[0].innerText,
-            players: players
+            teamID: getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[1].innerText)._id
          });
       }
 
@@ -37,23 +29,27 @@ const onDragEnd = async () => {
    let success:boolean = await setGroups(props.tournament._id, groups);
    if(success){
       await props.getTournament();
+      await generateRandomMatchesGroupPhase(props.tournament);
+      await props.getTournament();
+      await initMatchesKOPhase(props.tournament);
+      await props.getTournament();
       initSortable();
+      toggleModal();
    }
 }
 
 const initSortable = () => {
-   // setTimeout(() => {
-   //    let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
-   //    for (let i = 0; i < groupAmmount; i++){
-   //       let groupDOM:any = document.getElementById("Group-"+i);
-   //       let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
-   //       new Sortable(tbody, {
-   //          animation: 150,
-   //          group: 'shared',
-   //          // onEnd: onDragEnd,
-   //       });
-   //    }
-   // }, 0);
+   setTimeout(() => {
+      let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+      for (let i = 0; i < groupAmmount; i++){
+         let groupDOM:any = document.getElementById("Group-"+i);
+         let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
+         new Sortable(tbody, {
+            animation: 150,
+            group: 'shared'
+         });
+      }
+   }, 0);
 }
 
 onMounted(() => {
@@ -81,9 +77,12 @@ const generateGroups = async () => {
    toggleModal();
 }
 
+let generateRandom = ref(false);
 let showModal = ref(false);
-const toggleModal = () => {
+const toggleModal = (generate?:boolean) => {
    showModal.value = !showModal.value;
+   if(generate != undefined)
+      generateRandom.value = generate;
 }
 </script>
 
@@ -92,20 +91,24 @@ const toggleModal = () => {
 
       <Transition name="fade">
          <Modal v-if="showModal">
-               <template #title>Gruppen auslosen</template>
+               <template #title>{{generateRandom ? "Gruppen auslosen" : "Gruppen umsortieren"}}</template>
                <template #template>
-               <p style="text-align: center">Sicher das die Gruppen ausgelost werden sollen?<br>Dadurch wird der Spielplan neu generiert und der alte gelöscht!</p>
+               <p style="text-align: center; white-space: break-spaces;">{{  generateRandom ? 
+                  "Sicher das die Gruppen ausgelost werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!" : 
+                  "Sicher das die Gruppen umsortiert werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!"
+               }}</p>
                </template>
                <template #cancle>
                   <div @click="toggleModal()">Abbrechen</div>
                </template>
                <template #confirm>
-                  <div @click="generateGroups()">Auslosen</div>
+                  <div @click="generateRandom ? generateGroups() : changeGroups()">{{ generateRandom ? "Auslosen" : "Umsortieren"}}</div>
                </template>
          </Modal>
       </Transition>
 
-      <div class="bp-button" @click="toggleModal()">Gruppen auslosen</div>
+      <div class="bp-button" style="margin-bottom: 20px;" @click="toggleModal(true)">Gruppen auslosen</div>
+      <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
       <table class="table table-hover caption-top" v-for="(group,index) in getGroups(tournament)" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>

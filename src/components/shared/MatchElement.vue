@@ -1,39 +1,57 @@
 <script setup lang="ts">
-const props = defineProps(['match','toggleModal','index',"isBackend"])
+import { ref } from "vue"
+
+import ModalSetGameResult from '@/components/shared/ModalSetGameResult.vue';
+
+defineProps(['match','stageIndex',"matchIndex","isBackend","tournament","getTournament","isGroupPhase"])
+let showModal = ref(false);
+const toggleModal = () => {
+   showModal.value = !showModal.value;
+}
 </script>
 
 <template>
     <div class="Match">
 
-        <!-- Team 1 -->
-        <div class="gsk-match-team" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
-            <div v-if="index == 0 || !match.team1" class="gsk-match-placeholder">{{ match.placeHolderTeam1 }}</div>
-            <div v-if="match.team1" >
-                <div>{{match.team1.name}}</div>
-                <div v-for="player in match.team1.players" :key="player">{{ player }}</div>
-            </div>
-        </div>
+         <Transition name="fade">
+            <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
+         </Transition>
 
-        <!-- Result -->
-        <div v-if="!match.result && match.team1 && match.team2">
-            <div v-if="isBackend " class="bp-button gsk-button" @click="toggleModal(match)">Eintragen</div>
-            <div v-else class="gsk-result">vs.</div>
-        </div>
-        <div v-else-if="!match.result" style="padding: 10px;">vs.</div>
-        <div class="gsk-result" v-else @click="isBackend ? toggleModal(match) : ''" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : ''}">
-            <div>{{match.result.team1Score + " - " + match.result.team2Score}}</div>
-            <div>{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
-            <div>{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
-        </div>
-
-        <!-- Team 2 -->
-        <div class="gsk-match-team" :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
-         <div v-if="index == 0 || !match.team2" class="gsk-match-placeholder">{{ match.placeHolderTeam2 }}</div>
-         <div v-if="match.team2">
-               <div>{{match.team2.name}}</div>
-               <div v-for="player in match.team2.players" :key="player">{{ player }}</div>
+         <div v-if="matchIndex != undefined" class="mt-index" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+           <div>{{ matchIndex + 1 }}</div> 
          </div>
-        </div>
+
+         <!-- Team 1 -->
+         <div class="mt-team" style="text-align: right" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+            <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
+            <div v-if="match.team1" >
+               <div class="mt-team-name">{{match.team1.name}}</div>
+               <div class="mt-team-players" v-for="player in match.team1.players" :key="player">{{ player }}</div>
+            </div>
+         </div>
+
+         <!-- Result -->
+         <div v-if="!match.result && !isBackend || !match.team1 || !match.team2" class="mt-result">vs.</div>
+         
+         <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button mt-result" @click="toggleModal()">Eintragen</div>
+
+         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" :style="{
+            'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : '',
+            'paddingTop' : stageIndex == 0 ? '31px' : ''
+         }">
+            <div class="mt-result-team">{{match.result.team1Score + " - " + match.result.team2Score}}</div>
+            <div class="mt-result-player">{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
+            <div class="mt-result-player">{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
+         </div>
+
+         <!-- Team 2 -->
+         <div class="mt-team" :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+            <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
+            <div v-if="match.team2">
+               <div class="mt-team-name">{{match.team2.name}}</div>
+               <div class="mt-team-players" v-for="player in match.team2.players" :key="player">{{ player }}</div>
+            </div>
+         </div>
 
     </div>
 </template>
@@ -44,49 +62,70 @@ const props = defineProps(['match','toggleModal','index',"isBackend"])
    display: flex;
    justify-content: center;
    align-items: center;
+   white-space: nowrap;
+   width: 100%;
 }
-
-.gsk-match-team{
-   width: 240px;
-   padding: 10px;
-   height: 115px;
+.mt-index{
+   width: 40px;
+   min-width: 40px;
+   text-align: center;
+   align-self: stretch;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+.mt-team{
+   width: 100%;
    display: flex;
    flex-direction: column;
    justify-content: center;
 }
-.gsk-match-placeholder{
-   font-size: 16px !important;
-   font-style: italic !important;
-   font-weight: normal !important;
-   margin-bottom: 0px !important;
+.mt-team, .mt-result{
+   padding: 10px;
 }
-.gsk-match-team:nth-child(1){
-   text-align: right;
-}
-.gsk-match-team div:nth-child(2), .gsk-match-team div:nth-child(3), .gsk-result div{
-   font-size: 14px;
-   font-style: italic;
-   color: rgb(87, 87, 87);
-}
-.gsk-match-team div:nth-child(1), .gsk-result div:nth-child(1){
+.mt-team-name, .mt-result-team{
    font-size: 18px;
    font-weight: bold;
    color: rgb(56, 56, 56);
    font-style: normal;
    margin-bottom: 5px;
+}  
+.mt-team-players, .mt-result-player, .mt-team-placeholder{
+   font-size: 14px;
+   font-style: italic;
+   color: rgb(87, 87, 87);
 }
-.gsk-result{
+.mt-result{
    text-align: center;
-   width: 100px;
-   padding: 10px;
-   padding-top: 35px;
-   height: 115px;
-   font-size: 18px;
+   width: 200px;
 }
-.gsk-button{
-   width: 100px;
+.mt-button{
    font-size: 16px;
-   padding: 20px 10px;
-   margin: 30px 10px;
+   margin: 0 20px;
+   width: calc(200px - 40px);    /* width from .mt-result - margin */
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+   .Match{
+      white-space: normal;
+   }
+   .mt-index{
+      display: none;
+   }
+   .mt-team{
+      padding: 10px 5px;
+   }
+   .mt-team-name, .mt-result-team{
+      height: 50px;
+      font-size: 16px;
+   }
+   .mt-team-players, .mt-result-player, .mt-team-placeholder{
+      height: 25px;
+      font-size: 14px;
+   }
+   .mt-result{
+      width: 140px;
+   }
 }
 </style>
