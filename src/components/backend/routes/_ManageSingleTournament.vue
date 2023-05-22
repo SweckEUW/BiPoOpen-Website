@@ -5,7 +5,7 @@ import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
 import GroupsTab from '@/components/backend/manageSingleTournament/GroupsTab.vue';
-import GamesScheduleTab from '@/components/backend/manageSingleTournament/GamesScheduleTab.vue';
+import Schedule from '@/components/shared/schedule/Schedule.vue';
 
 let tournament = ref();
 
@@ -44,7 +44,7 @@ getTournament();
             <GroupsTab :getTournament="getTournament" :tournament="tournament"/>
          </div>
          <div class="tab-pane fade" id="result-tab-pane" role="tabpanel" aria-labelledby="result-tab" tabindex="0">
-            <GamesScheduleTab :getTournament="getTournament" :tournament="tournament"/>
+            <Schedule :getTournament="getTournament" :tournament="tournament" :isBackend="true"/>
          </div>
       </div>
 

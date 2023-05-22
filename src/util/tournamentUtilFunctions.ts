@@ -35,6 +35,11 @@ export const getTeamFromID = (tournament: any, teamID:string) => {
     return team;
 }
 
+export const getTeamFromName = (tournament: any, teamName:string) => {
+    let team = tournament.teams.find((team:any) => team.name == teamName);
+    return team;
+}
+
 // GROUPS
 export const getGroups = (tournament:any) => {
     if(!tournament.groupPhase.groups)
@@ -111,7 +116,8 @@ export const getMatchesGroupPhase = (tournament:any) => {
             matches[i].push({
                 result: match.result,
                 team1: getTeamFromID(tournament, match.team1ID),
-                team2: getTeamFromID(tournament, match.team2ID)
+                team2: getTeamFromID(tournament, match.team2ID),
+                _id: match._id
             });
         });
     });
@@ -152,7 +158,7 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
     await setMatchesGroupPhase(tournament._id,matches);
 }
 
-export const setGameResultGroupPhase = async (tournament:any, selectedMatch:any, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
+export const setGameResultGroupPhase = async (tournament:any, matchID:string, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
     let result = {
        team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
        team1Player1Score: team1Player1Score, 
@@ -163,13 +169,12 @@ export const setGameResultGroupPhase = async (tournament:any, selectedMatch:any,
        team2Player2Score: team2Player2Score
     }
 
-    // Find selectedMatch in matches and add result 
+    // Find match in matches and add result 
     let matches = tournament.groupPhase.matches;
     for (let i = 0; i < matches.length; i++) {
         for (let x = 0; x < matches[i].length; x++) {
-            let match = matches[i][x]
-            if(match.team1ID == selectedMatch.team1._id && match.team2ID == selectedMatch.team2._id)
-                matches[i][x].result = result;
+            if(matchID == matches[i][x]._id)
+                matches[i][x].result = result;   
         }
     }
 
@@ -191,7 +196,8 @@ export const getMatchesKOPhase = (tournament:any) => {
                 placeHolderTeam2: match.placeHolderTeam2,
                 result: match.result,
                 team1: getTeamFromID(tournament, match.team1ID),
-                team2: getTeamFromID(tournament, match.team2ID)
+                team2: getTeamFromID(tournament, match.team2ID),
+                _id: match._id
             });
         });
     });
@@ -268,7 +274,7 @@ export const updateMatchesKOPhase = async (tournament:any) => {
 }
 
 // KO-PHASE
-export const setGameResultKOPhase = async (tournament:any, selectedMatch:any, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
+export const setGameResultKOPhase = async (tournament:any, matchID:string, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
     let result = {
        team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
        team1Player1Score: team1Player1Score, 
@@ -279,14 +285,12 @@ export const setGameResultKOPhase = async (tournament:any, selectedMatch:any, te
        team2Player2Score: team2Player2Score
     }
 
-    // Find selectedMatch in matches and add result 
+    // Find match in matches and add result 
     let matches = tournament.koPhase.matches;
     for (let i = 0; i < matches.length; i++) {
         for (let x = 0; x < matches[i].length; x++) {
-            let match = matches[i][x];
-            if(match.team1ID == selectedMatch.team1._id && match.team2ID == selectedMatch.team2._id){
+            if(matchID == matches[i][x]._id)
                 matches[i][x].result = result;
-            }
         }
     }
 

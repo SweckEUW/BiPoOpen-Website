@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import GameScheduleGroups from '@/components/backend/manageSingleTournament/GameScheduleGroups.vue';
-import GameScheduleKO from '@/components/backend/manageSingleTournament/GameScheduleKO.vue';
+import ScheduleGroups from '@/components/shared/schedule/ScheduleGroups.vue';
+import ScheduleKO from '@/components/shared/schedule/ScheduleKO.vue';
 
-const props = defineProps(['getTournament','tournament'])
+defineProps(['getTournament','tournament',"isBackend"])
 </script>
 
 <template>
-   <div class="GameScheduleTab">
+   <div class="Schedule">
       <!-- Tabs -->
       <ul class="nav nav-tabs  justify-content-center" id="myTab" role="tablist">
          <li class="nav-item" role="presentation">
@@ -20,17 +20,17 @@ const props = defineProps(['getTournament','tournament'])
       <!-- Content -->
       <div class="tab-content">
          <div class="tab-pane fade show active" id="GameScheduleGroups" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-            <GameScheduleGroups :getTournament="getTournament" :tournament="tournament"/>
+            <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
          </div>
          <div class="tab-pane fade" id="GameScheduleKO" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-            <GameScheduleKO :getTournament="getTournament" :tournament="tournament"/>
+            <ScheduleKO :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
          </div>
       </div>
    </div>
 </template>
 
 <style scoped>
-.GameScheduleTab{
+.Schedule{
    margin-top: 50px;
 }
 </style>
