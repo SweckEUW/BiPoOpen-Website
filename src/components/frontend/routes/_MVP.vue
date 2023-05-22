@@ -32,9 +32,9 @@ window.addEventListener("resize", () => {
                 <tr>
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                     <th>{{'Name'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Spiele' : 'Sp.'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Treffer pro Spiel' : 'Trf. pro Spi.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Treffer pro Spiel' : 'Trf. pro Sp.'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getrunk. Becher'}}</th>
                 </tr>
             </thead>
@@ -42,9 +42,9 @@ window.addEventListener("resize", () => {
                 <tr v-for="(player, index) in players" :key="index">
                     <td>{{ index + 1 }}</td>
                     <td>{{ player.name }}</td>
-                    <td>{{ player.ammountOfMatches }}</td>
-                    <td>{{ player.score }}</td>
                     <td>{{ (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2) }}</td>
+                    <td>{{ player.score }}</td>
+                    <td>{{ player.ammountOfMatches }}</td>
                     <td>{{ player.ammountOfDrunkenCups }}</td>
                 </tr>
             </tbody>

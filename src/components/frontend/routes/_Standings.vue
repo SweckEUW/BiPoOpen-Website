@@ -36,7 +36,7 @@ window.addEventListener("resize", () => {
                     <th>Teamname</th>
                     <th>Spieler</th>
                     <th>{{ windowWidth > 900 ? 'Siege' :'Sg.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Spiele' :'Sp.'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Spiele' :'Spi.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
                 </tr>
