@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
 import { getGroups, getTournamentByName, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
+import { convertNumberToCharacter } from "@/util/util.js"; 
 
 let tournament = ref();
 let groups = ref();
@@ -28,7 +29,7 @@ window.addEventListener("resize", () => {
 <template>
     <div v-if="tournament">
         <table class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
-            <caption>{{"Gruppe " + index}}</caption>
+            <caption>{{"Gruppe " + convertNumberToCharacter(index)}}</caption>
             <thead>
                 <tr>
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>

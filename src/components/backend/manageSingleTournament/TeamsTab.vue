@@ -127,7 +127,7 @@ const removeTeamButton = async () => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team, id) in props.tournament?.teams" @click="toggleModalEditTeam(team)" :key="team.name">
+            <tr v-for="(team, id) in tournament.teams" @click="toggleModalEditTeam(team)" :key="team.name">
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>

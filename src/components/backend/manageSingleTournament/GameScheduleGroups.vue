@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import {ref} from "vue"
 import Sortable from "sortablejs";
-import {onMounted} from "vue"
+import { ref } from "vue"
+import { onMounted } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase, setGameResultGroupPhase } from "@/util/tournamentUtilFunctions.js";
+import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
+import { table } from "console";
 
 const props = defineProps(['getTournament','tournament'])
 
 const onDragEnd = async (evt:any) => {
    let matches = props.tournament.groupPhase.matches;
-   let groupIndex = parseInt(evt.srcElement.parentElement.getElementsByTagName("caption")[0].innerText.split(" ")[1]) - 1;
+
+   let groupCaption = evt.srcElement.parentElement.getElementsByTagName("caption")[0].getElementsByTagName("div")[0];
+   let groupIndex = groupCaption.innerText.split(" ")[1].toLowerCase().charCodeAt(0) - 97;
+
    let matchesInGroup = matches[groupIndex];
    let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
    matchesInGroup.splice(evt.newIndex, 0, movedMatch[0]);
@@ -131,7 +136,10 @@ const toggleModal = (match?:any) => {
       </Transition>
 
       <table class="table table-hover caption-top" v-for="tableIndex in tournament.groupPhase.settings.fixedGroupAmmount" :key="tableIndex" :id="'Match-Table-'+tableIndex">
-         <caption>{{ "Tisch " +  tableIndex}}</caption>
+         <caption>
+            <div>{{ "Gruppe " + convertNumberToCharacter(tableIndex)}}</div>
+            <div>{{ "Tisch " + tableIndex }}</div>
+         </caption>
          <thead>
             <tr>
                <th>#</th>
@@ -141,12 +149,18 @@ const toggleModal = (match?:any) => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(match,matchIndex) in getMatchesGroupPhase(props.tournament)[tableIndex-1]" :key="match">
+            <tr v-for="(match, matchIndex) in getMatchesGroupPhase(tournament)[tableIndex-1]" :key="match">
+
+               <!-- Match Number -->
                <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">{{ matchIndex + 1 }}</td>
+
+               <!-- Team 1 -->
                <td :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{match.team1.name}}</div>
                   <div v-for="player in match.team1.players" :key="player">{{ player }}</div>
                </td>
+
+               <!-- Result -->
                <td v-if="!match.result" @click="toggleModal(match)">
                   <div class="bp-button rt-button">Eintragen</div>
                </td>
@@ -155,6 +169,8 @@ const toggleModal = (match?:any) => {
                   <div>{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
                   <div>{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
                </td>
+
+               <!-- Team 2 -->
                <td :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
                   <div>{{match.team2.name}}</div>
                   <div v-for="player in match.team2.players" :key="player">{{ player }}</div>
@@ -206,10 +222,14 @@ table{
    margin-top: 30px;
    text-align: center;
 }
-caption{
+caption div:first-child{
    font-size: 28px;
    font-weight: bold;
    color: black;
+}
+caption div:nth-child(2){
+   font-size: 20px;
+   color: rgb(77, 77, 77);
 }
 table th{
    font-size: 20px;

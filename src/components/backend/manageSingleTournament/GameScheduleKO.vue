@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import {ref} from "vue"
+import { ref } from "vue"
 import { setGameResultKOPhase, getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
+import MatchElement from '@/components/shared/MatchElement.vue';
+
 
 const props = defineProps(['getTournament','tournament'])
 
@@ -94,39 +96,12 @@ const toggleModal = (match?:any) => {
       </Transition>
 
       <div class="gsk-matches">
-         <div v-for="(stage,i) in getMatchesKOPhase(props.tournament)" :key="i">
+         <div v-for="(stage,i) in getMatchesKOPhase(tournament)" :key="i">
             <div class="gsk-round">{{ "Runde " + (i + 1) }}</div>
             <div class="gsk-stage">
                <div class="gsk-match" v-for="(match,x) in stage" :key="x">
-
                   <div class="gsk-match-table">{{ "Tisch " + (x + 1) }}</div>
-
-                  <div class="gsk-match-container">
-                     <div class="gsk-match-team" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
-                        <div v-if="!match.team1" style="margin-top: 25px;">{{ match.placeHolderTeam1 }}</div>
-                        <div v-else>
-                           <div>{{match.team1.name}}</div>
-                           <div v-for="player in match.team1.players" :key="player">{{ player }}</div>
-                        </div>
-                     </div>
-                     <div v-if="!match.result && match.team1 && match.team2" @click="toggleModal(match)">
-                        <div class="bp-button gsk-button">Eintragen</div>
-                     </div>
-                     <div v-else-if="!match.result" style="margin-top: 25px; padding: 20px;" >vs.</div>
-                     <div class="gsk-result" v-else @click="toggleModal(match)" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : ''}">
-                        <div>{{match.result.team1Score + " - " + match.result.team2Score}}</div>
-                        <div>{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
-                        <div>{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
-                     </div>
-                     <div class="gsk-match-team" :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
-                        <div v-if="!match.team2" style="margin-top: 25px;">{{ match.placeHolderTeam2 }}</div>
-                        <div v-else>
-                           <div>{{match.team2.name}}</div>
-                           <div v-for="player in match.team2.players" :key="player">{{ player }}</div>
-                        </div>
-                     </div>
-                  </div>
-
+                  <MatchElement :match="match" :index="i" :toggleModal="toggleModal" :isBackend="true"/>
                </div>
             </div>
          </div>
@@ -174,6 +149,8 @@ const toggleModal = (match?:any) => {
 .gsk-matches{
    display: flex;
    flex-direction: row;
+   overflow-x: scroll;
+   overflow-y: hidden;
 }
 .gsk-round{
    font-weight: bold;
@@ -185,7 +162,6 @@ const toggleModal = (match?:any) => {
    display: flex;
    flex-direction: column;
    justify-content: space-around;
-   position: relative;
    height: 100%;
 }
 .gsk-match{
@@ -196,45 +172,9 @@ const toggleModal = (match?:any) => {
    margin-bottom: 10px;
 }
 .gsk-match-table{
-   margin-bottom: 10px;
-}
-.gsk-match-container{
-   display: flex;
-}
-
-.gsk-match-team{
-   width: 240px;
-   padding: 20px 10px;
-}
-.gsk-match-team:nth-child(1){
-   text-align: right;
-}
-.gsk-match-team div:nth-child(2), .gsk-match-team div:nth-child(3), .gsk-result div{
-   font-size: 14px;
-   font-style: italic;
-   color: rgb(87, 87, 87);
-}
-.gsk-match-team div:nth-child(1), .gsk-result div:nth-child(1){
-   height: 25px;
-   font-size: 18px;
-   font-weight: bold;
-   color: rgb(56, 56, 56);
-   font-style: normal;
    margin-bottom: 5px;
 }
-.gsk-result{
-   text-align: center;
-   width: 100px;
-   padding: 10px 10px;
-   padding-top: 20px;
-   font-size: 18px;
-}
-.gsk-button{
-   width: 100px;
-   font-size: 16px;
-   padding: 20px 10px;
-   margin: 30px 10px;
-}
+
 /* Remove arrows from input field */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none;
