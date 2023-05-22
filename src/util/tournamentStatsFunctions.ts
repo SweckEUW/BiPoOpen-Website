@@ -1,8 +1,12 @@
 import { getMatchesGroupPhase, getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
-export const getAmmountOfWinsFromTeam = (tournament:any, teamName:any) => {
+export const getAmmountOfWinsFromTeam = (tournament:any, teamName:any, onlyGroupPhase:boolean) => {
     let wins:number = 0;
-    let matches = getMatchesGroupPhase(tournament).concat(getMatchesKOPhase(tournament));
+    
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
     matches.forEach((group:any) => {
         group.forEach((match:any) => {
             if(match.result){
@@ -17,17 +21,21 @@ export const getAmmountOfWinsFromTeam = (tournament:any, teamName:any) => {
     return wins;
 }
 
-export const getAmmountOfHitsFromTeam = (tournament:any, team:any) => { 
-    let score = 0;
+export const getAmmountOfHitsFromTeam = (tournament:any, team:any, onlyGroupPhase:boolean) => { 
+    let score:number = 0;
     team.players.forEach((player:any) => {
-        score += getAmmountOfHitsFromPlayer(tournament, player);
+        score += getAmmountOfHitsFromPlayer(tournament, player, onlyGroupPhase);
     });
     return score;
 }
 
-export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:any) => { 
-    let score = 0;
-    let matches = getMatchesGroupPhase(tournament).concat(getMatchesKOPhase(tournament));
+export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:any, onlyGroupPhase:boolean) => { 
+    let score:number = 0;
+
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
@@ -46,17 +54,21 @@ export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:any) => {
     return score;
 }
 
-export const getAmmountOfEnemyHitsFromTeam = (tournament:any, team:any) => { 
-    let score = 0;
+export const getAmmountOfEnemyHitsFromTeam = (tournament:any, team:any, onlyGroupPhase:boolean) => { 
+    let score:number = 0;
     team.players.forEach((player:any) => {
-        score += getAmmountEnemyHitsFromPlayer(tournament, player);
+        score += getAmmountEnemyHitsFromPlayer(tournament, player, onlyGroupPhase);
     });
     return score;
 }
 
-export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any) => { 
-    let score = 0;
-    let matches = getMatchesGroupPhase(tournament).concat(getMatchesKOPhase(tournament));
+export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any,  onlyGroupPhase:boolean) => { 
+    let score:number = 0;
+    
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
@@ -75,13 +87,17 @@ export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any) =>
     return score;
 }
 
-export const getHitDifferenceFromTeam = (tournament:any, team:any) => { 
-   return getAmmountOfHitsFromTeam(tournament, team) - getAmmountOfEnemyHitsFromTeam(tournament, team);
+export const getHitDifferenceFromTeam = (tournament:any, team:any, onlyGroupPhase:boolean) => { 
+   return getAmmountOfHitsFromTeam(tournament, team, onlyGroupPhase) - getAmmountOfEnemyHitsFromTeam(tournament, team, onlyGroupPhase);
 }
 
-export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:any) => { 
-    let ammountOfMatches = 0;
-    let matches = getMatchesGroupPhase(tournament).concat(getMatchesKOPhase(tournament));
+export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:any, onlyGroupPhase:boolean) => { 
+    let ammountOfMatches:number = 0;
+
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
