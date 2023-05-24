@@ -59,8 +59,8 @@ a{
 .Page{
 	margin: auto;
 	margin-top: 150px;
-	padding-bottom: 100px;
-	min-height: calc(100vh - 300px - 80px);
+	padding-bottom: 50px;
+	min-height: calc(100vh - 200px - 80px);
 	width: 90%;
 }
 
@@ -117,6 +117,7 @@ a{
 	.Page{
 		margin-top: 80px;
 		width: 95%;
+		padding-bottom: 30px;
 	}
 }
 </style>
