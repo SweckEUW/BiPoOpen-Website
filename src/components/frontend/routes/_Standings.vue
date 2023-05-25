@@ -78,6 +78,10 @@ table td:nth-child(3) span{
     margin-right: 15px; 
     display: block;
 }
+table td:nth-child(2){
+    width: 250px;
+    max-width: 250px;
+}
 
 /*MOBILE*/
 @media (width <= 900px){

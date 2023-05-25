@@ -29,20 +29,20 @@ window.addEventListener("resize", () => {
     <div>
         <table class="table table-hover caption-top" id="mvp-table">
             <thead>
-                <tr>
+                <tr style="height: auto;">
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                     <th>{{'Name'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Treffer pro Spiel' : 'Trf. pro Spi.'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getrunk. Becher'}}</th>
+                    <th>{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(player, index) in players" :key="index">
-                    <td>{{ index + 1 }}</td>
+                    <td>{{ player.placement + 1}}</td>
                     <td>{{ player.name }}</td>
-                    <td>{{ (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2) }}</td>
+                    <td>{{ player.averageScore }}</td>
                     <td>{{ player.score }}</td>
                     <td>{{ player.ammountOfMatches }}</td>
                     <td>{{ player.ammountOfDrunkenCups }}</td>
@@ -71,6 +71,11 @@ tbody tr:nth-of-type(3){
     color: white;
     font-size: 16px;
 }
+table th{ 
+    position: sticky;
+    top: 100px;
+    background-color: #FFF;
+}
 
 /*MOBILE*/
 @media (width <= 900px){
@@ -80,13 +85,22 @@ tbody tr:nth-of-type(3){
     table *{
         font-size: 15px;
     }
-    table th:nth-of-type(1), table td:nth-of-type(1){
+    tr{
+        height: 80px;
+    }
+    tr *{
+        vertical-align: middle;
+    }
+    table th{ 
+        top: 60px;
+    }
+    th:nth-of-type(1), td:nth-of-type(1){
         max-width: 30px;
         width: 30px;
         padding-left: 2px;
         padding-right: 10px;
     }
-    table th:nth-of-type(2), table td:nth-of-type(2){
+    th:nth-of-type(2), td:nth-of-type(2){
         max-width: 100px;
         width: 100px;
     }
