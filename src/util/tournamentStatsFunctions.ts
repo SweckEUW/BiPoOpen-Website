@@ -59,13 +59,14 @@ export const getAmmountOfEnemyHitsFromTeam = (tournament:any, team:any, onlyGrou
     team.players.forEach((player:any) => {
         score += getAmmountEnemyHitsFromPlayer(tournament, player, onlyGroupPhase);
     });
+
     return score;
 }
 
 export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any,  onlyGroupPhase:boolean) => { 
     let score:number = 0;
     
-    let matches = getMatchesGroupPhase(tournament)
+    let matches = getMatchesGroupPhase(tournament);
     if(!onlyGroupPhase)
         matches = matches.concat(getMatchesKOPhase(tournament));
 
@@ -115,3 +116,44 @@ export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:any, on
 
     return ammountOfMatches;
 }
+
+export const checkIfTeam1WonVsTeam2 = (tournament:any, team1ID:string, team2ID:string) => { 
+    let team1Won = false;
+
+    let matches = getMatchesGroupPhase(tournament);
+    matches.forEach((matchesForGroup:any) => {
+        matchesForGroup.forEach((match:any) => {
+            if(match.result){
+                if(match.team1._id == team1ID && match.team2._id == team2ID)
+                    team1Won = match.result.team1Score > match.result.Team2ID;   
+            }
+        });
+    });
+
+    return team1Won;
+}
+
+export const getAmmountOfDrunkenCupsFromteam = (tournament:any, team:any, onlyGroupPhase:boolean) => { 
+    let cups = getAmmountOfEnemyHitsFromTeam(tournament, team, false);
+
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
+    // Wenn ein Spiel verloren wurde, errechne stehengebliebne Becher
+    let leftOverCups = 0;
+    matches.forEach((groups:any) => {
+        groups.forEach((match:any) => {
+            if(match.result){
+                if(match.team1._id == team._id && match.result.team1Score < match.result.team2Score)
+                    leftOverCups += match.result.team2Score - match.result.team1Score;
+                if(match.team2._id == team._id && match.result.team1Score > match.result.team2Score)
+                    leftOverCups += match.result.team1Score - match.result.team2Score;
+            }
+        });
+    });
+
+    return (leftOverCups + cups);
+}
+
+

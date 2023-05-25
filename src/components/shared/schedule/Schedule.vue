@@ -33,4 +33,17 @@ defineProps(['getTournament','tournament',"isBackend"])
 .Schedule{
    margin-top: 50px;
 }
+.nav-tabs{
+   position: sticky;
+   top: 106px;
+   background: white;
+   z-index: 2;
+}
+
+/* MOBILE */
+@media (width <= 900px){
+   .nav-tabs{
+      top: 64px;
+   }
+}
 </style>

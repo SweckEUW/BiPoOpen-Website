@@ -1,6 +1,6 @@
 import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
-import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfEnemyHitsFromTeam, getAmmountOfWinsFromTeam, getHitDifferenceFromTeam, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
+import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfEnemyHitsFromTeam, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, checkIfTeam1WonVsTeam2, getHitDifferenceFromTeam, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 // TOURNAMENT
@@ -87,19 +87,36 @@ export const getGroupsWithStats = (tournament:any) => {
             teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], true);
             teamTMP.score = getAmmountOfHitsFromTeam(tournament, teamTMP, true) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, teamTMP, true)
             teamTMP.scoreDifference = getHitDifferenceFromTeam(tournament, teamTMP, true);
+            teamTMP.hits = getAmmountOfHitsFromTeam(tournament, teamTMP, true);
             groups[i].teams.push(teamTMP);
         });
     });
 
-    // Sort after wins and hit difference
+    // Sort after wins, hit difference and direct win against component
     groups.forEach((group:any) => {
         group.teams = group.teams.sort((team1:any, team2:any) => {
-            if(team1.wins == team2.wins)
+            if (team1.hits == team2.hits && team1.scoreDifference == team2.scoreDifference && team1.wins == team2.wins)
+                return checkIfTeam1WonVsTeam2(tournament, team1._id, team2._id);
+            else if (team2.scoreDifference == team1.scoreDifference && team1.wins == team2.wins)
+                return team2.hits - team1.hits;
+            else if(team1.wins == team2.wins)
                 return team2.scoreDifference - team1.scoreDifference;
-            else
-                return team2.wins - team1.wins;
+
+            return team2.wins - team1.wins;
         });
     });
+
+
+    // TODO: Set placement
+    // for (let i = 0; i < players.length; i++) {
+    //     players[i].placement = i;
+    //     let playersWithSameScore = players.filter((player:any) => player.averageScore == players[i].averageScore && player.ammountOfDrunkenCups == players[i].ammountOfDrunkenCups)
+    //     if(playersWithSameScore.length > 1){
+    //         playersWithSameScore.forEach((playerWithSameScore:any) => {
+    //             playerWithSameScore.placement = playersWithSameScore[0].placement;
+    //         });
+    //     }
+    // }
 
     return groups;
 }
@@ -300,26 +317,40 @@ export const setGameResultKOPhase = async (tournament:any, matchID:string, team1
 
 // PLAYERS
 export const getPlayersWithStats = (tournament:any) => {
-    let players = [];
+    let players:any = [];
     let teams = tournament.teams;
     for (let i = 0; i < teams.length; i++) {
         for (let x = 0; x < teams[i].players.length; x++) {
-            players.push({
+            let player:any = {
                 name: teams[i].players[x],
                 score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false),
                 ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false),
                 team: teams[i],
-                ammountOfDrunkenCups: Math.ceil(getAmmountOfEnemyHitsFromTeam(tournament, teams[i], false) / 2)
-            }); 
+                ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i], false) / 2)
+            };
+            player.averageScore = (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2);
+            players.push(player); 
         }
     }
 
     // Sort after average hit cups per game
-    players.sort((player1, player2) => {
-        let score1 = player1.ammountOfMatches == 0 ? 0 : player1.score / player1.ammountOfMatches;
-        let score2 = player2.ammountOfMatches == 0 ? 0 : player2.score / player2.ammountOfMatches;
-        return score2 - score1;
+    players.sort((player1:any, player2:any) => {
+        if(player2.averageScore == player1.averageScore)
+            return player2.ammountOfDrunkenCups - player1.ammountOfDrunkenCups;
+        
+        return player2.averageScore - player1.averageScore;
     });
+
+    // Set placement
+    for (let i = 0; i < players.length; i++) {
+        players[i].placement = i;
+        let playersWithSameScore = players.filter((player:any) => player.averageScore == players[i].averageScore && player.ammountOfDrunkenCups == players[i].ammountOfDrunkenCups)
+        if(playersWithSameScore.length > 1){
+            playersWithSameScore.forEach((playerWithSameScore:any) => {
+                playerWithSameScore.placement = playersWithSameScore[0].placement;
+            });
+        }
+    }
 
     return players;
 }
