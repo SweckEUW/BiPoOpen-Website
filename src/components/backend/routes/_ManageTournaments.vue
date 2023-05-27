@@ -36,7 +36,7 @@ const createTournament = async () => {
         {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
         {name: "Eintracht Prügel", players: ["Alexander Borsig", "Björn Harz"]},
         {name: "Team Sunburn", players: ["David Jones", "Marco Radziej"]},
-        {name: "Jens & Marius", players: ["Jens Schauf", "Marius Berger"]},
+        {name: "Malle Schlauchkombo", players: ["Jens Schauf", "Marius Berger"]},
         {name: "Sex-Touristen", players: ["Marius Grote", "Leonard Südbrock"]},
         {name: "AS Koma", players: ["Antonio Melechi", "Yannick Overbeck"]},
         {name: "Die Beatmungsgeräte", players: ["Sham Hasso", "Nur-Sena Yildiz"]},
@@ -44,7 +44,7 @@ const createTournament = async () => {
         {name: "Für Gigolo", players: ["Stefan Linke", "Marvin Brinkrolf"]},
         {name: "Team Anime", players: ["Paul Falkenreck", "Anica Hollenbeck"]},
         {name: "Peter Pong & Trinkerbell", players: ["Svenja Förster", "Pascal Kurz"]},
-        {name: "Eduard & Lea", players: ["Eduard Schimpf", "Lea Ableitner"]},
+        {name: "Saufende Sachsen", players: ["Eduard Schimpf", "Lea Ableitner"]},
         {name: "Die Narren", players: ["Matthias Weck", "Lennard Kaffitz"]},
         {name: "One Punsh Bitches", players: ["Fritz Falkenreck", "Jenny Lemke"]},
         {name: "Leon & Ruben", players: ["Leon Breuker", "Ruben Heuser"]},
@@ -54,11 +54,12 @@ const createTournament = async () => {
         {name: "Blau wie der Ozean", players: ["Michelle Langer", "Maya Langer"]},
         {name: "Nico & Mats", players: ["Nico Kreimer", "Mats Düser"]},
         {name: "Bierus Pongus", players: ["Matthias Gunter", "Martin Brandt"]},
-        {name: "Alexander & Jens", players: ["Alexander Heitmann", "Jens Ossenbrink"]},
-        {name: "Wallmann", players: ["Peter Junker", "Tobias Mootz"]},
-        {name: "Sophia & Leonie", players: ["Sophia Mersch", "Leonie Offele"]},
+        {name: "FC Energie Kopfnuss", players: ["Alexander Heitmann", "Jens Ossenbrink"]},
+        {name: "Baywatch", players: ["Peter Junker", "Tobias Mootz"]},
+        {name: "Designated Last Place", players: ["Nadja Pohlmann", "Sina Westhus"]},
         {name: "Brews Brothers", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
-        {name: "Charly & Chiara", players: ["Charly Bramers", "Chiara Sochart"]}
+        {name: "Charly & Chiara", players: ["Charly Bramers", "Chiara Sochart"]},
+        {name: "Lovis & Marco", players: ["Lovis Büker", "Marco Grinder"]}
     ]
 
     let response = await axios.post("/createTournament", tournament);
