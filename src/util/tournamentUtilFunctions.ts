@@ -1,6 +1,6 @@
 import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
-import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfEnemyHitsFromTeam, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, checkIfTeam1WonVsTeam2, getHitDifferenceFromTeam, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
+import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 // TOURNAMENT
@@ -83,11 +83,15 @@ export const getGroupsWithStats = (tournament:any) => {
         groups.push({teams: []});
         group.teams.forEach((team:any) => {
             let teamTMP = team;
+
+            let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP._id, true);
+            let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP._id, true);
+
             teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, true);
             teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], true);
-            teamTMP.score = getAmmountOfHitsFromTeam(tournament, teamTMP, true) + " : " + getAmmountOfEnemyHitsFromTeam(tournament, teamTMP, true)
-            teamTMP.scoreDifference = getHitDifferenceFromTeam(tournament, teamTMP, true);
-            teamTMP.hits = getAmmountOfHitsFromTeam(tournament, teamTMP, true);
+            teamTMP.score = ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam;
+            teamTMP.scoreDifference = ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam;
+            teamTMP.hits = ammountOfHitsFromTeam;
             groups[i].teams.push(teamTMP);
         });
     });
@@ -105,7 +109,6 @@ export const getGroupsWithStats = (tournament:any) => {
             return team2.wins - team1.wins;
         });
     });
-
 
     // TODO: Set placement
     // for (let i = 0; i < players.length; i++) {
@@ -252,7 +255,7 @@ export const initMatchesKOPhase = async (tournament:any) => {
 export const updateMatchesKOPhase = async (tournament:any) => {
     let matchesTMP:any = [];
     let matches:any = tournament.koPhase.matches;
-    let groups:any = getGroupsWithStats(tournament);
+    let groups:any = getGroups(tournament);
     matches.forEach((stage:any, i:number) => {
         matchesTMP.push([]);
 
@@ -325,7 +328,6 @@ export const getPlayersWithStats = (tournament:any) => {
                 name: teams[i].players[x],
                 score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false),
                 ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false),
-                team: teams[i],
                 ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i], false) / 2)
             };
             player.averageScore = (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2);
