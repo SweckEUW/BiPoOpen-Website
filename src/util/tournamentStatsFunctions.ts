@@ -88,7 +88,7 @@ export const getAmmountOfEnemyHitsFromTeam = (tournament:any, teamID:string, onl
     return score;
 }
 
-export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any,  onlyGroupPhase:boolean) => { 
+export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any, onlyGroupPhase:boolean) => { 
     let score:number = 0;
     
     let matches = getMatchesGroupPhase(tournament);

@@ -66,11 +66,9 @@ const generateGroups = async () => {
    await props.getTournament();
 
    // DEBUG!
-   // props.tournament.groupPhase.matches.forEach(groupMatches => {
-   //    groupMatches.forEach(match => {
-   //       match.team1 = getTeamFromID(props.tournament, match.team1ID)
-   //       match.team2 = getTeamFromID(props.tournament, match.team2ID)
-   //       setGameResultGroupPhase(props.tournament, match, 5, 5, 2, 2);
+   // props.tournament.groupPhase.matches.forEach((groupMatches:any) => {
+   //    groupMatches.forEach((match:any) => {
+   //       setGameResultGroupPhase(props.tournament, match._id, 5, 5, 2, 2);
    //    });
    // });
 

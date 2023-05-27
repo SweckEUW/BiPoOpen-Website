@@ -240,8 +240,11 @@ export const initMatchesKOPhase = async (tournament:any) => {
         matches.push([]);
         if(i == 0){
             for (let x = 0; x < ammountOfMatches/2; x++) {
-                matches[i].push({placeHolderTeam1: "1. Platz - Gruppe " + convertNumberToCharacter(x*2 + 1), placeHolderTeam2: "2. Platz - Gruppe "  + convertNumberToCharacter(x*2 + 2)});
-                matches[i].push({placeHolderTeam1: "2. Platz - Gruppe "  + convertNumberToCharacter(x*2 + 1), placeHolderTeam2: "1. Platz - Gruppe "  + convertNumberToCharacter(x*2 + 2)});
+                let group1Letter = convertNumberToCharacter(x + 1);
+                let group2Letter = convertNumberToCharacter(ammountOfMatches - x);
+
+                matches[i].push({placeHolderTeam1: "1. Platz - Gruppe " + group1Letter, placeHolderTeam2: "2. Platz - Gruppe "  + group2Letter});
+                matches[i].push({placeHolderTeam1: "2. Platz - Gruppe "  + group1Letter, placeHolderTeam2: "1. Platz - Gruppe "  + group2Letter});
             }
         }else{
             for (let x = 0; x < ammountOfMatches; x++)
@@ -255,20 +258,20 @@ export const initMatchesKOPhase = async (tournament:any) => {
 export const updateMatchesKOPhase = async (tournament:any) => {
     let matchesTMP:any = [];
     let matches:any = tournament.koPhase.matches;
-    let groups:any = getGroups(tournament);
+    let groups:any = getGroupsWithStats(tournament);
     matches.forEach((stage:any, i:number) => {
         matchesTMP.push([]);
 
         if(i == 0) { // First Stage 
+            let t = tournament.koPhase.settings.advancingTeamsPerGroup;
             for (let x = 0; x < stage.length/2; x++) { 
-                for (let y = 0; y < tournament.koPhase.settings.advancingTeamsPerGroup; y++) {
-                    let matchTMP = stage[x*2+y];
-
-                    if(!tournament.groupPhase.matches[x*2].find((match:any) => !match.result))
-                        matchTMP.team1ID = groups[x*2].teams[y]._id;
+                for (let y = 0; y < t; y++) {
+                    let matchTMP = stage[x * 2 + y];
+                    if(!tournament.groupPhase.matches[x].find((match:any) => !match.result))
+                        matchTMP.team1ID = groups[x].teams[y]._id;
                     
-                    if(!tournament.groupPhase.matches[x*2 + 1].find((match:any) => !match.result))
-                        matchTMP.team2ID = groups[x*2 + 1].teams[y == 0 ? 1 : 0]._id;
+                    if(!tournament.groupPhase.matches[stage.length - x - 1].find((match:any) => !match.result))
+                        matchTMP.team2ID = groups[stage.length - x - 1].teams[y == 0 ? 1 : 0]._id;
 
                     matchesTMP[i].push(matchTMP); 
                 }
