@@ -92,7 +92,7 @@ let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 a{
 	display: inline-block;
 	cursor: pointer;
-	transition: .3s color ease;
+	transition: .3s opacity ease;
 	text-align: center;
     color: black;
     text-shadow: 0px 0px 10px rgba(0,0,0,0.4), 0px 0px 5px rgba(0,0,0,0.3);
@@ -108,7 +108,8 @@ a:last-child{
 	margin-right: 0;
 }
 a:hover{
-	color: rgb(160, 160, 160);
+	opacity: 0.7;
+	color: black;
 }
 
 /*MOBILE*/
@@ -128,6 +129,7 @@ a:hover{
 		margin-bottom: 0px !important;
 	}
 	.ap-left a:hover{
+		opacity: 1;
 		color: black;
 	}
 	.ap-right{

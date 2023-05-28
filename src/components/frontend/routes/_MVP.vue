@@ -2,12 +2,14 @@
 import { ref, onUnmounted } from "vue"
 import { getTournamentByName, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
 
+import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+
 let tournament = ref();
 let players = ref();
 const getTournament = async () => {
-   let tournamentName = "Weck BiPo Open 2023";
-   tournament.value = await getTournamentByName(tournamentName);
-   players.value = getPlayersWithStats(tournament.value);
+    let tournamentName = "Weck BiPo Open 2023";
+    tournament.value = await getTournamentByName(tournamentName);
+    players.value = getPlayersWithStats(tournament.value);
 }
 getTournament();
 
@@ -26,8 +28,11 @@ window.addEventListener("resize", () => {
 </script>
 
 <template>
-    <div>
-        <table class="table table-hover caption-top" id="mvp-table">
+    <div class="MVP">
+        
+        <Loadingscreen v-show="!tournament || !players"/>
+
+        <table v-show="tournament && players" class="table table-hover caption-top" id="mvp-table">
             <thead>
                 <tr style="height: auto;">
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>

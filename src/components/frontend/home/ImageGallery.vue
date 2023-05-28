@@ -60,7 +60,7 @@ onMounted(() => {
     font-size: 22px;
 }
 .ImageGallery img{
-	height: 300px;
+	height: 800px;
     width: 100%;
 	user-select: none;
 	object-fit: contain;
@@ -72,5 +72,12 @@ onMounted(() => {
     background: var(--main-color);
     width: 12px;
     height: 12px;
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+    .ImageGallery img{
+        height: 300px;
+    }
 }
 </style>

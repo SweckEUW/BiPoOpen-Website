@@ -3,6 +3,8 @@ import { ref, onUnmounted } from "vue"
 import { getGroups, getTournamentByName, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
+import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+
 let tournament = ref();
 let groups = ref();
 const getTournament = async () => {
@@ -27,8 +29,11 @@ window.addEventListener("resize", () => {
 </script>
 
 <template>
-    <div v-if="tournament">
-        <table class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
+    <div class="Standings">
+
+        <Loadingscreen v-show="!tournament || !groups"/>
+
+        <table v-show="tournament && groups" class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
             <caption>{{"Gruppe " + convertNumberToCharacter(index)}}</caption>
             <thead>
                 <tr>
