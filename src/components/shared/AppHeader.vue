@@ -16,13 +16,18 @@ const scrollToTop = () => {
 		setTimeout(() => { document.getElementsByTagName("html")[0].style.scrollBehavior = ""; }, 1000);
 	}
 }
+
+let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 </script>
 
 <template>
 	<div class="AppHeader">
 
 		<div class="ap-left">
-			<router-link to="/" @click="scrollToTop()">Weck BiPo Open 2023</router-link>
+			<router-link to="/" @click="scrollToTop()">
+				<img :src="logo" alt="" width="100" height="100">
+				BiPo Open
+			</router-link>
 		</div>
 		
 		<div class="ap-right">
@@ -62,6 +67,16 @@ const scrollToTop = () => {
 .ap-left{
 	float: left;
 }
+.ap-left a{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.ap-left img{
+	width: 40px;
+	height: 30px;
+	margin-right: 10px;
+}
 .ap-right{
 	float: right;
 }
@@ -100,7 +115,7 @@ a:hover{
 @media (width <= 900px){
 	.AppHeader{
 		padding-top: 20px;
-		padding: 15px 2.5%;
+		padding: 15px 5%;
 	}
 	a{
 		font-size: 32px;
@@ -122,7 +137,7 @@ a:hover{
 		display: block;
 		float: right;
 		position: absolute;
-		right: 2.5%;
+		right: 5%;
 		z-index: 99;
 	}
 	.ap-burger-menu{
