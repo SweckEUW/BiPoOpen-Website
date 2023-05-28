@@ -239,12 +239,16 @@ export const initMatchesKOPhase = async (tournament:any) => {
         let ammountOfMatches = teamsInKOPhase/(Math.pow(2,i+1));
         matches.push([]);
         if(i == 0){
-            for (let x = 0; x < ammountOfMatches/2; x++) {
-                let group1Letter = convertNumberToCharacter(x + 1);
-                let group2Letter = convertNumberToCharacter(ammountOfMatches - x);
-
-                matches[i].push({placeHolderTeam1: "1. Platz - Gruppe " + group1Letter, placeHolderTeam2: "2. Platz - Gruppe "  + group2Letter});
-                matches[i].push({placeHolderTeam1: "2. Platz - Gruppe "  + group1Letter, placeHolderTeam2: "1. Platz - Gruppe "  + group2Letter});
+            for (let x = 0; x < ammountOfMatches; x++) {
+                let group1Letter, group2Letter;
+                if(x % 2 == 0){
+                    group1Letter = convertNumberToCharacter(x + 1);
+                    group2Letter = convertNumberToCharacter(x + 2);
+                }else{
+                    group1Letter = convertNumberToCharacter(ammountOfMatches - x + 1);
+                    group2Letter = convertNumberToCharacter(ammountOfMatches - x);
+                }
+                matches[i].push({placeHolderTeam1: "1. Platz - Gruppe "  + group1Letter, placeHolderTeam2: "2. Platz - Gruppe "  + group2Letter});
             }
         }else{
             for (let x = 0; x < ammountOfMatches; x++)
@@ -263,18 +267,25 @@ export const updateMatchesKOPhase = async (tournament:any) => {
         matchesTMP.push([]);
 
         if(i == 0) { // First Stage 
-            let t = tournament.koPhase.settings.advancingTeamsPerGroup;
-            for (let x = 0; x < stage.length/2; x++) { 
-                for (let y = 0; y < t; y++) {
-                    let matchTMP = stage[x * 2 + y];
-                    if(!tournament.groupPhase.matches[x].find((match:any) => !match.result))
-                        matchTMP.team1ID = groups[x].teams[y]._id;
+            for (let x = 0; x < stage.length; x++) { 
+                    let matchTMP = stage[x];
+
+                    let group1Number, group2Number;
+                    if(x % 2 == 0){
+                        group1Number = x;
+                        group2Number = x + 1;
+                    }else{
+                        group1Number = stage.length - x;
+                        group2Number = stage.length - x - 1;
+                    }
+
+                    if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played
+                        matchTMP.team1ID = groups[group1Number].teams[0]._id;
                     
-                    if(!tournament.groupPhase.matches[stage.length - x - 1].find((match:any) => !match.result))
-                        matchTMP.team2ID = groups[stage.length - x - 1].teams[y == 0 ? 1 : 0]._id;
+                    if(!tournament.groupPhase.matches[group2Number].find((match:any) => !match.result)) // Check if all games of group are played
+                        matchTMP.team2ID = groups[group2Number].teams[1]._id;
 
                     matchesTMP[i].push(matchTMP); 
-                }
             }
         }else{ // Next Stages
             for (let x = 0; x < stage.length; x++) { 
