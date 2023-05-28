@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import ImageGallery from '@/components/frontend/home/ImageGallery.vue';
+
 let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta.url).href;
 </script>
 
 <template>
     <div class="Home">
         <img class="h-header" :src="headerImg" alt="">
+
+        <ImageGallery/>
     </div>
 </template>
 
