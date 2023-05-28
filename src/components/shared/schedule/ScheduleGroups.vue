@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted } from "vue"
+import { onMounted, watch } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase, getTeamFromID } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
@@ -14,15 +14,8 @@ const onDragEnd = async (evt:any) => {
 
    let matches = props.tournament.groupPhase.matches;
    let matchesInGroup = matches[groupIndex];
-   console.log(getTeamFromID(props.tournament, matchesInGroup[evt.oldIndex].team1ID).name);
-   // console.log(evt.oldIndex);
-
    let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
-   // console.log(getTeamFromID(props.tournament, movedMatch.team1ID).name);
-
    matchesInGroup.splice(evt.newIndex, 0, movedMatch[0]);
-
-   // console.log("");
 
    let success:boolean = await setMatchesGroupPhase(props.tournament._id, matches);
    if(success){
@@ -45,8 +38,13 @@ const initSortable = () => {
    }, 0);
 }
 
-onMounted(() => {
+watch(() => props.tournament, () => {
    if(props.tournament.groupPhase.groups && props.isBackend)
+      initSortable();
+});
+
+onMounted(() => {
+   if(props.tournament && props.tournament.groupPhase.groups && props.isBackend)
       initSortable();
 });
 </script>
@@ -87,7 +85,7 @@ onMounted(() => {
 
 <style scoped>
 .rt-table{
-   margin-bottom: 50px;
+   margin-top: 50px;
 }
 .rt-caption{
    margin-bottom: 10px;

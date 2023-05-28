@@ -42,7 +42,7 @@ export const getTeamFromName = (tournament: any, teamName:string) => {
 
 // GROUPS
 export const getGroups = (tournament:any) => {
-    if(!tournament.groupPhase.groups)
+    if(!tournament || !tournament.groupPhase.groups)
         return [];
 
     let groups:any = [];
@@ -126,7 +126,7 @@ export const getGroupsWithStats = (tournament:any) => {
 
 // MATCHES GROUP
 export const getMatchesGroupPhase = (tournament:any) => {
-    if(!tournament.groupPhase.matches)
+    if(!tournament || !tournament.groupPhase.matches)
         return [];
 
     let matches:any = [];
@@ -204,7 +204,7 @@ export const setGameResultGroupPhase = async (tournament:any, matchID:string, te
 
 // MATCHES KO-PHASE
 export const getMatchesKOPhase = (tournament:any) => {
-    if(!tournament.koPhase.matches)
+    if(!tournament || !tournament.koPhase.matches)
         return [];     
 
     let matches:any = [];
