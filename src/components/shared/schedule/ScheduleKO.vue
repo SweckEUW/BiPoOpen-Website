@@ -3,28 +3,31 @@ import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
 import MatchElement from '@/components/shared/MatchElement.vue';
 
-defineProps(['getTournament','tournament','isBackend'])
+const props = defineProps(['getTournament','tournament','isBackend'])
 
-const getStageText = (games:number) => {
-   if(games == 8)
+const getStageText = (stageIndex:number) => {
+   let ammountOfStages = props.tournament.koPhase.matches.length - 1;
+
+   if(ammountOfStages - stageIndex == 3)
       return "Achtelfinale"
-   if(games == 4)
+   if(ammountOfStages - stageIndex == 2)
       return "Viertelfinale"
-   if(games == 2)
+   if(ammountOfStages - stageIndex == 1)
       return "Halbfinale"
-   if(games == 1)
+   if(ammountOfStages - stageIndex == 0)
       return "Finale"
 }
 </script>
 
 <template>
    <div class="GameScheduleKO">
-         <div v-for="(stage, stageIndex) in getMatchesKOPhase(tournament)" :key="stageIndex" class="test123">
-            <div class="gsk-round">{{ getStageText(stage.length) }}</div>
-            <div class="gsk-stage" :class="{'gsk-stage1': stageIndex == 0}">
+         <div v-for="(stage, stageIndex) in getMatchesKOPhase(tournament)" :key="stageIndex" class="gsk-stages">
+            <div class="gsk-round">{{ getStageText(stageIndex) }}</div>
+            <div class="gsk-stage" :class="{'gsk-stage1': stageIndex == 0, 'gsk-finale': stageIndex == tournament.koPhase.matches.length - 1}">
                <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
-                  <div class="gsk-match-table">{{ "Tisch " + (matchIndex + 1) }}</div>
-                  <MatchElement class="gsk-matchElement" :class="{'gsk-matchElement-stage1': stageIndex == 0}" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
+                  <div v-if="stageIndex == tournament.koPhase.matches.length - 1" class="gsk-match-name">{{ (matchIndex == 0 ? "Finale" : "Spiel um Platz 3")}}</div>
+                  <div v-if="stageIndex != tournament.koPhase.matches.length - 1" class="gsk-match-table">{{ "Tisch " + (matchIndex + 1) }}</div>
+                  <MatchElement class="gsk-matchElement" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
                </div>
             </div>
          </div>
@@ -37,7 +40,7 @@ const getStageText = (games:number) => {
    overflow-y: hidden;
    display: flex;
 }
-.test123{
+.gsk-stages{
    flex: 1;
    display: flex;
    flex-direction: column;
@@ -54,6 +57,12 @@ const getStageText = (games:number) => {
    justify-content: space-around;
    flex: 1;
 }
+.gsk-finale{
+   justify-content: center;
+}
+.gsk-finale .gsk-match{
+   margin-top: 50px;
+}
 .gsk-match{
    border: 1px solid black;
    padding: 10px;
@@ -63,19 +72,26 @@ const getStageText = (games:number) => {
 }
 .gsk-match-table{
    margin-bottom: 5px;
+   display: inline-block;
+}
+.gsk-match-name{
+   font-size: 18px;
+   font-weight: bold;
+   display: inline-block;
+   white-space: break-spaces;
 }
 .gsk-matchElement{
    width: 600px; 
    height: 90px;
 }
-.gsk-matchElement-stage1{
+.gsk-stage1 .gsk-matchElement{
    height: 115px;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
    .gsk-matchElement{
-      width: 90vw; /* 2PX Border*/
+      width: 90vw;
       height: 125px;
    }
    .gsk-match{
@@ -84,7 +100,7 @@ const getStageText = (games:number) => {
       margin-top: 0px;
       margin-left: 0px;
    }
-   .gsk-matchElement-stage1{
+   .gsk-stage1 .gsk-matchElement{
       height: 140px;
    }
    .gsk-stage1 .gsk-match:nth-child(even){

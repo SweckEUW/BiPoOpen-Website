@@ -253,6 +253,9 @@ export const initMatchesKOPhase = async (tournament:any) => {
         }else{
             for (let x = 0; x < ammountOfMatches; x++)
                 matches[i].push({placeHolderTeam1: "TBD", placeHolderTeam2: "TBD"});
+
+            if(i == stages - 1)
+                matches[i].push({placeHolderTeam1: "TBD", placeHolderTeam2: "TBD"});
         }
     }
 
@@ -287,7 +290,27 @@ export const updateMatchesKOPhase = async (tournament:any) => {
 
                     matchesTMP[i].push(matchTMP); 
             }
-        }else{ // Next Stages
+        }else if(i == matches.length - 1){ // Last Stage (Finale, 3. Platz)
+            let matchFinal = stage[0];
+            let matchThirdPlace = stage[1];
+
+            let semiFinal1 = matches[i-1][0];
+            let semiFinal2 = matches[i-1][1];
+
+            if(semiFinal1.result){
+                matchFinal.team1ID = semiFinal1.result.team1Score > semiFinal1.result.team2Score ? semiFinal1.team1ID : semiFinal1.team2ID;
+                matchThirdPlace.team1ID = semiFinal1.result.team1Score > semiFinal1.result.team2Score ? semiFinal1.team2ID : semiFinal1.team1ID;
+            }
+                
+            if(semiFinal2.result){
+                matchFinal.team2ID = semiFinal2.result.team1Score > semiFinal2.result.team2Score ? semiFinal2.team1ID : semiFinal2.team2ID;
+                matchThirdPlace.team2ID = semiFinal2.result.team1Score > semiFinal2.result.team2Score ? semiFinal2.team2ID : semiFinal2.team1ID;
+            }
+
+            matchesTMP[i].push(matchFinal); 
+            matchesTMP[i].push(matchThirdPlace); 
+
+        }else{ // Other Stages
             for (let x = 0; x < stage.length; x++) { 
                 let matchTMP = stage[x];
 
