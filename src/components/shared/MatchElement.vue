@@ -1,31 +1,39 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch, onMounted } from "vue"
 
 import ModalSetGameResult from '@/components/shared/ModalSetGameResult.vue';
 
-defineProps(['match','stageIndex',"matchIndex","isBackend","tournament","getTournament","isGroupPhase"])
+const props = defineProps(['match','stageIndex',"matchIndex","isBackend","tournament","getTournament","isGroupPhase"])
+
 let showModal = ref(false);
 const toggleModal = () => {
    showModal.value = !showModal.value;
 }
 
-const scaleFontSize = (elementID:any, name:string) => {
+let matchHTMLElement:any = ref(null);
+const scaleFontSize = () => {
    if(window.innerWidth < 500){
-      setTimeout(() => {
-         var container:any = document.getElementById(elementID);
-         if (container.innerText.length > 16) 
-            container.style.fontSize = "13px";
-         if (container.innerText.length > 20) 
-            container.style.fontSize = "12px";
-      }, 0);
+      let teamNames:any = matchHTMLElement.value.getElementsByClassName("mt-team-name");
+      for (let item of teamNames) {
+         if (item.innerText.length > 16) 
+            item.style.fontSize = "13px";
+         if (item.innerText.length > 20) 
+            item.style.fontSize = "12px";
+      }
    }
-
-   return name;
 }
+
+watch(() => props.tournament, () => {
+   scaleFontSize();
+});
+
+onMounted(() => {
+   scaleFontSize();
+});
 </script>
 
 <template>
-    <div class="Match">
+    <div class="Match" ref="matchHTMLElement">
 
          <Transition name="fade">
             <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
@@ -36,10 +44,10 @@ const scaleFontSize = (elementID:any, name:string) => {
          </div>
 
          <!-- Team 1 -->
-         <div class="mt-team mt-team-first">
+         <div class="mt-team mt-team-first" :style="{'color' : match.result ? match.result.team1Score < match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
             <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
             <div v-if="match.team1" >
-               <div class="mt-team-name" :id="match._id + match.team1.name">{{ scaleFontSize(match._id + match.team1.name, match.team1.name) }}</div>
+               <div class="mt-team-name">{{ match.team1.name }}</div>
                <div class="mt-team-players" v-for="player in match.team1.players" :key="player">{{ player }}</div>
             </div>
          </div>
@@ -49,17 +57,29 @@ const scaleFontSize = (elementID:any, name:string) => {
          
          <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">Eintragen</div>
 
-         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" >
-            <div class="mt-result-team">{{match.result.team1Score + " - " + match.result.team2Score}}</div>
-            <div class="mt-result-player">{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
-            <div class="mt-result-player">{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
+         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}">
+            <div class="mt-result-team">
+               <span>{{ match.result.team1Score }}</span>
+               <span>{{  " - " }}</span>
+               <span>{{ match.result.team2Score }}</span>
+            </div>
+            <div class="mt-result-player">
+               <span>{{ match.result.team1Player1Score }}</span>
+               <span>{{  " - " }}</span>
+               <span>{{ match.result.team2Player1Score }}</span>
+            </div>
+            <div class="mt-result-player">
+               <span>{{ match.result.team1Player2Score }}</span>
+               <span>{{  " - " }}</span>
+               <span>{{ match.result.team2Player2Score }}</span>   
+            </div>
          </div>
 
          <!-- Team 2 -->
-         <div class="mt-team mt-team-second">
+         <div class="mt-team mt-team-second" :style="{'color' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
             <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
             <div v-if="match.team2">
-               <div class="mt-team-name" :id="match._id + match.team2.name">{{ scaleFontSize(match._id + match.team2.name, match.team2.name) }}</div>
+               <div class="mt-team-name">{{ match.team2.name }}</div>
                <div class="mt-team-players" v-for="player in match.team2.players" :key="player">{{ player }}</div>
             </div>
          </div>
@@ -134,6 +154,21 @@ const scaleFontSize = (elementID:any, name:string) => {
    font-style: italic;
    color: gray;
 }
+
+.mt-result-team span:nth-child(1), .mt-result-player span:nth-child(1){
+   color: var(--main-color);
+}
+.mt-result-team span:nth-child(3), .mt-result-player span:nth-child(3){
+   color: var(--secondary-color);
+}
+
+.mt-result-team1Win .mt-result-team span:nth-child(3), .mt-result-team1Win .mt-result-player span:nth-child(3){
+   color: var(--loose-gray);
+}
+.mt-result-team2Win .mt-result-team span:nth-child(1), .mt-result-team2Win .mt-result-player span:nth-child(1){
+   color: var(--loose-gray);
+}
+
 
 /*MOBILE*/
 @media (width <= 900px){

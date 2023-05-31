@@ -43,8 +43,7 @@ onBeforeMount(() => {
   --secondary-color: #61C3D9;
   --secondary-color-weak: #d3f7ff;
   --main-color-hover: rgb(241, 200, 200);
-  --result-red: rgb(253, 165, 165);
-  --result-green: rgb(213, 243, 206);
+  --loose-gray: rgb(209, 209, 209);
 }
 
 body{
