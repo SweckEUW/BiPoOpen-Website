@@ -7,8 +7,6 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
 <template>
     <div class="Home">
 
-        <h1>Weck BiPo Open 2023</h1>
-
         <img class="h-header" :src="headerImg" alt="">
 
         <hr>
@@ -25,14 +23,6 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
 </template>
 
 <style scoped>
-h1{
-    color: var(--main-color);
-    font-size: 30px;
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
 .h-header{
     height: calc(100vh - 200px);
     object-fit: cover;
@@ -41,16 +31,27 @@ h1{
 }
 
 .bp-button{
-    display: inline-block;
-    width: 100%;
+    display: block;
+    width: 50%;
+    margin: auto;
     margin-bottom: 10px;
     padding: 10px;
+}
+
+hr{
+    width: 50%;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
     .h-header{
         height: auto;
+        width: 100%;
+    }
+    .bp-button{
         width: 100%;
     }
 }

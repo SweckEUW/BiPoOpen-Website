@@ -59,7 +59,7 @@ onMounted(() => {
     text-align: center;
     color: var(--main-color);
     font-size: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 .ImageGallery img{
 	height: 800px;

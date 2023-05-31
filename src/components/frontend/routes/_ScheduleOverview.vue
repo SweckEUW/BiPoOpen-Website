@@ -70,9 +70,9 @@ initSwiper();
                   <!-- First Row -->
                   <div class="rt-row1">
                      <div>#</div>
-                     <div>Team 1</div>
-                     <div>vs.</div>
-                     <div>Team 2</div>
+                     <div style="color: var(--main-color)">Team 1</div>
+                     <div></div>
+                     <div style="color: var(--secondary-color)">Team 2</div>
                   </div>
 
                   <!-- Matches -->
@@ -95,17 +95,32 @@ initSwiper();
 </template>
 
 <style scoped>
+#SwiperPaginationScheduleOverview{
+   margin-top: 40px;
+   text-align: center;
+}
+.rt-table{
+   margin-top: 0 !important;
+}
+</style>
+
+<!-- Copied from SchedueGroups.vue -->
+<style scoped>
+.rt-table{
+   margin-top: 50px;
+}
 .rt-caption{
    margin-bottom: 10px;
 }
 .rt-caption div:nth-child(1){
    font-size: 28px;
    font-weight: bold;
-   color: black;
+   color: var(--main-color);
 }
 .rt-caption div:nth-child(2){
    font-size: 20px;
-   color: rgb(77, 77, 77);
+   color: var(--main-color);
+   opacity: 0.7;
 }
 .rt-rows{
    display: flex;
@@ -125,23 +140,21 @@ initSwiper();
 }
 .rt-row1 div:nth-child(2){
    text-align: right;
+   color: var(--main-color);
 }
 .rt-row1 div:nth-child(2), .rt-row1 div:nth-child(4){
    flex-grow: 1;
+   font-size: 24px;
 }
 .rt-row1 div:nth-child(3){
    width: 110px; /* same width as .mt-result from MatchElement.vue */
 }
 .rt-row1 div:nth-child(4){
    text-align: left;
+   color: var(--secondary-color);
 }
 .rt-matches{
    width: 100%;
-}
-
-#SwiperPaginationScheduleOverview{
-   margin-top: 40px;
-   text-align: center;
 }
 
 /*MOBILE*/
@@ -151,6 +164,9 @@ initSwiper();
    }
    .rt-row1 div:nth-child(1){
       display: none;
+   }
+   .rt-row1 div:nth-child(3){
+      width: 60px;
    }
 }
 </style>

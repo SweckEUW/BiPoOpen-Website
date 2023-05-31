@@ -95,8 +95,7 @@ a{
 	cursor: pointer;
 	transition: .3s opacity ease;
 	text-align: center;
-    color: black;
-    text-shadow: 0px 0px 10px rgba(0,0,0,0.4), 0px 0px 5px rgba(0,0,0,0.3);
+    color: var(--main-color);
 	margin: 0;
 	margin-bottom: 50px;
 	margin: 0 15px;
@@ -131,7 +130,7 @@ a:hover{
 	}
 	.ap-left a:hover{
 		opacity: 1;
-		color: black;
+		color: var(--main-color);;
 	}
 	.ap-right{
 		display: none;
@@ -142,6 +141,8 @@ a:hover{
 		position: absolute;
 		right: 5%;
 		z-index: 99;
+		padding: 10px;
+		padding-top: 5px;
 	}
 	.ap-burger-menu{
 		display: block;
@@ -155,30 +156,29 @@ a:hover{
 		justify-content: center;
 		align-items: center;
 		flex-direction: column;
-		background-color: rgba(0, 0, 0, 0.9);
+		background-color: var(--main-color);
 	}
 	.ap-burger-menu a{
 		color: white;
 	}
 	.bar1, .bar2, .bar3 {
 		width: 35px;
-		height: 4px;
-		background-color: black;
-		filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.5)) drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
-		margin: 6px 0;
+		height: 3px;
+		background-color: var(--main-color);
+		margin: 5px 0;
 		transition: 0.4s;
 	}
 	.change .bar1, .change .bar2, .change .bar3{
 		background: white;
 	}
 	.change .bar1 {
-		transform: translate(0, 10px) rotate(-45deg);
+		transform: translate(0, 8px) rotate(-45deg);
 	}
 	.change .bar2 {
 		opacity: 0;
 	}
 	.change .bar3 {
-		transform: translate(0, -10px) rotate(45deg);
+		transform: translate(0, -8px) rotate(45deg);
 	}
 }
 </style>

@@ -49,7 +49,8 @@ const getStageText = (stageIndex:number) => {
    font-weight: bold;
    text-align: center;
    font-size: 25px;
-   margin-top: 20px;
+   margin-top: 40px;
+   color: var(--main-color);
 }
 .gsk-stage{
    display: flex;
@@ -73,19 +74,21 @@ const getStageText = (stageIndex:number) => {
 .gsk-match-table{
    margin-bottom: 5px;
    display: inline-block;
+   color: var(--main-color);
 }
 .gsk-match-name{
    font-size: 18px;
    font-weight: bold;
    display: inline-block;
    white-space: break-spaces;
+   color: var(--main-color);
 }
 .gsk-matchElement{
    width: 600px; 
    height: 90px;
 }
 .gsk-stage1 .gsk-matchElement{
-   height: 115px;
+   height: 100px;
 }
 
 /*MOBILE*/
@@ -101,7 +104,7 @@ const getStageText = (stageIndex:number) => {
       margin-left: 0px;
    }
    .gsk-stage1 .gsk-matchElement{
-      height: 140px;
+      height: 115px;
    }
    .gsk-stage1 .gsk-match:nth-child(even){
       margin-bottom: 40px;

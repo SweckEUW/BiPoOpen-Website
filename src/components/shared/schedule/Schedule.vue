@@ -31,7 +31,7 @@ defineProps(['getTournament','tournament',"isBackend"])
 
 <style scoped>
 .Schedule{
-   margin-top: 50px;
+   margin-top: 70px;
 }
 .nav-tabs{
    position: sticky;
@@ -39,7 +39,17 @@ defineProps(['getTournament','tournament',"isBackend"])
    background: white;
    z-index: 2;
 }
-
+.nav-link{
+   border-radius: 0px;
+   width: 40vw;
+   padding: 15px 10px;
+   color: var(--secondary-color);
+   font-weight: bold;
+}
+.nav-item .active{
+   background-color: var(--main-color) !important;
+   color: white !important;
+}
 /* MOBILE */
 @media (width <= 900px){
    .nav-tabs{

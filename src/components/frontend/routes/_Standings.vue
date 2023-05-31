@@ -64,21 +64,26 @@ window.addEventListener("resize", () => {
 <style scoped>
 table{
    text-align: center;
-   margin-bottom: 30px;
+   margin-bottom: 20px;
+}
+table *{
+    vertical-align: middle;
 }
 caption{
    font-size: 28px;
    font-weight: bold;
-   color: black;
+   color: var(--main-color);
+}
+table th{
+    color: var(--main-color);
 }
 tbody tr:nth-of-type(1){
-    background: rgb(155, 132, 6);
-    color: white;
+    background: var(--secondary-color-weak);
 }
 tbody tr:nth-of-type(2){
-    background: silver;
-    color: white;
+    background: #e6faff;
 }
+
 table td:nth-child(3) span{
     margin-right: 15px; 
     display: block;
@@ -115,21 +120,28 @@ table td:nth-child(2){
 
 /* Table Border */
 table {
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 table td {
-  border: 1px solid rgba(0, 0, 0, 0.3); 
+    border: 1px solid rgba(0, 0, 0, 0.3); 
 }
-table tr:first-child td {
-  border-top: 0;
+table th{
+    border: 1px solid rgba(0, 0, 0, 0.3); 
+    border-top: 0;
+}
+table th:first-child{
+    border-left: 0;
+}
+table th:last-child{
+    border-right: 0;
 }
 table tr td:first-child {
-  border-left: 0;
+    border-left: 0;
 }
 table tr:last-child td {
-  border-bottom: 0;
+    border-bottom: 0;
 }
 table tr td:last-child {
-  border-right: 0;
+    border-right: 0;
 }
 </style>
