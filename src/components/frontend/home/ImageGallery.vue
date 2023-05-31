@@ -12,10 +12,10 @@ const getImage = (number:number) => {
 
 onMounted(() => {
     setTimeout(() => {
-        new Swiper('#mySwiper',{
+        new Swiper('#SwiperGallery',{
             modules: [Pagination, Navigation, Autoplay],
             spaceBetween: 100,
-            speed:1000,
+            speed: 1000,
             direction: 'horizontal',
             mousewheel: {
 			    invert: true,
@@ -23,11 +23,11 @@ onMounted(() => {
             loop: true,
             observer: true,
             pagination: {
-                el: '#swiper-pagination',
+                el: '#SwiperPaginationGallery',
                 clickable: true,
             },
             autoplay: {
-                delay: 1000,
+                delay: 2000,
                 disableOnInteraction: false,
             },
         });
@@ -40,14 +40,14 @@ onMounted(() => {
 
         <div class="ig-title">Impressionen aus 2022</div>
 
-        <div id="mySwiper" class="swiper mp-gallery">
+        <div id="SwiperGallery" class="swiper mp-gallery">
             <div class="swiper-wrapper">
                 <div class="swiper-slide" v-for="i in 11" :key="i">
                     <img :src="getImage(i)" alt="">
                 </div>
             </div>
 
-            <div id="swiper-pagination"/>
+            <div id="SwiperPaginationGallery"/>
         </div>
 
     </div>
@@ -67,7 +67,7 @@ onMounted(() => {
 	user-select: none;
 	object-fit: contain;
 }
-#swiper-pagination{
+#SwiperPaginationGallery{
     text-align: center;
 }
 .swiper-pagination-bullet{

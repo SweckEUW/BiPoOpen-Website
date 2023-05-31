@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { onMounted, watch } from "vue"
-import { getMatchesGroupPhase, setMatchesGroupPhase, getTeamFromID } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import MatchElement from '@/components/shared/MatchElement.vue';
