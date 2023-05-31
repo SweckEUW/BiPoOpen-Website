@@ -112,4 +112,24 @@ table td:nth-child(2){
         font-size: 22px;
     }
 }
+
+/* Table Border */
+table {
+  border-collapse: collapse;
+}
+table td {
+  border: 1px solid rgba(0, 0, 0, 0.3); 
+}
+table tr:first-child td {
+  border-top: 0;
+}
+table tr td:first-child {
+  border-left: 0;
+}
+table tr:last-child td {
+  border-bottom: 0;
+}
+table tr td:last-child {
+  border-right: 0;
+}
 </style>

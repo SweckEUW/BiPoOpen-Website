@@ -44,10 +44,10 @@ let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-burger-menu" v v-show="showBurger">
+				<router-link @click="toggleBurgerMenu()" to="/Regeln">Regeln</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Spielplan">Spielplan</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/MVP">Most Valuable Player</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/Regeln">Regeln</router-link>
 			</div>
 		</transition>
 

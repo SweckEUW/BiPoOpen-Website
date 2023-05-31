@@ -85,7 +85,7 @@ table th{
 /*MOBILE*/
 @media (width <= 900px){
     table{
-        width: auto;
+        width: 100%;
     }
     table *{
         font-size: 15px;
@@ -109,5 +109,25 @@ table th{
         max-width: 100px;
         width: 100px;
     }
+}
+
+/* Table Border */
+table {
+  border-collapse: collapse;
+}
+table td {
+  border: 1px solid rgba(0, 0, 0, 0.3); 
+}
+table tr:first-child td {
+  border-top: 0;
+}
+table tr td:first-child {
+  border-left: 0;
+}
+table tr:last-child td {
+  border-bottom: 0;
+}
+table tr td:last-child {
+  border-right: 0;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue"
 
-import Swiper , { Pagination, Navigation } from 'swiper';
+import Swiper , { Pagination, Navigation, Autoplay } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -13,19 +13,22 @@ const getImage = (number:number) => {
 onMounted(() => {
     setTimeout(() => {
         new Swiper('#mySwiper',{
-            modules: [Pagination, Navigation],
+            modules: [Pagination, Navigation, Autoplay],
             spaceBetween: 100,
-            autoplay: {
-                delay: 500,
-                disableOnInteraction: false,
-            },
+            speed:1000,
             direction: 'horizontal',
-            mousewheel: true,
+            mousewheel: {
+			    invert: true,
+		    },
             loop: true,
             observer: true,
             pagination: {
                 el: '#swiper-pagination',
                 clickable: true,
+            },
+            autoplay: {
+                delay: 1000,
+                disableOnInteraction: false,
             },
         });
     }, 0); 
@@ -51,13 +54,12 @@ onMounted(() => {
 </template>
 
 <style>
-.ImageGallery{
-    margin-top: 50px;
-}
 .ig-title{
     width: 100%;
     text-align: center;
-    font-size: 22px;
+    color: var(--main-color);
+    font-size: 30px;
+    margin-bottom: 20px;
 }
 .ImageGallery img{
 	height: 800px;
