@@ -6,7 +6,17 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
 
 <template>
     <div class="Home">
+
         <img class="h-header" :src="headerImg" alt="">
+
+        <hr>
+
+        <router-link class="bp-button" to="/Regeln">Zu den Regeln</router-link>
+        <router-link class="bp-button" to="/Spielplan">Zum Spielplan</router-link>
+        <router-link class="bp-button" to="/Platzierungen">Zu den Gruppenplatzierungen</router-link>
+        <router-link class="bp-button" to="/MVP">Zur MVP Tabelle</router-link>
+
+        <hr>
 
         <ImageGallery/>
     </div>
@@ -20,10 +30,28 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
     display: flex;
 }
 
+.bp-button{
+    display: block;
+    width: 50%;
+    margin: auto;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+hr{
+    width: 50%;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 /*MOBILE*/
 @media (width <= 900px){
     .h-header{
         height: auto;
+        width: 100%;
+    }
+    .bp-button{
         width: 100%;
     }
 }

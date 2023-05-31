@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue"
 
-import Swiper , { Pagination, Navigation } from 'swiper';
+import Swiper , { Pagination, Navigation, Autoplay } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -12,20 +12,23 @@ const getImage = (number:number) => {
 
 onMounted(() => {
     setTimeout(() => {
-        new Swiper('#mySwiper',{
-            modules: [Pagination, Navigation],
+        new Swiper('#SwiperGallery',{
+            modules: [Pagination, Navigation, Autoplay],
             spaceBetween: 100,
-            autoplay: {
-                delay: 500,
-                disableOnInteraction: false,
-            },
+            speed: 1000,
             direction: 'horizontal',
-            mousewheel: true,
+            mousewheel: {
+			    invert: true,
+		    },
             loop: true,
             observer: true,
             pagination: {
-                el: '#swiper-pagination',
+                el: '#SwiperPaginationGallery',
                 clickable: true,
+            },
+            autoplay: {
+                delay: 2000,
+                disableOnInteraction: false,
             },
         });
     }, 0); 
@@ -37,27 +40,26 @@ onMounted(() => {
 
         <div class="ig-title">Impressionen aus 2022</div>
 
-        <div id="mySwiper" class="swiper mp-gallery">
+        <div id="SwiperGallery" class="swiper mp-gallery">
             <div class="swiper-wrapper">
                 <div class="swiper-slide" v-for="i in 11" :key="i">
                     <img :src="getImage(i)" alt="">
                 </div>
             </div>
 
-            <div id="swiper-pagination"/>
+            <div id="SwiperPaginationGallery"/>
         </div>
 
     </div>
 </template>
 
 <style>
-.ImageGallery{
-    margin-top: 50px;
-}
 .ig-title{
     width: 100%;
     text-align: center;
-    font-size: 22px;
+    color: var(--main-color);
+    font-size: 30px;
+    margin-bottom: 5px;
 }
 .ImageGallery img{
 	height: 800px;
@@ -65,7 +67,7 @@ onMounted(() => {
 	user-select: none;
 	object-fit: contain;
 }
-#swiper-pagination{
+#SwiperPaginationGallery{
     text-align: center;
 }
 .swiper-pagination-bullet{

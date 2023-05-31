@@ -4,8 +4,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/components/frontend/routes/_Home.vue'
 import Poll from '@/components/frontend/routes/_Poll.vue'
 import Schedule from '@/components/frontend/routes/_Schedule.vue'
+import ScheduleOverview from '@/components/frontend/routes/_ScheduleOverview.vue'
 import Standings from '@/components/frontend/routes/_Standings.vue'
 import MVP from '@/components/frontend/routes/_MVP.vue'
+import Rules from '@/components/frontend/routes/_Rules.vue'
 // import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 // Backend
@@ -52,6 +54,23 @@ const routes = [
 		component: MVP,
 		meta: {
 			title: 'Weck BiPo Open 2023 - MVP',
+		}
+	},
+	{
+		path: '/Regeln',
+		name: 'Regeln',
+		component: Rules,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Regeln',
+		}
+	},
+
+	{
+		path: '/Spielplan2',
+		name: 'ScheduleOverview',
+		component: ScheduleOverview,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Spielplan-Übersicht',
 		}
 	},
 	// {

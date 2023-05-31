@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { onMounted, watch } from "vue"
-import { getMatchesGroupPhase, setMatchesGroupPhase, getTeamFromID } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import MatchElement from '@/components/shared/MatchElement.vue';
@@ -66,7 +66,7 @@ onMounted(() => {
             <div class="rt-row1">
                <div>#</div>
                <div>Team 1</div>
-               <div>vs.</div>
+               <div></div>
                <div>Team 2</div>
             </div>
 
@@ -93,11 +93,12 @@ onMounted(() => {
 .rt-caption div:nth-child(1){
    font-size: 28px;
    font-weight: bold;
-   color: black;
+   color: var(--main-color);
 }
 .rt-caption div:nth-child(2){
    font-size: 20px;
-   color: rgb(77, 77, 77);
+   color: var(--main-color);
+   opacity: 0.7;
 }
 .rt-rows{
    display: flex;
@@ -117,15 +118,18 @@ onMounted(() => {
 }
 .rt-row1 div:nth-child(2){
    text-align: right;
+   color: var(--main-color);
 }
 .rt-row1 div:nth-child(2), .rt-row1 div:nth-child(4){
    flex-grow: 1;
+   font-size: 24px;
 }
 .rt-row1 div:nth-child(3){
    width: 110px; /* same width as .mt-result from MatchElement.vue */
 }
 .rt-row1 div:nth-child(4){
    text-align: left;
+   color: var(--secondary-color);
 }
 .rt-matches{
    width: 100%;
@@ -138,6 +142,9 @@ onMounted(() => {
    }
    .rt-row1 div:nth-child(1){
       display: none;
+   }
+   .rt-row1 div:nth-child(3){
+      width: 60px;
    }
 }
 </style>

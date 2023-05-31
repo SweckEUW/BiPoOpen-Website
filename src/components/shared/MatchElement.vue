@@ -8,6 +8,20 @@ let showModal = ref(false);
 const toggleModal = () => {
    showModal.value = !showModal.value;
 }
+
+const scaleFontSize = (elementID:any, name:string) => {
+   if(window.innerWidth < 500){
+      setTimeout(() => {
+         var container:any = document.getElementById(elementID);
+         if (container.innerText.length > 16) 
+            container.style.fontSize = "13px";
+         if (container.innerText.length > 20) 
+            container.style.fontSize = "12px";
+      }, 0);
+   }
+
+   return name;
+}
 </script>
 
 <template>
@@ -17,15 +31,15 @@ const toggleModal = () => {
             <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
          </Transition>
 
-         <div v-if="matchIndex != undefined" class="mt-index" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+         <div v-if="matchIndex != undefined" class="mt-index">
            <div>{{ matchIndex + 1 }}</div> 
          </div>
 
          <!-- Team 1 -->
-         <div class="mt-team" style="text-align: right" :style="{'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+         <div class="mt-team mt-team-first">
             <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
             <div v-if="match.team1" >
-               <div class="mt-team-name">{{match.team1.name}}</div>
+               <div class="mt-team-name" :id="match._id + match.team1.name">{{ scaleFontSize(match._id + match.team1.name, match.team1.name) }}</div>
                <div class="mt-team-players" v-for="player in match.team1.players" :key="player">{{ player }}</div>
             </div>
          </div>
@@ -35,19 +49,17 @@ const toggleModal = () => {
          
          <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">Eintragen</div>
 
-         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" :style="{
-            'background' : match.result ? match.result.team1Score > match.result.team2Score ? 'linear-gradient(90deg, var(--result-green), var(--result-red))' : 'linear-gradient(90deg, var(--result-red), var(--result-green))' : '',
-         }">
+         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" >
             <div class="mt-result-team">{{match.result.team1Score + " - " + match.result.team2Score}}</div>
             <div class="mt-result-player">{{match.result.team1Player1Score + " - " + match.result.team2Player1Score}}</div>
             <div class="mt-result-player">{{match.result.team1Player2Score + " - " + match.result.team2Player2Score}}</div>
          </div>
 
          <!-- Team 2 -->
-         <div class="mt-team" :style="{'background' : match.result ? match.result.team2Score > match.result.team1Score ? 'var(--result-green)' : 'var(--result-red)' : ''}">
+         <div class="mt-team mt-team-second">
             <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
             <div v-if="match.team2">
-               <div class="mt-team-name">{{match.team2.name}}</div>
+               <div class="mt-team-name" :id="match._id + match.team2.name">{{ scaleFontSize(match._id + match.team2.name, match.team2.name) }}</div>
                <div class="mt-team-players" v-for="player in match.team2.players" :key="player">{{ player }}</div>
             </div>
          </div>
@@ -81,22 +93,28 @@ const toggleModal = () => {
    justify-content: center;
    align-self: stretch;
 }
+.mt-team-first{
+   color: var(--main-color);
+   text-align: right;
+}
+.mt-team-second{
+   color: var(--secondary-color);
+}
 .mt-team, .mt-result, .mt-vs, .mt-button{
    padding: 10px;
 }
 .mt-team-name, .mt-result-team{
    font-size: 18px;
-   font-weight: bold;
-   color: rgb(56, 56, 56);
+   font-weight: 500;
    font-style: normal;
    margin-bottom: 5px;
+   line-height: 15px;
 }  
 .mt-team-players, .mt-result-player, .mt-team-placeholder{
    font-size: 14px;
    font-style: italic;
-   color: rgb(87, 87, 87);
 }
-.mt-result, .mt-v, .mt-button{
+.mt-result, .mt-vs, .mt-button{
    text-align: center;
    width: 200px;
    align-self: stretch;
@@ -111,7 +129,10 @@ const toggleModal = () => {
    font-size: 16px;
    margin: 0 20px;
    width: calc(200px - 40px);    /* width from .mt-result - margin */
-   
+}
+.mt-vs{
+   font-style: italic;
+   color: gray;
 }
 
 /*MOBILE*/
@@ -123,18 +144,23 @@ const toggleModal = () => {
       display: none;
    }
    .mt-team{
-      padding: 10px 5px;
+      padding: 5px;
    }
    .mt-team-name, .mt-result-team{
-      height: 50px;
+      height: 24px;
       font-size: 16px;
    }
    .mt-team-players, .mt-result-player, .mt-team-placeholder{
       height: 25px;
       font-size: 14px;
    }
-   .mt-result{
-      width: 140px;
+   .mt-team-placeholder{
+      opacity: 0.7;
+      margin-bottom: 4px;
+   }
+   .mt-result, .mt-vs{
+      width: 125px;
+      padding: 5px;
    }
 }
 </style>

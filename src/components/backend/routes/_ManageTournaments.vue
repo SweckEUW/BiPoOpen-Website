@@ -31,7 +31,7 @@ const createTournament = async () => {
     // DEBUG!
     tournament.teams = [
         {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
-        {name: "Große Brüder", players: ["Philipp Karaula", "René Manke"]},
+        {name: "Alkoholigans", players: ["Philipp Karaula", "René Manke"]},
         {name: "Berufsalkoholiker", players: ["Leon Rose", "Jonas Weck"]},
         {name: "Die Tauebn Nüsschen", players: ["Patrick Pohlmann", "Tim Becker"]},
         {name: "Eintracht Prügel", players: ["Alexander Borsig", "Björn Harz"]},
@@ -44,13 +44,12 @@ const createTournament = async () => {
         {name: "Für Gigolo", players: ["Stefan Linke", "Marvin Brinkrolf"]},
         {name: "Team Anime", players: ["Paul Falkenreck", "Anica Hollenbeck"]},
         {name: "Peter Pong & Trinkerbell", players: ["Svenja Förster", "Pascal Kurz"]},
-        {name: "Saufende Sachsen", players: ["Eduard Schimpf", "Lea Ableitner"]},
         {name: "Die Narren", players: ["Matthias Weck", "Lennard Kaffitz"]},
         {name: "One Punsh Bitches", players: ["Fritz Falkenreck", "Jenny Lemke"]},
         {name: "Leon & Ruben", players: ["Leon Breuker", "Ruben Heuser"]},
         {name: "Anna & Leo", players: ["Anna Müller", "Leo Straub"]},
         {name: "5 in 5", players: ["Philipp Pohlman", "Raik Buxel"]},
-        {name: "Jannick & Steffen", players: ["Jannick Becker", "Steffen Gödde"]},
+        {name: "Jannick & Freddi", players: ["Jannick Becker", "Freddi Reckhaus"]},
         {name: "Blau wie der Ozean", players: ["Michelle Langer", "Maya Langer"]},
         {name: "Nico & Mats", players: ["Nico Kreimer", "Mats Düser"]},
         {name: "Bierus Pongus", players: ["Matthias Gunter", "Martin Brandt"]},
@@ -59,7 +58,10 @@ const createTournament = async () => {
         {name: "Designated Last Place", players: ["Nadja Pohlmann", "Sina Westhus"]},
         {name: "Brews Brothers", players: ["Paolo Wohlfahrt", "Marvin Brandt"]},
         {name: "Charly & Chiara", players: ["Charly Bramers", "Chiara Sochart"]},
-        {name: "Lovis & Marco", players: ["Lovis Büker", "Marco Grinder"]}
+        {name: "Lovis & Marco", players: ["Lovis Büker", "Marco Grinder"]},
+        {name: "Baris & Sophie", players: ["Baris Güntekin", "Sophie Güntekin"]},
+        {name: "Rando & Christina", players: ["Rando Schvede", "Christina Wicht"]},
+        {name: "Arno Dübel Fanclub", players: ["Kevin Krumscheidt", "Pascal Kronenberg"]}
     ]
 
     let response = await axios.post("/createTournament", tournament);

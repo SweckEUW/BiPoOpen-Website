@@ -61,40 +61,36 @@ window.addEventListener("resize", () => {
 table{
     text-align: center;
 }
+table *{
+    vertical-align: middle;
+}
 tbody tr:nth-of-type(1){
-    background: rgb(155, 132, 6);
-    color: white;
+    background: var(--secondary-color-weak);
     font-size: 24px;
 }
 tbody tr:nth-of-type(2){
-    background: silver;
-    color: white;
-    font-size: 20px;
+    background: #e6faff;
 }
 tbody tr:nth-of-type(3){
-    background: rgb(145, 100, 33);
-    color: white;
-    font-size: 16px;
+    background: #f4fdff;
 }
 table th{ 
     position: sticky;
     top: 100px;
     background-color: #FFF;
+    color: var(--main-color);
 }
 
 /*MOBILE*/
 @media (width <= 900px){
     table{
-        width: auto;
+        width: 100%;
     }
     table *{
         font-size: 15px;
     }
     tr{
         height: 80px;
-    }
-    tr *{
-        vertical-align: middle;
     }
     table th{ 
         top: 60px;
@@ -109,5 +105,32 @@ table th{
         max-width: 100px;
         width: 100px;
     }
+}
+
+/* Table Border */
+table {
+    border-collapse: collapse;
+}
+table td {
+    border: 1px solid rgba(0, 0, 0, 0.3); 
+}
+table th{
+    border: 1px solid rgba(0, 0, 0, 0.3); 
+    border-top: 0;
+}
+table th:first-child{
+    border-left: 0;
+}
+table th:last-child{
+    border-right: 0;
+}
+table tr td:first-child {
+    border-left: 0;
+}
+table tr:last-child td {
+    border-bottom: 0;
+}
+table tr td:last-child {
+    border-right: 0;
 }
 </style>
