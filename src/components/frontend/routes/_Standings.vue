@@ -31,6 +31,8 @@ window.addEventListener("resize", () => {
 <template>
     <div class="Standings">
 
+        <h1 class="bp-title">Platzierungen</h1>
+
         <Loadingscreen v-show="!tournament || !groups"/>
 
         <table v-show="tournament && groups" class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">

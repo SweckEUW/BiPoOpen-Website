@@ -100,6 +100,7 @@ a{
 	margin-bottom: 50px;
 	margin: 0 15px;
 	font-size: 24px;
+	text-decoration: none;
 }
 a:first-child{
 	margin-left: 0;

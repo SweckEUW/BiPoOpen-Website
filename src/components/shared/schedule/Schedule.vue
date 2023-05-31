@@ -30,9 +30,6 @@ defineProps(['getTournament','tournament',"isBackend"])
 </template>
 
 <style scoped>
-.Schedule{
-   margin-top: 70px;
-}
 .nav-tabs{
    position: sticky;
    top: 106px;
