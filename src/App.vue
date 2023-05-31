@@ -39,7 +39,8 @@ onBeforeMount(() => {
 @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100&display=swap');
 
 :root {
-  --main-color: red;
+  --main-color: #D81C66;
+  --secondary-color: #E86E4A;
   --main-color-hover: rgb(241, 200, 200);
   --result-red: rgb(253, 165, 165);
   --result-green: rgb(213, 243, 206);
