@@ -30,6 +30,8 @@ window.addEventListener("resize", () => {
 <template>
     <div class="MVP">
         
+        <h1 class="bp-title">Most Valuable Player</h1>
+
         <Loadingscreen v-show="!tournament || !players"/>
 
         <table v-show="tournament && players" class="table table-hover caption-top" id="mvp-table">

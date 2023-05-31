@@ -55,9 +55,6 @@ body{
 	margin: 0;
 }
 
-a{
-	text-decoration: none !important;
-}
 .Page{
 	margin: auto;
 	margin-top: 150px;
@@ -65,7 +62,6 @@ a{
 	min-height: calc(100vh - 200px - 80px);
 	width: 90%;
 }
-
 .bp-button{
 	padding: 20px;
 	background: var(--main-color);
@@ -74,9 +70,17 @@ a{
 	text-align: center;
 	margin-bottom: 50px;
 	transition: .3s background ease;
+	text-decoration: none;
 }
 .bp-button:hover{
 	background: var(--main-color-hover);
+}
+.bp-title{
+	margin-bottom: 40px;
+	color: var(--main-color);
+    font-size: 40px;
+	width: 100%;
+    text-align: center;
 }
 
 /* Transition Animations */
@@ -120,6 +124,10 @@ a{
 		margin-top: 80px;
 		width: 95%;
 		padding-bottom: 30px;
+	}
+	.bp-title{
+		font-size: 28px;
+		margin-bottom: 30px;
 	}
 }
 </style>

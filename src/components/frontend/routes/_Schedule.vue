@@ -23,6 +23,8 @@ onUnmounted(() => {
 
 <template>
    <div class="Schedule">
+      <h1 class="bp-title">Spielplan</h1>
+
       <Loadingscreen v-show="!tournament"/>
       <Schedule v-show="tournament" :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
    </div>
