@@ -9,9 +9,9 @@ import MatchElement from '@/components/shared/MatchElement.vue';
 const props = defineProps(['getTournament','tournament','isBackend'])
 
 const onDragEnd = async (evt:any) => {
-   let groupCaption = evt.srcElement.parentElement.parentElement.parentElement.getElementsByClassName("rt-caption")[0].getElementsByTagName("div")[0].innerText;
+   let groupCaption = evt.srcElement.parentElement.parentElement.getElementsByClassName("rt-caption")[0].getElementsByTagName("div")[0].innerText;
    let groupIndex = groupCaption.split(" ")[1].toLowerCase().charCodeAt(0) - 97;
-
+   
    let matches = props.tournament.groupPhase.matches;
    let matchesInGroup = matches[groupIndex];
    let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
