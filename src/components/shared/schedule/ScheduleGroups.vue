@@ -33,6 +33,8 @@ const initSortable = () => {
             animation: 150,
             group: "_" + i ,
             onEnd: onDragEnd,
+            filter: '.Modal',
+            preventOnFilter: false
          });
       }
    }, 0);
