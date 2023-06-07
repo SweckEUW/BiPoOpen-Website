@@ -87,4 +87,12 @@
 .mo-button div:hover{
     background: var(--main-color-hover);
 }
+
+/*MOBILE*/
+@media (width <= 900px){
+    .mo-container{
+        width: 95%;
+        padding: 20px 10px;
+    }
+}
 </style>

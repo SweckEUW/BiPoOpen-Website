@@ -135,4 +135,11 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/*MOBILE*/
+@media (width <= 900px){
+    .rt-modal-player, .rt-modal-team{
+        white-space: break-spaces;
+    }
+}
 </style>
