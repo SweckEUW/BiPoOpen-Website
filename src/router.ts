@@ -8,6 +8,7 @@ import ScheduleOverview from '@/components/frontend/routes/_ScheduleOverview.vue
 import Standings from '@/components/frontend/routes/_Standings.vue'
 import MVP from '@/components/frontend/routes/_MVP.vue'
 import Rules from '@/components/frontend/routes/_Rules.vue'
+import Photos from '@/components/frontend/routes/_Photos.vue'
 // import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
 
 // Backend
@@ -64,13 +65,20 @@ const routes = [
 			title: 'Weck BiPo Open 2023 - Regeln',
 		}
 	},
-
 	{
 		path: '/Spielplan2',
 		name: 'ScheduleOverview',
 		component: ScheduleOverview,
 		meta: {
 			title: 'Weck BiPo Open 2023 - Spielplan-Übersicht',
+		}
+	},
+	{
+		path: '/2023/Fotos',
+		name: 'Photos',
+		component: Photos,
+		meta: {
+			title: 'Weck BiPo Open 2023 - Fotos',
 		}
 	},
 	// {

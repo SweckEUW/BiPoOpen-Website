@@ -15,6 +15,7 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
         <router-link class="bp-button" to="/Spielplan">Zum Spielplan</router-link>
         <router-link class="bp-button" to="/Platzierungen">Zu den Gruppenplatzierungen</router-link>
         <router-link class="bp-button" to="/MVP">Zur MVP Tabelle</router-link>
+        <router-link class="bp-button" to="/2023/Fotos">Zu den Bildern aus 2023</router-link>
 
         <hr>
 

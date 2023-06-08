@@ -142,7 +142,7 @@ onMounted(() => {
    flex-direction: column;
    justify-content: center;
 }
-.mt-result{
+.gsk-stage1 .mt-result{
    justify-content: flex-end;
 }
 .mt-button{
