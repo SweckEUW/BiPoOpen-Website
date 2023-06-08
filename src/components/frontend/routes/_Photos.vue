@@ -3,6 +3,8 @@ import { ref, onMounted } from "vue"
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
 
+import driveImageIDs from "@/assets/2023/driveImageIDs.json"
+
 const showModal = ref(false);
 const modalImageURL = ref("");
 const modalImageIndex = ref(0);
@@ -30,8 +32,6 @@ const adjustImageGrid = () => {
 onMounted(() => {
     adjustImageGrid();
 });
-
-import driveImageIDs from "@/assets/2023/driveImageIDs.json"
 
 const pictures:any = ref([]); 
 for (let i = 0; i < driveImageIDs.pictures.length; i++) {
