@@ -48,6 +48,7 @@ let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 				<router-link @click="toggleBurgerMenu()" to="/Spielplan">Spielplan</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
 				<router-link @click="toggleBurgerMenu()" to="/MVP">Most Valuable Player</router-link>
+				<router-link @click="toggleBurgerMenu()" to="/Fotos">Fotos 2023</router-link>
 			</div>
 		</transition>
 
