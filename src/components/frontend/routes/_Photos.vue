@@ -3,19 +3,6 @@ import { ref, onMounted } from "vue"
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
 
-// Create Array with images and thumbnails
-const mainImage:any = import.meta.glob('@/assets/2023/pictures/*.jpg');
-const thumbnails:any = import.meta.glob('@/assets/2023/pictures/thumbnails/*.jpg');
-const pictures:any = ref([]); 
-for (let i = 0; i < Object.entries(thumbnails).length; i++) {
-    let thumbnail:string = Object.entries(thumbnails)[i][0];
-    let picture:string = Object.entries(mainImage)[i][0]; 
-    pictures.value.push({
-        thumbnail: thumbnail, 
-        picture: picture
-    })
-}
-
 const showModal = ref(false);
 const modalImageURL = ref("");
 const modalImageIndex = ref(0);
@@ -43,6 +30,18 @@ const adjustImageGrid = () => {
 onMounted(() => {
     adjustImageGrid();
 });
+
+import driveImageIDs from "@/assets/2023/driveImageIDs.json"
+
+const pictures:any = ref([]); 
+for (let i = 0; i < driveImageIDs.pictures.length; i++) {
+    let thumbnail:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.thumbnails[i].img_id;
+    let picture:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.pictures[i].img_id;
+    pictures.value.push({
+        thumbnail: thumbnail, 
+        picture: picture
+    })
+}
 </script>
 
 <template>
