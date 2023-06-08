@@ -34,7 +34,7 @@ onMounted(() => {
 });
 
 const pictures:any = ref([]); 
-for (let i = 0; i < driveImageIDs.pictures.length; i++) {
+for (let i = 0; i < 50; i++) { //driveImageIDs.pictures.length
     let thumbnail:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.thumbnails[i].img_id;
     let picture:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.pictures[i].img_id;
     pictures.value.push({
