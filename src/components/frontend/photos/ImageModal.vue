@@ -30,7 +30,7 @@ onMounted(() => {
 });
 
 const downloadImage = async () => {
-    let imageSrc = props.pictures[swiper.activeIndex].picture;
+    let imageSrc = props.pictures[swiper.activeIndex].original;
 
     const image = await fetch(imageSrc)
     const imageBlog = await image.blob()
@@ -58,7 +58,7 @@ const downloadImage = async () => {
             </div>
 
             <div class="pt-close" @click="toggleModal">
-                <svg fill="var(--main-color)" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M0 14.545L1.455 16 8 9.455 14.545 16 16 14.545 9.455 8 16 1.455 14.545 0 8 6.545 1.455 0 0 1.455 6.545 8z" fill-rule="evenodd"></path> </g></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M 9.15625 6.3125 L 6.3125 9.15625 L 22.15625 25 L 6.21875 40.96875 L 9.03125 43.78125 L 25 27.84375 L 40.9375 43.78125 L 43.78125 40.9375 L 27.84375 25 L 43.6875 9.15625 L 40.84375 6.3125 L 25 22.15625 Z" fill="var(--main-color)"/></svg>
             </div>
         </div>
 
@@ -82,6 +82,9 @@ const downloadImage = async () => {
 </template>
 
 <style scoped>
+.swiper{
+    overflow: visible;
+}
 .ImageModal{
     --swiper-theme-color: var(--main-color);
     position: fixed;
@@ -93,7 +96,7 @@ const downloadImage = async () => {
     height: 100vh;
     top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.9);
 }
 .mo-container{
     background: transparent;
@@ -128,17 +131,12 @@ img{
     z-index: 2;
     display: flex;
 }
-.pt-download{
-    width: 45px;
-    height: 45px;
-    margin-right: 20px;
+.pt-download, .pt-close {
+    width: 40px;
+    height: 40px;
 }
-.pt-close {
-    width: 30px;
-    height: 30px;
-    font-size: 70px;
-    color: var(--main-color);
-    line-height: 22px;
+.pt-download {
+    margin-right: 15px;
 }
 
 /*MOBILE*/
@@ -146,6 +144,20 @@ img{
     .mo-container{
         width: 95%;
         padding: 20px 10px;
+    }
+    .pt-icons{
+        top: 20px;
+        right: 20px;
+    }
+    .pt-download, .pt-close {
+        width: 30px;
+        height: 30px;
+    }
+    .pt-download {
+        margin-right: 10px;
+    }
+    .swiper-pagination{
+        top: -20px;
     }
 }
 </style>
