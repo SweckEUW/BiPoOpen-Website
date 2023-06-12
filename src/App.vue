@@ -73,6 +73,7 @@ body{
 }
 .bp-button:hover{
 	background: var(--main-color-hover);
+	color: white;
 }
 .bp-title{
 	margin-bottom: 40px;

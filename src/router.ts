@@ -1,26 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Frontend
-import Home from '@/components/frontend/routes/_Home.vue'
-import Poll from '@/components/frontend/routes/_Poll.vue'
-import Schedule from '@/components/frontend/routes/_Schedule.vue'
-import ScheduleOverview from '@/components/frontend/routes/_ScheduleOverview.vue'
-import Standings from '@/components/frontend/routes/_Standings.vue'
-import MVP from '@/components/frontend/routes/_MVP.vue'
-import Rules from '@/components/frontend/routes/_Rules.vue'
-import Photos from '@/components/frontend/routes/_Photos.vue'
-// import Teamanmeldung from '@/components/teamanmeldung/_Teamanmeldung.vue'
-
-// Backend
-import ManageTournaments from '@/components/backend/routes/_ManageTournaments.vue'
-import ManageSingleTournament from '@/components/backend/routes/_ManageSingleTournament.vue'
-
 const routes = [
 	// Frontend
 	{
 		path: '/',
 		name: 'Home',
-		component: Home,
+		component: () => import('@/components/frontend/routes/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023',
 		}
@@ -28,7 +13,7 @@ const routes = [
 	{
 		path: '/Umfrage',
 		name: 'Umfrage',
-		component: Poll,
+		component: () => import('@/components/frontend/routes/_Poll.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Umfrage',
 		}
@@ -36,7 +21,7 @@ const routes = [
 	{
 		path: '/Spielplan',
 		name: 'Schedule',
-		component: Schedule,
+		component: () => import('@/components/frontend/routes/_Schedule.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Spielplan',
 		}
@@ -44,7 +29,7 @@ const routes = [
 	{
 		path: '/Platzierungen',
 		name: 'Standings',
-		component: Standings,
+		component: () => import('@/components/frontend/routes/_Standings.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Platzierungen',
 		}
@@ -52,7 +37,7 @@ const routes = [
 	{
 		path: '/MVP',
 		name: 'MVP',
-		component: MVP,
+		component: () => import('@/components/frontend/routes/_MVP.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - MVP',
 		}
@@ -60,7 +45,7 @@ const routes = [
 	{
 		path: '/Regeln',
 		name: 'Regeln',
-		component: Rules,
+		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Regeln',
 		}
@@ -68,7 +53,7 @@ const routes = [
 	{
 		path: '/Spielplan2',
 		name: 'ScheduleOverview',
-		component: ScheduleOverview,
+		component: () => import('@/components/frontend/routes/_ScheduleOverview.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Spielplan-Übersicht',
 		}
@@ -76,7 +61,7 @@ const routes = [
 	{
 		path: '/2023/Fotos',
 		name: 'Photos',
-		component: Photos,
+		component: () => import('@/components/frontend/routes/_Photos.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Fotos',
 		}
@@ -84,7 +69,7 @@ const routes = [
 	// {
 	// 	path: '/Teamanmeldung',
 	// 	name: 'Teamanmeldung',
-	// 	component: Teamanmeldung,
+	// 	component: () => import('@/components/teamanmeldung/_Teamanmeldung.vue'),
 	// 	meta: {
 	// 		title: 'Weck BiPo Open 2023 - Teamanmeldung',
 	// 	},
@@ -94,7 +79,7 @@ const routes = [
 	{
 		path: '/Manage',
 		name: 'Manage',
-		component: ManageTournaments,
+		component: () => import('@/components/backend/routes/_ManageTournaments.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
 		}
@@ -102,7 +87,7 @@ const routes = [
 	{
 		path: '/Manage/:id',
 		name: 'ManageTournament',
-		component: ManageSingleTournament,
+		component: () => import('@/components/backend/routes/_ManageSingleTournament.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2023 - Manage',
 		}

@@ -2,7 +2,6 @@
 import { ref, onMounted } from "vue"
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
-
 import driveImageIDs from "@/assets/2023/driveImageIDs.json"
 
 const showModal = ref(false);
@@ -49,14 +48,15 @@ for (let i = 0; i < driveImageIDs.pictures.length; i++) {
     })
 }
 
-const headerVideo = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
+// const headerVideo = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
 
-const elementsShown = ref(30);
+const elementsShown = ref(20);
 let pauseScroll = false;
 window.onscroll = () => {
     if((window.innerHeight + window.scrollY) >= document.body.scrollHeight && !pauseScroll) {
-        elementsShown.value += 30;
+        elementsShown.value += 20;
         pauseScroll = true;
+        setTimeout(() => { adjustImageGrid(); }, 0);
         setTimeout(() => { pauseScroll = false; }, 500);
     }
 };
@@ -68,7 +68,7 @@ window.onscroll = () => {
         <h1 class="bp-title">Fotos 2023</h1>
 
         <Transition name="fade">
-            <ImageModal v-if="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
+            <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
         <div class="pt-intro">
@@ -80,10 +80,9 @@ window.onscroll = () => {
             <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
         </div>
         
-        <div class="pt-video">
+        <!-- <div class="pt-video">
             <video :src="headerVideo" autoplay muted loop></video>
-        </div>
-
+        </div> -->
 
         <div class="pt-gallery">
             <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
@@ -126,6 +125,7 @@ window.onscroll = () => {
 }
 .pt-gallery-element{
     cursor: pointer;
+    min-height: 250px;
 }
 .pt-thumbnail{
     width: 100%;
@@ -143,6 +143,9 @@ window.onscroll = () => {
     .Photos video{
         width: 100%;
         margin-bottom: 20px;
+    }
+    .pt-gallery-element{
+        min-height: 110px;
     }
 }
 </style>
