@@ -17,7 +17,7 @@ const scrollToTop = () => {
 	}
 }
 
-let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
+let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 </script>
 
 <template>
@@ -25,8 +25,7 @@ let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 
 		<div class="ap-left">
 			<router-link to="/" @click="scrollToTop()">
-				<img :src="logo" alt="" width="100" height="100">
-				BiPo Open
+				<img :src="logo" alt="">
 			</router-link>
 		</div>
 		
@@ -75,9 +74,8 @@ let logo:string = new URL(`/src/assets/logo.svg`, import.meta.url).href;
 	align-items: center;
 }
 .ap-left img{
-	width: 40px;
-	height: 30px;
-	margin-right: 10px;
+	width: 255px;
+	height: 40px;
 }
 .ap-right{
 	float: right;
@@ -111,7 +109,7 @@ a:last-child{
 }
 a:hover{
 	opacity: 0.7;
-	color: black;
+	color: var(--main-color) !important;
 }
 
 /*MOBILE*/
@@ -129,6 +127,10 @@ a:hover{
 		font-size: 20px;
 		margin-top: 4px !important;
 		margin-bottom: 0px !important;
+	}
+	.ap-left img{
+		width: 180px;
+		height: 30px;
 	}
 	.ap-left a:hover{
 		opacity: 1;
