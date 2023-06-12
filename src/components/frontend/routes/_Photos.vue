@@ -48,7 +48,7 @@ for (let i = 0; i < driveImageIDs.pictures.length; i++) {
     })
 }
 
-// const headerVideo = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
+const headerVideo = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
 
 const elementsShown = ref(20);
 let pauseScroll = false;
@@ -80,9 +80,9 @@ window.onscroll = () => {
             <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
         </div>
         
-        <!-- <div class="pt-video">
+        <div class="pt-video">
             <video :src="headerVideo" autoplay muted loop></video>
-        </div> -->
+        </div>
 
         <div class="pt-gallery">
             <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
