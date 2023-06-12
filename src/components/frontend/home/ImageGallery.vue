@@ -54,6 +54,10 @@ onMounted(() => {
 </template>
 
 <style>
+.ImageGallery{
+    width: 50%;
+    margin: auto;
+}
 .ig-title{
     width: 100%;
     text-align: center;
@@ -65,7 +69,7 @@ onMounted(() => {
 	height: 800px;
     width: 100%;
 	user-select: none;
-	object-fit: contain;
+	object-fit: cover;
 }
 #SwiperPaginationGallery{
     text-align: center;
@@ -78,6 +82,9 @@ onMounted(() => {
 
 /*MOBILE*/
 @media (width <= 900px){
+    .ImageGallery{
+        width: 100%
+    }
     .ImageGallery img{
         height: 300px;
     }
