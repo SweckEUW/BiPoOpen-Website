@@ -1,0 +1,1 @@
+import{_ as s,a as c,c as n,b as e}from"./index-387b0b0e.js";const o={},_={class:"Loadingscreen"},t=e("div",{class:"ls-container"},[e("div",{class:"loader"})],-1),a=[t];function r(d,i){return c(),n("div",_,a)}const f=s(o,[["render",r]]);export{f as L};
