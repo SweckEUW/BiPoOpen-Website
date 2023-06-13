@@ -33,6 +33,7 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 			<router-link to="/Platzierungen">Platzierungen</router-link>
 			<router-link to="/Spielplan">Spielplan</router-link>
 			<router-link to="/MVP">Most Valuable Player</router-link>
+			<router-link to="/2023/Fotos">Fotos 2023</router-link>
 		</div>
 
 		<div class="ap-burger" @click="toggleBurgerMenu()">
