@@ -11,9 +11,9 @@ const toggleMenu = () =>{
 </script>
 
 <template>
-	<div class="DropDown" :style="{'maxHeight': menuOpen ? '500px' : '60px'}">
+	<div class="DropDown" :style="{'maxHeight': menuOpen ? '450px' : '60px'}">
 
-		<div @click="toggleMenu()">
+		<div class="dd-title" @click="toggleMenu()">
 			<slot name="header"></slot>
 			<div class="arrow-down" :style="{'transform': menuOpen ? '' : 'rotate(180deg)'}"></div>
 		</div>
@@ -28,6 +28,12 @@ const toggleMenu = () =>{
 .DropDown{
 	overflow: hidden;
 	transition: max-height .3s ease;
+	margin-bottom: 30px;
+}
+.dd-title{
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .dd-content{
 	display: flex;
@@ -42,7 +48,7 @@ const toggleMenu = () =>{
 	display: inline-block;
 	border-top: 10px solid white;
 	margin-left: 10px;
-	margin-bottom: 10px;
+	margin-bottom: 25px;
 	transition: transform .3s ease;
 }
 </style>
