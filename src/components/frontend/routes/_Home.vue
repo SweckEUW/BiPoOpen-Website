@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ImageGallery from '@/components/frontend/home/ImageGallery.vue';
-
 let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta.url).href;
 </script>
 
@@ -11,15 +9,11 @@ let headerImg:string = new URL(`/src/assets/2023/poster/poster.jpg`, import.meta
 
         <hr>
 
-        <router-link class="bp-button" to="/Regeln">Zu den Regeln</router-link>
-        <router-link class="bp-button" to="/Spielplan">Zum Spielplan</router-link>
-        <router-link class="bp-button" to="/Platzierungen">Zu den Gruppenplatzierungen</router-link>
-        <router-link class="bp-button" to="/MVP">Zur MVP Tabelle</router-link>
-        <router-link class="bp-button" to="/2023/Fotos">Zu den Bildern aus 2023</router-link>
-
-        <hr>
-
-        <ImageGallery/>
+        <router-link class="bp-button" to="/2023/Regeln">Zu den Regeln</router-link>
+        <router-link class="bp-button" to="/2023/Spielplan">Zum Spielplan</router-link>
+        <router-link class="bp-button" to="/2023/Platzierungen">Zu den Gruppenplatzierungen</router-link>
+        <router-link class="bp-button" to="/2023/MVP">Zur MVP Tabelle</router-link>
+        <router-link class="bp-button" to="/2023/Fotos">Zu den Bildern</router-link>
     </div>
 </template>
 
