@@ -39,6 +39,11 @@ onMounted(() => {
             <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
          </Transition>
 
+         <div v-if="isBackend" class="mt-handle">
+            <div style="margin-bottom: 5px;"/>
+            <div/>
+         </div>
+
          <div v-if="matchIndex != undefined" class="mt-index">
            <div>{{ matchIndex + 1 }}</div> 
          </div>
@@ -88,7 +93,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 .Match{
    display: flex;
    justify-content: center;
@@ -96,6 +100,14 @@ onMounted(() => {
    white-space: nowrap;
    width: 100%;
    height: 100%;
+}
+.mt-handle{
+   cursor: grab;
+}
+.mt-handle div{
+   height: 2px;
+   width: 25px;
+   background-color: black;
 }
 .mt-index{
    width: 40px;
