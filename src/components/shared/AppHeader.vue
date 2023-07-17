@@ -2,6 +2,8 @@
 import { ref } from "vue"
 import router from '../../router.js';
 
+import DropDown from '@/components/shared/DropDown.vue';
+
 let showBurger = ref(false);
 
 const toggleBurgerMenu = () =>{
@@ -18,6 +20,8 @@ const scrollToTop = () => {
 }
 
 let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
+
+let tournaments = ref(["2022", "2023", "2024"]);
 </script>
 
 <template>
@@ -30,10 +34,10 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 		</div>
 		
 		<div class="ap-right">
-			<router-link to="/Platzierungen">Platzierungen</router-link>
-			<router-link to="/Spielplan">Spielplan</router-link>
-			<router-link to="/MVP">Most Valuable Player</router-link>
-			<router-link to="/2023/Fotos">Fotos 2023</router-link>
+			<router-link to="/2023/Platzierungen">Platzierungen</router-link>
+			<router-link to="/2023/Spielplan">Spielplan</router-link>
+			<router-link to="/2023/MVP">Most Valuable Player</router-link>
+			<router-link to="/2023/Fotos">Fotos</router-link>
 		</div>
 
 		<div class="ap-burger" @click="toggleBurgerMenu()">
@@ -44,11 +48,21 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-burger-menu" v v-show="showBurger">
-				<router-link @click="toggleBurgerMenu()" to="/Regeln">Regeln</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/Spielplan">Spielplan</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/Platzierungen">Platzierungen</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/MVP">Most Valuable Player</router-link>
-				<router-link @click="toggleBurgerMenu()" to="/2023/Fotos">Fotos 2023</router-link>
+				<div v-for="(tournament,i) in tournaments" :key="tournament">
+					<DropDown :isOpen="tournament == '2023'" :style="{'marginTop' : i == 0 ? '150px' : '0px'}">
+						<template #header>
+							<h1>{{tournament}}</h1>
+						</template>
+						<template #content>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Regeln'">Regeln</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Spielplan'">Spielplan</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Platzierungen'">Platzierungen</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/MVP'">Most Valuable Player</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Fotos'">Fotos</router-link>
+						</template>
+					</DropDown>
+				</div>
+
 			</div>
 		</transition>
 
@@ -123,6 +137,15 @@ a:hover{
 		font-size: 32px;
 		margin: 0px !important;
 		margin-bottom: 35px !important;
+		color: rgb(240, 240, 240);
+	}
+	h1{
+		color: white;
+		font-size: 35px;
+		font-weight: bolder;
+		margin-bottom: 20px;
+		text-align: center;
+		display: inline-block;
 	}
 	.ap-left a{
 		font-size: 20px;
@@ -150,21 +173,17 @@ a:hover{
 		padding-top: 5px;
 	}
 	.ap-burger-menu{
-		display: block;
 		width: 100vw;
 		height: 100vh;
 		position: absolute;
 		z-index: 2;
 		left: 0;
-    	top: 0;
+    	top: 0%;
 		display: flex;
-		justify-content: center;
 		align-items: center;
 		flex-direction: column;
 		background-color: var(--main-color);
-	}
-	.ap-burger-menu a{
-		color: white;
+		overflow: auto;
 	}
 	.bar1, .bar2, .bar3 {
 		width: 35px;
