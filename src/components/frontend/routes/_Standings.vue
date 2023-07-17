@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getGroups, getTournamentByName, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
+import { getGroups, getTournamentWithRouterID, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -8,8 +8,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 let tournament = ref();
 let groups = ref();
 const getTournament = async () => {
-   let tournamentName = "Weck BiPo Open 2023";
-   tournament.value = await getTournamentByName(tournamentName);
+   tournament.value = await getTournamentWithRouterID();
    groups.value = getGroupsWithStats(tournament.value);
 }
 getTournament();

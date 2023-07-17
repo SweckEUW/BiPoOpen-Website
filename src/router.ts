@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -7,7 +8,7 @@ const routes = [
 		name: 'Home',
 		component: () => import('@/components/frontend/routes/_Home.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023',
+			title: 'Weck BiPo Open',
 		}
 	},
 	{
@@ -15,55 +16,55 @@ const routes = [
 		name: 'Umfrage',
 		component: () => import('@/components/frontend/routes/_Poll.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Umfrage',
+			title: 'Weck BiPo Open REPLACE - Umfrage',
 		}
 	},
 	{
-		path: '/Spielplan',
+		path: '/:id/Spielplan',
 		name: 'Schedule',
 		component: () => import('@/components/frontend/routes/_Schedule.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Spielplan',
+			title: 'Weck BiPo Open REPLACE - Spielplan',
 		}
 	},
 	{
-		path: '/Platzierungen',
+		path: '/:id/Platzierungen',
 		name: 'Standings',
 		component: () => import('@/components/frontend/routes/_Standings.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Platzierungen',
+			title: 'Weck BiPo Open REPLACE - Platzierungen',
 		}
 	},
 	{
-		path: '/MVP',
+		path: '/:id/MVP',
 		name: 'MVP',
 		component: () => import('@/components/frontend/routes/_MVP.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - MVP',
+			title: 'Weck BiPo Open REPLACE - MVP',
 		}
 	},
 	{
-		path: '/Regeln',
+		path: '/:id/Regeln',
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Regeln',
+			title: 'Weck BiPo Open REPLACE - Regeln',
 		}
 	},
 	{
-		path: '/Spielplan2',
+		path: '/:id/Spielplan2',
 		name: 'ScheduleOverview',
 		component: () => import('@/components/frontend/routes/_ScheduleOverview.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Spielplan-Übersicht',
+			title: 'Weck BiPo Open REPLACE - Spielplan-Übersicht',
 		}
 	},
 	{
-		path: '/2023/Fotos',
+		path: '/:id/Fotos',
 		name: 'Photos',
 		component: () => import('@/components/frontend/routes/_Photos.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Fotos',
+			title: 'Weck BiPo Open REPLACE - Fotos',
 		}
 	},
 	// {
@@ -71,7 +72,7 @@ const routes = [
 	// 	name: 'Teamanmeldung',
 	// 	component: () => import('@/components/teamanmeldung/_Teamanmeldung.vue'),
 	// 	meta: {
-	// 		title: 'Weck BiPo Open 2023 - Teamanmeldung',
+	// 		title: 'Weck BiPo Open REPLACE - Teamanmeldung',
 	// 	},
 	// },
 
@@ -81,7 +82,7 @@ const routes = [
 		name: 'Manage',
 		component: () => import('@/components/backend/routes/_ManageTournaments.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
+			title: 'Weck BiPo Open REPLACE - Manage',
 		}
 	},
 	{
@@ -89,7 +90,7 @@ const routes = [
 		name: 'ManageTournament',
 		component: () => import('@/components/backend/routes/_ManageSingleTournament.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2023 - Manage',
+			title: 'Weck BiPo Open REPLACE - Manage',
 		}
 	},
 ];
@@ -103,57 +104,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-	// This goes through the matched routes from last to first, finding the closest route with a title.
-	// e.g., if we have `/some/deep/nested/route` and `/some`, `/deep`, and `/nested` have titles,
-	// `/nested`'s will be chosen.
-	const nearestWithTitle = to.matched
-		.slice()
-		.reverse()
-		.find((r) => r.meta && r.meta.title);
+	document.title = to.meta.title;
 
-	// Find the nearest route element with meta tags.
-	const nearestWithMeta = to.matched
-		.slice()
-		.reverse()
-		.find((r) => r.meta && r.meta.metaTags);
-
-	const previousNearestWithMeta = from.matched
-		.slice()
-		.reverse()
-		.find((r) => r.meta && r.meta.metaTags);
-
-	// If a route with a title was found, set the document (page) title to that value.
-	if (nearestWithTitle) {
-		(document as any).title = nearestWithTitle.meta.title;
-	} else if (previousNearestWithMeta) {
-		(document as any).title = previousNearestWithMeta.meta.title;
-	}
-
-	// Remove any stale meta tags from the document using the key attribute we set below.
-	Array.from(
-		document.querySelectorAll('[data-vue-router-controlled]')
-	).map((el:any) => el.parentNode.removeChild(el));
-
-	// Skip rendering meta tags if there are none.
-	if (!nearestWithMeta) return next();
-
-	// Turn the meta tag definitions into actual elements in the head.
-	(nearestWithMeta as any).meta.metaTags
-		.map((tagDef:any) => {
-			const tag = document.createElement('meta');
-
-			Object.keys(tagDef).forEach((key) => {
-				tag.setAttribute(key, tagDef[key]);
-			});
-
-			// We use this to track which meta tags we create so we don't interfere with other ones.
-			tag.setAttribute('data-vue-router-controlled', '');
-
-			return tag;
-		})
-		// Add the meta tags to the document head.
-		.forEach((tag:any) => document.head.appendChild(tag));
-
+	if(document.title.includes("REPLACE"))
+		document.title = document.title.replace("REPLACE", to.params.id);
+	
 	next();
 });
 

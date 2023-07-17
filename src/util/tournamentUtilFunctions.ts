@@ -2,9 +2,20 @@ import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
 import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
 import { convertNumberToCharacter } from "@/util/util.js"; 
+import { useRoute } from "vue-router";
 
 // TOURNAMENT
 export const getTournamentByName = async (tournamentName:string) => {
+    let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
+    console.log(response.data.message);
+    if(response.data.success)
+       return response.data.tournament;
+}
+
+export const getTournamentWithRouterID = async () => {
+    const route = useRoute();
+    let tournamentName = "Weck BiPo Open " + route.params.id;
+    
     let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
     console.log(response.data.message);
     if(response.data.success)

@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
+import { useRoute } from "vue-router";
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
-import driveImageIDs from "@/assets/2023/driveImageIDs.json"
+
+// TODO: Dynamic import of json files
+import driveImageIDs2023 from "@/assets/2023/driveImageIDs.json"
+import driveImageIDs2022 from "@/assets/2022/driveImageIDs.json"
+
+const route = useRoute();
+let driveImageIDs = route.params.id == '2023' ? driveImageIDs2023 : driveImageIDs2022;
 
 const showModal = ref(false);
 const modalImageURL = ref("");
@@ -65,25 +72,29 @@ window.onscroll = () => {
 <template>
     <div class="Photos" ref="photosHTMLElement">
 
-        <h1 class="bp-title">Fotos 2023</h1>
+        <h1 class="bp-title">{{ 'Fotos ' + route.params.id }}</h1>
 
         <Transition name="fade">
             <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
-        <div class="pt-intro">
-            Ein großes Dankeschön an 
-            <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
-            der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-            <br>
-            Folgt ihm gerne auf Instagram 
-            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
-        </div>
-        
-        <div class="pt-video">
-            <video :src="headerVideo" autoplay muted loop></video>
-        </div>
+        <!-- 2023 Credits & Video -->
+        <div v-if="route.params.id == '2023'">
+            <div class="pt-intro">
+                Ein großes Dankeschön an 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
+                der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+                <br>
+                Folgt ihm gerne auf Instagram 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
+            </div>
+            
+            <div class="pt-video">
+                <video :src="headerVideo" autoplay muted loop></video>
+            </div>
+        </div>  
 
+        <!-- Image Grid -->
         <div class="pt-gallery">
             <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
                 <img class="pt-thumbnail" :src="element.thumbnail" alt="" loading="lazy"/>

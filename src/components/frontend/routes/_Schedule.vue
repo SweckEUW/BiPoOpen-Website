@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
+import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
 
 import Schedule from '@/components/shared/schedule/Schedule.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 let tournament = ref();
 const getTournament = async () => {
-   let tournamentName = "Weck BiPo Open 2023";
-   tournament.value = await getTournamentByName(tournamentName);
+   tournament.value = await getTournamentWithRouterID();
 }
 getTournament();
 
