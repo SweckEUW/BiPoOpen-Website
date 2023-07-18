@@ -16,19 +16,16 @@ getTournaments();
 const createTournament = async () => {
     let tournament:any = {
         name: tournamentName.value,
-        groupPhase: {
-            settings: {
-                fixedGroupAmmount: 8
-            }
-        },
-        koPhase: {
-            settings: {
-                advancingTeamsPerGroup: 2
-            }
-        },
+        groupPhase: {},
+        koPhase: {},
+        settings: {
+            trackPlayerShots: true,
+            fixedGroupAmmount: 8,
+            advancingTeamsPerGroup: 2,
+        }
     }
 
-    // DEBUG!
+    // DEBUG 2023!
     // tournament.teams = [
     //     {name: "Messerstecher", players: ["Simon Weck", "Nick Brinkrolf"]},
     //     {name: "Alkoholigans", players: ["Philipp Karaula", "René Manke"]},
@@ -64,6 +61,30 @@ const createTournament = async () => {
     //     {name: "Arno Dübel Fanclub", players: ["Kevin Krumscheidt", "Pascal Kronenberg"]}
     // ]
 
+    // DEBUG 2022!
+    tournament.teams = [
+        {"name": "Bierkönig*innen","players": ["Esther ?","Dennis ?"]},
+        {"name": "Messerstecher","players": ["Simon Weck","Nick Brinkrolf"]},
+        {"name": "Die Bunten Banausen","players": ["Charlie ?","Laura ?"]},
+        {"name": "Geile Brille Trotz 4 Promille","players": ["Jonas Weck","Leon Rose"]},
+        {"name": "Die Stecher","players": ["Dana Pohlmann","Sally ?"]},
+        {"name": "Elotrance","players": ["Jerome Campigotto","Marvin Brandt"]},
+        {"name": "Team Kanto","players": ["Fritz Falkenreck","Jenny Lemke"]},
+        {"name": "Bierschiss","players": ["Tom Pohlschmidt","Jannick Becker"]},
+        {"name": "Elitepartner","players": ["Matthias Gunter","Paulo Wohlfahrt"]},
+        {"name": "Airballers","players": ["Celina Mercedes","Madelaine"]},
+        {"name": "Pong Daddy's","players": ["Matthias Weck","Lennard Kaffitz"]},
+        {"name": "#BANKERBOYS","players": ["Alexander Borsig","Björn Harz"]},
+        {"name": "Taube Nüsschen","players": ["Patrick Pohlmann","Tim Becker"]},
+        {"name": "Anime Lover","players": ["Paul Falkenreck","Anica Hollenbeck"]},
+        {"name": "Bierpolare Störung","players": ["Giulia Sanio","Tommy Sanio"]},
+        {"name": "Bieranjas","players": ["Nele Wonnemann","Nicole Brandt"]},
+        {"name": "Jetzt schon blau","players": ["Michelle Langer","Niklar Moritz"]},
+        {"name": "3,1 Bier","players": ["David Jones","Vivien ?"]},
+        {"name": "The Gentlemänners","players": ["Daniel Wonnemann","Martin Brandt"]},
+        {"name": "Emotional Damage","players": ["Sham Hasso","Nur-Sena Yildiz"]}
+    ]
+    
     let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);
     if(response.data.success){

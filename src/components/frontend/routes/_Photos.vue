@@ -67,6 +67,8 @@ window.onscroll = () => {
         setTimeout(() => { pauseScroll = false; }, 500);
     }
 };
+
+let poster:string = new URL(`/src/assets/` + route.params.id + `/poster/poster.jpg`, import.meta.url).href;
 </script>
 
 <template>
@@ -93,6 +95,11 @@ window.onscroll = () => {
                 <video :src="headerVideo" autoplay muted loop></video>
             </div>
         </div>  
+
+        <!-- Poster -->
+        <div class="pt-poster">
+            <img :src="poster" alt="">
+        </div>
 
         <!-- Image Grid -->
         <div class="pt-gallery">
@@ -127,6 +134,17 @@ window.onscroll = () => {
 .pt-video video{
     width: 70%;
     margin-bottom: 40px;
+}
+
+.pt-poster{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+.pt-poster img{
+    width: 50%;
+    object-fit: cover;
 }
 
 .pt-gallery{

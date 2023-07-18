@@ -77,9 +77,10 @@ tbody tr:nth-of-type(3){
 }
 table th{ 
     position: sticky;
-    top: 100px;
+    top: 165px;
     background-color: #FFF;
     color: var(--main-color);
+    font-size: 20px;
 }
 
 /*MOBILE*/
@@ -94,7 +95,8 @@ table th{
         height: 80px;
     }
     table th{ 
-        top: 60px;
+        top: 138px;
+        font-size: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){
         max-width: 30px;

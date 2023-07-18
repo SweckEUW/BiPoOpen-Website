@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted } from "vue"
-import { getGroups, setGroups, generateRandomGroups, getTeamFromID, getTeamFromName, setGameResultGroupPhase, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { getGroups, setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
+import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
 
 const props = defineProps(['getTournament','tournament'])
 
@@ -12,13 +13,13 @@ const changeGroups = async () => {
    // 1. Construct Groups Array from DOM
    let groups:any = [];
 
-   let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+   let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
    for (let i = 0; i < groupAmmount; i++){ // Loop over all Groups
       let teams:any = [];
       let teamsDomElment:any = document.getElementById("Group-"+i)?.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
       for (let y = 0; y < teamsDomElment.length; y++) {
          teams.push({
-            teamID: getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[1].innerText)._id
+            teamID: getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)._id
          });
       }
 
@@ -40,13 +41,14 @@ const changeGroups = async () => {
 
 const initSortable = () => {
    setTimeout(() => {
-      let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+      let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
       for (let i = 0; i < groupAmmount; i++){
          let groupDOM:any = document.getElementById("Group-"+i);
          let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
          new Sortable(tbody, {
             animation: 150,
-            group: 'shared'
+            group: 'shared',
+            handle: ".lt-handle"
          });
       }
    }, 0);
@@ -87,6 +89,7 @@ const toggleModal = (generate?:boolean) => {
 <template>
    <div class="LayoutTab">
 
+      <!-- Modal -->
       <Transition name="fade">
          <Modal v-if="showModal">
                <template #title>{{generateRandom ? "Gruppen auslosen" : "Gruppen umsortieren"}}</template>
@@ -105,13 +108,19 @@ const toggleModal = (generate?:boolean) => {
          </Modal>
       </Transition>
 
+      <!-- GroupsSettings -->
+      <GroupsSettings :tournament="tournament" :getTournament="getTournament"/>
+
+      <!-- Buttons -->
       <div class="bp-button" style="margin-bottom: 20px;" @click="toggleModal(true)">Gruppen auslosen</div>
       <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
+      <!-- Groups -->
       <table class="table table-hover caption-top" v-for="(group,index) in getGroups(tournament)" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
          <thead>
             <tr>
+               <th></th>
                <th>#</th>
                <th>Teamname</th>
                <th>Spieler</th>
@@ -119,6 +128,10 @@ const toggleModal = (generate?:boolean) => {
          </thead>
          <tbody>
             <tr v-for="(team,id) in group.teams" :key="team">
+               <td class="lt-handle">
+                  <div style="margin-bottom: 5px; margin-top: 5px;"/>
+                  <div/>
+               </td>
                <td>{{id+1}}</td>
                <td>{{team.name}}</td>
                <td>
@@ -136,6 +149,16 @@ const toggleModal = (generate?:boolean) => {
    margin-top: 20px;
 }
 
+.lt-handle{
+   cursor: grab;
+   width: 25px;
+}
+.lt-handle div{
+   height: 2px;
+   width: 25px;
+   background-color: black;
+}
+
 table{
    margin-bottom: 30px;
    text-align: center;
@@ -150,7 +173,7 @@ table th{
    font-size: 20px;
    font-weight: bold;
 }
-table td:nth-child(1){
+table td:nth-child(2){
    max-width: 20px;
    width: 20px;
 }

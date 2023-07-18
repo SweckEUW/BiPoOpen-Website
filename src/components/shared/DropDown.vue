@@ -27,13 +27,18 @@ const toggleMenu = () =>{
 <style scoped>
 .DropDown{
 	overflow: hidden;
-	transition: max-height .3s ease;
+	transition: max-height .5s ease;
 	margin-bottom: 30px;
 }
 .dd-title{
+	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	transition: .3s opacity ease;
+}
+.dd-title:hover{
+	opacity: 0.5;
 }
 .dd-content{
 	display: flex;
@@ -49,6 +54,13 @@ const toggleMenu = () =>{
 	border-top: 10px solid white;
 	margin-left: 10px;
 	margin-bottom: 25px;
-	transition: transform .3s ease;
+	transition: transform .5s ease;
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+	.dd-title:hover{
+		opacity: 1;
+	}
 }
 </style>

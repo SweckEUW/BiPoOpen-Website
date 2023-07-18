@@ -76,11 +76,15 @@ body{
 	color: white;
 }
 .bp-title{
-	margin-bottom: 40px;
+	margin: 0%;
+	padding-bottom: 20px;
 	color: var(--main-color);
     font-size: 40px;
-	width: 100%;
     text-align: center;
+	position: sticky;
+	background-color: white;
+	top: 100px;
+	z-index: 2;
 }
 
 /* Transition Animations */
@@ -127,7 +131,9 @@ body{
 	}
 	.bp-title{
 		font-size: 28px;
-		margin-bottom: 30px;
+		padding-bottom: 30px;
+		padding-top: 10px;
+		top: 78px;
 	}
 }
 </style>

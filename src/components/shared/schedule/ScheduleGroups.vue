@@ -26,7 +26,7 @@ const onDragEnd = async (evt:any) => {
 
 const initSortable = () => {
    setTimeout(() => { 
-      let groupAmmount:number = props.tournament.groupPhase.settings.fixedGroupAmmount;
+      let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
       for (let i = 0; i < groupAmmount; i++){
          let matchesForGroupDOM:any = document.getElementById("Match-Table-"+i)?.getElementsByClassName("rt-matches")[0];
          new Sortable(matchesForGroupDOM, {

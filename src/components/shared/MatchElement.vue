@@ -39,7 +39,7 @@ onMounted(() => {
             <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
          </Transition>
 
-         <div v-if="isBackend" class="mt-handle">
+         <div v-if="isBackend && isGroupPhase" class="mt-handle">
             <div style="margin-bottom: 5px;"/>
             <div/>
          </div>
@@ -62,18 +62,21 @@ onMounted(() => {
          
          <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">Eintragen</div>
 
-         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}">
+         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" 
+            :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}"
+            :style="{'justifyContent' : tournament.settings.trackPlayerShots ? '' : 'center'}"
+         >
             <div class="mt-result-team">
                <span>{{ match.result.team1Score }}</span>
                <span>{{  " - " }}</span>
                <span>{{ match.result.team2Score }}</span>
             </div>
-            <div class="mt-result-player">
+            <div class="mt-result-player" v-if="tournament.settings.trackPlayerShots">
                <span>{{ match.result.team1Player1Score }}</span>
                <span>{{  " - " }}</span>
                <span>{{ match.result.team2Player1Score }}</span>
             </div>
-            <div class="mt-result-player">
+            <div class="mt-result-player" v-if="tournament.settings.trackPlayerShots">
                <span>{{ match.result.team1Player2Score }}</span>
                <span>{{  " - " }}</span>
                <span>{{ match.result.team2Player2Score }}</span>   
@@ -131,6 +134,9 @@ onMounted(() => {
 }
 .mt-team-second{
    color: var(--secondary-color);
+}
+.mt-result{
+   cursor: pointer;
 }
 .mt-team, .mt-result, .mt-vs, .mt-button{
    padding: 10px;
