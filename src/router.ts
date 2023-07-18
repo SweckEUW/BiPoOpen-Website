@@ -112,7 +112,6 @@ router.beforeEach((to, from, next) => {
 		document.title = document.title.replace("REPLACE", to.params.id);
 	}
 		
-	
 	next();
 });
 
