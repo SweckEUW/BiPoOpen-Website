@@ -127,18 +127,7 @@ export const getGroupsWithStats = (tournament:any) => {
             return team2.wins - team1.wins;
         });
     });
-
-    // TODO: Set placement
-    // for (let i = 0; i < players.length; i++) {
-    //     players[i].placement = i;
-    //     let playersWithSameScore = players.filter((player:any) => player.averageScore == players[i].averageScore && player.ammountOfDrunkenCups == players[i].ammountOfDrunkenCups)
-    //     if(playersWithSameScore.length > 1){
-    //         playersWithSameScore.forEach((playerWithSameScore:any) => {
-    //             playerWithSameScore.placement = playersWithSameScore[0].placement;
-    //         });
-    //     }
-    // }
-
+    
     return groups;
 }
 

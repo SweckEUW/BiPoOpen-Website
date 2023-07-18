@@ -1,5 +1,5 @@
 <script setup lang="ts">
-let headerImg:string = new URL(`/src/assets/2023/poster.jpg`, import.meta.url).href;
+let headerImg:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
 </script>
 
 <template>
