@@ -55,8 +55,6 @@ for (let i = 0; i < driveImageIDs.pictures.length; i++) {
     })
 }
 
-const headerVideo = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
-
 const elementsShown = ref(20);
 let pauseScroll = false;
 window.onscroll = () => {
@@ -68,7 +66,9 @@ window.onscroll = () => {
     }
 };
 
-let poster:string = new URL(`/src/assets/` + route.params.id + `/poster/poster.jpg`, import.meta.url).href;
+const timelapseVideo2023:string = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
+
+let poster:string = new URL(`@/assets/` + route.params.id + `/poster.jpg`, import.meta.url).href;
 </script>
 
 <template>
@@ -92,7 +92,7 @@ let poster:string = new URL(`/src/assets/` + route.params.id + `/poster/poster.j
             </div>
             
             <div class="pt-video">
-                <video :src="headerVideo" autoplay muted loop></video>
+                <video :src="timelapseVideo2023" autoplay muted loop></video>
             </div>
         </div>  
 
