@@ -146,7 +146,7 @@ let poster = route.params.id == "2023" ? poster2023 : poster2022;
     margin-bottom: 20px;
 }
 .pt-poster img{
-    width: 50%;
+    width: 30%;
     object-fit: cover;
 }
 
@@ -178,6 +178,9 @@ let poster = route.params.id == "2023" ? poster2023 : poster2022;
     }
     .pt-gallery-element{
         min-height: 110px;
+    }
+    .pt-poster img{
+        width: 60%;
     }
 }
 </style>
