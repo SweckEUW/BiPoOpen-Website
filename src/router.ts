@@ -104,10 +104,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+	// @ts-ignore 
 	document.title = to.meta.title;
 
-	if(document.title.includes("REPLACE"))
+	if(document.title.includes("REPLACE")){
+		// @ts-ignore 
 		document.title = document.title.replace("REPLACE", to.params.id);
+	}
+		
 	
 	next();
 });
