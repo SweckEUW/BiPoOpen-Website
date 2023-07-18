@@ -4,7 +4,8 @@ import { useRoute } from "vue-router";
 import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
-import GroupsTab from '@/components/backend/manageSingleTournament/GroupsTab.vue';
+import ScheduleSettings from '@/components/backend/manageSingleTournament/ScheduleSettings.vue';
+import GroupsTab from '@/components/backend/manageSingleTournament/groups/GroupsTab.vue';
 import Schedule from '@/components/shared/schedule/Schedule.vue';
 
 let tournament = ref();
@@ -44,6 +45,7 @@ getTournament();
             <GroupsTab :getTournament="getTournament" :tournament="tournament"/>
          </div>
          <div class="tab-pane fade" id="result-tab-pane" role="tabpanel" aria-labelledby="result-tab" tabindex="0">
+            <ScheduleSettings :getTournament="getTournament" :tournament="tournament"/>
             <Schedule :getTournament="getTournament" :tournament="tournament" :isBackend="true"/>
          </div>
       </div>

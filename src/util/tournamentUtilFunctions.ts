@@ -2,6 +2,7 @@ import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
 import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
 import { convertNumberToCharacter } from "@/util/util.js"; 
+import { useRoute } from "vue-router";
 
 // TOURNAMENT
 export const getTournamentByName = async (tournamentName:string) => {
@@ -9,6 +10,23 @@ export const getTournamentByName = async (tournamentName:string) => {
     console.log(response.data.message);
     if(response.data.success)
        return response.data.tournament;
+}
+
+export const getTournamentWithRouterID = async () => {
+    const route = useRoute();
+    let tournamentName = "Weck BiPo Open " + route.params.id;
+    
+    let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
+    console.log(response.data.message);
+    if(response.data.success)
+       return response.data.tournament;
+}
+
+// SETTINGS
+export const setSettings = async (tournamentID:string, settings:any) => {
+    let response = await axios.post("/setSettings", {tournamentID: tournamentID, settings: settings})
+    console.log(response.data.message);
+    return response.data.success
 }
 
 // TEAMS
@@ -68,7 +86,7 @@ export const generateRandomGroups = async (tournament:any) => {
     let teams:any = shuffleArray(tournament.teams);
  
     // Case: Fixed ammount of Groups
-    let groupAmmount:number = tournament.groupPhase.settings.fixedGroupAmmount;
+    let groupAmmount:number = tournament.settings.fixedGroupAmmount;
     for (let i = 0; i < groupAmmount; i++)
        groups.push({teams: []});
     for (let i = 0; i < teams.length; i++)
@@ -165,12 +183,13 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
                 matchesForGroup.push(match);
             }
         }
- 
-        if(teams.length == 3){
-            let length = matchesForGroup.length;
-            for (let x = 0; x < length; x++)
-                matchesForGroup.push(matchesForGroup[x]);
-        }
+        
+        // Groups with 3 teams = Hin und Rückrunde
+        // if(teams.length == 3){
+        //     let length = matchesForGroup.length;
+        //     for (let x = 0; x < length; x++)
+        //         matchesForGroup.push(matchesForGroup[x]);
+        // }
     
         matches.push(shuffleArray(matchesForGroup));
     }
@@ -178,17 +197,7 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
     await setMatchesGroupPhase(tournament._id,matches);
 }
 
-export const setGameResultGroupPhase = async (tournament:any, matchID:string, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
-    let result = {
-       team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
-       team1Player1Score: team1Player1Score, 
-       team1Player2Score: team1Player2Score, 
- 
-       team2Score: (team1Player2Score ? team2Player1Score : 0) + (team2Player2Score ? team2Player2Score : 0),
-       team2Player1Score: team2Player1Score, 
-       team2Player2Score: team2Player2Score
-    }
-
+export const setGameResultGroupPhase = async (tournament:any, matchID:string, result:any) => {
     // Find match in matches and add result 
     let matches = tournament.groupPhase.matches;
     for (let i = 0; i < matches.length; i++) {
@@ -233,7 +242,7 @@ export const setMatchesKOPhase = async (tournamentID:any, matches:any) => {
 
 export const initMatchesKOPhase = async (tournament:any) => {
     let matches:any = [];
-    let teamsInKOPhase = tournament.koPhase.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
+    let teamsInKOPhase = tournament.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
     let stages = Math.log2(teamsInKOPhase);
     for (let i = 0; i < stages; i++){
         let ammountOfMatches = teamsInKOPhase/(Math.pow(2,i+1));
@@ -280,6 +289,26 @@ export const updateMatchesKOPhase = async (tournament:any) => {
                     }else{
                         group1Number = stage.length - x;
                         group2Number = stage.length - x - 1;
+                    }
+
+                    // Change first K.o-Stage for 2022 tournament
+                    if(tournament.name == "Weck BiPo Open 2022"){
+                        if(x == 0){
+                            group1Number = 2;
+                            group2Number = 0;
+                        }
+                        if(x == 1){
+                            group1Number = 3;
+                            group2Number = 1;
+                        }
+                        if(x == 2){
+                            group1Number = 0;
+                            group2Number = 3;
+                        }
+                        if(x == 3){
+                            group1Number = 1;
+                            group2Number = 2;
+                        }
                     }
 
                     if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played
@@ -331,17 +360,7 @@ export const updateMatchesKOPhase = async (tournament:any) => {
 }
 
 // KO-PHASE
-export const setGameResultKOPhase = async (tournament:any, matchID:string, team1Player1Score:number, team1Player2Score:number, team2Player1Score:number, team2Player2Score:number ) => {
-    let result = {
-       team1Score: (team1Player1Score ? team1Player1Score : 0) + (team1Player2Score ? team1Player2Score : 0),
-       team1Player1Score: team1Player1Score, 
-       team1Player2Score: team1Player2Score, 
- 
-       team2Score: (team1Player2Score ? team2Player1Score : 0) + (team2Player2Score ? team2Player2Score : 0),
-       team2Player1Score: team2Player1Score, 
-       team2Player2Score: team2Player2Score
-    }
-
+export const setGameResultKOPhase = async (tournament:any, matchID:string, result:any) => {
     // Find match in matches and add result 
     let matches = tournament.koPhase.matches;
     for (let i = 0; i < matches.length; i++) {

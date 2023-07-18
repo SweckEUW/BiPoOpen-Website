@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getMatchesGroupPhase, getTournamentByName } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesGroupPhase, getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Swiper , { Pagination, Navigation, Autoplay } from 'swiper';
@@ -12,8 +12,7 @@ import MatchElement from '@/components/shared/MatchElement.vue';
 
 let tournament = ref();
 const getTournament = async () => {
-   let tournamentName = "Weck BiPo Open 2023";
-   tournament.value = await getTournamentByName(tournamentName);
+   tournament.value = await getTournamentWithRouterID();
 }
 
 let updateInterval = setInterval(() => {

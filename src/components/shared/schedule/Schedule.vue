@@ -32,7 +32,7 @@ defineProps(['getTournament','tournament',"isBackend"])
 <style scoped>
 .nav-tabs{
    position: sticky;
-   top: 106px;
+   top: 160px;
    background: white;
    z-index: 2;
 }
@@ -50,7 +50,7 @@ defineProps(['getTournament','tournament',"isBackend"])
 /* MOBILE */
 @media (width <= 900px){
    .nav-tabs{
-      top: 64px;
+      top: 130px;
    }
 }
 </style>
