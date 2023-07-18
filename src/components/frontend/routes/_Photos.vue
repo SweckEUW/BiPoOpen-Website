@@ -66,9 +66,8 @@ window.onscroll = () => {
     }
 };
 
-const timelapseVideo2023:string = new URL(`@/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
-
-let poster:string = new URL(`@/assets/` + route.params.id + `/poster.jpg`, import.meta.url).href;
+let timelapseVideo2023:string = new URL(`/src/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
+let poster:string = new URL(`/src/assets/` + route.params.id + `/poster.jpg`, import.meta.url).href;
 </script>
 
 <template>
