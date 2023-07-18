@@ -24,7 +24,7 @@ onBeforeMount(() => {
 	<AppHeader/>
 
 	<div class="Page">
-		<router-view v-slot="{ Component }">
+		<router-view v-slot="{ Component }" :key="$route.fullPath">
 			<transition name="fade-page" mode="out-in">
 				<component :is="Component"/>
 			</transition>
