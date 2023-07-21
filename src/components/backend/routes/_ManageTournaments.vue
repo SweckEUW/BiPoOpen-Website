@@ -62,28 +62,28 @@ const createTournament = async () => {
     // ]
 
     // DEBUG 2022!
-    tournament.teams = [
-        {"name": "Bierkönig*innen","players": ["Esther ?","Dennis ?"]},
-        {"name": "Messerstecher","players": ["Simon Weck","Nick Brinkrolf"]},
-        {"name": "Die Bunten Banausen","players": ["Charlie ?","Laura ?"]},
-        {"name": "Geile Brille Trotz 4 Promille","players": ["Jonas Weck","Leon Rose"]},
-        {"name": "Die Stecher","players": ["Dana Pohlmann","Sally ?"]},
-        {"name": "Elotrance","players": ["Jerome Campigotto","Marvin Brandt"]},
-        {"name": "Team Kanto","players": ["Fritz Falkenreck","Jenny Lemke"]},
-        {"name": "Bierschiss","players": ["Tom Pohlschmidt","Jannick Becker"]},
-        {"name": "Elitepartner","players": ["Matthias Gunter","Paulo Wohlfahrt"]},
-        {"name": "Airballers","players": ["Celina Mercedes","Madelaine"]},
-        {"name": "Pong Daddy's","players": ["Matthias Weck","Lennard Kaffitz"]},
-        {"name": "#BANKERBOYS","players": ["Alexander Borsig","Björn Harz"]},
-        {"name": "Taube Nüsschen","players": ["Patrick Pohlmann","Tim Becker"]},
-        {"name": "Anime Lover","players": ["Paul Falkenreck","Anica Hollenbeck"]},
-        {"name": "Bierpolare Störung","players": ["Giulia Sanio","Tommy Sanio"]},
-        {"name": "Bieranjas","players": ["Nele Wonnemann","Nicole Brandt"]},
-        {"name": "Jetzt schon blau","players": ["Michelle Langer","Niklar Moritz"]},
-        {"name": "3,1 Bier","players": ["David Jones","Vivien ?"]},
-        {"name": "The Gentlemänners","players": ["Daniel Wonnemann","Martin Brandt"]},
-        {"name": "Emotional Damage","players": ["Sham Hasso","Nur-Sena Yildiz"]}
-    ]
+    // tournament.teams = [
+    //     {"name": "Bierkönig*innen","players": ["Esther ?","Dennis ?"]},
+    //     {"name": "Messerstecher","players": ["Simon Weck","Nick Brinkrolf"]},
+    //     {"name": "Die Bunten Banausen","players": ["Charlie ?","Laura ?"]},
+    //     {"name": "Geile Brille Trotz 4 Promille","players": ["Jonas Weck","Leon Rose"]},
+    //     {"name": "Die Stecher","players": ["Dana Pohlmann","Sally ?"]},
+    //     {"name": "Elotrance","players": ["Jerome Campigotto","Marvin Brandt"]},
+    //     {"name": "Team Kanto","players": ["Fritz Falkenreck","Jenny Lemke"]},
+    //     {"name": "Bierschiss","players": ["Tom Pohlschmidt","Jannick Becker"]},
+    //     {"name": "Elitepartner","players": ["Matthias Gunter","Paulo Wohlfahrt"]},
+    //     {"name": "Airballers","players": ["Celina Mercedes","Madelaine"]},
+    //     {"name": "Pong Daddy's","players": ["Matthias Weck","Lennard Kaffitz"]},
+    //     {"name": "#BANKERBOYS","players": ["Alexander Borsig","Björn Harz"]},
+    //     {"name": "Taube Nüsschen","players": ["Patrick Pohlmann","Tim Becker"]},
+    //     {"name": "Anime Lover","players": ["Paul Falkenreck","Anica Hollenbeck"]},
+    //     {"name": "Bierpolare Störung","players": ["Giulia Sanio","Tommy Sanio"]},
+    //     {"name": "Bieranjas","players": ["Nele Wonnemann","Nicole Brandt"]},
+    //     {"name": "Jetzt schon blau","players": ["Michelle Langer","Niklar Moritz"]},
+    //     {"name": "3,1 Bier","players": ["David Jones","Vivien ?"]},
+    //     {"name": "The Gentlemänners","players": ["Daniel Wonnemann","Martin Brandt"]},
+    //     {"name": "Emotional Damage","players": ["Sham Hasso","Nur-Sena Yildiz"]}
+    // ]
     
     let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);
@@ -109,7 +109,7 @@ let tournamentName = ref();
         <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
 
         <Transition name="fade">
-            <Modal v-if="showModal">
+            <Modal v-if="showModal">        
                 <template #title>Neues Turnier erstellen</template>
                 <template #template>
                     <div>Turniername</div>
@@ -141,6 +141,7 @@ let tournamentName = ref();
     text-align: center;
     margin-bottom: 50px;
     filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
+    text-decoration: none;
 }
 .ma-tournament:hover{
     background: rgb(207, 207, 207);
