@@ -76,6 +76,12 @@ const routes = [
 	// 	},
 	// },
 
+	// Redirect
+	{
+		path: '/Spielplan',
+		redirect: '/2023/Spielplan'
+	},
+
 	// Backend
 	{
 		path: '/Manage',
@@ -93,6 +99,16 @@ const routes = [
 			title: 'Weck BiPo Open REPLACE - Manage',
 		}
 	},
+	
+	// 404
+	{
+		path: "/:catchAll(.*)",
+		name: "NotFound404",
+		component: () => import('@/components/frontend/routes/_NotFound404.vue'),
+		meta: {
+			title: 'Weck BiPo Open - 404',
+		}
+	  }
 ];
 
 const router = createRouter({

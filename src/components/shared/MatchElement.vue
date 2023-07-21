@@ -187,6 +187,13 @@ onMounted(() => {
    color: var(--loose-gray);
 }
 
+.mt-result-team span, .mt-result-player span{
+   width: 40%;
+   display: inline-block;
+}
+.mt-result-team span:nth-child(2), .mt-result-player span:nth-child(2){
+   width: 20%;
+}
 
 /*MOBILE*/
 @media (width <= 900px){
@@ -212,7 +219,7 @@ onMounted(() => {
       margin-bottom: 4px;
    }
    .mt-result, .mt-vs{
-      width: 125px;
+      width: 130px;
       padding: 5px;
    }
 }
