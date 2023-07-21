@@ -2,14 +2,15 @@
 import { ref, onUnmounted } from "vue"
 import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
 
+import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+
 import { useRoute } from "vue-router";
 const route = useRoute()
-
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 let tournament = ref();
 let players = ref();
 const getTournament = async () => {
+    // @ts-ignore 
     tournament.value = await getTournamentWithRouterID(route.params.id);
     players.value = getPlayersWithStats(tournament.value);
 }

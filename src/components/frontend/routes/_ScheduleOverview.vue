@@ -10,9 +10,13 @@ import 'swiper/css/pagination';
 
 import MatchElement from '@/components/shared/MatchElement.vue';
 
+import { useRoute } from "vue-router";
+const route = useRoute()
+
 let tournament = ref();
 const getTournament = async () => {
-   tournament.value = await getTournamentWithRouterID();
+   // @ts-ignore 
+   tournament.value = await getTournamentWithRouterID(route.params.id);
 }
 
 let updateInterval = setInterval(() => {

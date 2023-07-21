@@ -3,12 +3,12 @@ import { ref, onMounted } from "vue"
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
 
-import { useRoute } from "vue-router";
-const route = useRoute();
-
 // TODO: Dynamic import of json files
 import driveImageIDs2023 from "@/assets/2023/driveImageIDs.json"
 import driveImageIDs2022 from "@/assets/2022/driveImageIDs.json"
+
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 let driveImageIDs = route.params.id == '2023' ? driveImageIDs2023 : driveImageIDs2022;
 
