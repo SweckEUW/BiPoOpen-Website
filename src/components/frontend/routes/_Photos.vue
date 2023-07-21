@@ -42,17 +42,14 @@ onMounted(() => {
 
 driveImageIDs.thumbnails.sort((a, b) => a.name.localeCompare(b.name));
 driveImageIDs.pictures.sort((a, b) => a.name.localeCompare(b.name));
-// driveImageIDs.originals.sort((a, b) => a.name.localeCompare(b.name));
 
 const pictures:any = ref([]); 
 for (let i = 0; i < driveImageIDs.pictures.length; i++) {
     let thumbnail:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.thumbnails[i].img_id;
     let picture:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.pictures[i].img_id;
-    // let original:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.originals[i].img_id;
     pictures.value.push({
         thumbnail: thumbnail, 
         picture: picture,
-        // original: original
     })
 }
 
