@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import { useRoute } from "vue-router";
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
+
+import { useRoute } from "vue-router";
+const route = useRoute();
 
 // TODO: Dynamic import of json files
 import driveImageIDs2023 from "@/assets/2023/driveImageIDs.json"
 import driveImageIDs2022 from "@/assets/2022/driveImageIDs.json"
 
-const route = useRoute();
 let driveImageIDs = route.params.id == '2023' ? driveImageIDs2023 : driveImageIDs2022;
 
 const showModal = ref(false);
@@ -77,7 +78,7 @@ let poster = route.params.id == "2023" ? poster2023 : poster2022;
 <template>
     <div class="Photos" ref="photosHTMLElement">
 
-        <h1 class="bp-title">{{ 'Fotos ' + route.params.id }}</h1>
+        <h1 class="bp-title">{{"Fotos " + route.params.id }}</h1>
 
         <Transition name="fade">
             <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>

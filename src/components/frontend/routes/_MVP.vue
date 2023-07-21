@@ -2,12 +2,15 @@
 import { ref, onUnmounted } from "vue"
 import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
 
+import { useRoute } from "vue-router";
+const route = useRoute()
+
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 let tournament = ref();
 let players = ref();
 const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID();
+    tournament.value = await getTournamentWithRouterID(route.params.id);
     players.value = getPlayersWithStats(tournament.value);
 }
 getTournament();
@@ -29,7 +32,7 @@ window.addEventListener("resize", () => {
 <template>
     <div class="MVP">
         
-        <h1 class="bp-title">Most Valuable Player</h1>
+        <h1 class="bp-title">{{"Most Valuable Player " + route.params.id }}</h1>
 
         <Loadingscreen v-show="!tournament || !players"/>
 
@@ -47,7 +50,7 @@ window.addEventListener("resize", () => {
             <tbody>
                 <tr v-for="(player, index) in players" :key="index">
                     <td>{{ player.placement + 1}}</td>
-                    <td>{{ player.name }}</td>
+                    <td>{{ player.name.replace(" ","\n") }}</td>
                     <td>{{ player.averageScore }}</td>
                     <td>{{ player.score }}</td>
                     <td>{{ player.ammountOfMatches }}</td>
@@ -65,9 +68,12 @@ table{
 table *{
     vertical-align: middle;
 }
+tbody tr{
+    font-size: 18px;
+}
 tbody tr:nth-of-type(1){
     background: var(--secondary-color-weak);
-    font-size: 24px;
+    font-size: 22px;
 }
 tbody tr:nth-of-type(2){
     background: #e6faff;
@@ -107,6 +113,14 @@ table th{
     th:nth-of-type(2), td:nth-of-type(2){
         max-width: 100px;
         width: 100px;
+        white-space: break-spaces;
+    }
+}
+
+/*MOBILE S*/
+@media (width <= 360px){
+    .bp-title{
+        font-size: 24px;
     }
 }
 

@@ -5,10 +5,13 @@ import { convertNumberToCharacter } from "@/util/util.js";
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
+import { useRoute } from "vue-router";
+const route = useRoute()
+
 let tournament = ref();
 let groups = ref();
 const getTournament = async () => {
-   tournament.value = await getTournamentWithRouterID();
+   tournament.value = await getTournamentWithRouterID(route.params.id);
    groups.value = getGroupsWithStats(tournament.value);
 }
 getTournament();
@@ -30,7 +33,7 @@ window.addEventListener("resize", () => {
 <template>
     <div class="Standings">
 
-        <h1 class="bp-title">Platzierungen</h1>
+        <h1 class="bp-title">{{"Platzierungen " + route.params.id }}</h1>
 
         <Loadingscreen v-show="!tournament || !groups"/>
 
@@ -75,6 +78,9 @@ caption{
    font-weight: bold;
    color: var(--main-color);
 }
+table td{
+    height: 60px;
+}
 table th{
     color: var(--main-color);
 }
@@ -86,7 +92,6 @@ tbody tr:nth-of-type(2){
 }
 
 table td:nth-child(3) span{
-    margin-right: 15px; 
     display: block;
 }
 table td:nth-child(2){
