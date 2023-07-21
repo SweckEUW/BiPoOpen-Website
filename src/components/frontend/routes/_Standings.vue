@@ -11,6 +11,7 @@ const route = useRoute()
 let tournament = ref();
 let groups = ref();
 const getTournament = async () => {
+    // @ts-ignore 
    tournament.value = await getTournamentWithRouterID(route.params.id);
    groups.value = getGroupsWithStats(tournament.value);
 }
