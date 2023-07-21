@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, onMounted } from "vue"
 
-import Swiper , { Pagination, Navigation } from 'swiper';
+import Swiper , { Pagination, Navigation, Zoom } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -12,7 +12,7 @@ let swiper:any;
 onMounted(() => {
     setTimeout(() => {
         swiper = new Swiper('#Gallery2023',{
-            modules: [Pagination, Navigation],
+            modules: [Pagination, Navigation, Zoom],
             initialSlide: props.index,
             spaceBetween: 50,
             speed: 500,
@@ -25,6 +25,7 @@ onMounted(() => {
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
             },
+            zoom: true
         });
     }, 0); 
 });
@@ -72,7 +73,9 @@ watch(() => props.index, () => {
             <div id="Gallery2023" class="swiper mp-gallery">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="element in pictures" :key="element.picture">
-                        <img :src="element.picture" alt="" loading="lazy">
+                        <div class="swiper-zoom-container">
+                            <img :src="element.picture" alt="" loading="lazy">
+                        </div>
                     </div>
                 </div>
 
@@ -113,11 +116,14 @@ watch(() => props.index, () => {
     width: 100%;
     height: 100%;
 }
+.swiper-slide{
+    display: flex;
+}
 img{
     width: 100%;
     height: 100%;
     object-fit: contain;
-    user-select: none;
+    /* user-select: none; */
 }
 .swiper-pagination{
     color: var(--main-color);
