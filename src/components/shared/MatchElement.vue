@@ -188,11 +188,18 @@ onMounted(() => {
 }
 
 .mt-result-team span, .mt-result-player span{
-   width: 40%;
+   width: 35%;
    display: inline-block;
 }
 .mt-result-team span:nth-child(2), .mt-result-player span:nth-child(2){
-   width: 20%;
+   width: 30%;
+}
+
+.mt-result-team span:nth-child(1), .mt-result-player span:nth-child(1){
+   text-align: right;
+}
+.mt-result-team span:nth-child(3), .mt-result-player span:nth-child(3){
+   text-align: left;
 }
 
 /*MOBILE*/
