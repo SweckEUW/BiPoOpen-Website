@@ -65,10 +65,10 @@ let tournaments = ref([
 		<transition name="fade" mode="out-in">
 			<div class="ap-menu" v-show="showBurger">
 
-				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'" style="margin-top: 150px;">Regeln</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'" style="margin-top: 100px;">Regeln</router-link>
 
-				<div v-for="(tournament,i) in tournaments" :key="tournament.year">
-					<DropDown :isOpen="tournament.year == '2023'">
+				<div v-for="tournament in tournaments" :key="tournament.year">
+					<DropDown> <!-- :isOpen="tournament.year == '2023'" -->
 						<template #header>
 							<h1>{{tournament.year}}</h1>
 						</template>
