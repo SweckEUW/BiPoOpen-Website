@@ -9,7 +9,7 @@ let headerImg:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href
 
         <hr>
 
-        <router-link class="bp-button" to="/2023/Regeln">Zu den Regeln</router-link>
+        <router-link class="bp-button" to="/Regeln">Zu den Regeln</router-link>
         <router-link class="bp-button" to="/2023/Spielplan">Zum Spielplan</router-link>
         <router-link class="bp-button" to="/2023/Platzierungen">Zu den Gruppenplatzierungen</router-link>
         <router-link class="bp-button" to="/2023/MVP">Zur MVP Tabelle</router-link>
