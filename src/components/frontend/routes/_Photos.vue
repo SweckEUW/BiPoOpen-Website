@@ -6,11 +6,19 @@ import ImageModal from '@/components/frontend/photos/ImageModal.vue';
 // TODO: Dynamic import of json files
 import driveImageIDs2023 from "@/assets/2023/driveImageIDs.json"
 import driveImageIDs2022 from "@/assets/2022/driveImageIDs.json"
+import driveImageIDs2021 from "@/assets/2021/driveImageIDs.json"
+import driveImageIDs2020 from "@/assets/2020/driveImageIDs.json"
 
 import { useRoute } from "vue-router";
 const route = useRoute();
 
-let driveImageIDs = route.params.id == '2023' ? driveImageIDs2023 : driveImageIDs2022;
+let driveImageIDs = driveImageIDs2023;
+if(route.params.id == "2022")
+    driveImageIDs = driveImageIDs2022;
+if(route.params.id == "2021")
+    driveImageIDs = driveImageIDs2021;
+if(route.params.id == "2020")
+    driveImageIDs = driveImageIDs2020;
 
 const showModal = ref(false);
 const modalImageURL = ref("");
@@ -67,9 +75,18 @@ window.onscroll = () => {
 let timelapseVideo2023:string = new URL(`/src/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
 
 // TODO: Dynamic import of Poster
+let poster2023:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
 let poster2022:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
-let poster2023:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
-let poster = route.params.id == "2023" ? poster2023 : poster2022;
+let poster2021:string = new URL(`@/assets/2021/poster.jpg`, import.meta.url).href;
+let poster2020:string = new URL(`@/assets/2020/poster.jpg`, import.meta.url).href;
+
+let poster = poster2023;
+if(route.params.id == "2022")
+    poster = poster2022;
+if(route.params.id == "2021")
+    poster = poster2021;
+if(route.params.id == "2020")
+    poster = poster2020;
 </script>
 
 <template>

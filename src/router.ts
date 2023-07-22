@@ -44,7 +44,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/:id/Regeln',
+		path: '/Regeln',
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
