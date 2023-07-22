@@ -75,7 +75,7 @@ window.onscroll = () => {
 let timelapseVideo2023:string = new URL(`/src/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
 
 // TODO: Dynamic import of Poster
-let poster2023:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
+let poster2023:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
 let poster2022:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
 let poster2021:string = new URL(`@/assets/2021/poster.jpg`, import.meta.url).href;
 let poster2020:string = new URL(`@/assets/2020/poster.jpg`, import.meta.url).href;
