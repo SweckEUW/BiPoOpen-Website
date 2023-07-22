@@ -4,7 +4,7 @@
 <template>
     <div class="Rules">
 
-        <h1 class="bp-title">{{"Regeln " + $route.params.id }}</h1>
+        <h1 class="bp-title">{{"Regeln"}}</h1>
 
         <div>
             Das Beginner-Team, wird durch eine einfache Runde Schnick-Schnack-Schnuck (ohne Brunnen ausgewählt).

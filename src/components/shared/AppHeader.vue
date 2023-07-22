@@ -21,7 +21,28 @@ const scrollToTop = () => {
 
 let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
-let tournaments = ref(["2022", "2023"]);
+let tournaments = ref([
+	{
+		year: "2020",
+		mvp: false,
+		games: true
+	},
+	{
+		year: "2021",
+		mvp: false,
+		games: false
+	},
+	{
+		year: "2022",
+		mvp: false,
+		games: true
+	},
+	{
+		year: "2023",
+		mvp: true,
+		games: true
+	}
+]);
 </script>
 
 <template>
@@ -43,17 +64,19 @@ let tournaments = ref(["2022", "2023"]);
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-menu" v-show="showBurger">
-				<div v-for="(tournament,i) in tournaments" :key="tournament">
-					<DropDown :isOpen="tournament == '2023'" :style="{'marginTop' : i == 0 ? '150px' : '0px'}">
+
+				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'" style="margin-top: 150px;">Regeln</router-link>
+
+				<div v-for="(tournament,i) in tournaments" :key="tournament.year">
+					<DropDown :isOpen="tournament.year == '2023'">
 						<template #header>
-							<h1>{{tournament}}</h1>
+							<h1>{{tournament.year}}</h1>
 						</template>
 						<template #content>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Regeln'">Regeln</router-link>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Spielplan'">Spielplan</router-link>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Platzierungen'">Platzierungen</router-link>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/MVP'" v-if="tournament != '2022'">Most Valuable Player</router-link>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament + '/Fotos'">Fotos</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Fotos'">Fotos</router-link>
 						</template>
 					</DropDown>
 				</div>
@@ -93,10 +116,11 @@ let tournaments = ref(["2022", "2023"]);
 }
 
 /* MENU */
-h1{
+h1, .ap-title{
 	color: white;
 	font-size: 50px;
 	font-weight: bolder;
+	margin-top: 0px;
 	margin-bottom: 20px;
 	text-align: center;
 	display: inline-block;
