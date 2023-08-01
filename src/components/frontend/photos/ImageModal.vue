@@ -11,7 +11,7 @@ const props = defineProps(['imageURL', 'toggleModal', 'pictures', 'index'])
 let swiper:any;
 onMounted(() => {
     setTimeout(() => {
-        swiper = new Swiper('#Gallery2023',{
+        swiper = new Swiper('#Gallery',{
             modules: [Pagination, Navigation, Zoom],
             initialSlide: props.index,
             spaceBetween: 50,
@@ -70,11 +70,11 @@ watch(() => props.index, () => {
 
         <div class="mo-container">
 
-            <div id="Gallery2023" class="swiper mp-gallery">
+            <div id="Gallery" class="swiper">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="element in pictures" :key="element.picture">
                         <div class="swiper-zoom-container">
-                            <img :src="element.picture" alt="" loading="lazy">
+                            <img class="mp-image" :src="element.picture" alt="" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -88,10 +88,7 @@ watch(() => props.index, () => {
     </div>
 </template>
 
-<style scoped>
-.swiper{
-    overflow: visible;
-}
+<style scoped> 
 .ImageModal{
     --swiper-theme-color: var(--main-color);
     position: fixed;
@@ -112,28 +109,29 @@ watch(() => props.index, () => {
     height: 95%;
     padding: 20px 10px;
 }
+
+/* Swiper */
 .swiper{
     width: 100%;
     height: 100%;
+    overflow: visible;
 }
 .swiper-slide{
     display: flex;
     justify-content: center;
 }
-img{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    user-select: none;
-}
 .swiper-pagination{
     color: var(--main-color);
     font-size: 24px;
     left: 0;
-    width: auto;
     top: 0;
+    width: auto;
 }
-
+.mp-image{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 .pt-icons{
     position: absolute;
     top: 40px;

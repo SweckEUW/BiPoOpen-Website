@@ -23,7 +23,12 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ref([
 	{
-		year: "2020",
+		year: "2023",
+		mvp: true,
+		games: true
+	},
+	{
+		year: "2022",
 		mvp: false,
 		games: true
 	},
@@ -33,13 +38,8 @@ let tournaments = ref([
 		games: false
 	},
 	{
-		year: "2022",
+		year: "2020",
 		mvp: false,
-		games: true
-	},
-	{
-		year: "2023",
-		mvp: true,
 		games: true
 	}
 ]);
@@ -65,7 +65,7 @@ let tournaments = ref([
 		<transition name="fade" mode="out-in">
 			<div class="ap-menu" v-show="showBurger">
 
-				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'" style="margin-top: 100px;">Regeln</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'">Regeln</router-link>
 
 				<div v-for="tournament in tournaments" :key="tournament.year">
 					<DropDown> <!-- :isOpen="tournament.year == '2023'" -->
@@ -116,6 +116,23 @@ let tournaments = ref([
 }
 
 /* MENU */
+.ap-menu{
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	z-index: 2;
+	left: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	background-color: var(--main-color);
+	overflow-y: scroll;
+}
+.ap-title{
+	margin-right: 10px;
+	margin-top: 20vh !important;
+}
 h1, .ap-title{
 	color: white;
 	font-size: 50px;
@@ -147,19 +164,6 @@ a:hover{
 	z-index: 99;
 	padding: 10px;
 	margin-left: auto;
-}
-.ap-menu{
-	width: 100vw;
-	height: 100vh;
-	position: absolute;
-	z-index: 2;
-	left: 0;
-	top: 0;
-	display: flex;
-	align-items: center;
-	flex-direction: column;
-	background-color: var(--main-color);
-	overflow-y: scroll;
 }
 .bar1, .bar2, .bar3 {
 	width: 35px;
@@ -199,6 +203,9 @@ a:hover{
 	.ap-logo a:hover{
 		opacity: 1;
 		color: var(--main-color);;
+	}
+	.ap-title{
+		margin-top: 100px;
 	}
 	a{
 		font-size: 32px;
