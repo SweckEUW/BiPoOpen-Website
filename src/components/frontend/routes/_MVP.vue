@@ -32,11 +32,12 @@ window.addEventListener("resize", () => {
 });
 
 const sortList = async () => {
-    players.value.sort((player1:any, player2:any) => {
-        if(player2[sortValue.value] == player1[sortValue.value])
-            return player1.placement - player2.placement
-        return player2[sortValue.value] - player1[sortValue.value]
-    });
+    // TODO
+    // players.value.sort((player1:any, player2:any) => {
+    //     if(player2[sortValue.value] == player1[sortValue.value])
+    //         return player1.placement - player2.placement
+    //     return player2[sortValue.value] - player1[sortValue.value]
+    // });
 }
 
 const setSortValue = async (value:string) => {
