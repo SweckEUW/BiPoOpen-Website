@@ -64,7 +64,7 @@ const removeTeamButton = async () => {
    }
 }
 </script>
-
+ 
 <template>
    <div class="ParticipantsTab">
       
