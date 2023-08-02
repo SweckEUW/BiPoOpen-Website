@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -20,51 +19,11 @@ const routes = [
 		}
 	},
 	{
-		path: '/:id/Spielplan',
-		name: 'Schedule',
-		component: () => import('@/components/frontend/routes/_Schedule.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Spielplan',
-		}
-	},
-	{
-		path: '/:id/Platzierungen',
-		name: 'Standings',
-		component: () => import('@/components/frontend/routes/_Standings.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Platzierungen',
-		}
-	},
-	{
-		path: '/:id/MVP',
-		name: 'MVP',
-		component: () => import('@/components/frontend/routes/_MVP.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - MVP',
-		}
-	},
-	{
 		path: '/Regeln',
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Regeln',
-		}
-	},
-	{
-		path: '/:id/Spielplan2',
-		name: 'ScheduleOverview',
-		component: () => import('@/components/frontend/routes/_ScheduleOverview.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Spielplan-Übersicht',
-		}
-	},
-	{
-		path: '/:id/Fotos',
-		name: 'Photos',
-		component: () => import('@/components/frontend/routes/_Photos.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Fotos',
 		}
 	},
 	// {
@@ -75,6 +34,56 @@ const routes = [
 	// 		title: 'Weck BiPo Open REPLACE - Teamanmeldung',
 	// 	},
 	// },
+
+	// Frontend - Tournament
+	{
+		path: '/:id/Spielplan',
+		name: 'Schedule',
+		component: () => import('@/components/frontend/routes/tournament/_Schedule.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Spielplan',
+		}
+	},
+	{
+		path: '/:id/Platzierungen',
+		name: 'Standings',
+		component: () => import('@/components/frontend/routes/tournament/_Standings.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Platzierungen',
+		}
+	},
+	{
+		path: '/:id/MVP',
+		name: 'MVP',
+		component: () => import('@/components/frontend/routes/tournament/_MVP.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - MVP',
+		}
+	},
+	{
+		path: '/:id/Spielplan-Übersicht',
+		name: 'ScheduleOverview',
+		component: () => import('@/components/frontend/routes/tournament/_ScheduleOverview.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Spielplan-Übersicht',
+		}
+	},
+	{
+		path: '/:id/Zusammenfassung',
+		name: 'Summary',
+		component: () => import('@/components/frontend/routes/tournament/_Summary.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Zusammenfassung',
+		}
+	},
+	{
+		path: '/:id/Fotos',
+		name: 'Photos',
+		component: () => import('@/components/frontend/routes/tournament/_Photos.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Fotos',
+		}
+	},
 
 	// Redirect
 	{

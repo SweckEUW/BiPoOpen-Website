@@ -73,6 +73,7 @@ let tournaments = ref([
 							<h1>{{tournament.year}}</h1>
 						</template>
 						<template #content>
+							<!-- <router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Zusammenfassung'">Zusammenfassung</router-link> -->
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
