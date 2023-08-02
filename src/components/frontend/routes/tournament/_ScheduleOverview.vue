@@ -57,7 +57,7 @@ initSwiper();
 <template>
    <div class="ResultsTab">
 
-      <div id="SwiperScheduleOverview" class="swiper mp-gallery">
+      <div id="SwiperScheduleOverview" class="swiper">
          <div class="swiper-wrapper">
 
             <div class="rt-table swiper-slide" v-for="(matchesForGroup ,groupIndex) in getMatchesGroupPhase(tournament)" :key="groupIndex">

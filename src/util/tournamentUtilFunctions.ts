@@ -162,22 +162,43 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
     for (let i = 0; i < groups.length; i++) {
         let matchesForGroup = [];
         let teams = groups[i].teams;
-    
-        for (let x = 0; x < teams.length; x++){
-            for (let y = x+1; y < teams.length; y++) {
-                let match = {team1ID: teams[y].teamID, team2ID: teams[x].teamID};
-                matchesForGroup.push(match);
+        let ammountOfGames = (teams.length * (teams.length - 1)) / 2;
+
+        // TODO: 5er Gruppen
+        if(ammountOfGames == 6){ // 4er Gruppen
+            matchesForGroup.push({team1ID: teams[2].teamID, team2ID: teams[3].teamID});
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
+            matchesForGroup.push({team1ID: teams[2].teamID, team2ID: teams[1].teamID});
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[3].teamID});
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
+            matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[3].teamID});
+
+            matches.push(matchesForGroup);
+
+        }else if(ammountOfGames == 3){ // 3er Gruppen
+            // Hinrunde
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
+            matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[2].teamID});
+
+            // Rückrunde
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
+            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
+            matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[2].teamID});
+
+            matches.push(matchesForGroup);
+
+        }else{
+            for (let x = 0; x < teams.length; x++){
+                for (let y = x+1; y < teams.length; y++) {
+                    let match = {team1ID: teams[y].teamID, team2ID: teams[x].teamID};
+                    matchesForGroup.push(match);
+                }
             }
+
+            matchesForGroup = shuffleArray(matchesForGroup);
+            matches.push(matchesForGroup);
         }
-        
-        // Groups with 3 teams = Hin und Rückrunde
-        // if(teams.length == 3){
-        //     let length = matchesForGroup.length;
-        //     for (let x = 0; x < length; x++)
-        //         matchesForGroup.push(matchesForGroup[x]);
-        // }
-    
-        matches.push(shuffleArray(matchesForGroup));
     }
 
     await setMatchesGroupPhase(tournament._id,matches);
