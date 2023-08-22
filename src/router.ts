@@ -23,7 +23,7 @@ const routes = [
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
-			title: 'Weck BiPo Open REPLACE - Regeln',
+			title: 'Weck BiPo Open - Regeln',
 		}
 	},
 	// {
