@@ -1,4 +1,5 @@
-import express, { Express} from "express";
+import express, { Express, Response, Request } from "express";
+
 import cors from "cors";
 import {MongoClient, ServerApiVersion} from "mongodb"
 import * as dotenv from "dotenv";
@@ -34,6 +35,10 @@ client.connect()
   });
 })
 
+app.get("/", (request: Request, response: Response) => {
+  response.send("BiPo Open Backend"); 
+})
+
 // Tournament
 app.get('/tournaments', tournamentCollection.getTournaments);
 app.post('/getTournamentByName', tournamentCollection.getTournamentByName);
@@ -58,3 +63,5 @@ app.post('/setMatchesKOPhase', tournamentCollection.setMatchesKOPhase);
 // let filename = fileURLToPath(import.meta.url);
 // let dirname = path.dirname(filename);
 // app.use(express.static(path.join(dirname, 'public')));
+
+export default app;

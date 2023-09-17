@@ -1,0 +1,11 @@
+{
+    "name": "bipo-open-website",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "vite ./packages/frontend",
+        "dev:backend": "nodemon ./packages/backend/src/index.ts"
+    }
+}

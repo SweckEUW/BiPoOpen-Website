@@ -124,7 +124,7 @@ export const getGroupsWithStats = (tournament:any) => {
             return team2.wins - team1.wins;
         });
     });
-
+    
     return groups;
 }
 
