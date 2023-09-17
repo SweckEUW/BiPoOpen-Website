@@ -8,7 +8,8 @@ import axios from "axios";
 
 onBeforeMount(() => {
 	// Configure Axios
-	axios.defaults.baseURL = import.meta.env.VITE_SERVER_URL;
+	axios.defaults.baseURL = "https://bipoopen-backend.vercel.app/";
+	// axios.defaults.baseURL = "http://localhost:8000";
 
 	// Redirect
 	let path = localStorage.getItem('path');
