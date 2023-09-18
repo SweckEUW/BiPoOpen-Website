@@ -12,8 +12,8 @@ const app: Express = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORT}@cluster0.wpwuaak.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, {
+const uri:string = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORT}@cluster0.wpwuaak.mongodb.net/?retryWrites=true&w=majority`;
+const client:MongoClient = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -21,14 +21,11 @@ const client = new MongoClient(uri, {
   }
 });
 
-client.connect()
-.catch(error => { 
+client.connect().catch(error => { 
   console.error(error);
   process.exit(1);
-}).then(async client =>{
+}).then(() =>{
   console.log("Connected to Database")
-
-  await tournamentCollection.retrieveTournamentsCollection(client);
 
   app.listen(process.env.PORT, () =>{
     console.log('Server started')
@@ -64,4 +61,4 @@ app.post('/setMatchesKOPhase', tournamentCollection.setMatchesKOPhase);
 // let dirname = path.dirname(filename);
 // app.use(express.static(path.join(dirname, 'public')));
 
-export default app;
+export default client;
