@@ -6,6 +6,6 @@
     ],
     "scripts": {
         "dev": "vite ./packages/frontend",
-        "dev:backend": "nodemon ./packages/backend/src/index.ts"
+        "dev:backend": "cd packages/backend && nodemon src/index.ts"
     }
 }
