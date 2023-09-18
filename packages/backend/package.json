@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
-    "verce-build": "echo hello"
+    "build": "tsc"
   },
   "dependencies": {
     "cors": "^2.8.5",
