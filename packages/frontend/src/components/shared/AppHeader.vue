@@ -23,24 +23,34 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ref([
 	{
+		year: "Kirmes 2023",
+		mvp: true,
+		games: true,
+		fotos: false
+	},
+	{
 		year: "2023",
 		mvp: true,
-		games: true
+		games: true,
+		fotos: true
 	},
 	{
 		year: "2022",
 		mvp: false,
-		games: true
+		games: true,
+		fotos: true
 	},
 	{
 		year: "2021",
 		mvp: false,
-		games: false
+		games: false,
+		fotos: true
 	},
 	{
 		year: "2020",
 		mvp: false,
-		games: true
+		games: true,
+		fotos: true
 	}
 ]);
 </script>
@@ -68,7 +78,7 @@ let tournaments = ref([
 				<router-link @click="toggleBurgerMenu()" class="ap-title" :to="'/Regeln'">Regeln</router-link>
 
 				<div v-for="tournament in tournaments" :key="tournament.year">
-					<DropDown> <!-- :isOpen="tournament.year == '2023'" -->
+					<DropDown :isOpen="tournament.year == 'Kirmes 2023'"> 
 						<template #header>
 							<h1>{{tournament.year}}</h1>
 						</template>
@@ -77,7 +87,7 @@ let tournaments = ref([
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
 							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
-							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Fotos'">Fotos</router-link>
+							<router-link @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Fotos'" v-if="tournament.fotos">Fotos</router-link>
 						</template>
 					</DropDown>
 				</div>
