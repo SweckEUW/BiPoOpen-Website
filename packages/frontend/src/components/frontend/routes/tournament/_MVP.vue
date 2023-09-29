@@ -53,7 +53,11 @@ const setSortValue = async (value:string) => {
 
         <Loadingscreen v-show="!tournament || !players"/>
 
-        <table v-show="tournament && players" class="table table-hover caption-top" id="mvp-table">
+        <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
+            Turnierplan wurde noch nicht erstellt
+        </div>
+
+        <table v-show="tournament && players && players.length > 0" class="table table-hover caption-top" id="mvp-table">
             <thead>
                 <tr style="height: auto;">
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>

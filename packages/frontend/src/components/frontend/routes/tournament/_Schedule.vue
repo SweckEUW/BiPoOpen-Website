@@ -30,7 +30,11 @@ onUnmounted(() => {
       <h1 class="bp-title">{{"Spielplan " + route.params.id }}</h1>
 
       <Loadingscreen v-show="!tournament"/>
-      <Schedule v-show="tournament" :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
+      <Schedule v-show="tournament && tournament.groupPhase.groups" :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
+
+      <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
+         Turnierplan wurde noch nicht erstellt
+      </div>
    </div>
 </template>
 

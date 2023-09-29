@@ -388,6 +388,10 @@ export const setGameResultKOPhase = async (tournament:any, matchID:string, resul
 export const getPlayersWithStats = (tournament:any) => {
     let players:any = [];
     let teams = tournament.teams;
+
+    if(!teams)
+        return [];
+    
     for (let i = 0; i < teams.length; i++) {
         for (let x = 0; x < teams[i].players.length; x++) {
             let player:any = {

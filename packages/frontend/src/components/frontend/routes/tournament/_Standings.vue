@@ -38,6 +38,10 @@ window.addEventListener("resize", () => {
 
         <Loadingscreen v-show="!tournament || !groups"/>
 
+        <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
+            Turnierplan wurde noch nicht erstellt
+        </div>
+
         <table v-show="tournament && groups" class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
             <caption>{{"Gruppe " + convertNumberToCharacter(index)}}</caption>
             <thead>
