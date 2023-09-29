@@ -13,6 +13,9 @@ export const getTournamentByName = async (tournamentName:string) => {
 
 export const getTournamentWithRouterID = async (id:string) => {
     let tournamentName = "Weck BiPo Open " + id;
+    if(id.includes("Kirmes"))
+        tournamentName = id;
+
     let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
     console.log(response.data.message);
     if(response.data.success)
