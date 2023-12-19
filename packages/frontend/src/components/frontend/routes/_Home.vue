@@ -1,53 +1,129 @@
 <script setup lang="ts">
-let headerImg:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
+import { ref } from 'vue';
+
+var end = new Date(2024,5,29,13);
+
+var _second = 1000;
+var _minute = _second * 60;
+var _hour = _minute * 60;
+var _day = _hour * 24;
+
+
+let daysRef = ref(0);
+let hoursRef = ref(0);
+let minutesRef = ref(0);
+let secondsRef = ref(0);
+
+const updateRemainingTime = () => {
+    var now = new Date();
+    var distance = end.getTime() - now.getTime();
+    if (distance < 0) {
+        clearInterval(timer);
+        // Time expired
+        return;
+    }
+
+    var days = Math.floor(distance / _day);
+    var hours = Math.floor((distance % _day) / _hour);
+    var minutes = Math.floor((distance % _hour) / _minute);
+    var seconds = Math.floor((distance % _minute) / _second);
+
+    daysRef.value = days;
+    hoursRef.value = hours;
+    minutesRef.value = minutes;
+    secondsRef.value = seconds;
+}
+updateRemainingTime();
+var timer = setInterval(updateRemainingTime, 1000);
 </script>
 
 <template>
     <div class="Home">
-
-        <img class="h-header" :src="headerImg" alt="">
-
-        <hr>
-
-        <router-link class="bp-button" to="/Regeln">Zu den Regeln</router-link>
-        <router-link class="bp-button" to="/2023/Spielplan">Zum Spielplan</router-link>
-        <router-link class="bp-button" to="/2023/Platzierungen">Zu den Gruppenplatzierungen</router-link>
-        <router-link class="bp-button" to="/2023/MVP">Zur MVP Tabelle</router-link>
-        <router-link class="bp-button" to="/2023/Fotos">Zu den Bildern</router-link>
+        <h1 class="ho-title">BiPo Open 2024</h1>
+        <h1 class="ho-title">Samstag 29.06.2024 - 14:00 Uhr</h1>
+        <div class="ho-timer">
+            <div class="ho-time">
+                <div>{{ daysRef }}</div>
+                <div>Tage</div>
+            </div>
+            <div class="ho-timer-break">:</div>
+            <div class="ho-time">
+                <div>{{ hoursRef }}</div>
+                <div>Stunden</div>
+            </div>
+            <div class="ho-timer-break">:</div>
+            <div class="ho-time">
+                <div>{{ minutesRef }}</div>
+                <div>Minuten</div>
+            </div>  
+            <div class="ho-timer-break">:</div>
+            <div class="ho-time">
+                <div>{{ secondsRef }}</div>
+                <div>Sekunden</div>
+            </div>  
+        </div>
     </div>
 </template>
 
 <style scoped>
-.h-header{
-    height: calc(100vh - 200px);
-    object-fit: cover;
-    margin: auto;
+.Home{
     display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
-
-.bp-button{
-    display: block;
-    width: 50%;
-    margin: auto;
-    margin-bottom: 10px;
-    padding: 10px;
+.ho-title:nth-of-type(1){
+    color: var(--main-color);
+    font-size: 100px;
+    margin-bottom: 60px;
+    margin-top: 150px;
 }
-
-hr{
-    width: 50%;
-    margin: auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
+.ho-title:nth-of-type(2){
+    color: var(--main-color);
+    font-size: 40px;
+    margin-bottom: 0px;
 }
-
+.ho-timer{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.ho-time div:nth-child(2){
+    color: var(--secondary-color);
+    font-size: 25px;
+}
+.ho-time div:nth-child(1), .ho-timer-break{
+    font-size: 40px;
+    color: var(--secondary-color);
+}
+.ho-time{
+    display: inline-block;
+    margin: 20px;
+    text-align: center;
+    width: 120px;
+}
 /*MOBILE*/
 @media (width <= 900px){
-    .h-header{
-        height: auto;
-        width: 100%;
+    .ho-title:nth-of-type(1){
+        font-size: 45px;
+        margin-bottom: 30px;
+        margin-top: 100px;
     }
-    .bp-button{
-        width: 100%;
+    .ho-title:nth-of-type(2){
+        font-size: 22px;
+    }
+    .ho-time div:nth-child(2){
+        font-size: 14px;
+    }
+    .ho-time div:nth-child(1), .ho-timer-break{
+        font-size: 26px;
+    }
+    .ho-time{
+        width: 60px;
+        margin: 10px;
+        margin-top: 5px;
     }
 }
 </style>
