@@ -76,6 +76,7 @@
             Wird der letzte Becher von beiden Bällen getroffen, so ist die Runde direkt gewonnen. 
             Trifft nur ein Ball den letzten Becher, so gilt Gentleman's Rule. Das Gegnerteam hat Nachwurf.
             Trifft dieses Team nun ebenfalls seine letzten Becher, geht das Spiel in die Verlängerung mit 2x3 Cups (Ausnahme: trifft nach der Gentleman's Rule das Nachwerferteam seinen letzten Becher mit beiden Bällen, so das dieses Team direkt gewonnen).
+            Ein spieler kann solange in Folge werfen, bis er nicht mehr trifft.
         </div>
 
     </div>
