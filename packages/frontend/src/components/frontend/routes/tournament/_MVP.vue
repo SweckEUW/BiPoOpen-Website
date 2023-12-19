@@ -110,7 +110,9 @@ table th{
     font-size: 20px;
     cursor: pointer;
 }
-
+table td{
+    background: inherit;
+}
 /*MOBILE*/
 @media (width <= 900px){
     table{

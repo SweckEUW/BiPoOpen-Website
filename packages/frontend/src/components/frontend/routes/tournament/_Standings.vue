@@ -96,6 +96,9 @@ tbody tr:nth-of-type(2){
     background: #e6faff;
 }
 
+table td{
+   background-color: inherit;
+}
 table td:nth-child(3) span{
     display: block;
 }
