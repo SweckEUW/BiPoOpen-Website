@@ -22,12 +22,12 @@ const scrollToTop = () => {
 let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ref([
-	{
-		year: "Kirmes 2023",
-		mvp: true,
-		games: true,
-		fotos: false
-	},
+	// {
+	// 	year: "Kirmes 2023",
+	// 	mvp: true,
+	// 	games: true,
+	// 	fotos: false
+	// },
 	{
 		year: "2023",
 		mvp: true,
