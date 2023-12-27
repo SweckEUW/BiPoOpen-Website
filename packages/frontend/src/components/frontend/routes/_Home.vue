@@ -35,6 +35,8 @@ const updateRemainingTime = () => {
 }
 updateRemainingTime();
 var timer = setInterval(updateRemainingTime, 1000);
+
+let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2024* um *14:00 Uhr* statt 💥! Es sind noch " + daysRef.value + " Tage " + + hoursRef.value + " Stunden " + + minutesRef.value + " Minuten " + + secondsRef.value + " Sekunden bis zum Turnierstart⏰! Willst du mein Teampartner💑 sein?"
 </script>
 
 <template>
@@ -61,6 +63,10 @@ var timer = setInterval(updateRemainingTime, 1000);
                 <div>{{ secondsRef }}</div>
                 <div>Sekunden</div>
             </div>  
+        </div>
+
+        <div class="ho-share">
+            <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
         </div>
     </div>
 </template>
@@ -104,6 +110,17 @@ var timer = setInterval(updateRemainingTime, 1000);
     text-align: center;
     width: 120px;
 }
+.ho-share{
+    margin-top: 50px;
+    padding: 20px 10px;
+    background-color: var(--main-color);
+    cursor: pointer;
+}
+.ho-share a{
+    color: white;
+    text-decoration: none;
+}
+
 /*MOBILE*/
 @media (width <= 900px){
     .ho-title:nth-of-type(1){
