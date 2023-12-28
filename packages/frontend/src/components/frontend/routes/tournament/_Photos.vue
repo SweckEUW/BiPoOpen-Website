@@ -108,10 +108,6 @@ if(route.params.id == "2020")
                 Folgt ihm gerne auf Instagram 
                 <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
             </div>
-            
-            <div class="pt-video">
-                <video :src="timelapseVideo2023" autoplay muted loop></video>
-            </div>
         </div>  
 
         <!-- Poster -->
@@ -161,7 +157,7 @@ if(route.params.id == "2020")
     margin-bottom: 20px;
 }
 .pt-poster img{
-    width: 30%;
+    width: 25%;
     object-fit: cover;
 }
 

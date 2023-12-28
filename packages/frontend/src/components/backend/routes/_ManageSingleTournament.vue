@@ -53,5 +53,8 @@ getTournament();
    </div>
 </template>
 
-<style scoped>
+<style>
+.ManageTournament .nav-tabs{
+   top: 99px !important;
+}
 </style>
