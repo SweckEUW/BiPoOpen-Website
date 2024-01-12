@@ -11,14 +11,6 @@ const routes = [
 		}
 	},
 	{
-		path: '/Umfrage',
-		name: 'Umfrage',
-		component: () => import('@/components/frontend/routes/_Poll.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Umfrage',
-		}
-	},
-	{
 		path: '/Regeln',
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
