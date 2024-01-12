@@ -84,6 +84,14 @@ const routes = [
 			title: 'Weck BiPo Open REPLACE - Fotos',
 		}
 	},
+	{
+		path: '/:id/Teams',
+		name: 'Teams',
+		component: () => import('@/components/frontend/routes/tournament/_Teams.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Teams',
+		}
+	},
 
 	// Redirect
 	{

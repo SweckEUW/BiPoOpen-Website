@@ -22,6 +22,12 @@ const scrollToTop = () => {
 let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ref([
+	{
+		year: "2024",
+		mvp: true,
+		games: true,
+		fotos: true
+	},
 	// {
 	// 	year: "Kirmes 2023",
 	// 	mvp: true,
@@ -87,6 +93,7 @@ let tournaments = ref([
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
+							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Teams'" v-if="tournament.games">Teams</router-link>
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Fotos'" v-if="tournament.fotos">Fotos</router-link>
 						</template>
 					</DropDown>

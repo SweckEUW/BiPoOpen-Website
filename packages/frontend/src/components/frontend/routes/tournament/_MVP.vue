@@ -70,7 +70,7 @@ const giveArrowClass = (value:string) => {
             Turnierplan wurde noch nicht erstellt
         </div>
 
-        <table v-show="tournament && players && players.length > 0" class="table table-hover caption-top" id="mvp-table">
+        <table v-show="tournament && tournament.groupPhase.groups" class="table table-hover caption-top" id="mvp-table">
             <thead>
                 <tr style="height: auto;">
                     <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
