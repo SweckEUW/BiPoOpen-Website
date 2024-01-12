@@ -43,7 +43,7 @@ onUnmounted(() => {
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>
-                  <div v-for="player in team.players" style="margin-right: 15px" :key="player">{{ player }}</div>
+                  <div v-for="player in team.players" :key="player">{{ player }}</div>
                </td>
             </tr>
          </tbody>

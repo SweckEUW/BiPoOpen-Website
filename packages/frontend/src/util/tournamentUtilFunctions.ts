@@ -221,6 +221,27 @@ export const setGameResultGroupPhase = async (tournament:any, matchID:string, re
     await updateMatchesKOPhase(tournament);
 }
 
+
+export const getTeamsKOPhase = (tournament:any) => {
+    if(!tournament || !tournament.koPhase.matches)
+        return [];     
+
+    let teams:any = [];
+    tournament.koPhase.matches.forEach((stage:any, i:number) => {
+        stage.forEach((match:any) => {
+            let team1 = getTeamFromID(tournament, match.team1ID);
+            if(!teams.includes(team1))
+                teams.push(team1);
+
+            let team2 = getTeamFromID(tournament, match.team2ID);
+            if(!teams.includes(team2))
+                teams.push(team2);
+        });
+    });
+
+    return teams;
+}
+
 // MATCHES KO-PHASE
 export const getMatchesKOPhase = (tournament:any) => {
     if(!tournament || !tournament.koPhase.matches)

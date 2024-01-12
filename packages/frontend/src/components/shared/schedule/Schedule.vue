@@ -8,7 +8,7 @@ defineProps(['getTournament','tournament',"isBackend"])
 <template>
    <div class="Schedule">
       <!-- Tabs -->
-      <ul class="nav nav-tabs  justify-content-center" id="myTab" role="tablist">
+      <ul class="nav nav-tabs  justify-content-center" role="tablist">
          <li class="nav-item" role="presentation">
             <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#GameScheduleGroups" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Gruppenphase</button>
          </li>
