@@ -18,10 +18,20 @@ const routes = [
 			title: 'Weck BiPo Open - Regeln',
 		}
 	},
+
+	{
+		path: '/Zusammenfassung',
+		name: 'Zusammenfassung',
+		component: () => import('@/components/frontend/routes/_Summary.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Zusammenfassung',
+		}
+	},
+
 	// {
 	// 	path: '/Teamanmeldung',
 	// 	name: 'Teamanmeldung',
-	// 	component: () => import('@/components/teamanmeldung/_Teamanmeldung.vue'),
+	// 	component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
 	// 	meta: {
 	// 		title: 'Weck BiPo Open REPLACE - Teamanmeldung',
 	// 	},
@@ -53,7 +63,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/:id/Spielplan-Übersicht',
+		path: '/:id/Spielplan2',
 		name: 'ScheduleOverview',
 		component: () => import('@/components/frontend/routes/tournament/_ScheduleOverview.vue'),
 		meta: {

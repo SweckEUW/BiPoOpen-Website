@@ -75,7 +75,8 @@ let tournaments = ref([
 		<transition name="fade" mode="out-in">
 			<div class="ap-menu" v-show="showBurger">
 
-				<router-link @click="toggleBurgerMenu()" class="ap-rules" :to="'/Regeln'">Regeln</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Zusammenfassung'">Zusammenfassung</router-link>
 
 				<div v-for="tournament in tournaments" :key="tournament.year">
 					<DropDown :isOpen="tournament.year == 'Kirmes 2023'"> 
@@ -140,9 +141,8 @@ let tournaments = ref([
 	background-color: var(--main-color);
 	overflow-y: scroll;
 }
-.ap-rules{
+.ap-menu-title{
 	margin-left: 10px;
-	margin-top: 20vh !important;
 	text-decoration: none;
 	color: white;
 	font-size: 50px;
@@ -152,6 +152,9 @@ let tournaments = ref([
 	text-align: center;
 	display: inline-block;
 	transition: .3s opacity ease;
+}
+.ap-menu-title:first-of-type{
+	margin-top: 20vh !important;
 }
 .ap-dropdown-title{
 	color: white;
@@ -226,7 +229,7 @@ a:hover{
 		opacity: 1;
 		color: var(--main-color);;
 	}
-	.ap-rules{
+	.ap-menu-title{
 		margin-top: 100px;
 	}
 	.ap-dropdown-link{

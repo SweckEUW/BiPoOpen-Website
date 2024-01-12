@@ -47,20 +47,29 @@ const getMatchLooser = (match:any) => {
 
         <Loadingscreen v-show="!tournament"/>
 
-        <div v-if="tournament">
+        <div  v-if="tournament">
+            
+            <!-- Platzierung -->
             <div>
-                {{ "1. Platz: " + firstPlace.name }}
+                <div>
+                    {{ "1. Platz: " + firstPlace.name }}
+                </div>
+
+                <div>
+                    {{ "2. Platz: " + secondPlace.name }}
+                </div>
+
+                <div>
+                    {{ "3. Platz: " + thirdPlace.name }}
+                </div>
             </div>
 
-            <div>
-                {{ "2. Platz: " + secondPlace.name }}
+            <!-- MVP -->
+            <div v-if="tournament">
+                
             </div>
 
-            <div>
-                {{ "3. Platz: " + thirdPlace.name }}
-            </div>
         </div>
-
     </div>
 </template>
 
