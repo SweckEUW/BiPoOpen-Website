@@ -6,8 +6,8 @@
 
         <h1 class="bp-title">{{"Regeln"}}</h1>
         
-        <h2 style="margin-top: 40px;">Zusammenfassung</h2>
-        <div>
+        <h2 style="margin-bottom: 20px;">Zusammenfassung</h2>
+        <div style="margin-bottom: 100px;">
             <ul style="padding-left: 15px;">
                 <li>Schnick-Schnack-Schnuck wer anfängt</li>
                 <li>2 Becher werden bei einem "Bouncer" getrunken</li>
