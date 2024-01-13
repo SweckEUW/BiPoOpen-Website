@@ -1,0 +1,32 @@
+[
+	{
+		"year": "2024",
+		"mvp": true,
+		"games": true,
+		"fotos": true
+	},
+	{
+		"year": "2023",
+		"mvp": true,
+		"games": true,
+		"fotos": true
+	},
+	{
+		"year": "2022",
+		"mvp": false,
+		"games": true,
+		"fotos": true
+	},
+	{
+		"year": "2021",
+		"mvp": false,
+		"games": false,
+		"fotos": true
+	},
+	{
+		"year": "2020",
+		"mvp": false,
+		"games": true,
+		"fotos": true
+	}
+]

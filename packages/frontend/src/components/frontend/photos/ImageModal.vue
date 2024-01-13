@@ -2,9 +2,7 @@
 import { watch, onMounted } from "vue"
 
 import Swiper , { Pagination, Navigation, Zoom } from 'swiper';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import 'swiper/swiper-bundle.min.css';
 
 const props = defineProps(['imageURL', 'toggleModal', 'pictures', 'index'])
 
@@ -13,6 +11,7 @@ onMounted(() => {
     setTimeout(() => {
         swiper = new Swiper('#Gallery',{
             modules: [Pagination, Navigation, Zoom],
+            zoom: true,
             initialSlide: props.index,
             spaceBetween: 50,
             speed: 500,
@@ -24,8 +23,7 @@ onMounted(() => {
             navigation: {
                 nextEl: ".swiper-button-next",
                 prevEl: ".swiper-button-prev",
-            },
-            zoom: true
+            }
         });
     }, 0); 
 });
@@ -70,11 +68,11 @@ watch(() => props.index, () => {
 
         <div class="mo-container">
 
-            <div id="Gallery" class="swiper">
+            <div id="Gallery" class="swiper-container">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide" v-for="element in pictures" :key="element.picture">
                         <div class="swiper-zoom-container">
-                            <img class="mp-image" :src="element.picture" alt="" loading="lazy">
+                            <img :src="element.picture" alt="" loading="lazy">
                         </div>
                     </div>
                 </div>
@@ -111,14 +109,11 @@ watch(() => props.index, () => {
 }
 
 /* Swiper */
-.swiper{
+.swiper-container{
     width: 100%;
     height: 100%;
     overflow: visible;
-}
-.swiper-slide{
-    display: flex;
-    justify-content: center;
+    position: relative;
 }
 .swiper-pagination{
     color: var(--main-color);
@@ -126,11 +121,6 @@ watch(() => props.index, () => {
     left: 0;
     top: 0;
     width: auto;
-}
-.mp-image{
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
 }
 .pt-icons{
     position: absolute;

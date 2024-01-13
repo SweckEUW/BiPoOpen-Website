@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted } from "vue"
-import { getGroups, setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase, getGroups } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
@@ -92,19 +92,19 @@ const toggleModal = (generate?:boolean) => {
       <!-- Modal -->
       <Transition name="fade">
          <Modal v-if="showModal">
-               <template #title>{{generateRandom ? "Gruppen auslosen" : "Gruppen umsortieren"}}</template>
-               <template #template>
-               <p style="text-align: center; white-space: break-spaces;">{{  generateRandom ? 
-                  "Sicher das die Gruppen ausgelost werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!" : 
-                  "Sicher das die Gruppen umsortiert werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!"
-               }}</p>
-               </template>
-               <template #cancle>
-                  <div @click="toggleModal()">Abbrechen</div>
-               </template>
-               <template #confirm>
-                  <div @click="generateRandom ? generateGroups() : changeGroups()">{{ generateRandom ? "Auslosen" : "Umsortieren"}}</div>
-               </template>
+            <template #title>{{generateRandom ? "Gruppen auslosen" : "Gruppen umsortieren"}}</template>
+            <template #template>
+            <p style="text-align: center; white-space: break-spaces;">{{  generateRandom ? 
+               "Sicher das die Gruppen ausgelost werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!" : 
+               "Sicher das die Gruppen umsortiert werden sollen?\nDadurch wird der Spielplan neu generiert und der alte gelöscht!"
+            }}</p>
+            </template>
+            <template #cancle>
+               <div @click="toggleModal()">Abbrechen</div>
+            </template>
+            <template #confirm>
+               <div @click="generateRandom ? generateGroups() : changeGroups()">{{ generateRandom ? "Auslosen" : "Umsortieren"}}</div>
+            </template>
          </Modal>
       </Transition>
 

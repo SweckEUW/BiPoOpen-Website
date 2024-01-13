@@ -10,8 +10,7 @@ const route = useRoute()
 
 let tournament = ref();
 const getTournament = async () => {
-   // @ts-ignore 
-   tournament.value = await getTournamentWithRouterID(route.params.id);
+   tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
 getTournament();
 
@@ -37,6 +36,3 @@ onUnmounted(() => {
       </div>
    </div>
 </template>
-
-<style scoped>
-</style>

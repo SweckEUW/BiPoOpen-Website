@@ -58,7 +58,49 @@ export const getTeamFromName = (tournament: any, teamName:string) => {
     return team;
 }
 
-// GROUPS
+export const getAllTeams = (tournament:any) => {
+    if(!tournament)
+        return [];
+
+    let teams:any = [];
+    tournament.teams.forEach((team:any) => {
+        teams.push(team);
+    });
+
+    return teams;
+}
+
+export const getTopTeams = (tournament:any) => {
+    if(!tournament)
+        return [];
+
+    let topTeams:any = [];
+    let matches = getMatchesKOPhase(tournament);
+
+    if(matches.length > 0){
+        let firstPlaceMatch = matches[matches.length-1][0];
+        let firstPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team1 : firstPlaceMatch.team2;
+        let secondPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team2 : firstPlaceMatch.team1;
+
+        let thirdPlaceMatch = matches[matches.length-1][1];
+        let thirdPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
+        let fourthPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team2 : thirdPlaceMatch.team1; 
+
+        topTeams.push(firstPlace);
+        topTeams.push(secondPlace);
+        topTeams.push(thirdPlace);
+        topTeams.push(fourthPlace);
+    }
+
+    return topTeams;
+}
+
+////////////
+// GROUPS //
+////////////
+
+// Use this function to get Groups
+// Else groups array will get poluted
 export const getGroups = (tournament:any) => {
     if(!tournament || !tournament.groupPhase.groups)
         return [];
@@ -96,8 +138,14 @@ export const generateRandomGroups = async (tournament:any) => {
 }
 
 export const getGroupsWithStats = (tournament:any) => {
+    if(!tournament)
+        return [];
+
     let groups:any = [];
-    getGroups(tournament).forEach((group:any, i:number) => {
+
+    let tournamentGroups = getGroups(tournament);
+    // let tournamentGroups = tournament.groupPhase.groups;
+    tournamentGroups.forEach((group:any, i:number) => {        
         groups.push({teams: []});
         group.teams.forEach((team:any) => {
             let teamTMP = team;
@@ -110,9 +158,11 @@ export const getGroupsWithStats = (tournament:any) => {
             teamTMP.score = ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam;
             teamTMP.scoreDifference = ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam;
             teamTMP.hits = ammountOfHitsFromTeam;
+            
             groups[i].teams.push(teamTMP);
         });
     });
+    
 
     // Sort after wins, hit difference and direct win against component
     groups.forEach((group:any) => {
@@ -160,7 +210,7 @@ export const setMatchesGroupPhase = async (tournamentID:any, matches:any) => {
 
 export const generateRandomMatchesGroupPhase = async (tournament:any) => {
     let matches:any = [];
-    let groups = tournament.groupPhase.groups;
+    let groups = getGroups(tournament);
  
     for (let i = 0; i < groups.length; i++) {
         let matchesForGroup = [];
@@ -219,6 +269,30 @@ export const setGameResultGroupPhase = async (tournament:any, matchID:string, re
 
     await setMatchesGroupPhase(tournament._id, matches);
     await updateMatchesKOPhase(tournament);
+}
+
+
+//////////////
+// KO PHASE //
+//////////////
+export const getTeamsKOPhase = (tournament:any) => {
+    if(!tournament || !tournament.koPhase.matches)
+        return [];     
+
+    let teams:any = [];
+    tournament.koPhase.matches.forEach((stage:any, i:number) => {
+        stage.forEach((match:any) => {
+            let team1 = getTeamFromID(tournament, match.team1ID);
+            if(!teams.includes(team1))
+                teams.push(team1);
+
+            let team2 = getTeamFromID(tournament, match.team2ID);
+            if(!teams.includes(team2))
+                teams.push(team2);
+        });
+    });
+
+    return teams;
 }
 
 // MATCHES KO-PHASE
@@ -281,53 +355,55 @@ export const initMatchesKOPhase = async (tournament:any) => {
     await setMatchesKOPhase(tournament._id, matches);
 }
 
+// Gets called when Group or KO Phase sets Game Result
+// Loops over all Matches in the KO Phase and 
 export const updateMatchesKOPhase = async (tournament:any) => {
-    let matchesTMP:any = [];
-    let matches:any = tournament.koPhase.matches;
-    let groups:any = getGroupsWithStats(tournament);
+    let matchesTMP:any[] = [];
+    let matches = tournament.koPhase.matches;
+    let groups = getGroups(tournament);
     matches.forEach((stage:any, i:number) => {
         matchesTMP.push([]);
 
         if(i == 0) { // First Stage 
             for (let x = 0; x < stage.length; x++) { 
-                    let matchTMP = stage[x];
+                let matchTMP = stage[x];
 
-                    let group1Number, group2Number;
-                    if(x % 2 == 0){
-                        group1Number = x;
-                        group2Number = x + 1;
-                    }else{
-                        group1Number = stage.length - x;
-                        group2Number = stage.length - x - 1;
+                let group1Number, group2Number;
+                if(x % 2 == 0){
+                    group1Number = x;
+                    group2Number = x + 1;
+                }else{
+                    group1Number = stage.length - x;
+                    group2Number = stage.length - x - 1;
+                }
+
+                // Change first K.o-Stage for 2022 tournament
+                if(tournament.name == "Weck BiPo Open 2022"){
+                    if(x == 0){
+                        group1Number = 2;
+                        group2Number = 0;
                     }
-
-                    // Change first K.o-Stage for 2022 tournament
-                    if(tournament.name == "Weck BiPo Open 2022"){
-                        if(x == 0){
-                            group1Number = 2;
-                            group2Number = 0;
-                        }
-                        if(x == 1){
-                            group1Number = 3;
-                            group2Number = 1;
-                        }
-                        if(x == 2){
-                            group1Number = 0;
-                            group2Number = 3;
-                        }
-                        if(x == 3){
-                            group1Number = 1;
-                            group2Number = 2;
-                        }
+                    if(x == 1){
+                        group1Number = 3;
+                        group2Number = 1;
                     }
+                    if(x == 2){
+                        group1Number = 0;
+                        group2Number = 3;
+                    }
+                    if(x == 3){
+                        group1Number = 1;
+                        group2Number = 2;
+                    }
+                }
 
-                    if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played
-                        matchTMP.team1ID = groups[group1Number].teams[0]._id;
-                    
-                    if(!tournament.groupPhase.matches[group2Number].find((match:any) => !match.result)) // Check if all games of group are played
-                        matchTMP.team2ID = groups[group2Number].teams[1]._id;
+                if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played
+                    matchTMP.team1ID = groups[group1Number].teams[0]._id;
+                
+                if(!tournament.groupPhase.matches[group2Number].find((match:any) => !match.result)) // Check if all games of group are played
+                    matchTMP.team2ID = groups[group2Number].teams[1]._id;
 
-                    matchesTMP[i].push(matchTMP); 
+                matchesTMP[i].push(matchTMP); 
             }
         }else if(i == matches.length - 1){ // Last Stage (Finale, 3. Platz)
             let matchFinal = stage[0];
@@ -384,13 +460,71 @@ export const setGameResultKOPhase = async (tournament:any, matchID:string, resul
     await updateMatchesKOPhase(tournament);
 }
 
+export const getTeamsKOPhaseWithStats = (tournament:any) => {
+    let teams:any = [];
+
+    let teamsKOPhase = getTeamsKOPhase(tournament);
+    teamsKOPhase.forEach((team:any) => {
+        let teamTMP = team;
+
+        let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP._id, false);
+        let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP._id, false);
+
+        teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, false);
+        teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], false);
+        teamTMP.score = ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam;
+        teamTMP.scoreDifference = ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam;
+        teamTMP.hits = ammountOfHitsFromTeam;
+        
+        teams.push(teamTMP);
+    });
+
+
+    // Sort after ammount of games, wins
+    teams = teams.sort((team1:any, team2:any) => {
+        if(team1.games == team2.games)
+            return team2.wins - team1.wins;
+
+        return team2.games - team1.games;
+    });
+
+    // Set placement
+    for (let i = 0; i < teams.length; i++) {
+        teams[i].placement = i;
+
+        // Top 4 Teams in Array
+        let topTeams = getTopTeams(tournament);
+
+        // Check if teams have the same ammoung of games and give them same placement
+        if(!topTeams.includes(teams[i])){
+            let teamsWithSameScore = teams.filter((team:any) => team.games == teams[i].games);
+            if(teamsWithSameScore.length > 1){
+                teamsWithSameScore.forEach((teamWithSameWin:any) => {
+                    teamWithSameWin.placement = teamsWithSameScore[0].placement;
+                });
+            }
+        }
+
+        // Top 4 Teams get placement from function
+        if(topTeams.includes(teams[i]))
+            teams[i].placement = topTeams.indexOf(teams[i]);
+    }
+
+    // Finally sort again for placement
+    teams = teams.sort((team1:any, team2:any) => {
+        return team1.placement - team2.placement;
+    });
+
+    return teams;
+}
+
 // PLAYERS
 export const getPlayersWithStats = (tournament:any) => {
-    let players:any = [];
-    let teams = tournament.teams;
+    if(!tournament)
+        return [];     
 
-    if(!teams)
-        return [];
+    let players:any = [];
+    let teams = getAllTeams(tournament);
     
     for (let i = 0; i < teams.length; i++) {
         for (let x = 0; x < teams[i].players.length; x++) {

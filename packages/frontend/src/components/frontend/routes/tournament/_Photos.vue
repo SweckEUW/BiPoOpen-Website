@@ -12,7 +12,9 @@ import driveImageIDs2020 from "@/assets/2020/driveImageIDs.json"
 import { useRoute } from "vue-router";
 const route = useRoute();
 
-let driveImageIDs = driveImageIDs2023;
+let driveImageIDs = undefined;
+if(route.params.id == "2023")
+    driveImageIDs = driveImageIDs2023;
 if(route.params.id == "2022")
     driveImageIDs = driveImageIDs2022;
 if(route.params.id == "2021")
@@ -48,17 +50,21 @@ onMounted(() => {
     adjustImageGrid();
 });
 
-driveImageIDs.thumbnails.sort((a, b) => a.name.localeCompare(b.name));
-driveImageIDs.pictures.sort((a, b) => a.name.localeCompare(b.name));
-
 const pictures:any = ref([]); 
-for (let i = 0; i < driveImageIDs.pictures.length; i++) {
-    let thumbnail:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.thumbnails[i].img_id;
-    let picture:string = "https://drive.google.com/uc?export=view&id=" + driveImageIDs.pictures[i].img_id;
-    pictures.value.push({
-        thumbnail: thumbnail, 
-        picture: picture,
-    })
+if(driveImageIDs){
+    // Sort Images and thumbnails
+    driveImageIDs.thumbnails.sort((a, b) => a.name.localeCompare(b.name));
+    driveImageIDs.pictures.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Add Thumbnails and pictures to array
+    for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
+        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w1000";
+        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
+        pictures.value.push({
+            thumbnail: thumbnail, 
+            picture: picture,
+        })
+    }
 }
 
 const elementsShown = ref(20);
@@ -72,15 +78,15 @@ window.onscroll = () => {
     }
 };
 
-let timelapseVideo2023:string = new URL(`/src/assets/2023/videos/Zeitraffer.mp4`, import.meta.url).href;
-
 // TODO: Dynamic import of Poster
 let poster2023:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
 let poster2022:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
 let poster2021:string = new URL(`@/assets/2021/poster.jpg`, import.meta.url).href;
 let poster2020:string = new URL(`@/assets/2020/poster.jpg`, import.meta.url).href;
 
-let poster = poster2023;
+let poster = "";
+if(route.params.id == "2023")
+    poster = poster2023;
 if(route.params.id == "2022")
     poster = poster2022;
 if(route.params.id == "2021")
@@ -98,31 +104,34 @@ if(route.params.id == "2020")
             <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
-        <!-- 2023 Credits & Video -->
-        <div v-if="route.params.id == '2023'">
-            <div class="pt-intro">
-                Ein großes Dankeschön an 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
-                der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-                <br>
-                Folgt ihm gerne auf Instagram 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
-            </div>
-            
-            <div class="pt-video">
-                <video :src="timelapseVideo2023" autoplay muted loop></video>
-            </div>
-        </div>  
-
-        <!-- Poster -->
-        <div class="pt-poster">
-            <img :src="poster" alt="">
+        <div v-show="!poster" style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);">
+            Fotos für 2024 noch nicht verfügbar
         </div>
 
-        <!-- Image Grid -->
-        <div class="pt-gallery">
-            <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
-                <img class="pt-thumbnail" :src="element.thumbnail" alt="" loading="lazy"/>
+        <!-- 2023 Credits & Video -->
+        <div v-show="poster">
+
+            <div v-if="route.params.id == '2023'">
+                <div class="pt-intro">
+                    Ein großes Dankeschön an 
+                    <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
+                    der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+                    <br>
+                    Folgt ihm gerne auf Instagram 
+                    <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
+                </div>
+            </div>  
+
+            <!-- Poster -->
+            <div class="pt-poster">
+                <img :src="poster" alt="">
+            </div>
+
+            <!-- Image Grid -->
+            <div class="pt-gallery">
+                <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
+                    <img class="pt-thumbnail" :src="element.thumbnail" alt="" loading="lazy"/>
+                </div>
             </div>
         </div>
 
@@ -161,7 +170,7 @@ if(route.params.id == "2020")
     margin-bottom: 20px;
 }
 .pt-poster img{
-    width: 30%;
+    width: 25%;
     object-fit: cover;
 }
 

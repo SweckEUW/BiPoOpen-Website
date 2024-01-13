@@ -12,8 +12,7 @@ let tournament = ref();
 
 const route = useRoute();
 const getTournament = async () => {
-   // @ts-ignore 
-   let tournamentName = route.params.id.replaceAll("-"," ");
+   let tournamentName = (route.params.id as string).replaceAll("-"," ");
    tournament.value = await getTournamentByName(tournamentName);
 }
 getTournament();
@@ -53,5 +52,8 @@ getTournament();
    </div>
 </template>
 
-<style scoped>
+<style>
+.ManageTournament .nav-tabs{
+   top: 99px !important;
+}
 </style>

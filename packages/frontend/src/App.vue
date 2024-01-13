@@ -84,7 +84,7 @@ body{
     text-align: center;
 	position: sticky;
 	background-color: white;
-	top: 100px;
+	top: 99px; /* 99px = AppHeader Height */
 	z-index: 2;
 }
 
@@ -134,7 +134,7 @@ body{
 		font-size: 28px;
 		padding-bottom: 30px;
 		padding-top: 10px;
-		top: 78px;
+		top: 79px; /* 79px = AppHeader Height */
 	}
 }
 </style>

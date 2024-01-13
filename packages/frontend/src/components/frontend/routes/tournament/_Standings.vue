@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
-import { getGroups, getTournamentWithRouterID, getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
+import { ref, onUnmounted, toRaw } from "vue"
+import { getTournamentWithRouterID, getGroupsWithStats, getTeamsKOPhaseWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -9,11 +9,8 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref();
-let groups = ref();
 const getTournament = async () => {
-    // @ts-ignore 
-   tournament.value = await getTournamentWithRouterID(route.params.id);
-   groups.value = getGroupsWithStats(tournament.value);
+    tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
 getTournament();
 
@@ -36,41 +33,109 @@ window.addEventListener("resize", () => {
 
         <h1 class="bp-title">{{"Platzierungen " + route.params.id }}</h1>
 
-        <Loadingscreen v-show="!tournament || !groups"/>
+        <Loadingscreen v-show="!tournament"/>
 
         <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
             Turnierplan wurde noch nicht erstellt
         </div>
 
-        <table v-show="tournament && groups" class="table table-hover caption-top" v-for="index in getGroups(tournament).length" :key="index">
-            <caption>{{"Gruppe " + convertNumberToCharacter(index)}}</caption>
-            <thead>
-                <tr>
-                    <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                    <th>Teamname</th>
-                    <th>Spieler</th>
-                    <th>{{ windowWidth > 900 ? 'Siege' :'Sieg.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Spiele' :'Spie.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(team,i) in groups[index-1].teams" :key="team">
-                    <td>{{ i+1 }}</td>
-                    <td>{{team.name}}</td>
-                    <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
-                    <td>{{ team.wins }}</td>
-                    <td>{{ team.games }}</td>
-                    <td>{{ team.score }}</td>
-                    <td>{{ team.scoreDifference }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-show="tournament && tournament.groupPhase.groups">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs  justify-content-center" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#GameScheduleGroups" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Gruppenphase</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#GameScheduleKO" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">K.o.Phase</button>
+                </li>
+            </ul>
+
+            <!-- Content -->
+            <div class="tab-content">
+
+                <!-- Groups -->
+                <div class="tab-pane fade show active" id="GameScheduleGroups" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                    <table class="table table-hover caption-top" v-for="(group,index) in getGroupsWithStats(toRaw(tournament))" :key="index">
+                        <caption>{{"Gruppe " + convertNumberToCharacter(index+1)}}</caption>
+                        <thead>
+                            <tr>
+                                <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
+                                <th>Teamname</th>
+                                <th>Spieler</th>
+                                <th>{{ windowWidth > 900 ? 'Siege' :'Sieg.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Spiele' :'Spie.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(team,i) in group.teams" :key="team">
+                                <td>{{ i+1 }}</td>
+                                <td>{{team.name}}</td>
+                                <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
+                                <td>{{ team.wins }}</td>
+                                <td>{{ team.games }}</td>
+                                <td>{{ team.score }}</td>
+                                <td>{{ team.scoreDifference }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- KO Phase -->
+                <div class="tab-pane fade" id="GameScheduleKO" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                    <table v-if="tournament" class="table table-hover caption-top">
+                        <thead>
+                            <tr>
+                                <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
+                                <th>Teamname</th>
+                                <th>Spieler</th>
+                                <th>{{ windowWidth > 900 ? 'Siege' :'Sieg.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Spiele' :'Spie.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
+                                <th>{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="team in getTeamsKOPhaseWithStats(tournament)" :key="team">
+                                <td>{{ team.placement + 1 }}</td>
+                                <td>{{team.name}}</td>
+                                <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
+                                <td>{{ team.wins }}</td>
+                                <td>{{ team.games }}</td>
+                                <td>{{ team.score }}</td>
+                                <td>{{ team.scoreDifference }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
     </div>
 </template>
 
 <style scoped>
+/* Navbar */
+.nav-tabs{
+   position: sticky;
+   top: 160px;
+   background: white;
+   z-index: 2;
+   margin-bottom: 40px;
+}
+.nav-link{
+   border-radius: 0px;
+   width: 40vw;
+   padding: 15px 10px;
+   color: var(--secondary-color);
+   font-weight: bold;
+}
+.nav-item .active{
+   background-color: var(--main-color) !important;
+   color: white !important;
+}
+/* Groups Table */
 table{
    text-align: center;
    margin-bottom: 20px;
@@ -95,6 +160,19 @@ tbody tr:nth-of-type(1){
 tbody tr:nth-of-type(2){
     background: #e6faff;
 }
+tbody tr:nth-of-type(3){
+    background: #f4fdff;
+}
+
+#GameScheduleKO tbody tr:nth-of-type(1){
+    font-size: 22px;
+}
+#GameScheduleKO tbody tr:nth-of-type(2){
+    font-size: 20px;
+}
+#GameScheduleKO tbody tr:nth-of-type(3){
+    font-size: 18px;
+}
 
 table td{
    background-color: inherit;
@@ -109,6 +187,10 @@ table td:nth-child(2){
 
 /*MOBILE*/
 @media (width <= 900px){
+    .nav-tabs{
+      top: 130px;
+    }
+
     table *{
         font-size: 14px;
     }

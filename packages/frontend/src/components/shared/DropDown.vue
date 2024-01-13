@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { ref } from "vue"
 
-const props = defineProps(['isOpen'])
+const props = defineProps(['isOpen', "name"])
 
 let menuOpen = ref(props.isOpen);
 
 const toggleMenu = () =>{
 	menuOpen.value = !menuOpen.value;
+	window.dispatchEvent(new CustomEvent("closeAllDropDowns", {detail: { name: props.name }}));
 }
+
+window.addEventListener("closeAllDropDowns", (e:any) => {
+	if(e.detail && e.detail.name != props.name)
+		menuOpen.value = false;
+})
 </script>
 
 <template>
-	<div class="DropDown" :style="{'maxHeight': menuOpen ? '450px' : '60px'}">
+	<div class="DropDown" :style="{'maxHeight': menuOpen ? '480px' : '60px'}">
 
 		<div class="dd-title" @click="toggleMenu()">
 			<div class="arrow-down" :style="{'transform': menuOpen ? 'rotate(0deg)' : 'rotate(-90deg)'}"></div>

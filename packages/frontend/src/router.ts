@@ -11,14 +11,6 @@ const routes = [
 		}
 	},
 	{
-		path: '/Umfrage',
-		name: 'Umfrage',
-		component: () => import('@/components/frontend/routes/_Poll.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Umfrage',
-		}
-	},
-	{
 		path: '/Regeln',
 		name: 'Regeln',
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
@@ -26,10 +18,20 @@ const routes = [
 			title: 'Weck BiPo Open - Regeln',
 		}
 	},
+
+	{
+		path: '/Hall-of-Fame',
+		name: 'Hall Of Fame',
+		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Hall of Fame',
+		}
+	},
+
 	// {
 	// 	path: '/Teamanmeldung',
 	// 	name: 'Teamanmeldung',
-	// 	component: () => import('@/components/teamanmeldung/_Teamanmeldung.vue'),
+	// 	component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
 	// 	meta: {
 	// 		title: 'Weck BiPo Open REPLACE - Teamanmeldung',
 	// 	},
@@ -61,7 +63,7 @@ const routes = [
 		}
 	},
 	{
-		path: '/:id/Spielplan-Übersicht',
+		path: '/:id/Spielplan2',
 		name: 'ScheduleOverview',
 		component: () => import('@/components/frontend/routes/tournament/_ScheduleOverview.vue'),
 		meta: {
@@ -82,6 +84,14 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_Photos.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Fotos',
+		}
+	},
+	{
+		path: '/:id/Teams',
+		name: 'Teams',
+		component: () => import('@/components/frontend/routes/tournament/_Teams.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Teams',
 		}
 	},
 
