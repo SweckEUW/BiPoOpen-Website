@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
-import { getGroups, getTournamentWithRouterID, getGroupsWithStats, getTeamsKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { ref, onUnmounted, toRaw } from "vue"
+import { getTournamentWithRouterID, getGroupsWithStats, getTeamsKOPhaseWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -10,8 +10,7 @@ const route = useRoute()
 
 let tournament = ref();
 const getTournament = async () => {
-    // @ts-ignore 
-   tournament.value = await getTournamentWithRouterID(route.params.id);
+    tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
 getTournament();
 
@@ -40,7 +39,7 @@ window.addEventListener("resize", () => {
             Turnierplan wurde noch nicht erstellt
         </div>
 
-        <div v-if="tournament && tournament.groupPhase.groups">
+        <div v-show="tournament && tournament.groupPhase.groups">
             <!-- Tabs -->
             <ul class="nav nav-tabs  justify-content-center" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -56,8 +55,8 @@ window.addEventListener("resize", () => {
 
                 <!-- Groups -->
                 <div class="tab-pane fade show active" id="GameScheduleGroups" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-                    <table class="table table-hover caption-top" v-for="(group,index) in getGroupsWithStats(tournament)" :key="index">
-                        <caption>{{"Gruppe " + convertNumberToCharacter(index)}}</caption>
+                    <table class="table table-hover caption-top" v-for="(group,index) in getGroupsWithStats(toRaw(tournament))" :key="index">
+                        <caption>{{"Gruppe " + convertNumberToCharacter(index+1)}}</caption>
                         <thead>
                             <tr>
                                 <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
@@ -98,8 +97,8 @@ window.addEventListener("resize", () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(team,i) in getTeamsKOPhase(tournament)" :key="team">
-                                <td>{{ i+1 }}</td>
+                            <tr v-for="team in getTeamsKOPhaseWithStats(tournament)" :key="team">
+                                <td>{{ team.placement + 1 }}</td>
                                 <td>{{team.name}}</td>
                                 <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
                                 <td>{{ team.wins }}</td>
@@ -160,6 +159,19 @@ tbody tr:nth-of-type(1){
 }
 tbody tr:nth-of-type(2){
     background: #e6faff;
+}
+tbody tr:nth-of-type(3){
+    background: #f4fdff;
+}
+
+#GameScheduleKO tbody tr:nth-of-type(1){
+    font-size: 22px;
+}
+#GameScheduleKO tbody tr:nth-of-type(2){
+    font-size: 20px;
+}
+#GameScheduleKO tbody tr:nth-of-type(3){
+    font-size: 18px;
 }
 
 table td{

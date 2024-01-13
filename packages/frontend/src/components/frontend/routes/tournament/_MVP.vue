@@ -8,14 +8,11 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref();
-let players = ref();
 let sortValue = ref("averageScore");
 let sortUp = ref(false);
 
 const getTournament = async () => {
     tournament.value = await getTournamentWithRouterID(route.params.id as string);
-    players.value = getPlayersWithStats(tournament.value);
-    sortList();
 }
 getTournament();
 
@@ -32,8 +29,8 @@ window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
 });
 
-const sortList = async () => {
-    players.value.sort((player1:any, player2:any) => {
+const sortPlayersList = (players:any[]) => {
+    players.sort((player1:any, player2:any) => {
         if(sortValue.value == "name") // sort strings
             return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
 
@@ -41,16 +38,17 @@ const sortList = async () => {
             return sortUp.value ? player2.placement - player1.placement : player1.placement - player2.placement;
         return sortUp.value ? player1[sortValue.value] - player2[sortValue.value] : player2[sortValue.value] - player1[sortValue.value]
     });
+
+    return players;
 }
 
-const setSortValue = async (value:string) => {
+const setSortValue = (value:string) => {
     if(sortValue.value == value)
         sortUp.value = !sortUp.value;
     else
         sortUp.value = false;
 
     sortValue.value = value;
-    sortList();
 }
 
 const giveArrowClass = (value:string) => {
@@ -64,7 +62,7 @@ const giveArrowClass = (value:string) => {
         
         <h1 class="bp-title">{{"Most Valuable Player " + route.params.id }}</h1>
 
-        <Loadingscreen v-show="!tournament || !players"/>
+        <Loadingscreen v-show="!tournament"/>
 
         <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
             Turnierplan wurde noch nicht erstellt
@@ -82,7 +80,7 @@ const giveArrowClass = (value:string) => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(player, index) in players" :key="index">
+                <tr v-for="(player, index) in sortPlayersList(getPlayersWithStats(tournament))" :key="index">
                     <td>{{ player.placement + 1}}</td>
                     <td>{{ player.name.replace(" ","\n") }}</td>
                     <td>{{ player.averageScore }}</td>

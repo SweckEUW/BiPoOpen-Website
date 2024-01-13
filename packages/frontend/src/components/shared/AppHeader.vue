@@ -82,7 +82,7 @@ let tournaments = ref([
 			<div class="ap-menu" v-show="showBurger">
 
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Zusammenfassung'">Zusammenfassung</router-link>
+				<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Zusammenfassung'">Zusammenfassung</router-link> -->
 
 				<div v-for="tournament in tournaments" :key="tournament.year">
 					<DropDown :isOpen="tournament.year == 'Kirmes 2023'"> 

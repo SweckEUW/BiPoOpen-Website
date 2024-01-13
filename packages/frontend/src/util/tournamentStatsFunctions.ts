@@ -1,19 +1,21 @@
 import { getMatchesGroupPhase, getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 
-export const getAmmountOfWinsFromTeam = (tournament:any, teamName:any, onlyGroupPhase:boolean) => {
-    let wins:number = 0;
+export const getAmmountOfWinsFromTeam = (tournament:any, teamName:string, onlyGroupPhase:boolean) => {
+    let wins = 0;
     
     let matches = getMatchesGroupPhase(tournament)
     if(!onlyGroupPhase)
         matches = matches.concat(getMatchesKOPhase(tournament));
-
+    
     matches.forEach((group:any) => {
         group.forEach((match:any) => {
             if(match.result){
-                if(match.team1.name == teamName && match.result.team1Score > match.result.team2Score)
-                    wins += 1;
-                if(match.team2.name == teamName && match.result.team2Score > match.result.team1Score)
-                    wins += 1;
+                if(match.team1.name == teamName && match.result.team1Score > match.result.team2Score){
+                    wins ++;
+                }
+                if(match.team2.name == teamName && match.result.team2Score > match.result.team1Score){
+                    wins ++;
+                }
             }
         });
     });
@@ -113,24 +115,21 @@ export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:any, on
     return score;
 }
 
-export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:any, onlyGroupPhase:boolean) => { 
-    let ammountOfMatches:number = 0;
+export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:string, onlyGroupPhase:boolean) => { 
+    let ammountOfMatches = 0;
 
-    let matches = getMatchesGroupPhase(tournament)
+    let matches = getMatchesGroupPhase(tournament);
     if(!onlyGroupPhase)
         matches = matches.concat(getMatchesKOPhase(tournament));
 
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
-                if(match.team1.players[0] == playerName)
-                    ammountOfMatches ++;                   
-                if(match.team1.players[1] == playerName)
-                    ammountOfMatches ++;
-                if(match.team2.players[0] == playerName)
-                    ammountOfMatches ++;
-                if(match.team2.players[1] == playerName)
-                    ammountOfMatches ++;
+                if(
+                    match.team1.players[0] == playerName || match.team1.players[1] == playerName ||
+                    match.team2.players[0] == playerName || match.team2.players[1] == playerName
+                )
+                    ammountOfMatches ++;                 
             }
         });
     });

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
+import { getTournamentWithRouterID, getAllTeams } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
@@ -8,7 +8,6 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref();
-
 const getTournament = async () => {
     tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
@@ -30,7 +29,7 @@ onUnmounted(() => {
 
         <Loadingscreen v-show="!tournament"/>
 
-        <table v-if="tournament" class="table table-hover caption-top">
+        <table v-show="tournament" class="table table-hover caption-top">
          <thead>
             <tr>
                <th>#</th>
@@ -39,7 +38,7 @@ onUnmounted(() => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team, id) in tournament.teams" :key="team.name">
+            <tr v-for="(team, id) in getAllTeams(tournament)" :key="team.name">
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>

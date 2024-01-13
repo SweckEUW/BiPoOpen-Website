@@ -12,8 +12,7 @@ let firstPlace = ref();
 let secondPlace = ref();
 let thirdPlace = ref();
 const getTournament = async () => {
-    // @ts-ignore 
-    tournament.value = await getTournamentWithRouterID(route.params.id);
+    tournament.value = await getTournamentWithRouterID(route.params.id as string);
     firstPlace.value = getMatchWinner(tournament.value.koPhase.matches.at(-1)[0]);
     secondPlace.value = getMatchLooser(tournament.value.koPhase.matches.at(-1)[0]);
     thirdPlace.value = getMatchWinner(tournament.value.koPhase.matches.at(-1)[1]);
