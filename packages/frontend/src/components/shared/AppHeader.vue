@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import router from '../../router.js';
+import router from '@/router.js';
 
 import DropDown from '@/components/shared/DropDown.vue';
 
@@ -85,7 +85,7 @@ let tournaments = ref([
 				<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Zusammenfassung'">Zusammenfassung</router-link> -->
 
 				<div v-for="tournament in tournaments" :key="tournament.year">
-					<DropDown :isOpen="tournament.year == 'Kirmes 2023'"> 
+					<DropDown :name="tournament.year"> <!-- :isOpen="tournament.year == 'Kirmes 2023'" -->
 						<template #header>
 							<div class="ap-dropdown-title">{{tournament.year}}</div>
 						</template>
