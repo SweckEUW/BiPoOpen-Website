@@ -1,0 +1,1 @@
+import{_ as t,o as s,c as o,a as e,t as a}from"./index-1197ba8f.js";const c={},n={class:"HallOfFame"},_=e("h1",{class:"bp-title"},a("Hall of Fame"),-1),l=e("div",{style:{"text-align":"center","font-size":"18px"}},"Coming Soon",-1),i=[_,l];function r(d,f){return s(),o("div",n,i)}const p=t(c,[["render",r]]);export{p as default};
