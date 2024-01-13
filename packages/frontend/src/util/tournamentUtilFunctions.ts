@@ -77,18 +77,20 @@ export const getTopTeams = (tournament:any) => {
     let topTeams:any = [];
     let matches = getMatchesKOPhase(tournament);
 
-    let firstPlaceMatch = matches[matches.length-1][0];
-    let firstPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team1 : firstPlaceMatch.team2;
-    let secondPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team2 : firstPlaceMatch.team1;
+    if(matches.length > 0){
+        let firstPlaceMatch = matches[matches.length-1][0];
+        let firstPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team1 : firstPlaceMatch.team2;
+        let secondPlace = firstPlaceMatch.result.team1Score > firstPlaceMatch.result.team2Score ? firstPlaceMatch.team2 : firstPlaceMatch.team1;
 
-    let thirdPlaceMatch = matches[matches.length-1][1];
-    let thirdPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
-    let fourthPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team2 : thirdPlaceMatch.team1; 
+        let thirdPlaceMatch = matches[matches.length-1][1];
+        let thirdPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
+        let fourthPlace = thirdPlaceMatch.result.team1Score > thirdPlaceMatch.result.team2Score ? thirdPlaceMatch.team2 : thirdPlaceMatch.team1; 
 
-    topTeams.push(firstPlace);
-    topTeams.push(secondPlace);
-    topTeams.push(thirdPlace);
-    topTeams.push(fourthPlace);
+        topTeams.push(firstPlace);
+        topTeams.push(secondPlace);
+        topTeams.push(thirdPlace);
+        topTeams.push(fourthPlace);
+    }
 
     return topTeams;
 }

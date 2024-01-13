@@ -17,7 +17,7 @@ window.addEventListener("closeAllDropDowns", (e:any) => {
 </script>
 
 <template>
-	<div class="DropDown" :style="{'maxHeight': menuOpen ? '450px' : '60px'}">
+	<div class="DropDown" :style="{'maxHeight': menuOpen ? '480px' : '60px'}">
 
 		<div class="dd-title" @click="toggleMenu()">
 			<div class="arrow-down" :style="{'transform': menuOpen ? 'rotate(0deg)' : 'rotate(-90deg)'}"></div>

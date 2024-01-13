@@ -20,11 +20,11 @@ const routes = [
 	},
 
 	{
-		path: '/Zusammenfassung',
-		name: 'Zusammenfassung',
-		component: () => import('@/components/frontend/routes/_Summary.vue'),
+		path: '/Hall-of-Fame',
+		name: 'Hall Of Fame',
+		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),
 		meta: {
-			title: 'Weck BiPo Open - Zusammenfassung',
+			title: 'Weck BiPo Open - Hall of Fame',
 		}
 	},
 

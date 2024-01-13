@@ -158,8 +158,8 @@ export const getAmmountOfDrunkenCupsFromteam = (tournament:any, team:any, onlyGr
     if(!onlyGroupPhase)
         matches = matches.concat(getMatchesKOPhase(tournament));
 
-    let leftOverCups:number = 0;
-    let enemyHits:number = 0;
+    let leftOverCups = 0;
+    let enemyHits = 0;
     matches.forEach((groups:any) => {
         groups.forEach((match:any) => {
             if(match.result){
