@@ -58,8 +58,8 @@ if(driveImageIDs){
 
     // Add Thumbnails and pictures to array
     for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
-        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&export=download";
-        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&export=download";
+        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w1000";
+        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
         pictures.value.push({
             thumbnail: thumbnail, 
             picture: picture,
