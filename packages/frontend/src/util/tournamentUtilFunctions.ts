@@ -154,12 +154,24 @@ export const getAllTeams = (tournament:any) => {
     return teams;
 }
 
+// returns top 4 teams as array
 export const getTopTeams = (tournament:any) => {
     if(!tournament)
         return [];
 
-    let topTeams:any = [];
     let matches = getMatchesKOPhase(tournament);
+
+    // If not all Games are played out there are not top 4 Teams
+    for (let i = 0; i < matches.length; i++){
+        for (let x = 0; x < matches[i].length; x++) {
+            if(!matches[i][x].result){
+                return [];
+            }
+        }
+    }
+
+
+    let topTeams:any = [];
 
     if(matches.length > 0){
         let firstPlaceMatch = matches[matches.length-1][0];
@@ -233,7 +245,7 @@ export const getTeamsKOPhaseWithStats = (tournament:any) => {
         // Top 4 Teams in Array
         let topTeams = getTopTeams(tournament);
 
-        // Check if teams have the same ammoung of games and give them same placement
+        // Check if teams have the same ammount of games and give them same placement
         if(!topTeams.includes(teams[i])){
             let teamsWithSameScore = teams.filter((team:any) => team.games == teams[i].games);
             if(teamsWithSameScore.length > 1){
@@ -379,32 +391,33 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
 
         // TODO: 5er Gruppen
         if(ammountOfGames == 6){ // 4er Gruppen
-            matchesForGroup.push({team1ID: teams[2].teamID, team2ID: teams[3].teamID});
-            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
-            matchesForGroup.push({team1ID: teams[2].teamID, team2ID: teams[1].teamID});
-            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[3].teamID});
-            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
-            matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[3].teamID});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id});
 
             matches.push(matchesForGroup);
 
         }else if(ammountOfGames == 3){ // 3er Gruppen
+            console.log(teams[0]);
             // Hinrunde
-            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
-            matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
-            matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[2].teamID});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
 
             // Rückrunde
-            // matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[1].teamID});
-            // matchesForGroup.push({team1ID: teams[0].teamID, team2ID: teams[2].teamID});
-            // matchesForGroup.push({team1ID: teams[1].teamID, team2ID: teams[2].teamID});
+            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
+            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
+            // matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
 
             matches.push(matchesForGroup);
 
         }else{
             for (let x = 0; x < teams.length; x++){
                 for (let y = x+1; y < teams.length; y++) {
-                    let match = {team1ID: teams[y].teamID, team2ID: teams[x].teamID};
+                    let match = {team1ID: teams[y]._id, team2ID: teams[x]._id};
                     matchesForGroup.push(match);
                 }
             }
@@ -440,15 +453,16 @@ export const getTeamsKOPhase = (tournament:any) => {
         return [];     
 
     let teams:any = [];
-    tournament.koPhase.matches.forEach((stage:any, i:number) => {
-        stage.forEach((match:any) => {
-            let team1 = getTeamFromID(tournament, match.team1ID);
-            if(!teams.includes(team1))
-                teams.push(team1);
 
-            let team2 = getTeamFromID(tournament, match.team2ID);
-            if(!teams.includes(team2))
-                teams.push(team2);
+    let matchesKOPhase = getMatchesKOPhase(tournament);
+    
+    matchesKOPhase.forEach((stage:any) => {
+        stage.forEach((match:any) => {
+            if(match.team1 && !teams.includes(match.team1))
+                teams.push(match.team1);
+
+            if(match.team2 && !teams.includes(match.team2))
+                teams.push(match.team2);
         });
     });
 
@@ -520,7 +534,7 @@ export const initMatchesKOPhase = async (tournament:any) => {
 export const updateMatchesKOPhase = async (tournament:any) => {
     let matchesTMP:any[] = [];
     let matches = tournament.koPhase.matches;
-    let groups = getGroups(tournament);
+    let groups = getGroupsWithStats(tournament); // getGroups with stats because its sorted after wins. 
     matches.forEach((stage:any, i:number) => {
         matchesTMP.push([]);
 
@@ -557,10 +571,10 @@ export const updateMatchesKOPhase = async (tournament:any) => {
                     }
                 }
 
-                if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played
+                if(!tournament.groupPhase.matches[group1Number].find((match:any) => !match.result)) // Check if all games of group are played. Get first place of picked group1 and set as team1
                     matchTMP.team1ID = groups[group1Number].teams[0]._id;
                 
-                if(!tournament.groupPhase.matches[group2Number].find((match:any) => !match.result)) // Check if all games of group are played
+                if(!tournament.groupPhase.matches[group2Number].find((match:any) => !match.result)) // Check if all games of group are played. Get first place of picked group2 and set as team2
                     matchTMP.team2ID = groups[group2Number].teams[1]._id;
 
                 matchesTMP[i].push(matchTMP); 
