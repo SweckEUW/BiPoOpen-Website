@@ -32,14 +32,12 @@ onUnmounted(() => {
         <table v-show="tournament" class="table table-hover caption-top">
          <thead>
             <tr>
-               <th>#</th>
                <th>Teamname</th>
                <th>Spieler</th>
             </tr>
          </thead>
          <tbody>
             <tr v-for="(team, id) in getAllTeams(tournament)" :key="team.name">
-               <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>
                   <div v-for="player in team.players" :key="player">{{ player }}</div>
@@ -72,6 +70,10 @@ table td{
     background: inherit;
 }
 
+th:nth-of-type(1), td:nth-of-type(1){
+    font-weight: 600;
+}
+
 /*MOBILE*/
 @media (width <= 900px){
     table{
@@ -86,16 +88,6 @@ table td{
     table th{ 
         top: 138px;
         font-size: 15px;
-    }
-
-    th:nth-of-type(1), td:nth-of-type(1){
-        max-width: 30px;
-        padding-left: 2px;
-        padding-right: 10px;
-    }
-
-    th:nth-of-type(2), td:nth-of-type(2){
-        max-width: 125px;
     }
 }
 
