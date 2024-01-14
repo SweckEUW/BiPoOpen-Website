@@ -160,18 +160,8 @@ tbody tr:nth-of-type(1){
 tbody tr:nth-of-type(2){
     background: #e6faff;
 }
-tbody tr:nth-of-type(3){
-    background: #f4fdff;
-}
-
-#GameScheduleKO tbody tr:nth-of-type(1){
-    font-size: 22px;
-}
-#GameScheduleKO tbody tr:nth-of-type(2){
-    font-size: 20px;
-}
 #GameScheduleKO tbody tr:nth-of-type(3){
-    font-size: 18px;
+    background: #f4fdff;
 }
 
 table td{
@@ -211,6 +201,15 @@ table td:nth-child(2){
     }
     caption{
         font-size: 22px;
+    }
+    #GameScheduleKO tbody tr:nth-of-type(1){
+        font-size: 22px;
+    }
+    #GameScheduleKO tbody tr:nth-of-type(2){
+        font-size: 20px;
+    }
+    #GameScheduleKO tbody tr:nth-of-type(3){
+        font-size: 18px;
     }
 }
 
