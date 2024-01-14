@@ -9,7 +9,7 @@ let tournaments:any = ref([]);
 let sortValue = ref("wins");
 let sortUp = ref(false);
 
-let tournamentsToEvaluate = ["2020","2021","2022","2023"];
+let tournamentsToEvaluate = ["2020","2022","2023"]; //2021
 const getTournament = async () => {
     let tournamentsArray:any = [];
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
