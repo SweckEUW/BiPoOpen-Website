@@ -3,24 +3,36 @@
 		"year": "2023",
 		"mvp": true,
 		"games": true,
-		"fotos": true
+		"fotos":{
+			"driveImageIDs": "2023/driveImageIDs.json",
+			"poster": "2023/poster.jpg"
+		}
 	},
 	{
 		"year": "2022",
 		"mvp": false,
 		"games": true,
-		"fotos": true
+		"fotos":{
+			"driveImageIDs": "2022/driveImageIDs.json",
+			"poster": "2022/poster.jpg"
+		}
 	},
 	{
 		"year": "2021",
 		"mvp": false,
 		"games": true,
-		"fotos": true
+		"fotos":{
+			"driveImageIDs": "2021/driveImageIDs.json",
+			"poster": "2021/poster.jpg"
+		}
 	},
 	{
 		"year": "2020",
 		"mvp": false,
 		"games": true,
-		"fotos": true
+		"fotos":{
+			"driveImageIDs": "2020/driveImageIDs.json",
+			"poster": "2020/poster.jpg"
+		}
 	}
 ]
