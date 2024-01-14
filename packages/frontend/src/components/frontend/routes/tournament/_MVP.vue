@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
+import { getTournamentWithRouterID, getMVPList } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
@@ -52,7 +52,7 @@ const setSortValue = (value:string) => {
 }
 
 const giveArrowClass = (value:string) => {
-    if(windowWidth.value > 900 && value == sortValue.value)
+    if(value == sortValue.value) //windowWidth.value > 900 && 
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
 }
 </script>
@@ -68,32 +68,53 @@ const giveArrowClass = (value:string) => {
             Turnierplan wurde noch nicht erstellt
         </div>
 
-        <table v-show="tournament && tournament.groupPhase.groups" class="table table-hover caption-top" id="mvp-table">
-            <thead>
-                <tr style="height: auto;">
-                    <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                    <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                    <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
-                    <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th>
-                    <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                    <th @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(player, index) in sortPlayersList(getPlayersWithStats(tournament))" :key="index">
-                    <td>{{ player.placement + 1}}</td>
-                    <td>{{ player.name.replace(" ","\n") }}</td>
-                    <td>{{ player.averageScore }}</td>
-                    <td>{{ player.score }}</td>
-                    <td>{{ player.ammountOfMatches }}</td>
-                    <td>{{ player.ammountOfDrunkenCups }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div v-show="tournament && tournament.groupPhase.groups">
+
+            <div class="mvp-text">Eine Liste aller Spieler aus dem Turnier sortiert nach der durchschnittlichen Trefferquote pro Spiel</div>
+
+            <table class="table table-hover caption-top">
+                <thead>
+                    <tr style="height: auto;">
+                        <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
+                        <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
+                        <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                        <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
+                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
+                        <th @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(player, index) in sortPlayersList(getMVPList(tournament))" :key="index">
+                        <td>{{ player.placement + 1}}</td>
+                        <td>{{ player.name.replace(" ","\n") }}</td>
+                        <td>{{ player.averageScore }}</td>
+                        <td>{{ player.score }}</td>
+                        <td>{{ player.ammountOfMatches }}</td>
+                        <td>{{ player.ammountOfDrunkenCups }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div v-if="windowWidth < 900" class="mvp-explain">
+                <div>*Pl. = Platz</div>
+                <div>*Trfq. = Trefferquote</div>
+                <div>*Trf. = Treffer</div>
+                <div>*Spi. = Spiele</div>
+                <div>*Getru. Becher = Getrunkene Becher</div>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <style scoped>
+.mvp-text{
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 18px;
+    color: var(--main-color);
+}
+
 table{
     text-align: center;
 }
@@ -141,6 +162,14 @@ table td{
 
 /*MOBILE*/
 @media (width <= 900px){
+    .mvp-text{
+        font-size: 16px;
+    }
+    .mvp-explain{
+        font-size: 14px;
+        color: var(--main-color);
+        margin-bottom: 30px;
+    }
     table{
         width: 100%;
     }

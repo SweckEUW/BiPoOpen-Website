@@ -1,9 +1,12 @@
 import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
-import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam } from "@/util/tournamentStatsFunctions.js"
+import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam, getAmmountOfWinsFromPlayer } from "@/util/tournamentStatsFunctions.js"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
-// TOURNAMENT
+
+////////////////
+// TOURNAMENT //
+////////////////
 export const getTournamentByName = async (tournamentName:string) => {
     let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
     console.log(response.data.message);
@@ -22,14 +25,95 @@ export const getTournamentWithRouterID = async (id:string) => {
        return response.data.tournament;
 }
 
-// SETTINGS
+
+//////////////
+// SETTINGS //
+//////////////
 export const setSettings = async (tournamentID:string, settings:any) => {
     let response = await axios.post("/setSettings", {tournamentID: tournamentID, settings: settings})
     console.log(response.data.message);
     return response.data.success
 }
 
-// TEAMS
+
+/////////////
+// PLAYERS //
+/////////////
+export const getPlayersWithStats = (tournament:any) => {
+    if(!tournament)
+        return [];     
+
+    let players:any = [];
+    let teams = getAllTeams(tournament);
+    
+    for (let i = 0; i < teams.length; i++) {
+        for (let x = 0; x < teams[i].players.length; x++) {
+            let player:any = {
+                name: teams[i].players[x],
+                score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false),
+                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false),
+                ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i].name, false) / 2),
+                wins: getAmmountOfWinsFromPlayer(tournament, teams[i].players[x], false)
+            };
+            player.averageScore = (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2);
+            player.averageWins = (player.ammountOfMatches == 0 ? 0 : player.wins / player.ammountOfMatches).toFixed(2);
+            players.push(player); 
+        }
+    }
+
+    return players;
+}
+
+export const getMVPList = (tournament:any) => {
+    let playersWithStats = getPlayersWithStats(tournament);
+
+    // Sort after average hit cups per game
+    playersWithStats.sort((player1:any, player2:any) => {
+        if(player2.averageScore == player1.averageScore)
+            return player2.ammountOfDrunkenCups - player1.ammountOfDrunkenCups;
+        
+        return player2.averageScore - player1.averageScore;
+    });
+
+    // Set placement
+    for (let i = 0; i < playersWithStats.length; i++) {
+        playersWithStats[i].placement = i;
+        let playersWithSameScore = playersWithStats.filter((player:any) => player.averageScore == playersWithStats[i].averageScore && player.ammountOfDrunkenCups == playersWithStats[i].ammountOfDrunkenCups)
+        if(playersWithSameScore.length > 1){
+            playersWithSameScore.forEach((playerWithSameScore:any) => {
+                playerWithSameScore.placement = playersWithSameScore[0].placement;
+            });
+        }
+    }
+
+    return playersWithStats;
+}
+
+export const getMatchesFromPlayer = (tournament:any, playerName:any, onlyGroupPhase:boolean) => { 
+    let matchesFromPlayer:any = [];
+
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
+    matches.forEach((groups:any) => {
+        groups.forEach((match:any) => {
+            if(match.result){
+                if(
+                    match.team1.players[0] == playerName || match.team1.players[1] == playerName ||
+                    match.team2.players[0] == playerName || match.team2.players[1] == playerName
+                )
+                matchesFromPlayer.push(match);       
+            }
+        });
+    });
+
+    return matchesFromPlayer;
+}
+
+///////////
+// TEAMS //
+///////////
 export const addTeam = async (tournamentID:string, team:any) => {
     let response = await axios.post("/addTeam", {tournamentID: tournamentID, team: team})
     console.log(response.data.message);
@@ -95,12 +179,89 @@ export const getTopTeams = (tournament:any) => {
     return topTeams;
 }
 
+export const getMatchesFromTeam = (tournament:any, teamName:any, onlyGroupPhase:boolean) => { 
+    let matchesFromTeam:any = [];
+
+    let matches = getMatchesGroupPhase(tournament)
+    if(!onlyGroupPhase)
+        matches = matches.concat(getMatchesKOPhase(tournament));
+
+    matches.forEach((groups:any) => {
+        groups.forEach((match:any) => {
+            if(match.result){
+                if(match.team1.name == teamName || match.team2.name == teamName)
+                    matchesFromTeam.push(match);       
+            }
+        });
+    });
+
+    return matchesFromTeam;
+}
+
+export const getTeamsKOPhaseWithStats = (tournament:any) => {
+    let teams:any = [];
+
+    let teamsKOPhase = getTeamsKOPhase(tournament);
+    teamsKOPhase.forEach((team:any) => {
+        let teamTMP = team;
+
+        let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP.name, false);
+        let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP.name, false);
+
+        teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, false);
+        teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], false);
+        teamTMP.score = ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam;
+        teamTMP.scoreDifference = ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam;
+        teamTMP.hits = ammountOfHitsFromTeam;
+        
+        teams.push(teamTMP);
+    });
+
+
+    // Sort after ammount of games, wins
+    teams = teams.sort((team1:any, team2:any) => {
+        if(team1.games == team2.games)
+            return team2.wins - team1.wins;
+
+        return team2.games - team1.games;
+    });
+
+    // Set placement
+    for (let i = 0; i < teams.length; i++) {
+        teams[i].placement = i;
+
+        // Top 4 Teams in Array
+        let topTeams = getTopTeams(tournament);
+
+        // Check if teams have the same ammoung of games and give them same placement
+        if(!topTeams.includes(teams[i])){
+            let teamsWithSameScore = teams.filter((team:any) => team.games == teams[i].games);
+            if(teamsWithSameScore.length > 1){
+                teamsWithSameScore.forEach((teamWithSameWin:any) => {
+                    teamWithSameWin.placement = teamsWithSameScore[0].placement;
+                });
+            }
+        }
+
+        // Top 4 Teams get placement from function
+        if(topTeams.includes(teams[i]))
+            teams[i].placement = topTeams.indexOf(teams[i]);
+    }
+
+    // Finally sort again for placement
+    teams = teams.sort((team1:any, team2:any) => {
+        return team1.placement - team2.placement;
+    });
+
+    return teams;
+}
+
+
 ////////////
 // GROUPS //
 ////////////
 
-// Use this function to get Groups
-// Else groups array will get poluted
+// Use this function to get Groups, This will decode teamID into actualy Team
 export const getGroups = (tournament:any) => {
     if(!tournament || !tournament.groupPhase.groups)
         return [];
@@ -144,14 +305,13 @@ export const getGroupsWithStats = (tournament:any) => {
     let groups:any = [];
 
     let tournamentGroups = getGroups(tournament);
-    // let tournamentGroups = tournament.groupPhase.groups;
     tournamentGroups.forEach((group:any, i:number) => {        
         groups.push({teams: []});
         group.teams.forEach((team:any) => {
             let teamTMP = team;
 
-            let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP._id, true);
-            let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP._id, true);
+            let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP.name, true);
+            let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP.name, true);
 
             teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, true);
             teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], true);
@@ -458,105 +618,4 @@ export const setGameResultKOPhase = async (tournament:any, matchID:string, resul
 
     await setMatchesKOPhase(tournament._id, matches);
     await updateMatchesKOPhase(tournament);
-}
-
-export const getTeamsKOPhaseWithStats = (tournament:any) => {
-    let teams:any = [];
-
-    let teamsKOPhase = getTeamsKOPhase(tournament);
-    teamsKOPhase.forEach((team:any) => {
-        let teamTMP = team;
-
-        let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamTMP._id, false);
-        let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamTMP._id, false);
-
-        teamTMP.wins = getAmmountOfWinsFromTeam(tournament, teamTMP.name, false);
-        teamTMP.games = getAmmountOfMatchesFromPlayer(tournament, teamTMP.players[0], false);
-        teamTMP.score = ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam;
-        teamTMP.scoreDifference = ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam;
-        teamTMP.hits = ammountOfHitsFromTeam;
-        
-        teams.push(teamTMP);
-    });
-
-
-    // Sort after ammount of games, wins
-    teams = teams.sort((team1:any, team2:any) => {
-        if(team1.games == team2.games)
-            return team2.wins - team1.wins;
-
-        return team2.games - team1.games;
-    });
-
-    // Set placement
-    for (let i = 0; i < teams.length; i++) {
-        teams[i].placement = i;
-
-        // Top 4 Teams in Array
-        let topTeams = getTopTeams(tournament);
-
-        // Check if teams have the same ammoung of games and give them same placement
-        if(!topTeams.includes(teams[i])){
-            let teamsWithSameScore = teams.filter((team:any) => team.games == teams[i].games);
-            if(teamsWithSameScore.length > 1){
-                teamsWithSameScore.forEach((teamWithSameWin:any) => {
-                    teamWithSameWin.placement = teamsWithSameScore[0].placement;
-                });
-            }
-        }
-
-        // Top 4 Teams get placement from function
-        if(topTeams.includes(teams[i]))
-            teams[i].placement = topTeams.indexOf(teams[i]);
-    }
-
-    // Finally sort again for placement
-    teams = teams.sort((team1:any, team2:any) => {
-        return team1.placement - team2.placement;
-    });
-
-    return teams;
-}
-
-// PLAYERS
-export const getPlayersWithStats = (tournament:any) => {
-    if(!tournament)
-        return [];     
-
-    let players:any = [];
-    let teams = getAllTeams(tournament);
-    
-    for (let i = 0; i < teams.length; i++) {
-        for (let x = 0; x < teams[i].players.length; x++) {
-            let player:any = {
-                name: teams[i].players[x],
-                score: getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false),
-                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false),
-                ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i], false) / 2)
-            };
-            player.averageScore = (player.ammountOfMatches == 0 ? 0 : player.score / player.ammountOfMatches).toFixed(2);
-            players.push(player); 
-        }
-    }
-
-    // Sort after average hit cups per game
-    players.sort((player1:any, player2:any) => {
-        if(player2.averageScore == player1.averageScore)
-            return player2.ammountOfDrunkenCups - player1.ammountOfDrunkenCups;
-        
-        return player2.averageScore - player1.averageScore;
-    });
-
-    // Set placement
-    for (let i = 0; i < players.length; i++) {
-        players[i].placement = i;
-        let playersWithSameScore = players.filter((player:any) => player.averageScore == players[i].averageScore && player.ammountOfDrunkenCups == players[i].ammountOfDrunkenCups)
-        if(playersWithSameScore.length > 1){
-            playersWithSameScore.forEach((playerWithSameScore:any) => {
-                playerWithSameScore.placement = playersWithSameScore[0].placement;
-            });
-        }
-    }
-
-    return players;
 }

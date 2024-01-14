@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID, getTopTeams, getPlayersWithStats, getMatchesGroupPhase, getMatchesKOPhase, getAllTeams} from "@/util/tournamentUtilFunctions.js"
+import { getTournamentWithRouterID, getTopTeams, getMVPList, getMatchesGroupPhase, getMatchesKOPhase, getAllTeams} from "@/util/tournamentUtilFunctions.js"
 import { getAmmountOfDrunkenCupsFromteam } from "@/util/tournamentStatsFunctions";
 import tournaments from '@/assets/tournaments.json';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -40,7 +40,7 @@ let getAmmountOfDrunkenCups = () => {
 
     let teams = getAllTeams(tournament.value);
     teams.forEach((team:any) => {
-        ammountOfDrunkenCups += getAmmountOfDrunkenCupsFromteam(tournament.value, team, false);
+        ammountOfDrunkenCups += getAmmountOfDrunkenCupsFromteam(tournament.value, team.name, false);
     });
 
     return ammountOfDrunkenCups;
@@ -107,7 +107,7 @@ let getHighestWin = () => {
             <div v-if="tournaments.find((tournament:any) => tournament.year == route.params.id)!.mvp">
                 <h2>Most Valuable Player</h2>
 
-                <div v-for="(player, i) in getPlayersWithStats(tournament).slice(0,3)">
+                <div v-for="(player, i) in getMVPList(tournament).slice(0,3)">
                     <div>{{ i + 1 + ". Platz: " + player.name }}</div>
                 </div>
             </div>
@@ -118,8 +118,11 @@ let getHighestWin = () => {
 </template>
 
 <style scoped>
+.Summary{
+    text-align: center;
+}
 h2{
-    margin-top: 20px;
+    margin-top: 40px;
     color: var(--secondary-color);
 }
 </style>
