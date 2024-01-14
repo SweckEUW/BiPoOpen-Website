@@ -121,6 +121,7 @@ watch(() => props.index, () => {
     left: 0;
     top: 0;
     width: auto;
+    height: 50px;
 }
 .pt-icons{
     position: absolute;
