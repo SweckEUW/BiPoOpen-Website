@@ -22,7 +22,7 @@ const setupImages = async () => {
     driveImageIDs.thumbnails.sort((a:any, b:any) => a.name.localeCompare(b.name));
     driveImageIDs.pictures.sort((a:any, b:any) => a.name.localeCompare(b.name));
     for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
-        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w1000";
+        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w500";
         let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
         pictures.value.push({
             thumbnail: thumbnail, 
@@ -75,10 +75,6 @@ window.onscroll = () => {
         <Transition name="fade">
             <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
-
-        <div v-show="!poster" style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);">
-            Fotos für 2024 noch nicht verfügbar
-        </div>
 
         <!-- 2023 Credits & Video -->
         <div v-show="poster">
