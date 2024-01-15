@@ -70,7 +70,7 @@ const giveArrowClass = (value:string) => {
 
         <div v-show="tournament && tournament.groupPhase.groups">
 
-            <div class="mvp-text">Eine Liste aller Spieler aus dem Turnier sortiert nach der durchschnittlichen Trefferquote pro Spiel</div>
+            <div class="mvp-text">Aller Spieler aus dem Turnier sortiert nach der durchschnittlichen Trefferquote pro Spiel</div>
 
             <table class="table table-hover caption-top">
                 <thead>
@@ -164,6 +164,7 @@ table td{
 @media (width <= 900px){
     .mvp-text{
         font-size: 16px;
+        margin-bottom: 30px;
     }
     .mvp-explain{
         font-size: 14px;
@@ -180,7 +181,7 @@ table td{
         height: 80px;
     }
     table th{ 
-        top: 138px;
+        top: 140px;
         font-size: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){

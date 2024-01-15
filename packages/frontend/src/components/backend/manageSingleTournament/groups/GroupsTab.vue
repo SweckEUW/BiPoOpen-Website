@@ -133,8 +133,8 @@ const toggleModal = (generate?:boolean) => {
                   <div/>
                </td>
                <td>{{id+1}}</td>
-               <td>{{team.name}}</td>
-               <td>
+               <td>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</td>
+               <td v-if="team">
                   <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{player}}</span>
                </td>
             </tr>

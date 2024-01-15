@@ -9,7 +9,7 @@ let tournaments:any = ref([]);
 let sortValue = ref("wins");
 let sortUp = ref(false);
 
-let tournamentsToEvaluate = ["2020","2021","2022","2023"];
+let tournamentsToEvaluate = ["2020","2022","2023"]; //2021
 const getTournament = async () => {
     let tournamentsArray:any = [];
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
@@ -120,7 +120,7 @@ const giveArrowClass = (value:string) => {
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
 
-            <div class="hof-text">Eine Liste aller Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
+            <div class="hof-text">Alle Spieler aus allen Turnieren sortiert nach Anzahl der Siegen</div>
 
             <table class="table table-hover caption-top">
                 <thead>
@@ -217,6 +217,7 @@ table td{
 @media (width <= 900px){
     .hof-text{
         font-size: 16px;
+        margin-bottom: 30px;
     }
     .hof-explain{
         font-size: 14px;
@@ -233,7 +234,7 @@ table td{
         height: 80px;
     }
     table th{ 
-        top: 138px;
+        top: 140px;
         font-size: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){

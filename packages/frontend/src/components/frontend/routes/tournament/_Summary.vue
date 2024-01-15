@@ -8,6 +8,8 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
+let tournamentData = tournaments.find((tournament:any) => tournament.year == route.params.id)!;
+
 let tournament = ref();
 const getTournament = async () => {
     tournament.value = await getTournamentWithRouterID(route.params.id as string);
@@ -81,16 +83,20 @@ let getHighestWin = () => {
             
             <!-- Facts -->
             <div>
-                <h2>Fakten</h2>
+                <h2 style="margin-top: 10px;">Fakten</h2>
 
-                <div>{{ "Teams: " + getAllTeams(tournament).length }}</div>
-                <div>{{ "Spiele: " + getAmmountOfMatches() }}</div>
-                <div>{{ "Getrunkene Becher: " + getAmmountOfDrunkenCups() }}</div>
-                <div>{{ "Höchster Sieg: " + getHighestWin()}}</div>
+                <div><strong>Teams: </strong>{{getAllTeams(tournament).length }}</div>
+                <div><strong>Spiele: </strong>{{getAmmountOfMatches() }}</div>
+                <div><strong>Getrunkene Becher: </strong>{{getAmmountOfDrunkenCups() }}</div>
+                <div><strong>Höchster Sieg: </strong>{{getHighestWin()}}</div>
                 <!-- <div>{{ "Höste Treffer Differenz" }}</div> -->
                 <!-- <div>{{ "Spieler am meisten Becher getrunken" }}</div> -->
                 <!-- <div>{{ "Spieler mit den meisten gesamten Treffern" }}</div> -->
                 <!-- <div>{{ "Anzahl an Verlängerungen" }}</div> -->
+
+                <div class="sum-images">
+                    <img v-for="image in tournamentData.summary.facts.images" :src="image" alt="">
+                </div>
             </div>
 
             <!-- Platzierung -->
@@ -98,21 +104,28 @@ let getHighestWin = () => {
                 <h2>Platzierungen</h2>
 
                 <div v-for="(team, i) in getTopTeams(tournament).slice(0,3)">
-                    <div>{{ i + 1 + ". Platz: " + team.name }}</div>
+                    <div><strong>{{ i + 1 + ". "}}</strong>{{ team.name }}</div>
+                </div>
+
+                <div class="sum-images">
+                    <img v-for="image in tournamentData.summary.standings.images" :src="image" alt="">
                 </div>
             </div>
             
 
             <!-- MVP -->
-            <div v-if="tournaments.find((tournament:any) => tournament.year == route.params.id)!.mvp">
+            <div v-if="tournamentData.mvp">
                 <h2>Most Valuable Player</h2>
 
                 <div v-for="(player, i) in getMVPList(tournament).slice(0,3)">
-                    <div>{{ i + 1 + ". Platz: " + player.name }}</div>
+                    <div><strong>{{ i + 1 + ". "}}</strong>{{ player.name }}</div>
+                </div>
+
+                <div class="sum-images">
+                    <img v-for="image in tournamentData.summary.mvp!.images" :src="image" alt="">
                 </div>
             </div>
             
-
         </div>
     </div>
 </template>
@@ -120,9 +133,34 @@ let getHighestWin = () => {
 <style scoped>
 .Summary{
     text-align: center;
+    font-size: 18px;
 }
 h2{
+    font-size: 28px;
     margin-top: 40px;
     color: var(--secondary-color);
+}
+.sum-images{
+    width: 100%;
+    text-align: center;
+}
+.sum-images img{
+    width: 20%;
+    height: 400px;
+    margin: 10px;
+    object-fit: cover;
+}
+
+
+/*MOBILE*/
+@media (width <= 900px){
+    
+    .sum-images img{
+        display: block;
+        width: 80%;
+        height: 200px;
+        margin: auto;
+        margin-bottom: 5px;
+    }
 }
 </style>

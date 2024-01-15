@@ -12,6 +12,11 @@ const clearInputs = () => {
    player2Input.value = "";
 }
 
+let showModalConfirmDelete = ref(false);
+const toggleModalConfirmDelete = () => {
+   showModalConfirmDelete.value = !showModalConfirmDelete.value;
+}
+
 let showModalCreateTeam = ref(false);
 const toggleModalCreateTeam = () => {
    if(!showModalCreateTeam.value)
@@ -38,7 +43,7 @@ let player1Input = ref("");
 let player2Input = ref("");
 
 const addTeamButton = async () => {
-   let team:any = {name: teamnameInput.value, players: [player1Input.value, player2Input.value]}
+   let team:any = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()]}
    let success:boolean = await addTeam(props.tournament._id, team);
    if(success){
       await props.getTournament();
@@ -48,7 +53,7 @@ const addTeamButton = async () => {
 
 let selectedTeam = ref();
 const editTeamButton = async () => {
-   let team:any = {name: teamnameInput.value, players: [player1Input.value, player2Input.value], _id: selectedTeam.value._id}
+   let team:any = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()], _id: selectedTeam.value._id}
    let success:boolean = await editTeam(props.tournament._id, team);
    if(success){
       await props.getTournament();
@@ -61,6 +66,7 @@ const removeTeamButton = async () => {
    if(success){
       props.getTournament();
       toggleModalEditTeam();
+      toggleModalConfirmDelete();
    }
 }
 </script>
@@ -72,51 +78,67 @@ const removeTeamButton = async () => {
 
       <!-- Add -->
       <Transition name="fade">
-            <Modal v-if="showModalCreateTeam">
-                <template #title>Team hinzufügen</template>
-                <template #template>
-                  <div>Teamname</div>
-                    <input type="text" v-model="teamnameInput">
+         <Modal v-if="showModalCreateTeam">
+            <template #title>Team hinzufügen</template>
+            <template #template>
+            <div>Teamname</div>
+               <input type="text" v-model="teamnameInput">
 
-                    <div>Spieler 1</div>
-                    <input type="text" v-model="player1Input">
+               <div>Spieler 1</div>
+               <input type="text" v-model="player1Input">
 
-                    <div>Spieler 2</div>
-                    <input type="text" v-model="player2Input">
-                </template>
-                <template #cancle>
-                    <div @click="toggleModalCreateTeam()">Abbrechen</div>
-                </template>
-                <template #confirm>
-                    <div @click="addTeamButton()">Hinzufügen</div>
-                </template>
-            </Modal>
-        </Transition>
+               <div>Spieler 2</div>
+               <input type="text" v-model="player2Input">
+            </template>
+            <template #cancle>
+               <div @click="toggleModalCreateTeam()">Abbrechen</div>
+            </template>
+            <template #confirm>
+               <div @click="addTeamButton()">Hinzufügen</div>
+            </template>
+         </Modal>
+      </Transition>
 
-        <!-- Edit -->
-        <Transition name="fade">
-            <Modal v-if="showModalEditTeam">
-                <template #title>Team Bearbeiten</template>
-                <template #template>
-                  <div>Teamname</div>
-                    <input type="text" v-model="teamnameInput">
+      <!-- Edit -->
+      <Transition name="fade">
+         <Modal v-if="showModalEditTeam">
+            <template #title>Team Bearbeiten</template>
+            <template #template>
+            <div>Teamname</div>
+               <input type="text" v-model="teamnameInput">
 
-                    <div>Spieler 1</div>
-                    <input type="text" v-model="player1Input">
+               <div>Spieler 1</div>
+               <input type="text" v-model="player1Input">
 
-                    <div>Spieler 2</div>
-                    <input type="text" v-model="player2Input">
+               <div>Spieler 2</div>
+               <input type="text" v-model="player2Input">
 
-                    <button @click="removeTeamButton()">Team löschen</button>
-                </template>
-                <template #cancle>
-                    <div @click="toggleModalEditTeam()">Abbrechen</div>
-                </template>
-                <template #confirm>
-                    <div @click="editTeamButton()">Bearbeiten</div>
-                </template>
-            </Modal>
-        </Transition>
+               <button @click="toggleModalConfirmDelete();">Team löschen</button>
+            </template>
+            <template #cancle>
+               <div @click="toggleModalEditTeam()">Abbrechen</div>
+            </template>
+            <template #confirm>
+               <div @click="editTeamButton()">Bearbeiten</div>
+            </template>
+         </Modal>
+      </Transition>
+
+      <!-- Confirm Delete -->
+      <Transition name="fade">
+         <Modal v-if="showModalConfirmDelete">
+            <template #title>Team Löschen</template>
+            <template #template>
+               <p style="text-align: center;">Sicher das das Team gelöscht werden soll?</p>
+            </template>
+            <template #cancle>
+               <div @click="toggleModalConfirmDelete();">Abbrechen</div>
+            </template>
+            <template #confirm>
+               <div @click="removeTeamButton()">Löschen</div>
+            </template>
+         </Modal>
+      </Transition>
 
       <table class="table table-hover">
          <thead>

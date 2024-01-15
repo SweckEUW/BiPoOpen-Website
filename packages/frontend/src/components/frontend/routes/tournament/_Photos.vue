@@ -2,25 +2,36 @@
 import { ref, onMounted } from "vue"
 
 import ImageModal from '@/components/frontend/photos/ImageModal.vue';
-
-// TODO: Dynamic import of json files
-import driveImageIDs2023 from "@/assets/2023/driveImageIDs.json"
-import driveImageIDs2022 from "@/assets/2022/driveImageIDs.json"
-import driveImageIDs2021 from "@/assets/2021/driveImageIDs.json"
-import driveImageIDs2020 from "@/assets/2020/driveImageIDs.json"
+import tournaments from '@/assets/tournaments.json';
 
 import { useRoute } from "vue-router";
 const route = useRoute();
 
-let driveImageIDs = undefined;
-if(route.params.id == "2023")
-    driveImageIDs = driveImageIDs2023;
-if(route.params.id == "2022")
-    driveImageIDs = driveImageIDs2022;
-if(route.params.id == "2021")
-    driveImageIDs = driveImageIDs2021;
-if(route.params.id == "2020")
-    driveImageIDs = driveImageIDs2020;
+
+let tournamentData = tournaments.find((tournament:any) => tournament.year == route.params.id)!;
+let posterURL = new URL(`/src/assets/${tournamentData.fotos.poster}`, import.meta.url).href;
+
+onMounted(async () => {
+    await setupImages();
+    adjustImageGrid();
+});
+
+let pictures:any = ref([]);
+const setupImages = async () => {
+    let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos.driveImageIDs}`, import.meta.url);
+    let driveImageIDs:any = await fetch(driveImageIDsURL);
+    driveImageIDs = await driveImageIDs.json();
+    driveImageIDs.thumbnails.sort((a:any, b:any) => a.name.localeCompare(b.name));
+    driveImageIDs.pictures.sort((a:any, b:any) => a.name.localeCompare(b.name));
+    for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
+        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w500";
+        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
+        pictures.value.push({
+            thumbnail: thumbnail, 
+            picture: picture,
+        })
+    }
+}
 
 const showModal = ref(false);
 const modalImageURL = ref("");
@@ -46,27 +57,6 @@ const adjustImageGrid = () => {
     }
 }
 
-onMounted(() => {
-    adjustImageGrid();
-});
-
-const pictures:any = ref([]); 
-if(driveImageIDs){
-    // Sort Images and thumbnails
-    driveImageIDs.thumbnails.sort((a, b) => a.name.localeCompare(b.name));
-    driveImageIDs.pictures.sort((a, b) => a.name.localeCompare(b.name));
-
-    // Add Thumbnails and pictures to array
-    for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
-        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w1000";
-        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
-        pictures.value.push({
-            thumbnail: thumbnail, 
-            picture: picture,
-        })
-    }
-}
-
 const elementsShown = ref(20);
 let pauseScroll = false;
 window.onscroll = () => {
@@ -77,22 +67,6 @@ window.onscroll = () => {
         setTimeout(() => { pauseScroll = false; }, 500);
     }
 };
-
-// TODO: Dynamic import of Poster
-let poster2023:string = new URL(`@/assets/2023/poster.jpg`, import.meta.url).href;
-let poster2022:string = new URL(`@/assets/2022/poster.jpg`, import.meta.url).href;
-let poster2021:string = new URL(`@/assets/2021/poster.jpg`, import.meta.url).href;
-let poster2020:string = new URL(`@/assets/2020/poster.jpg`, import.meta.url).href;
-
-let poster = "";
-if(route.params.id == "2023")
-    poster = poster2023;
-if(route.params.id == "2022")
-    poster = poster2022;
-if(route.params.id == "2021")
-    poster = poster2021;
-if(route.params.id == "2020")
-    poster = poster2020;
 </script>
 
 <template>
@@ -104,12 +78,8 @@ if(route.params.id == "2020")
             <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
-        <div v-show="!poster" style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);">
-            Fotos für 2024 noch nicht verfügbar
-        </div>
-
         <!-- 2023 Credits & Video -->
-        <div v-show="poster">
+        <div>
 
             <div v-if="route.params.id == '2023'">
                 <div class="pt-intro">
@@ -124,7 +94,7 @@ if(route.params.id == "2020")
 
             <!-- Poster -->
             <div class="pt-poster">
-                <img :src="poster" alt="">
+                <img :src="posterURL" alt="">
             </div>
 
             <!-- Image Grid -->
