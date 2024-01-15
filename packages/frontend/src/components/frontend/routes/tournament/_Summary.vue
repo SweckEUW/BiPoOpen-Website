@@ -122,11 +122,10 @@ let getHighestWin = () => {
                 </div>
 
                 <div class="sum-images">
-                    <img v-for="image in tournamentData.summary.mvp.images" :src="image" alt="">
+                    <img v-for="image in tournamentData.summary.mvp!.images" :src="image" alt="">
                 </div>
             </div>
             
-
         </div>
     </div>
 </template>

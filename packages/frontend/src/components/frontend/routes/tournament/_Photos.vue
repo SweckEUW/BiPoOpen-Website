@@ -9,16 +9,18 @@ const route = useRoute();
 
 
 let tournamentData = tournaments.find((tournament:any) => tournament.year == route.params.id)!;
-let poster = new URL("/src/assets/" + tournamentData.fotos.poster, import.meta.url).href;
+let posterURL = new URL(`/src/assets/${tournamentData.fotos.poster}`, import.meta.url).href;
 
 onMounted(async () => {
     await setupImages();
     adjustImageGrid();
 });
 
-let pictures:any = ref([]); 
+let pictures:any = ref([]);
 const setupImages = async () => {
-    let driveImageIDs = await import("/src/assets/" + tournamentData.fotos.driveImageIDs);
+    let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos.driveImageIDs}`, import.meta.url);
+    let driveImageIDs:any = await fetch(driveImageIDsURL);
+    driveImageIDs = await driveImageIDs.json();
     driveImageIDs.thumbnails.sort((a:any, b:any) => a.name.localeCompare(b.name));
     driveImageIDs.pictures.sort((a:any, b:any) => a.name.localeCompare(b.name));
     for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
@@ -77,7 +79,7 @@ window.onscroll = () => {
         </Transition>
 
         <!-- 2023 Credits & Video -->
-        <div v-show="poster">
+        <div>
 
             <div v-if="route.params.id == '2023'">
                 <div class="pt-intro">
@@ -92,7 +94,7 @@ window.onscroll = () => {
 
             <!-- Poster -->
             <div class="pt-poster">
-                <img :src="poster" alt="">
+                <img :src="posterURL" alt="">
             </div>
 
             <!-- Image Grid -->
