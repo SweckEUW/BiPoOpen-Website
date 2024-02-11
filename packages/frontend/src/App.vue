@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import AppHeader from '@/components/shared/AppHeader.vue';
-// import AppFooter from '@/components/shared/AppFooter.vue';
+import AppFooter from '@/components/shared/AppFooter.vue';
 
 import { onBeforeMount } from 'vue'
 import router from './router.js';
@@ -33,7 +33,7 @@ onBeforeMount(() => {
 	</div>
 
 	<!-- App footer -->
-	<!-- <AppFooter/> -->
+	<AppFooter/>
 </template>
 
 <style>
@@ -59,7 +59,7 @@ body{
 	margin: auto;
 	margin-top: 150px;
 	padding-bottom: 50px;
-	min-height: calc(100vh - 200px - 80px);
+	min-height: calc(100vh - 149px - 80px);
 	width: 90%;
 }
 .bp-button{
@@ -129,6 +129,7 @@ body{
 		margin-top: 80px;
 		width: 95%;
 		padding-bottom: 30px;
+		min-height: calc(100dvh - 80px - 80px);
 	}
 	.bp-title{
 		font-size: 28px;

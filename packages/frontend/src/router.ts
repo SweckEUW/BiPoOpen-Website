@@ -127,7 +127,17 @@ const routes = [
 		meta: {
 			title: 'Weck BiPo Open - 404',
 		}
-	  }
+	},
+
+	{
+		path: '/Impressum',
+		name: 'Impressum',
+		component: () => import('@/components/frontend/routes/_Imprint.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Impressum',
+		}
+	}
+
 ];
 
 const router = createRouter({
