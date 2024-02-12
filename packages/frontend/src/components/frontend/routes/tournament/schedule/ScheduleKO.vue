@@ -73,29 +73,29 @@ onMounted(() => {
 
 /* Top Swiper Pagination */
 .swiper-pagination{
-   position: sticky;
+   position: sticky !important;
    top: 180px !important;
-   padding-top: 10px;
-   padding-bottom: 20px;
-   display: flex;
-   background-color: white;
+   padding-top: 10px !important;
+   padding-bottom: 20px !important;
+   display: flex !important;
+   background-color: white !important;
 }
 .swiper-pagination-bullet {
-	padding: 5px 10px;
-	border-radius: 0;
-	width: auto;
-   height: auto;
-	text-align: center;
-	color: var(--secondary-color);
-   background-color: transparent;
-   opacity: 1;
+	padding: 5px 10px !important; 
+	border-radius: 0 !important;
+	width: auto !important;
+   height: auto !important;
+	text-align: center !important;
+	color: var(--secondary-color) !important;
+   background-color: transparent !important;
+   opacity: 1 !important; 
    margin: 0 !important;
-   flex: 1 1 0;
-   text-align: center;
+   flex: 1 1 0 !important;
+   text-align: center !important;
 }
 .swiper-pagination-bullet-active {
-	color:white;
-	background: var(--main-color);
+	color:white !important;
+	background: var(--main-color) !important;
 }
 
 
