@@ -8,13 +8,13 @@ const props = defineProps(['getTournament','tournament',"toggleModal","match","i
 
 const setResultGroupPhase = async () => {
     let result = {
-       team1Score: team1Score.value ? team1Score.value : (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-       team1Player1Score: team1Player1Score.value, 
-       team1Player2Score: team1Player2Score.value, 
- 
-       team2Score: team2Score.value ? team2Score.value : (team1Player2Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-       team2Player1Score: team2Player1Score.value, 
-       team2Player2Score: team2Player2Score.value
+        team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
+        team1Player1Score: team1Player1Score.value, 
+        team1Player2Score: team1Player2Score.value, 
+    
+        team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
+        team2Player1Score: team2Player1Score.value, 
+        team2Player2Score: team2Player2Score.value
     }
 
     await setGameResultGroupPhase(props.tournament, props.match._id, result);
@@ -24,11 +24,11 @@ const setResultGroupPhase = async () => {
 
 const setResultKOPhase = async () => {
     let result = {
-       team1Score: team1Score.value ? team1Score.value : (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
+       team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
        team1Player1Score: team1Player1Score.value, 
        team1Player2Score: team1Player2Score.value, 
  
-       team2Score: team2Score.value ? team2Score.value : (team1Player2Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
+       team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
        team2Player1Score: team2Player1Score.value, 
        team2Player2Score: team2Player2Score.value
     }
@@ -38,16 +38,16 @@ const setResultKOPhase = async () => {
     props.toggleModal();
 }
 
-let team1Score = ref();
-let team1Player1Score = ref();
-let team1Player2Score = ref();
+let team1Score = ref<number>();
+let team1Player1Score = ref<number>();
+let team1Player2Score = ref<number>();
 
-let team2Score = ref();
-let team2Player1Score = ref();
-let team2Player2Score = ref();
+let team2Score = ref<number>();
+let team2Player1Score = ref<number>();
+let team2Player2Score = ref<number>();
 
 onMounted(() => {
-    if(props.match && props.match.result){
+    if(props.match.result){
         team1Score.value =  props.match.result.team1Score;
         team1Player1Score.value = props.match.result.team1Player1Score;
         team1Player2Score.value = props.match.result.team1Player2Score;
@@ -59,13 +59,13 @@ onMounted(() => {
 })
 
 const clearInputs = () => {
-    team1Score = ref();
-    team1Player1Score = ref();
-    team1Player2Score = ref();
+    team1Score = ref<number>();
+    team1Player1Score = ref<number>();
+    team1Player2Score = ref<number>();
 
-    team2Score = ref();
-    team2Player1Score = ref();
-    team2Player2Score = ref();
+    team2Score = ref<number>();
+    team2Player1Score = ref<number>();
+    team2Player2Score = ref<number>();
 }
 </script>
 
