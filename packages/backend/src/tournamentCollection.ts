@@ -1,4 +1,4 @@
-import {Collection, MongoClient, ObjectId} from "mongodb"
+import {Collection, ObjectId} from "mongodb"
 import {Request, Response} from "express";
 import client from "./index"
 
@@ -25,7 +25,7 @@ export class tournamentCollection{
 
         let tournamentName = request.body.tournamentName;
         let tournament = tournaments.find((tournament:any) => tournament.name == tournamentName);
-        if(tournaments)
+        if(tournament)
             response.json({success: true, message: 'Tournament "' + tournamentName + '" gefunden', tournament: tournament});
         else    
             response.json({success: false, message: 'Keine Tournaments gefunden'}); 
