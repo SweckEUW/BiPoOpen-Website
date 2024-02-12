@@ -3,7 +3,8 @@ import Sortable from "sortablejs";
 import { onMounted, watch } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
-
+import Swiper, { Pagination } from 'swiper';
+import 'swiper/swiper-bundle.min.css';
 import MatchElement from '@/components/shared/MatchElement.vue';
 
 const props = defineProps(['getTournament','tournament','isBackend'])
@@ -49,47 +50,95 @@ watch(() => props.tournament, () => {
 onMounted(() => {
    if(props.tournament && props.tournament.groupPhase.groups && props.isBackend)
       initSortable();
+
+   new Swiper('#GameScheduleGroupsSwiper',{
+      modules: [Pagination],
+      initialSlide: 0,
+      spaceBetween: 50,
+      speed: 500,
+      pagination: {
+         el: "#GameScheduleGroupsSwiper-Pagination",
+         clickable: true,
+         renderBullet: (index, className) => {
+            return '<span class="' + className + '">' + convertNumberToCharacter(index+1) + '</span>';
+         }
+      }
+   });
 });
 </script>
 
 <template>
-   <div class="ResultsTab">
+   <div class="swiper-pagination" id="GameScheduleGroupsSwiper-Pagination"/>
 
-      <div class="rt-table" v-for="(matchesForGroup ,groupIndex) in getMatchesGroupPhase(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
+   <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
+      <div class="swiper-wrapper">
 
-         <!-- Caption -->
-         <div class="rt-caption">
-            <div>{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
-            <div>{{ "Tisch " + (groupIndex + 1) }}</div>
-         </div>
+         <div class="rt-table swiper-slide" v-for="(matchesForGroup ,groupIndex) in getMatchesGroupPhase(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
 
-         <div class="rt-rows">
-
-            <!-- First Row -->
-            <div class="rt-row1">
-               <div :style="{'marginLeft': isBackend ? '25px' : ''}">#</div>
-               <div>Team 1</div>
-               <div></div>
-               <div>Team 2</div>
+            <!-- Caption -->
+            <div class="rt-caption">
+               <div>{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
+               <div>{{ "Tisch " + (groupIndex + 1) }}</div>
             </div>
 
-            <!-- Matches -->
-            <div class="rt-matches">
-               <div class="rt-match" v-for="(match, matchIndex) in matchesForGroup" :key="match">
-                  <hr style="margin: 2px 0px">
-                  <MatchElement :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
+            <div class="rt-rows">
+
+               <!-- First Row -->
+               <div class="rt-row1">
+                  <div :style="{'marginLeft': isBackend ? '25px' : ''}">#</div>
+                  <div>Team 1</div>
+                  <div></div>
+                  <div>Team 2</div>
                </div>
-            </div>
 
+               <!-- Matches -->
+               <div class="rt-matches">
+                  <div class="rt-match" v-for="(match, matchIndex) in matchesForGroup" :key="match">
+                     <hr style="margin: 2px 0px">
+                     <MatchElement :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
+                  </div>
+               </div>
+
+            </div>
          </div>
+
       </div>
    </div>
 </template>
 
-<style scoped>
-.rt-table{
-   margin-top: 50px;
+<style>
+.GameScheduleGroups{
+   overflow: hidden;
 }
+
+/* Top Swiper Pagination */
+.swiper-pagination{
+   position: sticky;
+   top: 180px !important;
+   padding-top: 10px;
+   padding-bottom: 20px;
+   display: flex;
+   background-color: white;
+}
+.swiper-pagination-bullet {
+	padding: 5px 10px;
+	border-radius: 0;
+	width: auto;
+   height: auto;
+	text-align: center;
+	color: var(--secondary-color);
+   background-color: transparent;
+   opacity: 1;
+   margin: 0 !important;
+   flex: 1 1 0;
+   text-align: center;
+}
+.swiper-pagination-bullet-active {
+	color:white;
+	background: var(--main-color);
+}
+
+
 .rt-caption{
    margin-bottom: 10px;
 }

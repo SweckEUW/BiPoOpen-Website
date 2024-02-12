@@ -1,0 +1,62 @@
+<script setup lang="ts">
+import StandingsGroups from '@/components/frontend/routes/tournament/standings/StandingsGroups.vue';
+import StandingsKO from '@/components/frontend/routes/tournament/standings/StandingsKO.vue';
+
+defineProps(['tournament'])
+</script>
+
+<template>
+   <div class="Standings">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs justify-content-center">
+         <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#GameStandingsGroups">Gruppenphase</button>
+         </li>
+         <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#GameStandingsKO">K.o.Phase</button>
+         </li>
+      </ul>
+
+      <!-- Content -->
+      <div class="tab-content">
+         <div class="tab-pane fade show active" id="GameStandingsGroups">
+            <StandingsGroups :tournament="tournament"/>
+         </div>
+         <div class="tab-pane fade" id="GameStandingsKO">
+            <StandingsKO :tournament="tournament"/>
+         </div>
+      </div>
+   </div>
+</template>
+
+<style scoped>
+.nav-tabs{
+   position: sticky;
+   top: 160px;
+   background: white;
+   z-index: 2;
+}
+.nav-link{
+   border-radius: 0px;
+   width: 40vw;
+   padding: 15px 10px;
+   color: var(--secondary-color);
+   font-weight: bold;
+}
+.nav-item{
+   flex: 1;
+}
+.nav-item .active{
+   background-color: var(--main-color) !important;
+   color: white !important;
+}
+.nav-item button{
+   width: 100%;
+}
+/* MOBILE */
+@media (width <= 900px){
+   .nav-tabs{
+      top: 130px;
+   }
+}
+</style>

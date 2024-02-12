@@ -41,7 +41,7 @@ const routes = [
 	{
 		path: '/:id/Spielplan',
 		name: 'Schedule',
-		component: () => import('@/components/frontend/routes/tournament/_Schedule.vue'),
+		component: () => import('@/components/frontend/routes/tournament/schedule/_Schedule.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Spielplan',
 		}
@@ -49,7 +49,7 @@ const routes = [
 	{
 		path: '/:id/Platzierungen',
 		name: 'Standings',
-		component: () => import('@/components/frontend/routes/tournament/_Standings.vue'),
+		component: () => import('@/components/frontend/routes/tournament/standings/_Standings.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Platzierungen',
 		}

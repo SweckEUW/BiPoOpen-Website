@@ -4,7 +4,7 @@
 		<div class="af-socials">
 			<!-- Instagram -->
 			<a href="https://www.instagram.com/bipoopen" target="_blank">
-				<img :src="instaIcon" titl="LinkedIn" alt="">
+				<img :src="instaIcon" alt="">
 			</a>
 		</div>
 		
@@ -31,8 +31,8 @@ let instaIcon = new URL(`/src/assets/icons/instagram.png`, import.meta.url).href
 	margin-bottom: 5px;
 }
 img{
-	width: 30px;
-	height: 30px;
+	width: 25px;
+	height: 25px;
 	object-fit: contain;
 	margin: 0px 12px;
 	cursor: pointer;

@@ -83,7 +83,7 @@ let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2
     color: var(--main-color);
     font-size: 100px;
     margin-bottom: 60px;
-    margin-top: 150px;
+    margin-top: 50px;
 }
 .ho-title:nth-of-type(2){
     color: var(--main-color);

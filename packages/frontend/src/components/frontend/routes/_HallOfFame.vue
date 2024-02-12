@@ -120,7 +120,7 @@ const giveArrowClass = (value:string) => {
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
 
-            <div class="hof-text">Alle Spieler aus allen Turnieren sortiert nach Anzahl der Siegen</div>
+            <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
             <table class="table table-hover caption-top">
                 <thead>
@@ -129,8 +129,8 @@ const giveArrowClass = (value:string) => {
                         <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
                         <!-- <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th> -->
                         <!-- <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th> -->
-                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                         <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
+                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spie.'}}</th>
                         <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Siegwahr.'}}</th>
                         <!-- <th @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th> -->
                     </tr>
@@ -141,8 +141,8 @@ const giveArrowClass = (value:string) => {
                         <td>{{ player.name.replace(" ","\n") }}</td>
                         <!-- <td>{{ player.averageScore }}</td> -->
                         <!-- <td>{{ player.score }}</td> -->
-                        <td>{{ player.ammountOfMatches }}</td>
                         <td>{{ player.wins }}</td>
+                        <td>{{ player.ammountOfMatches }}</td>
                         <td>{{ player.averageWins + "%" }}</td>
                         <!-- <td>{{ player.ammountOfDrunkenCups }}</td> -->
                     </tr>
@@ -151,7 +151,8 @@ const giveArrowClass = (value:string) => {
 
             <div v-if="windowWidth < 900" class="hof-explain">
                 <div>*Pl. = Platz</div>
-                <div>*Spi. = Spiele</div>
+                <div>*Sieg. = Siege</div>
+                <div>*Spie. = Spiele</div>
                 <div>*Siegwahr. = Siegwahrscheinlichkeit</div>
             </div>
 
@@ -220,9 +221,8 @@ table td{
         margin-bottom: 30px;
     }
     .hof-explain{
-        font-size: 14px;
+        font-size: 11px;
         color: var(--main-color);
-        margin-bottom: 30px;
     }
     table{
         width: 100%;
@@ -236,6 +236,8 @@ table td{
     table th{ 
         top: 140px;
         font-size: 15px;
+        padding-top: 20px;
+        padding-bottom: 20px;
     }
     th:nth-of-type(1), td:nth-of-type(1){
         max-width: 30px;
@@ -244,8 +246,7 @@ table td{
         padding-right: 10px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
-        max-width: 100px;
-        width: 100px;
+        min-width: 100px;
         white-space: break-spaces;
     }
 
@@ -265,6 +266,9 @@ table td{
 @media (width <= 360px){
     .bp-title{
         font-size: 24px;
+    }
+    th:nth-of-type(2), td:nth-of-type(2){
+        max-width: 100px;
     }
 }
 
