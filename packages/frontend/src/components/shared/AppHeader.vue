@@ -123,7 +123,7 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 	transition: .3s opacity ease;
 }
 .ap-menu-title:first-of-type{
-	margin-top: 20vh !important;
+	margin-top: 15vh !important;
 }
 .ap-dropdown-title{
 	color: white;

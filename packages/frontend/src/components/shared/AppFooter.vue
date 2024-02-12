@@ -1,36 +1,59 @@
 <template>
 	<div class="AppFooter">
-		<p>@2023 Simon Weck</p>
-		<p>|</p>
-		<router-link to="/Imprint" class="af-link">Imprint/Privacy Policy</router-link>
+
+		<div class="af-socials">
+			<!-- Instagram -->
+			<a href="https://www.instagram.com/bipoopen" target="_blank">
+				<img :src="instaIcon" alt="">
+			</a>
+		</div>
+		
+		<div class="af-imprint">
+			<router-link to="/Impressum">Impressum</router-link>
+		</div>
 	</div>
 </template>
 
+<script setup lang="ts">
+let instaIcon = new URL(`/src/assets/icons/instagram.png`, import.meta.url).href;
+</script>
+
 <style scoped>
 .AppFooter{
-	width: 100%;
+	width: 100%; 
+	background: var(--main-color);
 	text-align: center;
-	color: gray;
-	padding: 20px;
-	display: flex;
-	justify-content: center;
+	color: white;
+	padding: 10px;
 }
-p, .af-link{
-	display: inline-block;
-	margin: auto 4px;
-	font-size: 14px;
+
+.af-socials{
+	margin-bottom: 5px;
 }
-.af-link{
+img{
+	width: 25px;
+	height: 25px;
+	object-fit: contain;
+	margin: 0px 12px;
 	cursor: pointer;
+	transition: .3s filter ease;
+	filter: brightness(0%) invert(0.9);
+}
+
+.af-imprint a{
+	cursor: pointer;
+	color: white;
+	text-decoration: none;
 	transition: .3s color ease;
 }
-.af-link:hover{
+.af-imprint a:hover{
 	color: rgb(211, 211, 211);
 }
+
 /*MOBILE*/
 @media (width <= 900px){
-	p, .af-link{
-		font-size: 12px !important;
+	.af-imprint a{
+		font-size: 13px;
 	}
 }
 </style>

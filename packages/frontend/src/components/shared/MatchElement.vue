@@ -50,7 +50,7 @@ onMounted(() => {
 
          <!-- Team 1 -->
          <div class="mt-team mt-team-first" :style="{'color' : match.result ? match.result.team1Score < match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
-            <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
+            <!-- <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div> -->
             <div v-if="match.team1" >
                <div class="mt-team-name">{{ match.team1.name }}</div>
                <div class="mt-team-players" v-for="player in match.team1.players" :key="player">{{ player }}</div>
@@ -85,7 +85,7 @@ onMounted(() => {
 
          <!-- Team 2 -->
          <div class="mt-team mt-team-second" :style="{'color' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
-            <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
+            <!-- <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div> -->
             <div v-if="match.team2">
                <div class="mt-team-name">{{ match.team2.name }}</div>
                <div class="mt-team-players" v-for="player in match.team2.players" :key="player">{{ player }}</div>
@@ -159,9 +159,6 @@ onMounted(() => {
    display: flex;
    flex-direction: column;
    justify-content: center;
-}
-.gsk-stage1 .mt-result{
-   justify-content: flex-end;
 }
 .mt-button{
    font-size: 16px;

@@ -2,7 +2,7 @@
 import { ref, onUnmounted } from "vue"
 import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
 
-import Schedule from '@/components/shared/schedule/Schedule.vue';
+import Schedule from '@/components/frontend/routes/tournament/schedule/Schedule.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 import { useRoute } from "vue-router";
@@ -29,7 +29,7 @@ onUnmounted(() => {
       <h1 class="bp-title">{{"Spielplan " + route.params.id }}</h1>
 
       <Loadingscreen v-show="!tournament"/>
-      <Schedule v-show="tournament && tournament.groupPhase.groups" :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
+      <Schedule v-show="tournament && tournament.groupPhase.groups" :tournament="tournament"/>
 
       <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
          Turnierplan wurde noch nicht erstellt

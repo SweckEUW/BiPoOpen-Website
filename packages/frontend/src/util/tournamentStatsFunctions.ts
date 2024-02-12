@@ -92,6 +92,9 @@ export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:string, on
             score += match.result.team2Player2Score;
     });
 
+    if(isNaN(score))
+        score = 0;
+
     return score;
 }
 

@@ -8,7 +8,7 @@
         
         <h2 style="margin-bottom: 20px;">Zusammenfassung</h2>
         <div style="margin-bottom: 100px;">
-            <ul style="padding-left: 15px;">
+            <ul style="padding-left: 20px;">
                 <li>Schnick-Schnack-Schnuck wer anfängt</li>
                 <li>2 Becher werden bei einem "Bouncer" getrunken</li>
                 <li>3 Becher werden bei einer "Bombe" getrunken</li>
