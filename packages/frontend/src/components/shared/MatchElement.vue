@@ -35,9 +35,11 @@ onMounted(() => {
 <template>
     <div class="Match" ref="matchHTMLElement">
 
-         <Transition name="fade">
-            <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
-         </Transition>
+         <Teleport to="body">
+            <Transition name="fade">
+               <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
+            </Transition>
+         </Teleport>
 
          <div v-if="isBackend && isGroupPhase" class="mt-handle">
             <div style="margin-bottom: 5px;"/>
@@ -50,7 +52,7 @@ onMounted(() => {
 
          <!-- Team 1 -->
          <div class="mt-team mt-team-first" :style="{'color' : match.result ? match.result.team1Score < match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
-            <!-- <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div> -->
+            <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
             <div v-if="match.team1" >
                <div class="mt-team-name">{{ match.team1.name }}</div>
                <div class="mt-team-players" v-for="player in match.team1.players" :key="player">{{ player }}</div>
@@ -64,7 +66,7 @@ onMounted(() => {
 
          <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" 
             :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}"
-            :style="{'justifyContent' : tournament.settings.trackPlayerShots ? '' : 'center'}"
+            :style="{justifyContent : tournament.settings.trackPlayerShots ? '' : 'center', cursor: isBackend ? 'pointer' : ''}"
          >
             <div class="mt-result-team">
                <span>{{ match.result.team1Score }}</span>
@@ -85,7 +87,7 @@ onMounted(() => {
 
          <!-- Team 2 -->
          <div class="mt-team mt-team-second" :style="{'color' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
-            <!-- <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div> -->
+            <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
             <div v-if="match.team2">
                <div class="mt-team-name">{{ match.team2.name }}</div>
                <div class="mt-team-players" v-for="player in match.team2.players" :key="player">{{ player }}</div>
@@ -135,8 +137,8 @@ onMounted(() => {
 .mt-team-second{
    color: var(--secondary-color);
 }
-.mt-result{
-   cursor: pointer;
+.gsk-stage1 .mt-result{
+   justify-content: flex-end;
 }
 .mt-team, .mt-result, .mt-vs, .mt-button{
    padding: 10px;
