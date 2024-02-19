@@ -52,7 +52,7 @@ const setSortValue = (value:string) => {
 }
 
 const giveArrowClass = (value:string) => {
-    if(value == sortValue.value) //windowWidth.value > 900 && 
+    if(value == sortValue.value)
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
 }
 </script>

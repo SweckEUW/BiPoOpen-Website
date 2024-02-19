@@ -106,63 +106,63 @@ onMounted(() => {
 }
 
 /* Groups Table */
-table{
+.GameStandingsGroups table{
     text-align: center;
     margin-bottom: 20px;
 }
-table *{
+.GameStandingsGroups table *{
     vertical-align: middle;
 }
-caption{
+.GameStandingsGroups caption{
     font-size: 28px;
     font-weight: bold;
     color: var(--main-color);
 }
-table td{
+.GameStandingsGroups table td{
     height: 60px;
 }
-table th{
+.GameStandingsGroups table th{
     color: var(--main-color) !important;
 }
 .GameStandingsGroups tbody tr:nth-of-type(1) td{
     background: var(--secondary-color-weak);
 }
-tbody tr:nth-of-type(2) td{
+.GameStandingsGroups tbody tr:nth-of-type(2) td{
     background: #e6faff;
 }
 
-table td{
+.GameStandingsGroups table td{
    background-color: inherit;
 }
-table td:nth-child(3) span{
+.GameStandingsGroups table td:nth-child(3) span{
     display: block;
 }
-table td:nth-child(2){
+.GameStandingsGroups table td:nth-child(2){
     width: 250px;
     max-width: 250px;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
-    table *{
+    .GameStandingsGroups table *{
         font-size: 14px;
     }
-    table td:nth-child(2){
+    .GameStandingsGroups table td:nth-child(2){
         width: 120px;
         max-width: 120px;
     }
-    table td:nth-child(3), table th:nth-child(3){
+    .GameStandingsGroups table td:nth-child(3), .GameStandingsGroups table th:nth-child(3){
         display: none;
     }
-    table td:nth-child(3) span{
+    .GameStandingsGroups table td:nth-child(3) span{
         margin-bottom: 4px;
         margin-right: 0px;
     }
-    table td:nth-child(6){
+    .GameStandingsGroups table td:nth-child(6){
         width: 60px;
         min-width: 60px;
     }
-    caption{
+    .GameStandingsGroups caption{
         font-size: 22px;
     }
     .hof-explain{
@@ -173,29 +173,29 @@ table td:nth-child(2){
 }
 
 /* Table Border */
-table {
+.GameStandingsGroups table {
     border-collapse: collapse;
 }
-table td {
+.GameStandingsGroups table td {
     border: 1px solid rgba(0, 0, 0, 0.3); 
 }
-table th{
+.GameStandingsGroups table th{
     border: 1px solid rgba(0, 0, 0, 0.3); 
     border-top: 0;
 }
-table th:first-child{
+.GameStandingsGroups table th:first-child{
     border-left: 0;
 }
-table th:last-child{
+.GameStandingsGroups table th:last-child{
     border-right: 0;
 }
-table tr td:first-child {
+.GameStandingsGroups table tr td:first-child {
     border-left: 0;
 }
-table tr:last-child td {
+.GameStandingsGroups table tr:last-child td {
     border-bottom: 0;
 }
-table tr td:last-child {
+.GameStandingsGroups table tr td:last-child {
     border-right: 0;
 }
 </style>
