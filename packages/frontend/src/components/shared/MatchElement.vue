@@ -64,7 +64,10 @@ onMounted(() => {
          
          <div v-if="isBackend && !match.result && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">Eintragen</div>
 
-         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''"  :style="{justifyContent : tournament.settings.trackPlayerShots ? '' : 'center', cursor: isBackend ? 'pointer' : ''}">
+         <div v-if="match.result" class="mt-result" @click="isBackend ? toggleModal() : ''" 
+            :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}"
+            :style="{justifyContent : tournament.settings.trackPlayerShots ? '' : 'center', cursor: isBackend ? 'pointer' : ''}"
+         >
             <div class="mt-result-team" v-if="tournament.settings.trackTeamShots">
                <span>{{ match.result.team1Score }}</span>
                <span>{{  " - " }}</span>
@@ -168,6 +171,12 @@ onMounted(() => {
    display: flex;
    flex-direction: column;
    justify-content: center;
+}
+.mt-result-team1Win .mt-result-team span:nth-child(3), .mt-result-team1Win .mt-result-player span:nth-child(3){
+   color: var(--loose-gray);
+}
+.mt-result-team2Win .mt-result-team span:nth-child(1), .mt-result-team2Win .mt-result-player span:nth-child(1){
+   color: var(--loose-gray);
 }
 .mt-button{
    font-size: 16px;
