@@ -3,7 +3,7 @@ import { setSettings } from "@/util/tournamentUtilFunctions.js";
 
 const props = defineProps(['getTournament','tournament'])
 
-const setFixedGroupAmmountOnInput = async (e:any) => {
+const setTrackPlayerShots = async (e:any) => {
    let settings = props.tournament.settings;
    settings.trackPlayerShots = e.srcElement.checked;
    let success:boolean = await setSettings(props.tournament._id, settings);
@@ -12,6 +12,14 @@ const setFixedGroupAmmountOnInput = async (e:any) => {
    }
 }
 
+const setTrackTeamShots = async (e:any) => {
+   let settings = props.tournament.settings;
+   settings.trackTeamShots = e.srcElement.checked;
+   let success:boolean = await setSettings(props.tournament._id, settings);
+   if(success){
+      await props.getTournament();
+   }
+}
 </script>
 
 <template>
@@ -19,8 +27,13 @@ const setFixedGroupAmmountOnInput = async (e:any) => {
       <h1>Einstellungen</h1>
 
       <div class="ss-setting">
-         <div class="ss-title">Würfe der Spieler eintragen?</div>
-         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setFixedGroupAmmountOnInput">
+         <div class="ss-title">Würfe einzelner Spieler eintragen?</div>
+         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setTrackPlayerShots">
+      </div>
+
+      <div class="ss-setting">
+         <div class="ss-title">Würfe der Teams eintragen?</div>
+         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setTrackTeamShots">
       </div>
       
       <hr>
