@@ -51,7 +51,7 @@ onMounted(() => {
          </div>
 
          <!-- Team 1 -->
-         <div class="mt-team mt-team-first" :style="{'color' : match.result ? match.result.team1Score < match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
+         <div class="mt-team mt-team-first" :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team1Loose': match.result && match.result.team1Score < match.result.team2Score}">
             <div v-if="stageIndex == 0 || !match.team1" class="mt-team-placeholder">{{ match.placeHolderTeam1 }}</div>
             <div v-if="match.team1" >
                <div class="mt-team-name">{{ match.team1.name }}</div>
@@ -68,7 +68,7 @@ onMounted(() => {
             :class="{'mt-result-team1Win': match.result && match.result.team1Score > match.result.team2Score, 'mt-result-team2Win': match.result && match.result.team1Score < match.result.team2Score}"
             :style="{justifyContent : tournament.settings.trackPlayerShots ? '' : 'center', cursor: isBackend ? 'pointer' : ''}"
          >
-            <div class="mt-result-team">
+            <div class="mt-result-team" v-if="tournament.settings.trackTeamShots">
                <span>{{ match.result.team1Score }}</span>
                <span>{{  " - " }}</span>
                <span>{{ match.result.team2Score }}</span>
@@ -86,7 +86,7 @@ onMounted(() => {
          </div>
 
          <!-- Team 2 -->
-         <div class="mt-team mt-team-second" :style="{'color' : match.result ? match.result.team1Score > match.result.team2Score ? 'var(--loose-gray)' : '' : ''}">
+         <div class="mt-team mt-team-second" :class="{'mt-result-team2Win': match.result && match.result.team2Score > match.result.team1Score, 'mt-result-team2Loose': match.result && match.result.team2Score < match.result.team1Score}">
             <div v-if="stageIndex == 0 || !match.team2" class="mt-team-placeholder">{{ match.placeHolderTeam2 }}</div>
             <div v-if="match.team2">
                <div class="mt-team-name">{{ match.team2.name }}</div>
@@ -134,6 +134,16 @@ onMounted(() => {
    color: var(--main-color);
    text-align: right;
 }
+.mt-result-team1Win{
+   color: var(--main-color);
+}
+.mt-result-team2Win{
+   color: var(--secondary-color);
+}
+.mt-result-team2Loose, .mt-result-team1Loose{
+   color: var(--loose-gray) !important;
+   text-decoration: line-through;
+}
 .mt-team-second{
    color: var(--secondary-color);
 }
@@ -162,6 +172,12 @@ onMounted(() => {
    flex-direction: column;
    justify-content: center;
 }
+.mt-result-team1Win .mt-result-team span:nth-child(3), .mt-result-team1Win .mt-result-player span:nth-child(3){
+   color: var(--loose-gray);
+}
+.mt-result-team2Win .mt-result-team span:nth-child(1), .mt-result-team2Win .mt-result-player span:nth-child(1){
+   color: var(--loose-gray);
+}
 .mt-button{
    font-size: 16px;
    margin: 0 20px;
@@ -177,13 +193,6 @@ onMounted(() => {
 }
 .mt-result-team span:nth-child(3), .mt-result-player span:nth-child(3){
    color: var(--secondary-color);
-}
-
-.mt-result-team1Win .mt-result-team span:nth-child(3), .mt-result-team1Win .mt-result-player span:nth-child(3){
-   color: var(--loose-gray);
-}
-.mt-result-team2Win .mt-result-team span:nth-child(1), .mt-result-team2Win .mt-result-player span:nth-child(1){
-   color: var(--loose-gray);
 }
 
 .mt-result-team span, .mt-result-player span{
