@@ -91,14 +91,14 @@ onMounted(() => {
 	padding: 5px 10px !important; 
 	border-radius: 0 !important;
 	width: auto !important;
-   height: auto !important;
+    height: auto !important;
 	text-align: center !important;
 	color: var(--secondary-color) !important;
-   background-color: transparent !important;
-   opacity: 1 !important; 
-   margin: 0 !important;
-   flex: 1 1 0 !important;
-   text-align: center !important;
+    background-color: transparent !important;
+    opacity: 1 !important; 
+    margin: 0 !important;
+    flex: 1 1 0 !important;
+    text-align: center !important;
 }
 .swiper-pagination-bullet-active {
 	color:white !important;
@@ -124,11 +124,11 @@ table td{
 table th{
     color: var(--main-color) !important;
 }
-tbody tr:nth-of-type(1) *{
-    background: var(--secondary-color-weak) !important;
+.GameStandingsGroups tbody tr:nth-of-type(1) td{
+    background: var(--secondary-color-weak);
 }
-tbody tr:nth-of-type(2) *{
-    background: #e6faff !important;
+tbody tr:nth-of-type(2) td{
+    background: #e6faff;
 }
 
 table td{
