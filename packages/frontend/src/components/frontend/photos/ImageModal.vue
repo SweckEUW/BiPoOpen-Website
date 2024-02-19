@@ -109,13 +109,13 @@ watch(() => props.index, () => {
 }
 
 /* Swiper */
-.swiper-container{
+.ImageModal .swiper-container{
     width: 100%;
     height: 100%;
     overflow: visible;
     position: relative;
 }
-.swiper-pagination{
+.ImageModal .swiper-pagination{
     color: var(--main-color);
     font-size: 24px;
     left: 0;
@@ -123,6 +123,7 @@ watch(() => props.index, () => {
     width: auto;
     height: 50px;
 }
+
 .pt-icons{
     position: absolute;
     top: 40px;

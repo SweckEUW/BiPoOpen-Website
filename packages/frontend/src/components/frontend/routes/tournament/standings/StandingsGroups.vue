@@ -79,7 +79,7 @@ onMounted(() => {
 }
 
 /* Top Swiper Pagination */
-.swiper-pagination{
+.Standings .swiper-pagination{
    position: sticky !important;
    top: 180px !important;
    padding-top: 10px !important;
@@ -87,7 +87,7 @@ onMounted(() => {
    display: flex !important;
    background-color: white !important;
 }
-.swiper-pagination-bullet {
+.Standings .swiper-pagination-bullet {
 	padding: 5px 10px !important; 
 	border-radius: 0 !important;
 	width: auto !important;
@@ -100,7 +100,7 @@ onMounted(() => {
     flex: 1 1 0 !important;
     text-align: center !important;
 }
-.swiper-pagination-bullet-active {
+.Standings .swiper-pagination-bullet-active {
 	color:white !important;
 	background: var(--main-color) !important;
 }
