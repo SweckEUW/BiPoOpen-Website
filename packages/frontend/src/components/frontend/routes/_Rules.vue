@@ -12,9 +12,9 @@
                 <li>Schnick-Schnack-Schnuck wer anfängt</li>
                 <li>2 Becher werden bei einem "Bouncer" getrunken</li>
                 <li>3 Becher werden bei einer "Bombe" getrunken</li>
-                <li>2 Mal Re-Rack pro Spiel, nur bei 3, 4 oder 6 Bechern möglich</li>
+                <li>2 Mal Re-Rack pro Spiel. Nur bei 3, 4 oder 6 Bechern möglich</li>
                 <li>Mit Gentleman's Rule (Nachwurf der Gegnerischen Mannschaft bei letzten getroffenem Becher)</li>
-                <li>Mit Deathcup Regel(Direkte Niederlage bei Treffern in noch nicht ausgetrunkenen Becher)</li>
+                <li>Mit Deathcup Regel (Direkte Niederlage bei Treffern in noch nicht ausgetrunkenen Becher)</li>
                 <li>Mit On-Fire Regel (Bei 3 Treffern in Folge, werfen solange nicht mehr getroffen wird)</li>
                 <li>Mit Trickshot Regel (Trickshot, wenn Ball nach Wurf vom Wurfteam gegriffen, bevor dieser den Boden berührt)</li>
             </ul>
@@ -22,7 +22,7 @@
 
         <h2>Spielbeginn</h2>
         <div>
-            Das Beginner-Team, wird durch eine einfache Runde Schnick-Schnack-Schnuck (ohne Brunnen ausgewählt).
+            Das Beginner-Team, wird durch eine einfache Runde Schnick-Schnack-Schnuck.
             Ein Cup gilt als getroffen, wenn der Ball in einen Cup fliegt und dort liegen bleibt. 
             Wird ein Cup getroffen, muss dieser leer getrunken werden. Der Ball darf nur berührt werden, wenn er zuvor den Tisch oder einen Cup berührt hat.
             Ablenkungsmanöver sind erlaubt, Cups, Tisch und Gegner dürfen dabei jedoch nicht berührt werden. 
@@ -38,7 +38,7 @@
             Wirft ein Spieler absichtlich oder unabsichtlich einen oder mehrere seiner eigenen Cups vom Tisch, gelten diese als getroffen und sind aus dem Spiel.
         </div>
 
-        <h2>Bounce Back</h2>
+        <h2>Bouncer</h2>
         <div>
             Springt der Ball auf dem Tisch auf, bevor er in einen Becher geht, müssen die Verteidiger zewi Becher trinken.
             Sobald der Ball den Tisch berührt hat, darf er jedoch weggeschlagen werden.
@@ -60,27 +60,27 @@
         <h2>On-Fire</h2>
         <div>
             Trifft ein Spieler zwei Becher in Folge, muss dieser <strong>"Heaten Up"</strong> sagen.
-            Trifft er im Anschluss den dritten Becher, ist er <strong>"On Fire"</strong> und darf solange werden, bis er nicht mehr trifft.
+            Trifft er in der nächsten Runde den dritten Becher in Folge, ist er <strong>"On Fire"</strong>. Er erhält daraufhin den Ball zurück und darf solange werfen, bis er nicht mehr trifft.
         </div>
 
         <h2>Trickshot</h2>
         <div>
-            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so ist der Werfer erneut dran </strong>.
-            Der Wurf muss aber ein Trickshot sein.
-            Als Trickshot gilt nicht der Wurf mit der schwachen Hand. 
+            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so ist der Werfer erneut dran</strong>.
+            Der Wurf muss ein Trickshot sein.
             Zur Verhinderung eines Trickhots hat das andere Team ebenfalls die Möglichkeit, den Ball auf dem gesamten Tisch abzufangen.
+            Als Trickshot gilt nicht der Wurf mit der schwachen Hand. 
         </div>
 
         <h2>Re-Rack</h2>
         <div>
-            <strong>Zweimal pro Spiel</strong> darf jedes Team seine Gegner bitten, die Becher neu zu positionieren.
-            <strong>Möglich ist dies bei je 3, 4 oder 6 Bechern (nicht möglich bei einer anderen Becheranzahl, beispielsweise 2, 5 oder 7). </strong>
+            <strong>Zweimal pro Spiel</strong> darf ein Team seine Gegner bitten, die Becher neu zu positionieren.
+            <strong>Möglich ist dies nur bei 3, 4 oder 6 Bechern (nicht möglich bei einer anderen Becheranzahl, beispielsweise 2, 5 oder 7).</strong>
             Die neue Formation ist immer mittig vorne (an der Pyramidenspitze) zu positionieren.
         </div>
 
         <h2>Deathcup</h2>
         <div>
-            Landet der Ball in einem ausgeschiedenen, aber noch nicht ausgetrunkenen Becher, <strong>verliert das getroffene Team sofort</strong>.
+            Landet der Ball in einem getroffenen, aber noch nicht ausgetrunkenen Becher, <strong>verliert das getroffene Team sofort das Spiel</strong>.
         </div>
 
         <h2>Spielende</h2>
@@ -94,7 +94,7 @@
         <h2>Gentleman's Rule</h2>
         <div>
             Nachdem das gegnerische Team den letzten Becher getroffen hat greift die Gentleman's Rule und das andere Team darf nachwerfen. 
-            Trifft dieses Team nun ebenfalls seine letzten Becher, geht das Spiel in die Verlängerung mit 2x3 Cups (Ausnahme: trifft nach der Gentleman's Rule das Nachwerferteam seinen letzten Becher mit beiden Bällen, so das dieses Team direkt gewonnen).
+            Trifft dieses Team nun ebenfalls seine letzten Becher, geht das Spiel in die Verlängerung mit 2x3 Cups (Ausnahme: trifft nach der Gentleman's Rule das Nachwerferteam seinen letzten Becher mit beiden Bällen, so hat dieses Team direkt gewonnen).
             <strong>Ein spieler kann bei der Gentleman's Rule solange in Folge werfen, bis er nicht mehr trifft.</strong>
         </div>
     </div>
