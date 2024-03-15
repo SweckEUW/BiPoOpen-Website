@@ -30,7 +30,7 @@
         </div>
 
         <h2>Wurf</h2>
-        <div>
+        <div> 
             Jedes Team hat pro Zug zwei Würfe. 
             Verlässt der Ball die Hand des Werfers, so ist der Ball im Spiel und gilt als geworfen.
             Damit ein Treffer gültig ist, muss der <strong>Ellenbogen beim Wurf hinter der Kante des Tisches verbleiben</strong>.
