@@ -1,19 +1,17 @@
-import express, { Express, Response, Request } from "express";
-
+import express from "express";
 import cors from "cors";
 import {MongoClient, ServerApiVersion} from "mongodb"
-import * as dotenv from "dotenv";
-
+import { config as DotEnvConfig } from "dotenv";
 import {tournamentCollection} from "./tournamentCollection"
 
-dotenv.config();
+DotEnvConfig();
 
-const app: Express = express();
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri:string = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORT}@cluster0.wpwuaak.mongodb.net/?retryWrites=true&w=majority`;
-const client:MongoClient = new MongoClient(uri, {
+const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORT}@cluster0.wpwuaak.mongodb.net/?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -27,12 +25,12 @@ client.connect().catch(error => {
 }).then(() =>{
   console.log("Connected to Database")
 
-  app.listen(process.env.PORT, () =>{
+  app.listen(8000, () =>{
     console.log('Server started')
   });
 })
 
-app.get("/", (request: Request, response: Response) => {
+app.get("/", (request, response) => {
   response.send("BiPo Open Backend"); 
 })
 
@@ -55,10 +53,5 @@ app.post('/setSettings', tournamentCollection.setSettings);
 // K.o Stage
 app.post('/setMatchesGroupPhase', tournamentCollection.setMatchesGroupPhase);
 app.post('/setMatchesKOPhase', tournamentCollection.setMatchesKOPhase);
-
-
-// let filename = fileURLToPath(import.meta.url);
-// let dirname = path.dirname(filename);
-// app.use(express.static(path.join(dirname, 'public')));
 
 export default client;
