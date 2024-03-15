@@ -54,4 +54,5 @@ app.post('/setSettings', tournamentCollection.setSettings);
 app.post('/setMatchesGroupPhase', tournamentCollection.setMatchesGroupPhase);
 app.post('/setMatchesKOPhase', tournamentCollection.setMatchesKOPhase);
 
+module.exports = app;
 export default client;
