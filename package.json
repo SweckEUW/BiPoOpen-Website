@@ -9,5 +9,8 @@
         "dev:backend": "npm run dev --workspace=bipoopen-backend",
         "build": "npm run build --workspace=bipoopen-frontend",
         "build:backend": "npm run build --workspace=bipoopen-backend"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "^4.13.0"
     }
 }
