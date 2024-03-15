@@ -3,9 +3,12 @@ import Sortable from "sortablejs";
 import { onMounted, watch } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
-import Swiper, { Pagination } from 'swiper';
-import 'swiper/swiper-bundle.min.css';
 import MatchElement from '@/components/shared/MatchElement.vue';
+
+import Swiper from 'swiper';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const props = defineProps(['getTournament','tournament','isBackend'])
 

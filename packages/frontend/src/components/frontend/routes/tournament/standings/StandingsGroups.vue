@@ -2,8 +2,11 @@
 import { ref, toRaw, onMounted } from "vue"
 import { getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
-import Swiper, { Pagination } from 'swiper';
-import 'swiper/swiper-bundle.min.css';
+
+import Swiper from 'swiper';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 defineProps(['tournament']);
 

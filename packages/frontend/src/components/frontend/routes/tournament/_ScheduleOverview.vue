@@ -3,7 +3,8 @@ import { ref, onUnmounted } from "vue"
 import { getMatchesGroupPhase, getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
-import Swiper , { Pagination, Navigation, Autoplay } from 'swiper';
+import Swiper from 'swiper';
+import { Pagination, Navigation, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
