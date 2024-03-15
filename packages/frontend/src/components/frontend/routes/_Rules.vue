@@ -44,7 +44,7 @@
             Sobald der Ball den Tisch berührt hat, darf er jedoch weggeschlagen werden.
             <strong>Der zweite Becher wird vom Werfer ausgewählt</strong>. 
             Diese Regel ist nicht anzuwenden, wenn der Ball statt vom Tisch lediglich vom Becherrand abspringt. 
-        </div>
+        </div> 
 
         <h2>Balls Back</h2>
         <div>
