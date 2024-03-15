@@ -1,1 +1,0 @@
-import{_ as c,o,c as a,p as _,b as t,a as s}from"./index-50b81fd1.js";const d={},n=e=>(_("data-v-d9c3296a"),e=e(),t(),e),r={class:"Loadingscreen"},i=n(()=>s("div",{class:"ls-container"},[s("div",{class:"loader"})],-1)),p=[i];function l(e,v){return o(),a("div",r,p)}const f=c(d,[["render",l],["__scopeId","data-v-d9c3296a"]]);export{f as L};
