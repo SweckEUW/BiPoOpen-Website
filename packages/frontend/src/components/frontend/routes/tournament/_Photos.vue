@@ -60,7 +60,7 @@ const adjustImageGrid = () => {
 const elementsShown = ref(20);
 let pauseScroll = false;
 window.onscroll = () => {
-    if((window.innerHeight + window.scrollY) >= document.body.scrollHeight && !pauseScroll) {
+    if((window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1000) && !pauseScroll) {
         elementsShown.value += 20;
         pauseScroll = true;
         setTimeout(() => { adjustImageGrid(); }, 0);
