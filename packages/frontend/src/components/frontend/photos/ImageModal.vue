@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { watch, onMounted } from "vue"
 
-import Swiper , { Pagination, Navigation, Zoom } from 'swiper';
-import 'swiper/swiper-bundle.min.css';
+import Swiper from 'swiper';
+import { Pagination, Navigation, Zoom } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/zoom';
 
 const props = defineProps(['imageURL', 'toggleModal', 'pictures', 'index'])
 
@@ -77,8 +81,8 @@ watch(() => props.index, () => {
                     </div>
                 </div>
 
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next" style="right: -15px"></div>
+                <div class="swiper-button-prev" style="left: -15px"></div>
                 <div class="swiper-pagination"></div>
             </div>
 

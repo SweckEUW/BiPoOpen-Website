@@ -53,8 +53,8 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 						</template>
 						<template #content>
 							<!-- <router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Zusammenfassung'" v-if="tournament.games">Zusammenfassung</router-link> -->
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
+							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
 							<!-- <router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Teams'" v-if="tournament.games">Teams</router-link> -->
 							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Fotos'" v-if="tournament.fotos">Fotos</router-link>

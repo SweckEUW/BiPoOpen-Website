@@ -2,8 +2,11 @@
 import { onMounted } from "vue"
 import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import MatchElement from '@/components/shared/MatchElement.vue';
-import Swiper, { Pagination } from 'swiper';
-import 'swiper/swiper-bundle.min.css';
+
+import Swiper from 'swiper';
+import { Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const props = defineProps(['getTournament','tournament','isBackend'])
 
