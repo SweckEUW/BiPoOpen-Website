@@ -76,6 +76,8 @@ onMounted(() => {
 
 /* Top Swiper Pagination */
 .Schedule .swiper-pagination{
+   width: 100% !important;
+   flex-wrap: wrap !important;
    position: sticky !important;
    top: 180px !important;
    padding-top: 10px !important;
@@ -143,6 +145,16 @@ onMounted(() => {
       margin: 5px;
       margin-top: 0px;
       margin-left: 0px;
+   }
+   .Schedule .swiper-pagination-bullet {
+      font-size: 15px;
+   }
+}
+
+/*MOBILE S*/
+@media (width <= 360px){
+   .Schedule .swiper-pagination-bullet {
+      font-size: 12px;
    }
 }
 </style>

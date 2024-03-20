@@ -224,9 +224,6 @@ table td{
         font-size: 11px;
         color: var(--main-color);
     }
-    table{
-        width: 100%;
-    }
     table *{
         font-size: 15px;
     }
@@ -236,8 +233,8 @@ table td{
     table th{ 
         top: 140px;
         font-size: 15px;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding-top: 10px;
+        padding-bottom: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){
         max-width: 30px;
@@ -268,7 +265,14 @@ table td{
         font-size: 24px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
-        max-width: 100px;
+        max-width: 70px;
+        min-width: 70px;
+    }
+    table th{
+        font-size: 13px;
+    }
+    table td{
+        font-size: 13px;
     }
 }
 

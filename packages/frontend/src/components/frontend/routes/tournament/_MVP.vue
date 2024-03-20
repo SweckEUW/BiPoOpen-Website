@@ -80,7 +80,7 @@ const giveArrowClass = (value:string) => {
                         <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                         <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
                         <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                        <th @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
+                        <th v-if="windowWidth > 360" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,7 +90,7 @@ const giveArrowClass = (value:string) => {
                         <td>{{ player.averageScore }}</td>
                         <td>{{ player.score }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
-                        <td>{{ player.ammountOfDrunkenCups }}</td>
+                        <td v-if="windowWidth > 360">{{ player.ammountOfDrunkenCups }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -100,7 +100,7 @@ const giveArrowClass = (value:string) => {
                 <div>*Trfq. = Trefferquote</div>
                 <div>*Trf. = Treffer</div>
                 <div>*Spi. = Spiele</div>
-                <div>*Getru. Becher = Getrunkene Becher</div>
+                <div v-if="windowWidth > 360">*Getru. Becher = Getrunkene Becher</div>
             </div>
         </div>
 
@@ -181,7 +181,7 @@ table td{
         height: 80px;
     }
     table th{ 
-        top: 150px;
+        top: 140px;
         font-size: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){
@@ -209,11 +209,17 @@ table td{
 
 /*MOBILE S*/
 @media (width <= 360px){
+    table *{
+        font-size: 14px !important;
+    }
     .bp-title{
         font-size: 24px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
         max-width: 100px;
+    }
+    .mvp-text{
+        font-size: 15px;
     }
 }
 

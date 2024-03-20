@@ -111,7 +111,6 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 	overflow-y: scroll;
 }
 .ap-menu-title{
-	margin-left: 10px;
 	text-decoration: none;
 	color: white;
 	font-size: 50px;
@@ -207,6 +206,19 @@ a:hover{
 	}
 	.ap-dropdown-link:hover{
 		opacity: 1;
+	}
+}
+
+/*MOBILE S*/
+@media (width <= 360px){
+    .ap-menu-title{
+		font-size: 40px;
+	}
+	.ap-dropdown-title{
+		font-size: 45px;
+	}
+	.ap-dropdown-link{
+		font-size: 28px;
 	}
 }
 </style>

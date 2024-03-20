@@ -21,7 +21,7 @@ window.addEventListener("resize", () => {
                     <th>{{ windowWidth > 900 ? 'Siege' :'Sieg.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Spiele' :'Spie.'}}</th>
                     <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
-                    <th>{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
+                    <th v-if="windowWidth > 360">{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +32,7 @@ window.addEventListener("resize", () => {
                     <td>{{ team.wins }}</td>
                     <td>{{ team.games }}</td>
                     <td>{{ team.score }}</td>
-                    <td>{{ team.scoreDifference }}</td>
+                    <td v-if="windowWidth > 360">{{ team.scoreDifference }}</td>
                 </tr>
             </tbody>
         </table>
@@ -42,7 +42,7 @@ window.addEventListener("resize", () => {
             <div>*Sieg. = Siege</div>
             <div>*Spie. = Spiele</div>
             <div>*Trfv. = Trefferverhältnis</div>
-            <div>*Trfd. = Trefferdifferenz</div>
+            <div v-if="windowWidth > 360">*Trfd. = Trefferdifferenz</div>
         </div>
 
     </div>
@@ -132,6 +132,13 @@ table td:nth-child(2){
         margin-top: 15px;
         font-size: 11px;
         color: var(--main-color);
+    }
+}
+
+/*MOBILE S*/
+@media (width <= 360px){
+    table *{
+        font-size: 13px;
     }
 }
 
