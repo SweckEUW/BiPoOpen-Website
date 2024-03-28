@@ -1,1 +1,0 @@
-import{_ as e,o,c as a,p as t,b as d,a as c}from"./index-Dfb8zgmz.js";const n={},_=s=>(t("data-v-d9c3296a"),s=s(),d(),s),r={class:"Loadingscreen"},i=_(()=>c("div",{class:"ls-container"},[c("div",{class:"loader"})],-1)),p=[i];function l(s,h){return o(),a("div",r,p)}const v=e(n,[["render",l],["__scopeId","data-v-d9c3296a"]]);export{v as L};
