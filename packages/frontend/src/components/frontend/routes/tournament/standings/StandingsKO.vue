@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { getTeamsKOPhaseWithStats } from "@/util/tournamentUtilFunctions.js";
+import { getTeamsKOPhaseWithStats, checkIfTournamentFinished } from "@/util/tournamentUtilFunctions.js";
 
 defineProps(['tournament']);
 
@@ -12,7 +12,12 @@ window.addEventListener("resize", () => {
 
 <template>
     <div class="GameStandingsKO">
-        <table v-if="tournament" class="table table-hover caption-top">
+
+        <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !checkIfTournamentFinished(tournament)">
+            Turnier ist noch nicht zuende gespielt
+        </div>
+
+        <table v-if="tournament && checkIfTournamentFinished(tournament)" class="table table-hover caption-top">
             <thead>
                 <tr>
                     <th>{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
