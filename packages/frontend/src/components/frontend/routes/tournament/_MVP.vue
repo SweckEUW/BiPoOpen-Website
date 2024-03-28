@@ -60,7 +60,7 @@ const giveArrowClass = (value:string) => {
 <template>
     <div class="MVP">
         
-        <h1 class="bp-title">{{"Most Valuable Player " + route.params.id }}</h1>
+        <h1 class="bp-title">{{(route.params.id.length > 5 ? 'MVP ' : "Most Valuable Player ") + (route.params.id as string).replaceAll('-',' ') }}</h1>
 
         <Loadingscreen v-show="!tournament"/>
 
@@ -141,6 +141,7 @@ table th{
     color: var(--main-color);
     font-size: 20px;
     cursor: pointer;
+    z-index: 2;
 }
 table td{
     background: inherit;

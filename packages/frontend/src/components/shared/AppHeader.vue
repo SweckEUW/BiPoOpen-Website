@@ -132,6 +132,7 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 	text-align: center;
 	display: inline-block;
 	transition: .3s opacity ease;
+	margin-right: 20px;
 }
 .ap-dropdown-link{
 	display: inline-block;
@@ -207,18 +208,34 @@ a:hover{
 	.ap-dropdown-link:hover{
 		opacity: 1;
 	}
+
+	.ap-menu-title{
+		font-size: 40px;
+	}
+	.ap-dropdown-title{
+		font-size: 40px;
+	}
+	.ap-dropdown-link{
+		font-size: 28px;
+	}
+	.DropDown{
+		margin-bottom: 20px;
+	}
 }
 
 /*MOBILE S*/
 @media (width <= 360px){
     .ap-menu-title{
-		font-size: 40px;
+		font-size: 35px;
 	}
 	.ap-dropdown-title{
-		font-size: 45px;
+		font-size: 35px;
 	}
 	.ap-dropdown-link{
-		font-size: 28px;
+		font-size: 24px;
+	}
+	.DropDown{
+		margin-bottom: 10px;
 	}
 }
 </style>

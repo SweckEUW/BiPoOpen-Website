@@ -26,7 +26,7 @@ onUnmounted(() => {
 <template>
    <div class="Standings">
       
-      <h1 class="bp-title">{{"Platzierungen " + route.params.id }}</h1>
+      <h1 class="bp-title">{{"Platzierungen " + (route.params.id as string).replaceAll('-',' ') }}</h1>
 
       <Loadingscreen v-show="!tournament"/>
       <Standings v-show="tournament && tournament.groupPhase.groups" :tournament="tournament"/>

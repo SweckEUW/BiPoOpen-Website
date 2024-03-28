@@ -42,7 +42,7 @@ window.addEventListener("resize", () => {
             </tbody>
         </table>
 
-        <div v-if="windowWidth < 900" class="hof-explain">
+        <div v-if="windowWidth < 900 && checkIfTournamentFinished(tournament)" class="hof-explain">
             <div>*Pl. = Platz</div>
             <div>*Sieg. = Siege</div>
             <div>*Spie. = Spiele</div>

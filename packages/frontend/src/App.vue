@@ -138,4 +138,11 @@ body{
 		top: 79px; /* 79px = AppHeader Height */
 	}
 }
+
+/*MOBILE S*/
+@media (width <= 360px){
+    .bp-title{
+		font-size: 22px !important;
+	}
+}
 </style>
