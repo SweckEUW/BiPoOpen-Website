@@ -20,6 +20,7 @@ const createTournament = async () => {
         koPhase: {},
         settings: {
             trackPlayerShots: true,
+            trackTeamShots: true,
             fixedGroupAmmount: 8,
             advancingTeamsPerGroup: 2,
         }

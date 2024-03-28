@@ -33,7 +33,7 @@ const setTrackTeamShots = async (e:any) => {
 
       <div class="ss-setting">
          <div class="ss-title">Würfe der Teams eintragen?</div>
-         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setTrackTeamShots">
+         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackTeamShots" @input="setTrackTeamShots">
       </div>
       
       <hr>

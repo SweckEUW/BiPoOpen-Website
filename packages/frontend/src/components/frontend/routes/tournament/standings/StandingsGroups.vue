@@ -47,8 +47,8 @@ onMounted(() => {
                             <th>Spieler</th>
                             <th>{{ windowWidth > 900 ? 'Siege' :'Sieg.'}}</th>
                             <th>{{ windowWidth > 900 ? 'Spiele' :'Spie.'}}</th>
-                            <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
-                            <th v-if="windowWidth > 360">{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
+                            <th v-if="tournament.settings.trackTeamShots">{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
+                            <th v-if="tournament.settings.trackTeamShots && windowWidth > 360">{{ windowWidth > 900 ? 'Trefferdifferenz' :'Trfd.'}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,8 +58,8 @@ onMounted(() => {
                             <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
                             <td>{{ team.wins }}</td>
                             <td>{{ team.games }}</td>
-                            <td>{{ team.score }}</td>
-                            <td v-if="windowWidth > 360">{{ team.scoreDifference }}</td>
+                            <td v-if="tournament.settings.trackTeamShots">{{ team.score }}</td>
+                            <td v-if="tournament.settings.trackTeamShots && windowWidth > 360">{{ team.scoreDifference }}</td>
                         </tr>
                     </tbody>
                 </table>
