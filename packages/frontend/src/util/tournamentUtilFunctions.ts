@@ -15,7 +15,8 @@ export const getTournamentByName = async (tournamentName:string) => {
 }
 
 export const getTournamentWithRouterID = async (id:string) => {
-    let tournamentName = id;
+
+    let tournamentName = id.replaceAll('-',' ');
     if(id.includes("20"))
         tournamentName = "Weck BiPo Open " + id;
 
@@ -632,4 +633,20 @@ export const setGameResultKOPhase = async (tournament:any, matchID:string, resul
 
     await setMatchesKOPhase(tournament._id, matches);
     await updateMatchesKOPhase(tournament);
+}
+
+export const checkIfTournamentFinished = (tournament:any) => {
+    let tournamentFinished = true;
+
+    let matches = getMatchesGroupPhase(tournament)
+    matches = matches.concat(getMatchesKOPhase(tournament));
+
+    matches.forEach((groups:any) => {
+        groups.forEach((match:any) => {
+            if(!match.result)
+                tournamentFinished = false;  
+        });
+    });
+
+    return tournamentFinished;
 }

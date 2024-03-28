@@ -8,7 +8,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournamentData = tournaments.find((tournament:any) => tournament.year == route.params.id)!;
+let tournamentData = tournaments.find((tournament) => tournament.name == route.params.id)!;
 
 let tournament = ref();
 const getTournament = async () => {
@@ -95,7 +95,7 @@ let getHighestWin = () => {
                 <!-- <div>{{ "Anzahl an Verlängerungen" }}</div> -->
 
                 <div class="sum-images">
-                    <img v-for="image in tournamentData.summary.facts.images" :src="image" alt="">
+                    <img v-for="image in tournamentData.summary!.facts.images" :src="image" alt="">
                 </div>
             </div>
 
@@ -108,7 +108,7 @@ let getHighestWin = () => {
                 </div>
 
                 <div class="sum-images">
-                    <img v-for="image in tournamentData.summary.standings.images" :src="image" alt="">
+                    <img v-for="image in tournamentData.summary!.standings.images" :src="image" alt="">
                 </div>
             </div>
             
@@ -122,7 +122,7 @@ let getHighestWin = () => {
                 </div>
 
                 <div class="sum-images">
-                    <img v-for="image in tournamentData.summary.mvp!.images" :src="image" alt="">
+                    <img v-for="image in tournamentData.summary!.mvp!.images" :src="image" alt="">
                 </div>
             </div>
             

@@ -1,6 +1,11 @@
 [
 	{
-		"year": "2023",
+		"name": "SCW 3 Ostern",
+		"mvp": true,
+		"games": true
+	},
+	{
+		"name": "2023",
 		"mvp": true,
 		"games": true,
 		"fotos":{
@@ -31,7 +36,7 @@
 		}
 	},
 	{
-		"year": "2022",
+		"name": "2022",
 		"mvp": false,
 		"games": true,
 		"fotos":{
@@ -52,7 +57,7 @@
 		}
 	},
 	{
-		"year": "2021",
+		"name": "2021",
 		"mvp": false,
 		"games": true,
 		"fotos":{
@@ -73,7 +78,7 @@
 		}
 	},
 	{
-		"year": "2020",
+		"name": "2020",
 		"mvp": false,
 		"games": true,
 		"fotos":{

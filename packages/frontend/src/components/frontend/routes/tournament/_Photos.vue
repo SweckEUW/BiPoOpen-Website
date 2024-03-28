@@ -8,8 +8,8 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 
 
-let tournamentData = tournaments.find((tournament:any) => tournament.year == route.params.id)!;
-let posterURL = new URL(`/src/assets/${tournamentData.fotos.poster}`, import.meta.url).href;
+let tournamentData = tournaments.find((tournament) => tournament.name == route.params.id)!;
+let posterURL = new URL(`/src/assets/${tournamentData.fotos!.poster}`, import.meta.url).href;
 
 onMounted(async () => {
     await setupImages();
@@ -18,7 +18,7 @@ onMounted(async () => {
 
 let pictures:any = ref([]);
 const setupImages = async () => {
-    let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos.driveImageIDs}`, import.meta.url);
+    let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos!.driveImageIDs}`, import.meta.url);
     let driveImageIDs:any = await fetch(driveImageIDsURL);
     driveImageIDs = await driveImageIDs.json();
     driveImageIDs.thumbnails.sort((a:any, b:any) => a.name.localeCompare(b.name));
