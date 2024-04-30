@@ -28,14 +28,14 @@ const routes = [
 		}
 	},
 
-	// {
-	// 	path: '/Teamanmeldung',
-	// 	name: 'Teamanmeldung',
-	// 	component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
-	// 	meta: {
-	// 		title: 'Weck BiPo Open REPLACE - Teamanmeldung',
-	// 	},
-	// },
+	{
+		path: '/Teamanmeldung',
+		name: 'Teamanmeldung',
+		component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
+		meta: {
+			title: 'Weck BiPo Open REPLACE - Teamanmeldung',
+		},
+	},
 
 	// Frontend - Tournament
 	{

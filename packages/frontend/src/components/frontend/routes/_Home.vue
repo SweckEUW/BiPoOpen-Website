@@ -36,7 +36,7 @@ const updateRemainingTime = () => {
 updateRemainingTime();
 var timer = setInterval(updateRemainingTime, 1000);
 
-let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2024* um *14:00 Uhr* statt 💥! Es sind noch " + daysRef.value + " Tage " + + hoursRef.value + " Stunden " + + minutesRef.value + " Minuten " + + secondsRef.value + " Sekunden bis zum Turnierstart⏰! Willst du mein Teampartner💑 sein?"
+// let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2024* um *14:00 Uhr* statt 💥! Es sind noch " + daysRef.value + " Tage " + + hoursRef.value + " Stunden " + + minutesRef.value + " Minuten " + + secondsRef.value + " Sekunden bis zum Turnierstart⏰! Willst du mein Teampartner💑 sein?"
 </script>
 
 <template>
@@ -65,9 +65,14 @@ let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2
             </div>  
         </div>
 
-        <div class="ho-share">
+        <!-- <div class="ho-share">
             <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
+        </div> -->
+
+        <div class="ho-share">
+            <router-link :to="'/Teamanmeldung'">Anmeldung</router-link>
         </div>
+
     </div>
 </template>
 
@@ -112,7 +117,7 @@ let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2
 }
 .ho-share{
     margin-top: 50px;
-    padding: 20px 10px;
+    padding: 20px 40px;
     background-color: var(--main-color);
     cursor: pointer;
 }
