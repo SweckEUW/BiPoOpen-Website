@@ -1,0 +1,1 @@
+import{_ as e,o,c as r}from"./index-TUNBWjn9.js";const t={},c={src:"https://docs.google.com/forms/d/e/1FAIpQLSdOD6gv1kxf9mcMggg65DbRi_zxZqq0Az0-tIGUqjoovyJWqw/viewform?embedded=true",frameborder:"0",marginheight:"0",marginwidth:"0"};function a(d,n){return o(),r("iframe",c,"Loading…")}const m=e(t,[["render",a],["__scopeId","data-v-713d9b73"]]);export{m as default};
