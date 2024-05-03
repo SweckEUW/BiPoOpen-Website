@@ -69,9 +69,7 @@ var timer = setInterval(updateRemainingTime, 1000);
             <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
         </div> -->
 
-        <div class="ho-share">
-            <router-link :to="'/Teamanmeldung'">Anmeldung</router-link>
-        </div>
+        <router-link class="ho-share" :to="'/Teamanmeldung'">Anmeldung</router-link>
 
     </div>
 </template>
@@ -120,8 +118,6 @@ var timer = setInterval(updateRemainingTime, 1000);
     padding: 20px 40px;
     background-color: var(--main-color);
     cursor: pointer;
-}
-.ho-share a{
     color: white;
     text-decoration: none;
 }
