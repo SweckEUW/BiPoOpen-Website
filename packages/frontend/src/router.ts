@@ -33,7 +33,7 @@ const routes = [
 		name: 'Teamanmeldung',
 		component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
 		meta: {
-			title: 'Weck BiPo Open REPLACE - Teamanmeldung',
+			title: 'Weck BiPo Open 2024 - Teamanmeldung',
 		},
 	},
 
