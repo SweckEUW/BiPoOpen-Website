@@ -122,6 +122,7 @@ table td:nth-child(2){
     table td:nth-child(6){
         width: 60px;
         min-width: 60px;
+        white-space: nowrap;
     }
     table th{
         top: 172px;
