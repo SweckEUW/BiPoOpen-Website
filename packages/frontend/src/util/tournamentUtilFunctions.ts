@@ -390,8 +390,19 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
         let teams = groups[i].teams;
         let ammountOfGames = (teams.length * (teams.length - 1)) / 2;
 
-        // TODO: 5er Gruppen
-        if(ammountOfGames == 6){ // 4er Gruppen
+        if(ammountOfGames == 10){ // 5er Gruppen
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[4]._id});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[4]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
+            matchesForGroup.push({team1ID: teams[3]._id, team2ID: teams[4]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[4]._id});
+
+        }else if(ammountOfGames == 6){ // 4er Gruppen
             matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id});
             matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
             matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id});
@@ -399,10 +410,7 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
             matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
             matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id});
 
-            matches.push(matchesForGroup);
-
         }else if(ammountOfGames == 3){ // 3er Gruppen
-            console.log(teams[0]);
             // Hinrunde
             matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
             matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
@@ -413,8 +421,6 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
             // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
             // matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
 
-            matches.push(matchesForGroup);
-
         }else{
             for (let x = 0; x < teams.length; x++){
                 for (let y = x+1; y < teams.length; y++) {
@@ -424,8 +430,9 @@ export const generateRandomMatchesGroupPhase = async (tournament:any) => {
             }
 
             matchesForGroup = shuffleArray(matchesForGroup);
-            matches.push(matchesForGroup);
         }
+
+        matches.push(matchesForGroup);
     }
 
     await setMatchesGroupPhase(tournament._id,matches);

@@ -3,7 +3,7 @@ import Sortable from "sortablejs";
 import { onMounted, watch } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
-import MatchElement from '@/components/shared/MatchElement.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -13,9 +13,11 @@ import 'swiper/css/pagination';
 const props = defineProps(['getTournament','tournament','isBackend'])
 
 const onDragEnd = async (evt:any) => {
-   let groupCaption = evt.srcElement.parentElement.parentElement.getElementsByClassName("rt-caption")[0].getElementsByTagName("div")[0].innerText;
+
+   // Get Index of Group via Group Caption html element
+   let groupCaption = evt.srcElement.parentElement.getElementsByClassName("rt-caption")[0].innerText;
    let groupIndex = groupCaption.split(" ")[1].toLowerCase().charCodeAt(0) - 97;
-   
+
    let matches = props.tournament.groupPhase.matches;
    let matchesInGroup = matches[groupIndex];
    let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
@@ -32,9 +34,9 @@ const initSortable = () => {
    setTimeout(() => { 
       let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
       for (let i = 0; i < groupAmmount; i++){
-         let matchesForGroupDOM:any = document.getElementById("Match-Table-"+i)?.getElementsByClassName("rt-matches")[0];
+         let matchesForGroupDOM = document.getElementById("Match-Table-"+i)!.getElementsByClassName("rt-matches")[0] as HTMLDivElement;
          new Sortable(matchesForGroupDOM, {
-            animation: 150,
+            animation: 100,
             group: "_" + i ,
             onEnd: onDragEnd,
             filter: '.Modal',
@@ -57,6 +59,7 @@ onMounted(() => {
    new Swiper('#GameScheduleGroupsSwiper',{
       modules: [Pagination],
       initialSlide: 0,
+      allowTouchMove: !props.isBackend,
       spaceBetween: 50,
       speed: 500,
       pagination: {
@@ -79,30 +82,13 @@ onMounted(() => {
          <div class="rt-table swiper-slide" v-for="(matchesForGroup ,groupIndex) in getMatchesGroupPhase(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
 
             <!-- Caption -->
-            <div class="rt-caption">
-               <div>{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
-               <div>{{ "Tisch " + (groupIndex + 1) }}</div>
+            <div class="rt-caption">{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
+
+            <!-- Matches -->
+            <div class="rt-matches">
+               <MatchElement v-for="(match, matchIndex) in matchesForGroup" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
             </div>
 
-            <div class="rt-rows">
-
-               <!-- First Row -->
-               <div class="rt-row1">
-                  <div :style="{'marginLeft': isBackend ? '25px' : ''}">#</div>
-                  <div>Team 1</div>
-                  <div></div>
-                  <div>Team 2</div>
-               </div>
-
-               <!-- Matches -->
-               <div class="rt-matches">
-                  <div class="rt-match" v-for="(match, matchIndex) in matchesForGroup" :key="match">
-                     <hr style="margin: 2px 0px">
-                     <MatchElement :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
-                  </div>
-               </div>
-
-            </div>
          </div>
 
       </div>
@@ -115,91 +101,45 @@ onMounted(() => {
 }
 
 /* Top Swiper Pagination */
-.Schedule .swiper-pagination{
-   position: sticky !important;
-   top: 180px !important;
-   padding-top: 10px !important;
-   padding-bottom: 20px !important;
-   display: flex !important;
-   background-color: white !important;
+#GameScheduleGroups .swiper-pagination, .Standings .swiper-pagination{
+   position: sticky;
+   padding-top: 10px;
+   padding-bottom: 20px;
+   display: flex;
+   background-color: white;
+   top: 216px;
 }
-.Schedule .swiper-pagination-bullet {
-	padding: 5px 10px !important; 
-	border-radius: 0 !important;
-	width: auto !important;
-   height: auto !important;
-	text-align: center !important;
-	color: var(--secondary-color) !important;
-   background-color: transparent !important;
-   opacity: 1 !important; 
-   margin: 0 !important;
-   flex: 1 1 0 !important;
-   text-align: center !important;
+#GameScheduleGroups .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
+	padding: 5px 10px; 
+	border-radius: 0;
+	width: auto;
+   height: auto;
+	text-align: center;
+	color: var(--secondary-color);
+   background-color: transparent;
+   opacity: 1; 
+   margin: 0;
+   flex: 1 1 0;
+   text-align: center;
 }
-.Schedule .swiper-pagination-bullet-active {
-	color:white !important;
-	background: var(--main-color) !important;
+#GameScheduleGroups .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
+	color:white;
+	background: var(--main-color);
 }
-
-
 .rt-caption{
    margin-bottom: 10px;
-}
-.rt-caption div:nth-child(1){
    font-size: 28px;
    font-weight: bold;
    color: var(--main-color);
 }
-.rt-caption div:nth-child(2){
-   font-size: 20px;
-   color: var(--main-color);
-   opacity: 0.7;
-}
-.rt-rows{
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-}
-.rt-row1{
-   display: flex;
-   width: 100%;
-   text-align: center;
-   font-weight: bold;
-   font-size: 20px;
-   margin-bottom: 5px;
-}
-.rt-row1 div:nth-child(1){
-   width: 40px; /* same width as .mt-index from MatchElement.vue */
-}
-.rt-row1 div:nth-child(2){
-   text-align: right;
-   color: var(--main-color);
-}
-.rt-row1 div:nth-child(2), .rt-row1 div:nth-child(4){
-   flex-grow: 1;
-   font-size: 24px;
-}
-.rt-row1 div:nth-child(3){
-   width: 110px; /* same width as .mt-result from MatchElement.vue */
-}
-.rt-row1 div:nth-child(4){
-   text-align: left;
-   color: var(--secondary-color);
-}
-.rt-matches{
-   width: 100%;
-}
 
-/*MOBILE*/
+/* MOBILE */
 @media (width <= 900px){
-   .rt-row1{
-      font-size: 16px;
+   #GameScheduleGroups .swiper-pagination{
+      top: 172px;
    }
-   .rt-row1 div:nth-child(1){
-      display: none;
-   }
-   .rt-row1 div:nth-child(3){
-      width: 60px;
+   .rt-caption{
+      font-size: 22px;
    }
 }
 </style>

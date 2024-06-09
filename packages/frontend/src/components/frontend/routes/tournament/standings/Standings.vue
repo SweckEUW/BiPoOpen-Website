@@ -58,5 +58,9 @@ defineProps(['tournament'])
    .nav-tabs{
       top: 130px;
    }
+   .nav-link{
+      font-size: 14px;
+      padding: 10px 10px;
+   }
 }
 </style>

@@ -65,11 +65,15 @@ var timer = setInterval(updateRemainingTime, 1000);
             </div>  
         </div>
 
+        <!-- Share via Whatsapp -->
         <!-- <div class="ho-share">
             <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
         </div> -->
 
-        <router-link class="ho-share" :to="'/Teamanmeldung'">Anmeldung</router-link>
+        <!-- Anmeldung -->
+        <!-- <router-link class="ho-share" :to="'/Teamanmeldung'">Anmeldung</router-link> -->
+
+        <router-link class="ho-share" :to="'/2024/Teams'">Teilnehmende Teams</router-link>
 
     </div>
 </template>
