@@ -83,29 +83,29 @@ onMounted(() => {
 
 /* Top Swiper Pagination */
 .Standings .swiper-pagination{
-   position: sticky !important;
-   top: 180px !important;
-   padding-top: 10px !important;
-   padding-bottom: 20px !important;
-   display: flex !important;
-   background-color: white !important;
+   position: sticky;
+   padding-top: 10px;
+   padding-bottom: 20px;
+   display: flex;
+   background-color: white;
+   top: 216px;
 }
 .Standings .swiper-pagination-bullet {
-	padding: 5px 10px !important; 
-	border-radius: 0 !important;
-	width: auto !important;
-    height: auto !important;
-	text-align: center !important;
-	color: var(--secondary-color) !important;
-    background-color: transparent !important;
-    opacity: 1 !important; 
-    margin: 0 !important;
-    flex: 1 1 0 !important;
-    text-align: center !important;
+	padding: 5px 10px; 
+	border-radius: 0;
+	width: auto;
+    height: auto;
+	text-align: center;
+	color: var(--secondary-color);
+    background-color: transparent;
+    opacity: 1; 
+    margin: 0;
+    flex: 1 1 0;
+    text-align: center;
 }
 .Standings .swiper-pagination-bullet-active {
-	color:white !important;
-	background: var(--main-color) !important;
+	color:white;
+	background: var(--main-color);
 }
 
 /* Groups Table */
@@ -143,6 +143,13 @@ onMounted(() => {
 .GameStandingsGroups table td:nth-child(2){
     width: 250px;
     max-width: 250px;
+}
+
+/* MOBILE */
+@media (width <= 900px){
+    .Standings .swiper-pagination{
+        top: 172px !important;
+    }
 }
 
 /*MOBILE*/

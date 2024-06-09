@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted } from "vue"
 import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
-import MatchElement from '@/components/shared/MatchElement.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -38,10 +39,10 @@ onMounted(() => {
       }
    });
 
-   swiper.on('slideChange',() => {
+   swiper.on('slideChange', () => {
       let element = document.getElementsByClassName("gsk-stage")[swiper.activeIndex] as HTMLDivElement;
       let root = document.getElementById("GameScheduleKOSwiper") as HTMLDivElement;
-      root.style.height = element.clientHeight + "px";
+      root.style.height = element.offsetHeight + "px";
    });
 });
 </script>
@@ -58,8 +59,8 @@ onMounted(() => {
                <div class="gsk-stage" :class="{'gsk-stage1': stageIndex == 0, 'gsk-finale': stageIndex == tournament.koPhase.matches.length - 1}">
                   <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
                      <div v-if="stageIndex == tournament.koPhase.matches.length - 1" class="gsk-match-name">{{ (matchIndex == 0 ? "Finale" : "Spiel um Platz 3")}}</div>
-                     <div v-if="stageIndex != tournament.koPhase.matches.length - 1" class="gsk-match-table">{{ "Tisch " + (matchIndex + 1) }}</div>
-                     <MatchElement class="gsk-matchElement" :match="match" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
+                     <div v-if="stageIndex != tournament.koPhase.matches.length - 1" class="gsk-match-table">{{ "Tisch " + convertNumberToCharacter(matchIndex + 1) }}</div>
+                     <MatchElement :match="match" :key="match._id" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
                   </div>
                </div>
             </div>
@@ -73,52 +74,44 @@ onMounted(() => {
 .GameScheduleKO{
    overflow: hidden;
 }
+.swiper-wrapper{
+   overflow: visible;
+}
 
 /* Top Swiper Pagination */
-.Schedule .swiper-pagination{
-   width: 100% !important;
-   flex-wrap: wrap !important;
-   position: sticky !important;
-   top: 180px !important;
-   padding-top: 10px !important;
-   padding-bottom: 20px !important;
-   display: flex !important;
-   background-color: white !important;
-}
-.Schedule .swiper-pagination-bullet {
-	padding: 5px 10px !important; 
-	border-radius: 0 !important;
-	width: auto !important;
-   height: auto !important;
-	text-align: center !important;
-	color: var(--secondary-color) !important;
-   background-color: transparent !important;
-   opacity: 1 !important; 
-   margin: 0 !important;
-   flex: 1 1 0 !important;
-   text-align: center !important;
-}
-.Schedule .swiper-pagination-bullet-active {
-	color:white !important;
-	background: var(--main-color) !important;
-}
-
-
-.gsk-stage{
+#GameScheduleKO .swiper-pagination{
+   width: 100%;
    min-height: 100%;
+   flex-wrap: wrap;
+   position: sticky;
+   padding-top: 10px;
+   top: 216px;
+   padding-bottom: 20px;
+   display: flex;
+   background-color: white;
 }
+#GameScheduleKO .swiper-pagination-bullet {
+	padding: 5px 10px; 
+	border-radius: 0;
+	width: auto;
+   height: auto;
+	text-align: center;
+	color: var(--secondary-color);
+   background-color: transparent;
+   opacity: 1; 
+   margin: 0;
+   flex: 1 1 0;
+   text-align: center;
+}
+#GameScheduleKO .swiper-pagination-bullet-active {
+	color:white;
+	background: var(--main-color);
+}
+
 .gsk-finale{
    justify-content: center;
 }
-.gsk-match{
-   border: 1px solid black;
-   padding: 10px;
-   margin: 20px;
-   margin-left: 0px;
-   margin-bottom: 10px;
-}
 .gsk-match-table{
-   margin-bottom: 5px;
    display: inline-block;
    color: var(--main-color);
 }
@@ -129,31 +122,20 @@ onMounted(() => {
    white-space: break-spaces;
    color: var(--main-color);
 }
-.gsk-matchElement{
-   width: 600px; 
-   height: 115px !important;
-}
 
 /*MOBILE*/
 @media (width <= 900px){
-   .gsk-matchElement{
-      width: 90vw;
-      height: 125px;
+   #GameScheduleKO .swiper-pagination{
+      top: 172px;
    }
-   .gsk-match{
-      padding: 5px;
-      margin: 5px;
-      margin-top: 0px;
-      margin-left: 0px;
-   }
-   .Schedule .swiper-pagination-bullet {
+   #GameScheduleKO .swiper-pagination-bullet {
       font-size: 15px;
    }
 }
 
 /*MOBILE S*/
 @media (width <= 360px){
-   .Schedule .swiper-pagination-bullet {
+   #GameScheduleKO .swiper-pagination-bullet {
       font-size: 12px;
    }
 }

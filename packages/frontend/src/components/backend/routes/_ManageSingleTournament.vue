@@ -20,7 +20,7 @@ getTournament();
 
 <template>
    <div class="ManageTournament" v-if="tournament">
-      <h1>{{ 'Turnier: ' + tournament.name}}</h1>
+      <h1 class="mt-title">{{ 'Turnier: ' + tournament.name}}</h1>
 
       <!-- Tabs -->
       <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -54,6 +54,26 @@ getTournament();
 
 <style>
 .ManageTournament .nav-tabs{
-   top: 99px !important;
+   top: 140px !important;
+   position: sticky;
+   z-index: 2;
+   background-color: white;
+}
+.ManageTournament .Schedule .nav-tabs{
+   top: 185px !important;
+}
+.ManageTournament .Schedule .swiper-pagination{
+   top: 245px !important;
+}
+.mt-title{
+   top: 90px !important;
+   position: sticky;
+   z-index: 2;
+   background-color: white;
+   margin-bottom: 0;
+   padding-bottom: 10px;
+}
+.ManageTournament button{
+   font-size: 20px;
 }
 </style>

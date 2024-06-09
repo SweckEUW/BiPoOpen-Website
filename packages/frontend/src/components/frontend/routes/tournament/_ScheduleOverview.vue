@@ -9,7 +9,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-import MatchElement from '@/components/shared/MatchElement.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 
 import { useRoute } from "vue-router";
 const route = useRoute()
@@ -66,7 +66,6 @@ initSwiper();
                <!-- Caption -->
                <div class="rt-caption">
                   <div>{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
-                  <div>{{ "Tisch " + (groupIndex + 1) }}</div>
                </div>
 
                <div class="rt-rows">

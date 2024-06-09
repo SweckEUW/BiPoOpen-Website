@@ -123,7 +123,7 @@ const clearInputs = () => {
 
         <!-- Button 2 -->
         <template #confirm>
-            <div @click="isGroupPhase ? setResultGroupPhase(): setResultKOPhase();">Eintragen</div>
+            <div @click="isGroupPhase ? setResultGroupPhase(): setResultKOPhase();">{{ match.result ? 'Bearbeiten' : 'Eintragen' }}</div>
         </template>
     </Modal>
 </template>

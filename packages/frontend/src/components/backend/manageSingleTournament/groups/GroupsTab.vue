@@ -16,7 +16,7 @@ const changeGroups = async () => {
    let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
    for (let i = 0; i < groupAmmount; i++){ // Loop over all Groups
       let teams:any = [];
-      let teamsDomElment:any = document.getElementById("Group-"+i)?.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
+      let teamsDomElment:any = document.getElementById("Group-"+i)!.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
       for (let y = 0; y < teamsDomElment.length; y++) {
          teams.push({
             teamID: getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)._id
@@ -68,9 +68,19 @@ const generateGroups = async () => {
    await props.getTournament();
 
    // DEBUG!
-   // props.tournament.groupPhase.matches.forEach((groupMatches:any) => {
-   //    groupMatches.forEach((match:any) => {
-   //       setGameResultGroupPhase(props.tournament, match._id, 5, 5, 2, 2);
+   // props.tournament.groupPhase.matches.forEach(async (groupMatches:any) => {
+   //    await groupMatches.forEach(async (match:any) => {
+   //       let team1Won = Math.random() > 0.5;
+   //       let result = {
+   //          team1Score: team1Won ? 10 : Math.floor(Math.random() * 9),
+   //          team1Player1Score: Math.floor(Math.random() * 9), 
+   //          team1Player2Score: Math.floor(Math.random() * 9), 
+         
+   //          team2Score: team1Won ? Math.floor(Math.random() * 9) : 10,
+   //          team2Player1Score: Math.floor(Math.random() * 9), 
+   //          team2Player2Score: Math.floor(Math.random() * 9)
+   //       }
+   //       await setGameResultGroupPhase(props.tournament, match._id, result);
    //    });
    // });
 

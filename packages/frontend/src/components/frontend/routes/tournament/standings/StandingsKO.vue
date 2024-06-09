@@ -14,7 +14,7 @@ window.addEventListener("resize", () => {
     <div class="GameStandingsKO">
 
         <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !checkIfTournamentFinished(tournament)">
-            Turnier ist noch nicht zuende gespielt
+            Das Turnier ist noch nicht zuende gespielt
         </div>
 
         <table v-if="tournament && checkIfTournamentFinished(tournament)" class="table table-hover caption-top">
@@ -72,7 +72,7 @@ table td{
 table th{
     color: var(--main-color);
     position: sticky;
-    top: 185px;
+    top: 216px;
     padding-top: 15px;
     background-color: white;
 }
@@ -100,9 +100,11 @@ table td:nth-child(2){
 /*MOBILE*/
 @media (width <= 900px){
     .nav-tabs{
-      top: 130px;
+        top: 130px;
     }
-
+    caption{
+        font-size: 22px;
+    }
     table *{
         font-size: 14px;
     }
@@ -121,8 +123,8 @@ table td:nth-child(2){
         width: 60px;
         min-width: 60px;
     }
-    caption{
-        font-size: 22px;
+    table th{
+        top: 172px;
     }
     tbody tr:nth-of-type(1){
         font-size: 22px;
