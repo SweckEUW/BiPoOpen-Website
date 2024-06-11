@@ -171,6 +171,7 @@ onMounted(() => {
     .GameStandingsGroups table td:nth-child(6){
         width: 60px;
         min-width: 60px;
+        white-space: nowrap;
     }
     .GameStandingsGroups caption{
         font-size: 22px;

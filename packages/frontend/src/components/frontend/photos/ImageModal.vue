@@ -15,11 +15,10 @@ onMounted(() => {
     setTimeout(() => {
         swiper = new Swiper('#Gallery',{
             modules: [Pagination, Navigation, Zoom],
-            zoom: true,
             initialSlide: props.index,
             spaceBetween: 50,
             speed: 500,
-            direction: 'horizontal',
+            zoom: true,
             pagination: {
                 el: ".swiper-pagination",
                 type: "fraction",
@@ -116,8 +115,6 @@ watch(() => props.index, () => {
 .ImageModal .swiper-container{
     width: 100%;
     height: 100%;
-    overflow: visible;
-    position: relative;
 }
 .ImageModal .swiper-pagination{
     color: var(--main-color);

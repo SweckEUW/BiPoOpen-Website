@@ -25,7 +25,7 @@ const getStageText = (stageIndex:number) => {
 }
 
 onMounted(() => {
-   let swiper = new Swiper('#GameScheduleKOSwiper',{
+   new Swiper('#GameScheduleKOSwiper',{
       modules: [Pagination],
       initialSlide: 0,
       spaceBetween: 50,
@@ -39,11 +39,12 @@ onMounted(() => {
       }
    });
 
-   swiper.on('slideChange', () => {
-      let element = document.getElementsByClassName("gsk-stage")[swiper.activeIndex] as HTMLDivElement;
-      let root = document.getElementById("GameScheduleKOSwiper") as HTMLDivElement;
-      root.style.height = element.offsetHeight + "px";
-   });
+   // TODO: enlarged MatchElement gets cut off because height is set as fixed
+   // swiper.on('slideChange', () => {
+   //    let element = document.getElementsByClassName("gsk-stage")[swiper.activeIndex] as HTMLDivElement;
+   //    let root = document.getElementById("GameScheduleKOSwiper") as HTMLDivElement;
+   //    root.style.height = element.offsetHeight + "px";
+   // });
 });
 </script>
 

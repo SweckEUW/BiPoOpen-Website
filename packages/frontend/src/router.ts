@@ -98,7 +98,7 @@ const routes = [
 	// Redirect
 	{
 		path: '/Spielplan',
-		redirect: '/2023/Spielplan'
+		redirect: '/2024/Spielplan'
 	},
 
 	// Backend
