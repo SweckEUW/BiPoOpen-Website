@@ -32,15 +32,10 @@ const initSwiper = async () => {
    await getTournament();
    setTimeout(() => {
       new Swiper('#SwiperScheduleOverview',{
-         modules: [Pagination, Navigation, Autoplay],
+         modules: [Pagination, Autoplay],
          spaceBetween: 100,
          speed: 2000,
-         direction: 'horizontal',
-         mousewheel: {
-            invert: true,
-         },
          loop: true,
-         observer: true,
          pagination: {
             el: '#SwiperPaginationScheduleOverview',
             clickable: true,

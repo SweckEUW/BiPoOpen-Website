@@ -25,7 +25,7 @@ const getStageText = (stageIndex:number) => {
 }
 
 onMounted(() => {
-   let swiper = new Swiper('#GameScheduleKOSwiper',{
+   new Swiper('#GameScheduleKOSwiper',{
       modules: [Pagination],
       initialSlide: 0,
       spaceBetween: 50,
