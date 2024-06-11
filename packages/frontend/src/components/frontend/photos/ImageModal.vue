@@ -113,7 +113,6 @@ watch(() => props.index, () => {
 
 /* Swiper */
 .ImageModal .swiper-container{
-    width: 100%;
     height: 100%;
 }
 .ImageModal .swiper-pagination{
