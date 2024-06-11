@@ -13,12 +13,14 @@ const props = defineProps(['imageURL', 'toggleModal', 'pictures', 'index'])
 let swiper:any;
 onMounted(() => {
     setTimeout(() => {
+        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        
         swiper = new Swiper('#Gallery',{
             modules: [Pagination, Navigation, Zoom],
             zoom: true,
             initialSlide: props.index,
             spaceBetween: 50,
-            speed: 500,
+            speed: isSafari ? 0 : 500,
             direction: 'horizontal',
             pagination: {
                 el: ".swiper-pagination",
