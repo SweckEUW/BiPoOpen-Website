@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-var end = new Date(2024,5,29,13);
+var end = new Date(2024,5,29,14);
 
 var _second = 1000;
 var _minute = _second * 60;
 var _hour = _minute * 60;
 var _day = _hour * 24;
 
+let countdownOver = ref(false);
 
 let daysRef = ref(0);
 let hoursRef = ref(0);
@@ -19,7 +20,7 @@ const updateRemainingTime = () => {
     var distance = end.getTime() - now.getTime();
     if (distance < 0) {
         clearInterval(timer);
-        // Time expired
+        countdownOver.value = true;
         return;
     }
 
@@ -41,28 +42,42 @@ var timer = setInterval(updateRemainingTime, 1000);
 
 <template>
     <div class="Home">
-        <h1 class="ho-title">BiPo Open 2024</h1>
-        <h1 class="ho-title">Samstag 29.06.2024 - 14:00 Uhr</h1>
-        <div class="ho-timer">
-            <div class="ho-time">
-                <div>{{ daysRef }}</div>
-                <div>Tage</div>
+        <h1 class="ho-title-1">BiPo Open 2024</h1>
+
+        <div v-if="!countdownOver">
+            <h1 class="ho-title-2">Samstag 29.06.2024 - 14:00 Uhr</h1>
+
+            <div class="ho-timer">
+                <div class="ho-time">
+                    <div>{{ daysRef }}</div>
+                    <div>Tage</div>
+                </div>
+                <div class="ho-timer-break">:</div>
+                <div class="ho-time">
+                    <div>{{ hoursRef }}</div>
+                    <div>Stunden</div>
+                </div>
+                <div class="ho-timer-break">:</div>
+                <div class="ho-time">
+                    <div>{{ minutesRef }}</div>
+                    <div>Minuten</div>
+                </div>  
+                <div class="ho-timer-break">:</div>
+                <div class="ho-time">
+                    <div>{{ secondsRef }}</div>
+                    <div>Sekunden</div>
+                </div>  
             </div>
-            <div class="ho-timer-break">:</div>
-            <div class="ho-time">
-                <div>{{ hoursRef }}</div>
-                <div>Stunden</div>
+
+            <div class="ho-share-container">
+                <router-link class="ho-share" :to="'/2024/Teams'">Teilnehmende Teams</router-link>
             </div>
-            <div class="ho-timer-break">:</div>
-            <div class="ho-time">
-                <div>{{ minutesRef }}</div>
-                <div>Minuten</div>
-            </div>  
-            <div class="ho-timer-break">:</div>
-            <div class="ho-time">
-                <div>{{ secondsRef }}</div>
-                <div>Sekunden</div>
-            </div>  
+
+        </div>
+
+        <div v-if="countdownOver" class="ho-links">
+            <router-link class="ho-share" :to="'/2024/Spielplan'">Spielplan</router-link>
+            <router-link class="ho-share" :to="'/2024/MVP'">MVP-Tabelle</router-link>
         </div>
 
         <!-- Share via Whatsapp -->
@@ -73,7 +88,6 @@ var timer = setInterval(updateRemainingTime, 1000);
         <!-- Anmeldung -->
         <!-- <router-link class="ho-share" :to="'/Teamanmeldung'">Anmeldung</router-link> -->
 
-        <router-link class="ho-share" :to="'/2024/Teams'">Teilnehmende Teams</router-link>
 
     </div>
 </template>
@@ -86,16 +100,17 @@ var timer = setInterval(updateRemainingTime, 1000);
     align-items: center;
     flex-direction: column;
 }
-.ho-title:nth-of-type(1){
+.ho-title-1{
     color: var(--main-color);
     font-size: 100px;
     margin-bottom: 60px;
     margin-top: 50px;
 }
-.ho-title:nth-of-type(2){
+.ho-title-2{
     color: var(--main-color);
     font-size: 40px;
     margin-bottom: 0px;
+    text-align: center;
 }
 .ho-timer{
     display: flex;
@@ -117,23 +132,39 @@ var timer = setInterval(updateRemainingTime, 1000);
     text-align: center;
     width: 120px;
 }
+.ho-share-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
 .ho-share{
-    margin-top: 50px;
+    margin-top: 30px;
     padding: 20px 40px;
     background-color: var(--main-color);
     cursor: pointer;
     color: white;
     text-decoration: none;
+    text-align: center;
+}
+.ho-links{
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.ho-links .ho-share{
+    margin-top: 10px;
+    width: 100%;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
-    .ho-title:nth-of-type(1){
+    .ho-title-1{
         font-size: 45px;
         margin-bottom: 30px;
         margin-top: 100px;
     }
-    .ho-title:nth-of-type(2){
+    .ho-title-2{
         font-size: 22px;
     }
     .ho-time div:nth-child(2){
@@ -151,10 +182,10 @@ var timer = setInterval(updateRemainingTime, 1000);
 
 /*MOBILE S*/
 @media (width <= 360px){
-    .ho-title:nth-of-type(1){
+    .ho-title-1{
         font-size: 40px;
     }
-    .ho-title:nth-of-type(2){
+    .ho-title-2{
         font-size: 20px;
     }
 }
