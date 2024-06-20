@@ -23,10 +23,9 @@
         <h2>Spielbeginn</h2>
         <div>
             Das Beginner-Team, wird durch eine einfache Runde Schnick-Schnack-Schnuck ausgewählt.
-            Ein Cup gilt als getroffen, wenn der Ball in einen Cup fliegt und dort liegen bleibt. 
-            Wird ein Cup getroffen, muss dieser getrunken werden. Der Ball darf nur berührt werden, wenn er zuvor den Tisch oder einen Cup berührt hat.
-            Ablenkungsmanöver sind erlaubt, Cups, Tisch und Gegner dürfen dabei jedoch nicht berührt werden. 
-            Das Erzeugen eines Windstoßes zum Verändern der Fluglinie des Balles sowie das Herauspusten oder Herausfingern von Bällen aus Bechern ist verboten.
+            Ein Cup gilt als getroffen, wenn der Ball in einen Cup fliegt und dort liegen bleibt <strong>(Pusten, Fingern oder ähnliche Taktiken sind nicht erlaubt)</strong>.  
+            Wird ein Cup getroffen, muss dieser getrunken werden.
+            Das Spiel gilt als gewonnen, wenn ein Team alle Becher des Gegners getroffen hat.
         </div>
 
         <h2>Wurf</h2>
@@ -34,8 +33,9 @@
             Jedes Team hat pro Zug zwei Würfe. 
             Verlässt der Ball die Hand des Werfers, so ist der Ball im Spiel und gilt als geworfen.
             Damit ein Treffer gültig ist, muss der <strong>Ellenbogen beim Wurf hinter der Kante des Tisches verbleiben</strong>.
-            Fällt ein Cup wegen eines Balles um, muss der Rest getrunken werden und der Becher ist aus dem Spiel.
-            Wirft ein Spieler absichtlich oder unabsichtlich einen oder mehrere seiner eigenen Cups vom Tisch, gelten diese als getroffen und sind aus dem Spiel.
+            Fällt ein Cup wegen eines Balles um, muss der Rest getrunken werden und der Becher gilt als getroffen.
+            Wirft ein Spieler absichtlich oder unabsichtlich einen oder mehrere seiner eigenen Cups vom Tisch, gelten diese als getroffen.
+            Wird ein Ball vom Gegnerteam gefangen, bevor der Ball den Tisch oder einen Becher berührt, gilt der Wurf als Treffer. Der Werfer darf sich den getroffenen Becher auswählen.   
         </div>
 
         <h2>Bouncer</h2>
@@ -48,13 +48,13 @@
 
         <h2>Balls Back</h2>
         <div>
-            Versenkt ein Team beide Bälle in einer Runde, bekommt es beide Bälle zurück und darf noch einmal werfen.
+            Versenkt ein Team beide Bälle in einer Runde, bekommen beide Werfer die Bälle zurück und sie dürfen erneut werfen.
         </div>
 
         <h2>Bombe</h2>
         <div>
             Wenn ein Team mit beiden Bällen in denselben Becher trifft, müssen drei Becher getrunken werden.
-            <strong>Die Werfer entscheiden, welche Becher das sind </strong> und erhalten die Bälle zurück.
+            <strong>Die Werfer entscheiden, welche Becher das sind</strong> und erhalten die Bälle zurück.
         </div>
 
         <h2>On-Fire</h2>
@@ -65,7 +65,7 @@
 
         <h2>Trickshot</h2>
         <div>
-            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so ist der Werfer erneut dran</strong>.
+            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so ist der Werfer erneut dran</strong>. 
             Der Wurf muss ein Trickshot sein.
             Zur Verhinderung eines Trickhots hat das andere Team ebenfalls die Möglichkeit, den Ball auf dem gesamten Tisch abzufangen.
             Als Trickshot gilt nicht der Wurf mit der schwachen Hand. 
