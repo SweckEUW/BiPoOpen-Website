@@ -28,8 +28,8 @@ onUnmounted(() => {
       
       <h1 class="bp-title">{{"Spielplan " + (route.params.id as string).replaceAll('-',' ') }}</h1>
 
-      <Loadingscreen v-show="!tournament"/>
-      <Schedule v-show="tournament && tournament.groupPhase.groups" :tournament="tournament"/>
+      <Loadingscreen v-if="!tournament"/>
+      <Schedule v-if="tournament && tournament.groupPhase.groups" :tournament="tournament"/>
 
       <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
          Turnierplan wurde noch nicht erstellt

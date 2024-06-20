@@ -10,19 +10,19 @@ defineProps(['tournament'])
       <!-- Tabs -->
       <ul class="nav nav-tabs justify-content-center">
          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#GameStandingsGroups">Gruppenphase</button>
+            <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameStandingsGroups' + tournament._id">Gruppenphase</button>
          </li>
          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#GameStandingsKO">K.o.Phase</button>
+            <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameStandingsKO' + tournament._id">K.o.Phase</button>
          </li>
       </ul>
 
       <!-- Content -->
       <div class="tab-content">
-         <div class="tab-pane fade show active" id="GameStandingsGroups">
+         <div class="tab-pane fade show active" :id="'GameStandingsGroups' + tournament._id">
             <StandingsGroups :tournament="tournament"/>
          </div>
-         <div class="tab-pane fade" id="GameStandingsKO">
+         <div class="tab-pane fade" :id="'GameStandingsKO' + tournament._id">
             <StandingsKO :tournament="tournament"/>
          </div>
       </div>

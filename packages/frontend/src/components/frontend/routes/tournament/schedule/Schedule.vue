@@ -10,19 +10,19 @@ defineProps(['getTournament','tournament',"isBackend"])
       <!-- Tabs -->
       <ul class="nav nav-tabs justify-content-center">
          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#GameScheduleGroups">Gruppenphase</button>
+            <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameScheduleGroups' + tournament._id">Gruppenphase</button>
          </li>
          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#GameScheduleKO">K.o.Phase</button>
+            <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameScheduleKO' + tournament._id">K.o.Phase</button>
          </li>
       </ul>
 
       <!-- Content -->
-      <div class="tab-content">
-         <div class="tab-pane fade show active" id="GameScheduleGroups">
+      <div class="tab-content" id="GameScheduleGroupsContainer">
+         <div class="tab-pane fade show active" :id="'GameScheduleGroups' + tournament._id">
             <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
          </div>
-         <div class="tab-pane fade" id="GameScheduleKO">
+         <div class="tab-pane fade" :id="'GameScheduleKO' + tournament._id">
             <ScheduleKO :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
          </div>
       </div>
