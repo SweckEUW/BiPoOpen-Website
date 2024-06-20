@@ -8,6 +8,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open',
+			description: ''
 		}
 	},
 	{
@@ -16,6 +17,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Regeln',
+			description: 'Regeln'
 		}
 	},
 
@@ -25,6 +27,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Hall of Fame',
+			description: 'Hall of Fame'
 		}
 	},
 
@@ -34,6 +37,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2024 - Teamanmeldung',
+			description: 'Teamanmeldung'
 		},
 	},
 
@@ -44,6 +48,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/schedule/_Schedule.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Spielplan',
+			description: 'Spielplan'
 		}
 	},
 	{
@@ -52,6 +57,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/standings/_Standings.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Platzierungen',
+			description: 'Platzierungen'
 		}
 	},
 	{
@@ -60,6 +66,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_MVP.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - MVP',
+			description: 'Most Valuable Player'
 		}
 	},
 	{
@@ -68,6 +75,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_ScheduleOverview.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Spielplan-Übersicht',
+			description: 'Spielplan-Übersicht'
 		}
 	},
 	{
@@ -76,6 +84,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_Summary.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Zusammenfassung',
+			description: 'Zusammenfassung'
 		}
 	},
 	{
@@ -84,6 +93,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_Photos.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Fotos',
+			description: 'Fotos'
 		}
 	},
 	{
@@ -92,6 +102,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/tournament/_Teams.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Teams',
+			description: 'Teams'
 		}
 	},
 
@@ -108,6 +119,7 @@ const routes = [
 		component: () => import('@/components/backend/routes/_ManageTournaments.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Manage',
+			description: ''
 		}
 	},
 	{
@@ -116,6 +128,7 @@ const routes = [
 		component: () => import('@/components/backend/routes/_ManageSingleTournament.vue'),
 		meta: {
 			title: 'Weck BiPo Open REPLACE - Manage',
+			description: ''
 		}
 	},
 	
@@ -126,6 +139,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_NotFound404.vue'),
 		meta: {
 			title: 'Weck BiPo Open - 404',
+			description: '404 Seite nicht gefunden'
 		}
 	},
 
@@ -135,6 +149,7 @@ const routes = [
 		component: () => import('@/components/frontend/routes/_Imprint.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Impressum',
+			description: 'Impressum'
 		}
 	}
 
@@ -148,15 +163,15 @@ const router = createRouter({
 	}
 });
 
-router.beforeEach((to, from, next) => {
-	// @ts-ignore 
-	document.title = to.meta.title;
+router.beforeResolve((to, from, next) => {
+	let title = (to.meta.title as string).replace("REPLACE", to.params.id as string)
+	document.title = title;
+	(document.querySelector("meta[property='og:title']")as HTMLMetaElement).content = title;
+	
+	let description = (to.meta.description as string).replace("REPLACE", to.params.id as string);
+	(document.querySelector("meta[name=description]") as HTMLMetaElement).content = description;
+	(document.querySelector("meta[property='og:description']")as HTMLMetaElement).content = description;
 
-	if(document.title.includes("REPLACE")){
-		// @ts-ignore 
-		document.title = document.title.replace("REPLACE", to.params.id);
-	}
-		
 	next();
 });
 
