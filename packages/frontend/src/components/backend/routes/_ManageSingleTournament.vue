@@ -76,4 +76,21 @@ getTournament();
 .ManageTournament button{
    font-size: 20px;
 }
+
+/* MOBILE */
+@media (width <= 900px){
+   .mt-title{
+      font-size: 20px;
+      top: 78px !important;
+   }
+   .ManageTournament .nav-tabs{
+      top: 110px !important;
+   }
+   .ManageTournament .Schedule .nav-tabs{
+      top: 155px !important;
+   }
+   .ManageTournament .Schedule .swiper-pagination{
+      top: 195px !important;
+   }
+}
 </style>
