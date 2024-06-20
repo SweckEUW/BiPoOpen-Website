@@ -162,7 +162,7 @@ export const getTopTeams = (tournament:any) => {
 
     let matches = getMatchesKOPhase(tournament);
 
-    // If not all Games are played out there are not top 4 Teams
+    // If not all Games are played out there are no top 4 Teams
     for (let i = 0; i < matches.length; i++){
         for (let x = 0; x < matches[i].length; x++) {
             if(!matches[i][x].result){

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
+import { getTournamentWithRouterID, getPlayersWithStats, getTopTeams } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
@@ -109,6 +109,14 @@ const giveArrowClass = (value:string) => {
     if(value == sortValue.value) //windowWidth.value > 900 && 
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
 }
+
+let winners = [
+    { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
+    { year: "2022", name: "Taube Nüsschen", player1: "Patrick Pohlmann", player2: "Tim Becker"},
+    { year: "2021", name: "Pong Daddys", player1: "Matthias Weck", player2: "Lennard Kaffitz"},
+    { year: "2020", name: "Dynamo #DruckAmGlas", player1: "Alexander Borsig", player2: "Björn Harz"}
+]
+let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 </script>
 
 <template>
@@ -119,6 +127,25 @@ const giveArrowClass = (value:string) => {
         <Loadingscreen v-show="tournaments.length != tournamentsToEvaluate.length"/>
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
+
+            <!-- <div v-for="tournament,i in tournaments">
+                <div v-for="team in getTopTeams(tournament).slice(0,1)">
+                    <div><strong>{{ 2020 + i + ". "}}</strong>{{ team.name }}</div>
+                </div>
+            </div> -->
+
+            <div class="hof-winner" v-for="winner in winners">
+                <div class="hof-winner-icon">
+                    <img :src="trophyIcon" alt="">
+                    <div>{{ winner.year }}</div>
+                </div>
+                <div class="hof-team">
+                    <div class="hof-team-name">{{ winner.name }}</div>
+                    <div>{{ winner.player1 }}</div>
+                    <div>{{ winner.player2 }}</div>
+                </div>
+            </div>
+
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
@@ -162,8 +189,52 @@ const giveArrowClass = (value:string) => {
 </template>
 
 <style scoped>
+/* HoF Winners */
+.hof-winner{
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0px 40px 30px 40px;
+}
+.hof-winner::after {
+  content: '';
+  position: absolute;
+  left: 25%;
+  bottom: -20px;
+  width: 50%;
+  border-bottom: 1px solid var(--main-color);
+  opacity: 0.5;
+}
+.hof-winner:nth-child(even){
+    flex-direction: row-reverse;
+}
+.hof-winner-icon{
+    position: relative;
+    margin-right: 20px;
+}
+.hof-winner-icon img{
+    width: 80px;
+}
+.hof-winner-icon div{
+    position: absolute;
+    bottom: 5px;
+    left: 22px;
+    font-weight: bold;
+    color: white;
+}
+.hof-team{
+    flex: 1;
+    text-align: center;
+}
+.hof-team-name{
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
 .hof-text{
     text-align: center;
+    margin-top: 50px;
     margin-bottom: 50px;
     font-size: 18px;
     color: var(--main-color);
