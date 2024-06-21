@@ -20,14 +20,6 @@ const getTournament = async () => {
 }
 getTournament();
 
-let updateInterval = setInterval(() => {
-   getTournament();
-}, 10000);
-
-onUnmounted(() => {
-   clearInterval(updateInterval);
-});
-
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
@@ -133,18 +125,20 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     <div><strong>{{ 2020 + i + ". "}}</strong>{{ team.name }}</div>
                 </div>
             </div> -->
-
-            <div class="hof-winner" v-for="winner in winners">
-                <div class="hof-winner-icon">
-                    <img :src="trophyIcon" alt="">
-                    <div>{{ winner.year }}</div>
-                </div>
-                <div class="hof-team">
-                    <div class="hof-team-name">{{ winner.name }}</div>
-                    <div>{{ winner.player1 }}</div>
-                    <div>{{ winner.player2 }}</div>
+            <div class="hof-winners">
+                <div class="hof-winner" v-for="winner in winners">
+                    <div class="hof-winner-icon">
+                        <img :src="trophyIcon" alt="">
+                        <div>{{ winner.year }}</div>
+                    </div>
+                    <div class="hof-team">
+                        <div class="hof-team-name">{{ winner.name }}</div>
+                        <div>{{ winner.player1 }}</div>
+                        <div>{{ winner.player2 }}</div>
+                    </div>
                 </div>
             </div>
+
 
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
@@ -190,18 +184,25 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
 <style scoped>
 /* HoF Winners */
+.hof-winners{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 .hof-winner{
     position: relative;
     display: flex;
     align-items: center;
     margin: 0px 40px 30px 40px;
+    width: 20%;
 }
 .hof-winner::after {
   content: '';
   position: absolute;
-  left: 25%;
   bottom: -20px;
-  width: 50%;
+  width: 100%;
   border-bottom: 1px solid var(--main-color);
   opacity: 0.5;
 }
@@ -287,6 +288,9 @@ table td{
 
 /*MOBILE*/
 @media (width <= 900px){
+    .hof-winner{
+        width: 85%;
+    }
     .hof-text{
         font-size: 16px;
         margin-bottom: 30px;
