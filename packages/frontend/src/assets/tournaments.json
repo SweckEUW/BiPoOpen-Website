@@ -1,8 +1,8 @@
 [
 	{
 		"name": "2024",
-		"mvp": false,
-		"games": false
+		"mvp": true,
+		"games": true
 	},
 	{
 		"name": "2023",
