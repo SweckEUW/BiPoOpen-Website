@@ -18,7 +18,7 @@ defineProps(['getTournament','tournament',"isBackend"])
       </ul>
 
       <!-- Content -->
-      <div class="tab-content" id="GameScheduleGroupsContainer">
+      <div class="tab-content" id="GameScheduleContainer">
          <div class="tab-pane fade show active" :id="'GameScheduleGroups' + tournament._id">
             <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
          </div>
