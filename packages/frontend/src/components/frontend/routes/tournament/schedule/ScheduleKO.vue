@@ -80,7 +80,7 @@ onMounted(() => {
 }
 
 /* Top Swiper Pagination */
-#GameScheduleKO .swiper-pagination{
+#GameScheduleContainer .swiper-pagination{
    width: 100%;
    min-height: 100%;
    flex-wrap: wrap;
@@ -91,7 +91,7 @@ onMounted(() => {
    display: flex;
    background-color: white;
 }
-#GameScheduleKO .swiper-pagination-bullet {
+#GameScheduleContainer .swiper-pagination-bullet {
 	padding: 5px 10px; 
 	border-radius: 0;
 	width: auto;
@@ -104,7 +104,7 @@ onMounted(() => {
    flex: 1 1 0;
    text-align: center;
 }
-#GameScheduleKO .swiper-pagination-bullet-active {
+#GameScheduleContainer .swiper-pagination-bullet-active {
 	color:white;
 	background: var(--main-color);
 }
@@ -126,17 +126,17 @@ onMounted(() => {
 
 /*MOBILE*/
 @media (width <= 900px){
-   #GameScheduleKO .swiper-pagination{
+   #GameScheduleContainer .swiper-pagination{
       top: 172px;
    }
-   #GameScheduleKO .swiper-pagination-bullet {
+   #GameScheduleContainer .swiper-pagination-bullet {
       font-size: 15px;
    }
 }
 
 /*MOBILE S*/
 @media (width <= 360px){
-   #GameScheduleKO .swiper-pagination-bullet {
+   #GameScheduleContainer .swiper-pagination-bullet {
       font-size: 12px;
    }
 }

@@ -101,7 +101,7 @@ onMounted(() => {
 }
 
 /* Top Swiper Pagination */
-#GameScheduleGroupsContainer .swiper-pagination, .Standings .swiper-pagination{
+#GameScheduleContainer .swiper-pagination, .Standings .swiper-pagination{
    position: sticky;
    padding-top: 10px;
    padding-bottom: 20px;
@@ -109,7 +109,7 @@ onMounted(() => {
    background-color: white;
    top: 216px;
 }
-#GameScheduleGroupsContainer .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
+#GameScheduleContainer .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
 	padding: 5px 10px; 
 	border-radius: 0;
 	width: auto;
@@ -122,7 +122,7 @@ onMounted(() => {
    flex: 1 1 0;
    text-align: center;
 }
-#GameScheduleGroupsContainer .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
+#GameScheduleContainer .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
 	color:white;
 	background: var(--main-color);
 }
@@ -135,7 +135,7 @@ onMounted(() => {
 
 /* MOBILE */
 @media (width <= 900px){
-   #GameScheduleGroupsContainer .swiper-pagination{
+   #GameScheduleContainer .swiper-pagination{
       top: 172px;
    }
    .rt-caption{
