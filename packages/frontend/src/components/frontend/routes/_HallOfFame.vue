@@ -121,11 +121,20 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
 
-            <!-- <div v-for="tournament,i in tournaments">
-                <div v-for="team in getTopTeams(tournament).slice(0,1)">
-                    <div><strong>{{ 2020 + i + ". "}}</strong>{{ team.name }}</div>
+            <!-- <div class="hof-winners">
+                <div class="hof-winner" v-for="tournament,i in tournaments.reverse()">
+                    <div class="hof-winner-icon">
+                        <img :src="trophyIcon" alt="">
+                        <div>{{ 2020 + i }}</div>
+                    </div>
+                    <div class="hof-team">
+                        <div class="hof-team-name">{{ getTopTeams(tournament)[0].name }}</div>
+                        <div>{{ getTopTeams(tournament)[0].players[0] }}</div>
+                        <div>{{ getTopTeams(tournament)[0].players[1] }}</div>
+                    </div>
                 </div>
             </div> -->
+
             <div class="hof-winners">
                 <div class="hof-winner" v-for="winner in winners">
                     <div class="hof-winner-icon">
