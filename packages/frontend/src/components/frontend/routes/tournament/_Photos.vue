@@ -88,24 +88,20 @@ window.onscroll = () => {
         <!-- 2023 -->
         <div v-if="route.params.id == '2023'">
             <div class="pt-intro">
-                Ein großes Dankeschön an 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
-                der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+                Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
                 <br>
                 Folgt ihm gerne auf Instagram 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
             </div>
         </div>  
 
         <!-- 2024 -->
         <div v-if="route.params.id == '2024'">
             <div class="pt-intro">
-                Ein großes Dankeschön an 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
-                der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+                Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
                 <br>
                 Folgt ihm gerne auf Instagram 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
             </div>
         </div>  
 
