@@ -47,7 +47,7 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
 
 				<div v-for="tournament in tournaments" :key="tournament.name">
-					<DropDown :name="tournament.name" :isOpen="tournament.name == '2024'"> <!-- :isOpen="tournament.name == 'Kirmes 2023'" -->
+					<DropDown :name="tournament.name"> <!-- :isOpen="tournament.name == 'Kirmes 2023'" -->
 						<template #header>
 							<div class="ap-dropdown-title">{{tournament.name}}</div>
 						</template>

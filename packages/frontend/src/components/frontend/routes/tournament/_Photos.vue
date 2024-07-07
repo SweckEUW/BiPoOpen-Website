@@ -18,14 +18,19 @@ onMounted(async () => {
 
 let pictures:any = ref([]);
 const setupImages = async () => {
+
+    // Get IDs of images ind drive via json file
     let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos!.driveImageIDs}`, import.meta.url);
     let driveImageIDs:any = await fetch(driveImageIDsURL);
     driveImageIDs = await driveImageIDs.json();
-    driveImageIDs.thumbnails.sort((a:any, b:any) => a.name.localeCompare(b.name));
-    driveImageIDs.pictures.sort((a:any, b:any) => a.name.localeCompare(b.name));
-    for (let i = 0; i < driveImageIDs!.pictures.length; i++) {
-        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.thumbnails[i].img_id + "&sz=w500";
-        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs.pictures[i].img_id + "&sz=w1000";
+
+    // Sort array
+    driveImageIDs.sort((a:any, b:any) => a.name.localeCompare(b.name));
+    
+    // create array with urls to images via drive ids. set thumbnail parameter in url to reduce image size for fast loading
+    for (let i = 0; i < driveImageIDs.length; i++) {
+        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w500";
+        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
         pictures.value.push({
             thumbnail: thumbnail, 
             picture: picture,
@@ -34,12 +39,8 @@ const setupImages = async () => {
 }
 
 const showModal = ref(false);
-const modalImageURL = ref("");
 const modalImageIndex = ref(0);
-const toggleModal = (imageURL?:string, imageIndex?:number) => {
-    if(imageURL != undefined)
-        modalImageURL.value = imageURL;
-    
+const toggleModal = (imageIndex?:number) => {
     if(imageIndex != undefined)
         modalImageIndex.value = imageIndex;
 
@@ -51,8 +52,13 @@ const adjustImageGrid = () => {
     let images:any = photosHTMLElement.value.getElementsByTagName("img");
     for (let image of images) {
         image.onload = function() {
+            console.log(this.width);
+
             image.parentElement.style.gridRowEnd = this.height > 250 ? "span 2" : "span 1";
-            setTimeout(() => { image.style.height = "100%" }, 0);
+            // image.parentElement.style.gridColumnEnd = this.width > 500 ? "span 3" : "span 1";
+            setTimeout(() => { 
+                image.style.height = "100%"; 
+            });
         }
     }
 }
@@ -75,33 +81,43 @@ window.onscroll = () => {
         <h1 class="bp-title">{{"Fotos " + route.params.id }}</h1>
 
         <Transition name="fade">
-            <ImageModal v-show="showModal" :imageURL="modalImageURL" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
+            <ImageModal v-show="showModal" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
-        <!-- 2023 Credits & Video -->
-        <div>
-
-            <div v-if="route.params.id == '2023'">
-                <div class="pt-intro">
-                    Ein großes Dankeschön an 
-                    <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
-                    der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-                    <br>
-                    Folgt ihm gerne auf Instagram 
-                    <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
-                </div>
-            </div>  
-
-            <!-- Poster -->
-            <div class="pt-poster">
-                <img :src="posterURL" alt="">
+        
+        <!-- 2023 -->
+        <div v-if="route.params.id == '2023'">
+            <div class="pt-intro">
+                Ein großes Dankeschön an 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
+                der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+                <br>
+                Folgt ihm gerne auf Instagram 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
             </div>
+        </div>  
 
-            <!-- Image Grid -->
-            <div class="pt-gallery">
-                <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(element.picture, index)">
-                    <img class="pt-thumbnail" :src="element.thumbnail" alt="" loading="lazy"/>
-                </div>
+        <!-- 2024 -->
+        <div v-if="route.params.id == '2024'">
+            <div class="pt-intro">
+                Ein großes Dankeschön an 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">Patrik Finger</a>,
+                der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+                <br>
+                Folgt ihm gerne auf Instagram 
+                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger </a>  
+            </div>
+        </div>  
+
+        <!-- Poster -->
+        <div class="pt-poster">
+            <img :src="posterURL">
+        </div>
+
+        <!-- Image Grid -->
+        <div class="pt-gallery">
+            <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(index)">
+                <img class="pt-thumbnail" :src="element.thumbnail" loading="lazy"/>
             </div>
         </div>
 
@@ -150,6 +166,7 @@ window.onscroll = () => {
     grid-gap: 2px;
 }
 .pt-gallery-element{
+    display: flex;
     cursor: pointer;
     min-height: 250px;
 }

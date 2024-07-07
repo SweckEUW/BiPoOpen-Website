@@ -2,7 +2,11 @@
 	{
 		"name": "2024",
 		"mvp": true,
-		"games": true
+		"games": true,
+		"fotos":{
+			"driveImageIDs": "2024/driveImageIDs.json",
+			"poster": "2024/poster.jpg"
+		}
 	},
 	{
 		"name": "2023",

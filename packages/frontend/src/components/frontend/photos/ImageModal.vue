@@ -8,7 +8,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/zoom';
 
-const props = defineProps(['imageURL', 'toggleModal', 'pictures', 'index'])
+const props = defineProps(['toggleModal', 'pictures', 'index'])
 
 let swiper:any;
 onMounted(() => {
