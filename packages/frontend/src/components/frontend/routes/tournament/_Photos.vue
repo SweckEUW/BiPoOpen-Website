@@ -29,8 +29,23 @@ const setupImages = async () => {
     
     // create array with urls to images via drive ids. set thumbnail parameter in url to reduce image size for fast loading
     for (let i = 0; i < driveImageIDs.length; i++) {
-        let thumbnail:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w500";
-        let picture:string = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
+        let thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w500";
+        let picture = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
+        
+        if(driveImageIDs[i].img_id == "1W5chqvZUks8OSy2e3_pxTv1uWFBJZ8WV")
+            thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
+        
+        // let thumbnail = "https://www.robin-noorda.com/uploads/1/6/8/3/16830688/3347022_orig.jpg";
+        // let picture = "https://www.robin-noorda.com/uploads/1/6/8/3/16830688/3347022_orig.jpg";
+        // if(i%2 == 0){
+        //     thumbnail = "https://img.freepik.com/free-photo/people-taking-selfie-together-registration-day_23-2149096795.jpg";
+        //     picture = "https://img.freepik.com/free-photo/people-taking-selfie-together-registration-day_23-2149096795.jpg";
+        // }
+        // if(i%3 == 0){
+        //     thumbnail = "https://images.pexels.com/photos/1459505/pexels-photo-1459505.jpeg?cs=srgb&dl=pexels-felixmittermeier-1459505.jpg&fm=jpg";
+        //     picture = "https://images.pexels.com/photos/1459505/pexels-photo-1459505.jpeg?cs=srgb&dl=pexels-felixmittermeier-1459505.jpg&fm=jpg";
+        // }
+
         pictures.value.push({
             thumbnail: thumbnail, 
             picture: picture,
@@ -49,16 +64,12 @@ const toggleModal = (imageIndex?:number) => {
 
 let photosHTMLElement:any = ref(null);
 const adjustImageGrid = () => {
-    let images:any = photosHTMLElement.value.getElementsByTagName("img");
+    let images = photosHTMLElement.value.getElementsByTagName("img");
+
     for (let image of images) {
         image.onload = function() {
-            console.log(this.width);
-
-            image.parentElement.style.gridRowEnd = this.height > 250 ? "span 2" : "span 1";
-            // image.parentElement.style.gridColumnEnd = this.width > 500 ? "span 3" : "span 1";
-            setTimeout(() => { 
-                image.style.height = "100%"; 
-            });
+            image.parentElement.style.gridRowEnd = this.naturalHeight > 500 ? "span 3" :  this.naturalHeight > 350 ? "span 2" : "span 1";
+            image.parentElement.style.gridColumnEnd = this.naturalWidth > 900 ? "span 3" : "span 1";
         }
     }
 }
@@ -76,7 +87,7 @@ window.onscroll = () => {
 </script>
 
 <template>
-    <div class="Photos" ref="photosHTMLElement">
+    <div class="Photos">
 
         <h1 class="bp-title">{{"Fotos " + route.params.id }}</h1>
 
@@ -115,7 +126,7 @@ window.onscroll = () => {
         </div>
 
         <!-- Image Grid -->
-        <div class="pt-gallery">
+        <div class="pt-gallery" ref="photosHTMLElement">
             <div class="pt-gallery-element" v-for="(element, index) in pictures.slice(0, elementsShown)" :key="element.picture" target="_blank" @click="toggleModal(index)">
                 <img class="pt-thumbnail" :src="element.thumbnail" loading="lazy"/>
             </div>
@@ -171,8 +182,9 @@ window.onscroll = () => {
     min-height: 250px;
 }
 .pt-thumbnail{
-    width: 100%;
     object-fit: cover;
+    width: 100%;
+    height: 100%;
 }
 
 /*MOBILE*/
