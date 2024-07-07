@@ -30,22 +30,11 @@ const setupImages = async () => {
     // create array with urls to images via drive ids. set thumbnail parameter in url to reduce image size for fast loading
     for (let i = 0; i < driveImageIDs.length; i++) {
         let thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w500";
-        let picture = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
+        let picture = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1500"; //TODO: dont use thumnail insead use image in full quality from drive
         
-        if(driveImageIDs[i].img_id == "1W5chqvZUks8OSy2e3_pxTv1uWFBJZ8WV")
+        if(driveImageIDs[i].img_id == "1W5chqvZUks8OSy2e3_pxTv1uWFBJZ8WV") // Edge case for panorama image 2024
             thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";
         
-        // let thumbnail = "https://www.robin-noorda.com/uploads/1/6/8/3/16830688/3347022_orig.jpg";
-        // let picture = "https://www.robin-noorda.com/uploads/1/6/8/3/16830688/3347022_orig.jpg";
-        // if(i%2 == 0){
-        //     thumbnail = "https://img.freepik.com/free-photo/people-taking-selfie-together-registration-day_23-2149096795.jpg";
-        //     picture = "https://img.freepik.com/free-photo/people-taking-selfie-together-registration-day_23-2149096795.jpg";
-        // }
-        // if(i%3 == 0){
-        //     thumbnail = "https://images.pexels.com/photos/1459505/pexels-photo-1459505.jpeg?cs=srgb&dl=pexels-felixmittermeier-1459505.jpg&fm=jpg";
-        //     picture = "https://images.pexels.com/photos/1459505/pexels-photo-1459505.jpeg?cs=srgb&dl=pexels-felixmittermeier-1459505.jpg&fm=jpg";
-        // }
-
         pictures.value.push({
             thumbnail: thumbnail, 
             picture: picture,
