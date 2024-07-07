@@ -76,6 +76,7 @@ var timer = setInterval(updateRemainingTime, 1000);
         </div>
 
         <div v-if="countdownOver" class="ho-links">
+            <router-link class="ho-share" :to="'/2024/Platzierungen'">Platzierungen</router-link>
             <router-link class="ho-share" :to="'/2024/Spielplan'">Spielplan</router-link>
             <router-link class="ho-share" :to="'/2024/MVP'">MVP-Tabelle</router-link>
             <router-link class="ho-share" :to="'/2024/Fotos'">Fotos</router-link>

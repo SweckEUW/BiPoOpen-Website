@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
+import { ref } from "vue"
 import { getTournamentWithRouterID, getPlayersWithStats, getTopTeams } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -103,6 +103,7 @@ const giveArrowClass = (value:string) => {
 }
 
 let winners = [
+    { year: "2024", name: "Team Vogelnest", player1: "Lewin Pohlschmidt", player2: "Mattis Post"},
     { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
     { year: "2022", name: "Taube Nüsschen", player1: "Patrick Pohlmann", player2: "Tim Becker"},
     { year: "2021", name: "Pong Daddys", player1: "Matthias Weck", player2: "Lennard Kaffitz"},
@@ -120,11 +121,20 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
 
-            <!-- <div v-for="tournament,i in tournaments">
-                <div v-for="team in getTopTeams(tournament).slice(0,1)">
-                    <div><strong>{{ 2020 + i + ". "}}</strong>{{ team.name }}</div>
+            <!-- <div class="hof-winners">
+                <div class="hof-winner" v-for="tournament,i in tournaments.reverse()">
+                    <div class="hof-winner-icon">
+                        <img :src="trophyIcon" alt="">
+                        <div>{{ 2020 + i }}</div>
+                    </div>
+                    <div class="hof-team">
+                        <div class="hof-team-name">{{ getTopTeams(tournament)[0].name }}</div>
+                        <div>{{ getTopTeams(tournament)[0].players[0] }}</div>
+                        <div>{{ getTopTeams(tournament)[0].players[1] }}</div>
+                    </div>
                 </div>
             </div> -->
+
             <div class="hof-winners">
                 <div class="hof-winner" v-for="winner in winners">
                     <div class="hof-winner-icon">
