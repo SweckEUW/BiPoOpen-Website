@@ -15,11 +15,10 @@ export const getTournamentByName = async (tournamentName:string) => {
 }
 
 export const getTournamentWithRouterID = async (id:string) => {
-
     let tournamentName = id.replaceAll('-',' ');
-    if(id.includes("20"))
+    if(id == "2020" || id == "2021" || id == "2022" || id == "2023" || id == "2024" || id == "2025" || id == "2026" || id == "2027")
         tournamentName = "Weck BiPo Open " + id;
-
+    
     let response = await axios.post("/getTournamentByName", {tournamentName: tournamentName});
     console.log(response.data.message);
     if(response.data.success)
