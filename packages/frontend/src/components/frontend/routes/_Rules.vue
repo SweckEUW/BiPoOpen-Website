@@ -76,6 +76,7 @@
             <strong>Zweimal pro Spiel</strong> darf ein Team seine Gegner bitten, die Becher neu zu positionieren.
             <strong>Möglich ist dies nur bei 3, 4 oder 6 Bechern (nicht möglich bei einer anderen Becheranzahl, beispielsweise 2, 5 oder 7).</strong>
             Die neue Formation ist immer mittig vorne (an der Pyramidenspitze) zu positionieren.
+            Geworfen darf erst wieder, wenn das zusammenstellende Team die Becher freigibt. 
         </div>
 
         <h2>Deathcup</h2>
