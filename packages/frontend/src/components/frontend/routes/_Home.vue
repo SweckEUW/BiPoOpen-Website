@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-var end = new Date(2024,5,29,14);
+var end = new Date(2025,5,28,14);
 
 var _second = 1000;
 var _minute = _second * 60;
@@ -42,10 +42,10 @@ var timer = setInterval(updateRemainingTime, 1000);
 
 <template>
     <div class="Home">
-        <h1 class="ho-title-1">BiPo Open 2024</h1>
+        <h1 class="ho-title-1">BiPo Open 2025</h1>
 
         <div v-if="!countdownOver">
-            <h1 class="ho-title-2">Samstag 29.06.2024 - 14:00 Uhr</h1>
+            <h1 class="ho-title-2">Samstag 28.06.2025 - 14:00 Uhr</h1>
 
             <div class="ho-timer">
                 <div class="ho-time">
@@ -69,17 +69,17 @@ var timer = setInterval(updateRemainingTime, 1000);
                 </div>  
             </div>
 
-            <div class="ho-share-container">
+            <!-- <div class="ho-share-container">
                 <router-link class="ho-share" :to="'/2024/Teams'">Teilnehmende Teams</router-link>
-            </div>
+            </div> -->
 
         </div>
 
         <div v-if="countdownOver" class="ho-links">
-            <router-link class="ho-share" :to="'/2024/Platzierungen'">Platzierungen</router-link>
-            <router-link class="ho-share" :to="'/2024/Spielplan'">Spielplan</router-link>
-            <router-link class="ho-share" :to="'/2024/MVP'">MVP-Tabelle</router-link>
-            <router-link class="ho-share" :to="'/2024/Fotos'">Fotos</router-link>
+            <router-link class="ho-share" :to="'/2025/Platzierungen'">Platzierungen</router-link>
+            <router-link class="ho-share" :to="'/2025/Spielplan'">Spielplan</router-link>
+            <router-link class="ho-share" :to="'/2025/MVP'">MVP-Tabelle</router-link>
+            <router-link class="ho-share" :to="'/2025/Fotos'">Fotos</router-link>
         </div>
 
         <!-- Share via Whatsapp -->
