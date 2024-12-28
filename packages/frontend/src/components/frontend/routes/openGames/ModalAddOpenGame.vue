@@ -60,7 +60,8 @@ const addGame = async () => {
             <div class="rt-modal">
                 <div v-for="i in 2" :id="'addOpenGameModal-team-' + i" class="rt-modal-container">
 
-                    <div class="rt-modal-score" :style="{textAlign: i == 1 ? 'right' : 'left'}">{{ 0 }}</div>
+                    <!-- TODO: Fix Added Score if more than 1 Player is in each Team -->
+                    <!-- <div class="rt-modal-score" :style="{textAlign: i == 1 ? 'right' : 'left'}">{{ 0 }}</div> -->
 
                     <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
                         <input class="rt-modal-input-player" type="string" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
