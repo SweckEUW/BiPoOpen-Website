@@ -3,20 +3,6 @@
 
         <h1 class="bp-title">{{"Regeln"}}</h1>
         
-        <h2 style="margin-bottom: 20px;">Zusammenfassung</h2>
-        <div style="margin-bottom: 100px;">
-            <ul style="padding-left: 20px;">
-                <li>Schnick-Schnack-Schnuck, wer anfängt</li>
-                <li>2 Becher werden bei einem "Bouncer" getrunken</li>
-                <li>3 Becher werden bei einer "Bombe" getrunken</li>
-                <li>2 Mal Re-Rack pro Spiel. Nur bei 3, 4 oder 6 Bechern möglich</li>
-                <li>Mit Gentleman's Rule (Nachwurf der gegnerischen Mannschaft bei letzten getroffenem Becher)</li>
-                <li>Mit Deathcup Regel (Direkte Niederlage bei Treffern in noch nicht ausgetrunkenen Becher)</li>
-                <li>Mit On-Fire Regel (Bei 3 Treffern in Folge, werfen solange nicht mehr getroffen wird)</li>
-                <li>Mit Trickshot Regel (Trickshot, wenn Ball nach Wurf vom Wurfteam gegriffen, bevor dieser den Boden berührt)</li>
-            </ul>
-        </div>
-
         <h2>Spielbeginn</h2>
         <div>
             Das Beginner-Team, wird durch eine einfache Runde Schnick-Schnack-Schnuck ausgewählt.
