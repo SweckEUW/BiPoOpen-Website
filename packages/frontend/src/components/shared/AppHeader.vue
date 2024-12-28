@@ -44,6 +44,7 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 			<div class="ap-menu" v-show="showBurger">
 
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
 
 				<div v-for="tournament in tournaments" :key="tournament.name">

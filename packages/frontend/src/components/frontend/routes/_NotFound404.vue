@@ -1,7 +1,3 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
     <div class="NotFound404">
         <h1 class="bp-title" style="margin-top: 150px;">404</h1>

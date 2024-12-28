@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { setSettings } from "@/util/tournamentUtilFunctions.js";
+import { PropType } from "vue";
 
-const props = defineProps(['getTournament','tournament'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true }
+});
 
-const setFixedGroupAmmountOnInput = async (e:any) => {
+const setFixedGroupAmmountOnInput = async (e:FocusEvent) => {
+   let inputElement = e.target as HTMLInputElement;
    let settings = props.tournament.settings;
-   settings.fixedGroupAmmount = e.srcElement.value;
-   let success:boolean = await setSettings(props.tournament._id, settings);
-   if(success){
+   settings.fixedGroupAmmount = parseInt(inputElement.value);
+   let success:boolean = await setSettings(props.tournament._id, props.tournament.settings);
+   if(success)
       await props.getTournament();
-   }
 }
 </script>
 
@@ -19,7 +23,7 @@ const setFixedGroupAmmountOnInput = async (e:any) => {
 
       <div class="gs-setting">
          <div class="gs-title">Anzahl Gruppen</div>
-         <input class="gs-input" type="number" :value="props.tournament.settings.fixedGroupAmmount" @focusout="setFixedGroupAmmountOnInput">
+         <input class="gs-input" type="number" :value="props.tournament.settings.fixedGroupAmmount" @focusout="setFixedGroupAmmountOnInput($event)">
       </div>
       
       <hr>

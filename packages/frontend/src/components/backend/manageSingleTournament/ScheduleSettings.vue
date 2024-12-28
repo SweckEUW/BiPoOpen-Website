@@ -1,24 +1,28 @@
 <script setup lang="ts">
 import { setSettings } from "@/util/tournamentUtilFunctions.js";
+import { PropType } from "vue";
 
-const props = defineProps(['getTournament','tournament'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true }
+});
 
-const setTrackPlayerShots = async (e:any) => {
+const setTrackPlayerShots = async (e:Event) => {
+   let inputElement = e.target as HTMLInputElement;
    let settings = props.tournament.settings;
-   settings.trackPlayerShots = e.srcElement.checked;
-   let success:boolean = await setSettings(props.tournament._id, settings);
-   if(success){
+   settings.trackPlayerShots = inputElement.checked;
+   let success = await setSettings(props.tournament._id, settings);
+   if(success)
       await props.getTournament();
-   }
 }
 
-const setTrackTeamShots = async (e:any) => {
+const setTrackTeamShots = async (e:Event) => {
+   let inputElement = e.target as HTMLInputElement;
    let settings = props.tournament.settings;
-   settings.trackTeamShots = e.srcElement.checked;
-   let success:boolean = await setSettings(props.tournament._id, settings);
-   if(success){
+   settings.trackTeamShots = inputElement.checked;
+   let success = await setSettings(props.tournament._id, settings);
+   if(success)
       await props.getTournament();
-   }
 }
 </script>
 
@@ -28,12 +32,12 @@ const setTrackTeamShots = async (e:any) => {
 
       <div class="ss-setting">
          <div class="ss-title">Würfe einzelner Spieler eintragen?</div>
-         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setTrackPlayerShots">
+         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackPlayerShots" @input="setTrackPlayerShots($event)">
       </div>
 
       <div class="ss-setting">
          <div class="ss-title">Würfe der Teams eintragen?</div>
-         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackTeamShots" @input="setTrackTeamShots">
+         <input type="checkbox" class="ss-input" :checked="props.tournament.settings.trackTeamShots" @input="setTrackTeamShots($event)">
       </div>
       
       <hr>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRaw, onMounted } from "vue"
+import { ref, toRaw, onMounted, PropType } from "vue"
 import { getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
@@ -8,7 +8,9 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-defineProps(['tournament']);
+defineProps({
+   tournament: {type: Object as PropType<Tournament>, required: true },
+})
 
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
@@ -16,19 +18,19 @@ window.addEventListener("resize", () => {
 });
 
 onMounted(() => {
-   new Swiper('#GameStandingsGroupsSwiper',{
-      modules: [Pagination],
-      initialSlide: 0,
-      spaceBetween: 50,
-      speed: 500,
-      pagination: {
-         el: "#GameStandingsGroupsSwiper-Pagination",
-         clickable: true,
-         renderBullet: (index, className) => {
-            return '<span class="' + className + '">' + convertNumberToCharacter(index+1) + '</span>';
-         }
-      }
-   });
+    new Swiper('#GameStandingsGroupsSwiper',{
+        modules: [Pagination],
+        initialSlide: 0,
+        spaceBetween: 50,
+        speed: 500,
+        pagination: {
+            el: "#GameStandingsGroupsSwiper-Pagination",
+            clickable: true,
+            renderBullet: (index, className) => {
+                return '<span class="' + className + '">' + convertNumberToCharacter(index+1) + '</span>';
+            }
+        }
+    });
 });
 </script>
 
@@ -52,7 +54,7 @@ onMounted(() => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(team,i) in group.teams" :key="team">
+                        <tr v-for="(team,i) in group.teams" :key="team.name">
                             <td>{{ i+1 }}</td>
                             <td>{{team.name}}</td>
                             <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>

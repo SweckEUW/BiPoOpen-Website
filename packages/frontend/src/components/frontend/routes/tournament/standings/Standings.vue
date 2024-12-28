@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import StandingsGroups from '@/components/frontend/routes/tournament/standings/StandingsGroups.vue';
 import StandingsKO from '@/components/frontend/routes/tournament/standings/StandingsKO.vue';
+import { PropType } from 'vue';
 
-defineProps(['tournament'])
+defineProps({
+   tournament: {type: Object as PropType<Tournament>, required: true },
+})
 </script>
 
 <template>

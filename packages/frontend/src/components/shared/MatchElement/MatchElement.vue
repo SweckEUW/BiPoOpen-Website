@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { PropType, ref } from "vue"
 
 import ModalSetGameResult from '@/components/shared/ModalSetGameResult.vue';
 import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
 
-defineProps(['match','stageIndex',"matchIndex","isBackend","tournament","getTournament","isGroupPhase"])
+defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true },
+   match: {type: Object as PropType<MatchDecoded>, required: true },
+   isGroupPhase: {type: Boolean, required: true },
+   isBackend: {type: Boolean, required: true },
+   matchIndex: {type: Number },
+});
 
 let showModal = ref(false);
 const toggleModal = () => {

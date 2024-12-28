@@ -1,31 +1,29 @@
-import { getMatchesFromPlayer, getMatchesFromTeam, getMatchesGroupPhase, getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
+import { getMatchesFromPlayer, getMatchesFromTeam, getMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 
 
 ////////////////
 // TEAM STATS //
 ////////////////
-export const getAmmountOfWinsFromTeam = (tournament:any, teamName:string, onlyGroupPhase:boolean) => {
+export const getAmmountOfWinsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => {
     let wins = 0;
     
     let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
-    matches.forEach((match:any) => {
-        if(match.team1.name == teamName && match.result.team1Score > match.result.team2Score){
+    matches.forEach((match) => {
+        if(match.team1.name == teamName && match.result.team1Score > match.result.team2Score)
             wins ++;
-        }
-        if(match.team2.name == teamName && match.result.team2Score > match.result.team1Score){
+        if(match.team2.name == teamName && match.result.team2Score > match.result.team1Score)
             wins ++;
-        }
     });
 
     return wins;
 }
 
-export const getAmmountOfHitsFromTeam = (tournament:any, teamName:string, onlyGroupPhase:boolean) => { 
+export const getAmmountOfHitsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
     let score = 0;
 
     let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         if(match.team1.name == teamName)
             score += match.result.team1Score;        
         if(match.team2.name == teamName)
@@ -35,28 +33,28 @@ export const getAmmountOfHitsFromTeam = (tournament:any, teamName:string, onlyGr
     return score;
 }
 
-export const getAmmountOfEnemyHitsFromTeam = (tournament:any, teamName:string, onlyGroupPhase:boolean) => { 
-    let score:number = 0;
+export const getAmmountOfEnemyHitsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
+    let score = 0;
     
     let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         if(match.team1.name == teamName)
             score += match.result.team2Score;               
         if(match.team2.name == teamName)
-            score += match.result.team1Score          
+            score += match.result.team1Score       
     });
 
     return score;
 }
 
-export const getAmmountOfDrunkenCupsFromteam = (tournament:any, teamName:string, onlyGroupPhase:boolean) => { 
+export const getAmmountOfDrunkenCupsFromteam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
     let leftOverCups = 0;
     let enemyHits = 0;
 
     let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         // Getroffene Becher vom Gegner die Getrunken wurden
         if(match.team1.name == teamName)
             enemyHits += match.result.team2Score;               
@@ -76,12 +74,12 @@ export const getAmmountOfDrunkenCupsFromteam = (tournament:any, teamName:string,
 //////////////////
 // PLAYER STATS //
 //////////////////
-export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:string, onlyGroupPhase:boolean) => { 
+export const getAmmountOfHitsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => { 
     let score = 0;
 
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
 
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         if(match.team1.players[0] == playerName)
             score += match.result.team1Player1Score;        
         if(match.team1.players[1] == playerName)
@@ -92,18 +90,15 @@ export const getAmmountOfHitsFromPlayer = (tournament:any, playerName:string, on
             score += match.result.team2Player2Score;
     });
 
-    if(isNaN(score))
-        score = 0;
-
     return score;
 }
 
-export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:string, onlyGroupPhase:boolean) => { 
+export const getAmmountEnemyHitsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => { 
     let score = 0;
     
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
 
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         if(match.team1.players[0] == playerName)
             score += match.result.team2Player1Score;               
         if(match.team1.players[1] == playerName)
@@ -117,17 +112,17 @@ export const getAmmountEnemyHitsFromPlayer = (tournament:any, playerName:string,
     return score;
 }
 
-export const getAmmountOfMatchesFromPlayer = (tournament:any, playerName:string, onlyGroupPhase:boolean) => { 
+export const getAmmountOfMatchesFromPlayer = (tournament:Tournament|undefined, playerName:string, onlyGroupPhase:boolean) => { 
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
     return matches.length;
 }
 
-export const getAmmountOfWinsFromPlayer = (tournament:any, playerName:string, onlyGroupPhase:boolean) => {
+export const getAmmountOfWinsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => {
     let wins = 0;
     
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
     
-    matches.forEach((match:any) => {
+    matches.forEach((match) => {
         if((match.team1.players[0] == playerName || match.team1.players[1] == playerName) && match.result.team1Score > match.result.team2Score)
             wins ++;
         
@@ -138,16 +133,15 @@ export const getAmmountOfWinsFromPlayer = (tournament:any, playerName:string, on
     return wins;
 }
 
-export const checkIfTeam1WonVsTeam2 = (tournament:any, team1ID:string, team2ID:string) => { 
+export const checkIfTeam1WonVsTeam2 = (tournament:Tournament|undefined, team1Name:string, team2Name:string) => { 
     let team1Won = false;
 
     let matches = getMatchesGroupPhase(tournament);
-    matches.forEach((matchesForGroup:any) => {
-        matchesForGroup.forEach((match:any) => {
-            if(match.result){
-                if(match.team1._id == team1ID && match.team2._id == team2ID)
-                    team1Won = match.result.team1Score > match.result.Team2ID;   
-            }
+
+    matches.forEach((matchesForGroup) => {
+        matchesForGroup.forEach((match) => {
+            if(match.result && match.team1.name == team1Name && match.team2.name == team2Name)
+                team1Won = match.result.team1Score > match.result.team2Score;   
         });
     });
 

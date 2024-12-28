@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { PropType, ref } from "vue"
 import { addTeam, editTeam, removeTeam } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
-const props = defineProps(['getTournament','tournament'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true }
+});
+
 
 const clearInputs = () => {
    teamnameInput.value = "";
@@ -26,7 +30,7 @@ const toggleModalCreateTeam = () => {
 }
 
 let showModalEditTeam = ref(false);
-const toggleModalEditTeam = (team?: any) => {
+const toggleModalEditTeam = (team?:Team) => {
    if(team){
       teamnameInput.value = team.name;
       player1Input.value = team.players[0];
@@ -43,8 +47,8 @@ let player1Input = ref("");
 let player2Input = ref("");
 
 const addTeamButton = async () => {
-   let team:any = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()]}
-   let success:boolean = await addTeam(props.tournament._id, team);
+   let team = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()]}
+   let success = await addTeam(props.tournament._id, team);
    if(success){
       await props.getTournament();
       toggleModalCreateTeam();
@@ -53,8 +57,8 @@ const addTeamButton = async () => {
 
 let selectedTeam = ref();
 const editTeamButton = async () => {
-   let team:any = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()], _id: selectedTeam.value._id}
-   let success:boolean = await editTeam(props.tournament._id, team);
+   let team = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()], _id: selectedTeam.value._id, teamID: selectedTeam.value._id}
+   let success = await editTeam(props.tournament._id, team);
    if(success){
       await props.getTournament();
       toggleModalEditTeam();

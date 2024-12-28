@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, watch } from "vue"
+import { onMounted, PropType, watch } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
@@ -10,18 +10,22 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-const props = defineProps(['getTournament','tournament','isBackend'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true },
+   isBackend: {type: Boolean, required: true },
+});
 
-const onDragEnd = async (evt:any) => {
+const onDragEnd = async (evt:Sortable.SortableEvent) => {
 
    // Get Index of Group via Group Caption html element
-   let groupCaption = evt.srcElement.parentElement.getElementsByClassName("rt-caption")[0].innerText;
+   let groupCaption = (evt.target.parentElement!.getElementsByClassName("rt-caption")[0] as HTMLDivElement).innerText;
    let groupIndex = groupCaption.split(" ")[1].toLowerCase().charCodeAt(0) - 97;
 
    let matches = props.tournament.groupPhase.matches;
    let matchesInGroup = matches[groupIndex];
-   let movedMatch = matchesInGroup.splice(evt.oldIndex,1);
-   matchesInGroup.splice(evt.newIndex, 0, movedMatch[0]);
+   let movedMatch = matchesInGroup.splice(evt.oldIndex!,1);
+   matchesInGroup.splice(evt.newIndex!, 0, movedMatch[0]);
 
    let success:boolean = await setMatchesGroupPhase(props.tournament._id, matches);
    if(success){

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
+import { ref, onUnmounted, computed } from "vue"
 import { getTournamentWithRouterID, getMVPList } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -7,8 +7,8 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournament = ref();
-let sortValue = ref("averageScore");
+let tournament = ref<Tournament|undefined>();
+let sortValue = ref<SortValueMVP>("averageScore");
 let sortUp = ref(false);
 
 const getTournament = async () => {
@@ -29,20 +29,28 @@ window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
 });
 
-const sortPlayersList = (players:any[]) => {
-    players.sort((player1:any, player2:any) => {
+const sortedMVPList = computed(() => {
+    if(tournament.value == undefined)
+        return [];
+    
+    let mvpList = getMVPList(tournament.value);
+
+    // Sort the MVP List depenging on the sortValue
+    mvpList.sort((player1, player2) => {
         if(sortValue.value == "name") // sort strings
             return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
 
         if(player2[sortValue.value] == player1[sortValue.value])
-            return sortUp.value ? player2.placement - player1.placement : player1.placement - player2.placement;
-        return sortUp.value ? player1[sortValue.value] - player2[sortValue.value] : player2[sortValue.value] - player1[sortValue.value]
+            return sortUp.value ? player2.placement! - player1.placement! : player1.placement! - player2.placement!;
+        
+        return sortUp.value ? player1[sortValue.value]! - player2[sortValue.value]! : player2[sortValue.value]! - player1[sortValue.value]!;
     });
 
-    return players;
-}
+    return mvpList;
+})
 
-const setSortValue = (value:string) => {
+
+const setSortValue = (value:SortValueMVP) => {
     if(sortValue.value == value)
         sortUp.value = !sortUp.value;
     else
@@ -84,8 +92,8 @@ const giveArrowClass = (value:string) => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(player, index) in sortPlayersList(getMVPList(tournament))" :key="index">
-                        <td>{{ player.placement + 1}}</td>
+                    <tr v-for="(player, index) in sortedMVPList" :key="index">
+                        <td>{{ player.placement! + 1}}</td>
                         <td>{{ player.name.replace(" ","\n") }}</td>
                         <td>{{ player.averageScore }}</td>
                         <td>{{ player.score }}</td>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { PropType, ref } from "vue"
 import { getTeamsKOPhaseWithStats, checkIfTournamentFinished } from "@/util/tournamentUtilFunctions.js";
 
-defineProps(['tournament']);
+defineProps({
+   tournament: {type: Object as PropType<Tournament>, required: true },
+})
 
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
@@ -30,8 +32,8 @@ window.addEventListener("resize", () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="team in getTeamsKOPhaseWithStats(tournament)" :key="team">
-                    <td>{{ team.placement + 1 }}</td>
+                <tr v-for="team in getTeamsKOPhaseWithStats(tournament)" :key="team.name">
+                    <td>{{ team.placement! + 1 }}</td>
                     <td>{{team.name}}</td>
                     <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
                     <td>{{ team.wins }}</td>

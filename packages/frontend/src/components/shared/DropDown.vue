@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
 
-const props = defineProps(['isOpen', "name"])
+const props = defineProps({
+	name: {type: String, required: true },
+	isOpen: {type: Boolean, default: false},
+});
 
 let menuOpen = ref(props.isOpen);
 
@@ -10,10 +13,10 @@ const toggleMenu = () =>{
 	window.dispatchEvent(new CustomEvent("closeAllDropDowns", {detail: { name: props.name }}));
 }
 
-window.addEventListener("closeAllDropDowns", (e:any) => {
+window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 	if(e.detail && e.detail.name != props.name)
 		menuOpen.value = false;
-})
+}) as EventListener)
 </script>
 
 <template>

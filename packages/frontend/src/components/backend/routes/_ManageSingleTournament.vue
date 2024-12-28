@@ -8,7 +8,7 @@ import ScheduleSettings from '@/components/backend/manageSingleTournament/Schedu
 import GroupsTab from '@/components/backend/manageSingleTournament/groups/GroupsTab.vue';
 import Schedule from '@/components/frontend/routes/tournament/schedule/Schedule.vue';
 
-let tournament = ref();
+let tournament = ref<Tournament|undefined>();
 
 const route = useRoute();
 const getTournament = async () => {

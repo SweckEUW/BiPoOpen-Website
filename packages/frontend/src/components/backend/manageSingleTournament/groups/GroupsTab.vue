@@ -1,33 +1,35 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { ref, onMounted } from "vue"
-import { setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase, getGroups } from "@/util/tournamentUtilFunctions.js";
+import { ref, onMounted, PropType } from "vue"
+import { setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase, getGroupsDecoded } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
 
-const props = defineProps(['getTournament','tournament'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true }
+});
 
 const changeGroups = async () => {
    // 1. Construct Groups Array from DOM
-   let groups:any = [];
+   let groups:Group[] = [];
 
-   let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
+   let groupAmmount = props.tournament.settings.fixedGroupAmmount;
    for (let i = 0; i < groupAmmount; i++){ // Loop over all Groups
-      let teams:any = [];
-      let teamsDomElment:any = document.getElementById("Group-"+i)!.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
+      let teams:{teamID: string}[] = [];
+      let teamsDomElment = document.getElementById("Group-"+i)!.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
       for (let y = 0; y < teamsDomElment.length; y++) {
-         teams.push({
-            teamID: getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)._id
-         });
+         let teamID = getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)!.teamID;
+         teams.push({teamID: teamID});
       }
 
       groups.push({teams: teams});
    }
 
    // 2. Set Groups in Database
-   let success:boolean = await setGroups(props.tournament._id, groups);
+   let success = await setGroups(props.tournament._id, groups);
    if(success){
       await props.getTournament();
       await generateRandomMatchesGroupPhase(props.tournament);
@@ -41,10 +43,10 @@ const changeGroups = async () => {
 
 const initSortable = () => {
    setTimeout(() => {
-      let groupAmmount:number = props.tournament.settings.fixedGroupAmmount;
+      let groupAmmount = props.tournament.settings.fixedGroupAmmount;
       for (let i = 0; i < groupAmmount; i++){
-         let groupDOM:any = document.getElementById("Group-"+i);
-         let tbody:any = groupDOM.getElementsByTagName("tbody")[0];
+         let groupDOM = document.getElementById("Group-"+i)!;
+         let tbody = groupDOM.getElementsByTagName("tbody")[0];
          new Sortable(tbody, {
             animation: 150,
             group: 'shared',
@@ -68,8 +70,8 @@ const generateGroups = async () => {
    await props.getTournament();
 
    // DEBUG!
-   // props.tournament.groupPhase.matches.forEach(async (groupMatches:any) => {
-   //    await groupMatches.forEach(async (match:any) => {
+   // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
+   //    await groupMatches.forEach(async (match) => {
    //       let team1Won = Math.random() > 0.5;
    //       let result = {
    //          team1Score: team1Won ? 10 : Math.floor(Math.random() * 9),
@@ -126,7 +128,7 @@ const toggleModal = (generate?:boolean) => {
       <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
       <!-- Groups -->
-      <table class="table table-hover caption-top" v-for="(group,index) in getGroups(tournament)" :key="index" :id="'Group-' + index">
+      <table class="table table-hover caption-top" v-for="(group,index) in getGroupsDecoded(tournament)" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
          <thead>
             <tr>
@@ -137,7 +139,7 @@ const toggleModal = (generate?:boolean) => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team,id) in group.teams" :key="team">
+            <tr v-for="(team,id) in group.teams" :key="team._id">
                <td class="lt-handle">
                   <div style="margin-bottom: 5px; margin-top: 5px;"/>
                   <div/>

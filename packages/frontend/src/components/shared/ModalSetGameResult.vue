@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, PropType } from "vue"
 import { setGameResultGroupPhase, setGameResultKOPhase } from "@/util/tournamentUtilFunctions.js";
 
 import Modal from '@/components/shared/Modal.vue';
 
-const props = defineProps(['getTournament','tournament',"toggleModal","match","isGroupPhase"])
+const props = defineProps({
+    getTournament: {type: Function, required: true },
+    tournament: {type: Object as PropType<Tournament>, required: true },
+    isGroupPhase: {type: Boolean, required: true },
+    toggleModal: {type: Function, required: true },
+    match: {type: Object as PropType<MatchDecoded>, required: true },
+});
 
 const setResultGroupPhase = async () => {
     let result = {
         team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-        team1Player1Score: team1Player1Score.value, 
-        team1Player2Score: team1Player2Score.value, 
+        team1Player1Score: team1Player1Score.value!, 
+        team1Player2Score: team1Player2Score.value!, 
     
         team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-        team2Player1Score: team2Player1Score.value, 
-        team2Player2Score: team2Player2Score.value
+        team2Player1Score: team2Player1Score.value!, 
+        team2Player2Score: team2Player2Score.value!
     }
 
     await setGameResultGroupPhase(props.tournament, props.match._id, result);
@@ -25,12 +31,12 @@ const setResultGroupPhase = async () => {
 const setResultKOPhase = async () => {
     let result = {
        team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-       team1Player1Score: team1Player1Score.value, 
-       team1Player2Score: team1Player2Score.value, 
+       team1Player1Score: team1Player1Score.value!, 
+       team1Player2Score: team1Player2Score.value!, 
  
        team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-       team2Player1Score: team2Player1Score.value, 
-       team2Player2Score: team2Player2Score.value
+       team2Player1Score: team2Player1Score.value!, 
+       team2Player2Score: team2Player2Score.value!
     }
 
     await setGameResultKOPhase(props.tournament, props.match._id, result);

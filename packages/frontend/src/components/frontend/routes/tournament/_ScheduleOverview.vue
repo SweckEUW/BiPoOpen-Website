@@ -4,7 +4,7 @@ import { getMatchesGroupPhase, getTournamentWithRouterID } from "@/util/tourname
 import { convertNumberToCharacter } from "@/util/util.js"; 
 
 import Swiper from 'swiper';
-import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -14,7 +14,7 @@ import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournament = ref();
+let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
    tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
@@ -51,7 +51,7 @@ initSwiper();
 </script>
 
 <template>
-   <div class="ResultsTab">
+   <div class="ResultsTab" v-if="tournament">
 
       <div id="SwiperScheduleOverview" class="swiper">
          <div class="swiper-wrapper">

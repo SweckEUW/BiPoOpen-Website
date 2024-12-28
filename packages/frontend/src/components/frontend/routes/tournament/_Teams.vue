@@ -7,7 +7,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournament = ref();
+let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
     tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }

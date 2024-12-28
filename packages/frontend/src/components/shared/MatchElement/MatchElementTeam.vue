@@ -1,7 +1,13 @@
 <script setup lang="ts">
-const props = defineProps(['match',"isTeam2",'playersVisible'])
+import { PropType } from 'vue';
 
-let team:any = props.match.team1;
+const props = defineProps({
+    match: {type: Object as PropType<MatchDecoded>, required: true },
+    playersVisible: {type: Boolean, required: true },
+    isTeam2: {type: Boolean, required: true },
+});
+
+let team = props.match.team1;
 if(props.isTeam2){
     team = props.match.team2;
 }
@@ -14,7 +20,7 @@ if(props.match.result){
     teamScore = props.match.result.team1Score;
     player1Score = props.match.result.team1Player1Score;
     player2Score = props.match.result.team1Player2Score;
-    if(props.isTeam2){
+    if(props.isTeam2){  
         teamScore = props.match.result.team2Score;
         player1Score = props.match.result.team2Player1Score;
         player2Score = props.match.result.team2Player2Score;
@@ -30,7 +36,8 @@ if(props.match.result){
         }"
     >
         <div class="mt-team">
-            <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? match.placeHolderTeam2 : match.placeHolderTeam1) }}</div>
+            <!-- TODO: Fix Placerholder Text -->
+            <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? "Placerholder Team 2" : "Placeholder Team 1") }}</div>
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
         <div v-if="team && playersVisible">

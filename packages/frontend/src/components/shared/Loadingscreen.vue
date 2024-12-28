@@ -1,9 +1,9 @@
 <template>
-<div class="Loadingscreen">
-  <div class="ls-container">
-    <div class="loader"></div>
+  <div class="Loadingscreen">
+    <div class="ls-container">
+      <div class="loader"></div>
+    </div>
   </div>
-</div>
 </template>
 
 <style scoped>

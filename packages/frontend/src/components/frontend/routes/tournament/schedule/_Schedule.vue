@@ -8,7 +8,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournament = ref();
+let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
    tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
@@ -29,7 +29,7 @@ onUnmounted(() => {
       <h1 class="bp-title">{{"Spielplan " + (route.params.id as string).replaceAll('-',' ') }}</h1>
 
       <Loadingscreen v-if="!tournament"/>
-      <Schedule v-if="tournament && tournament.groupPhase.groups" :tournament="tournament"/>
+      <Schedule v-if="tournament && tournament.groupPhase.groups" :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
 
       <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
          Turnierplan wurde noch nicht erstellt

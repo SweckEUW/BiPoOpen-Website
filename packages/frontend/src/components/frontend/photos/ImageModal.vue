@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onMounted } from "vue"
+import { watch, onMounted, PropType } from "vue"
 
 import Swiper from 'swiper';
 import { Pagination, Navigation, Zoom } from 'swiper/modules';
@@ -8,9 +8,15 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/zoom';
 
-const props = defineProps(['toggleModal', 'pictures', 'index'])
+type Picture = {thumbnail: string, picture: string};
 
-let swiper:any;
+const props = defineProps({
+    toggleModal: {type: Function, required: true },
+    index: {type: Number, required: true },
+    pictures: {type: Object as PropType<Picture[]>, required: true }
+});
+
+let swiper:Swiper;
 onMounted(() => {
     setTimeout(() => {
         var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -38,18 +44,6 @@ watch(() => props.index, () => {
 });
 
 // const downloadImage = async () => {
-//     let imageSrc = props.pictures[swiper.activeIndex].original;
-
-//     const image = await fetch(imageSrc, { mode: 'no-cors'})
-//     const imageBlog = await image.blob()
-//     const imageURL = URL.createObjectURL(imageBlog)
-
-//     const link = document.createElement('a')
-//     link.href = imageURL
-//     link.download = 'BiPo Open 2023 Bild ' + (swiper.activeIndex + 1)
-//     document.body.appendChild(link)
-//     link.click()
-//     document.body.removeChild(link)
 // }
 </script>
 
@@ -65,7 +59,7 @@ watch(() => props.index, () => {
                 </svg>
             </div> -->
 
-            <div class="pt-close" @click="toggleModal">
+            <div class="pt-close" @click="toggleModal()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M 9.15625 6.3125 L 6.3125 9.15625 L 22.15625 25 L 6.21875 40.96875 L 9.03125 43.78125 L 25 27.84375 L 40.9375 43.78125 L 43.78125 40.9375 L 27.84375 25 L 43.6875 9.15625 L 40.84375 6.3125 L 25 22.15625 Z" fill="var(--main-color)"/></svg>
             </div>
         </div>

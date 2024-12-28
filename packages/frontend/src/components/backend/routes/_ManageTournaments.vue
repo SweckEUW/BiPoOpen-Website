@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
+import { getAllTournaments, addTournament } from "@/util/tournamentUtilFunctions";
 
-let tournaments = ref();
+let tournaments = ref<Tournament[]|undefined>();
 
 const getTournaments = async () => {
-    let response = await axios.get("/tournaments")
-    console.log(response.data.message);
-    if(response.data.success)
-        tournaments.value = response.data.tournaments;
+    tournaments.value = await getAllTournaments();
 }
 getTournaments();
 
 const createTournament = async () => {
-    let tournament:any = {
+    let tournament:Tournament = {
+        _id: '', // Add a default or generate an ID
         name: tournamentName.value,
-        groupPhase: {},
-        koPhase: {},
+        teams: [], // Initialize teams as an empty array
+        groupPhase: {
+            groups: [],
+            matches: []
+        },
+        koPhase: {
+            matches: []
+        },
         settings: {
             trackPlayerShots: true,
             trackTeamShots: true,
@@ -86,9 +90,8 @@ const createTournament = async () => {
     //     {"name": "Emotional Damage","players": ["Sham Hasso","Nur-Sena Yildiz"]}
     // ]
     
-    let response = await axios.post("/createTournament", tournament);
-    console.log(response.data.message);
-    if(response.data.success){
+    let success = await addTournament(tournament);
+    if(success){
         await getTournaments();
         tournamentName = ref();
         toggleModal();

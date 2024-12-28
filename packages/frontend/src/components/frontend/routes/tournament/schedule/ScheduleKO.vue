@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue"
+import { onMounted, PropType } from "vue"
 import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import { convertNumberToCharacter } from "@/util/util.js"; 
@@ -9,7 +9,11 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-const props = defineProps(['getTournament','tournament','isBackend'])
+const props = defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true },
+   isBackend: {type: Boolean, required: true },
+});
 
 const getStageText = (stageIndex:number) => {
    let ammountOfStages = props.tournament.koPhase.matches.length - 1;
@@ -61,7 +65,7 @@ onMounted(() => {
                   <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
                      <div v-if="stageIndex == tournament.koPhase.matches.length - 1" class="gsk-match-name">{{ (matchIndex == 0 ? "Finale" : "Spiel um Platz 3")}}</div>
                      <div v-if="stageIndex != tournament.koPhase.matches.length - 1" class="gsk-match-table">{{ "Tisch " + convertNumberToCharacter(matchIndex + 1) }}</div>
-                     <MatchElement :match="match" :key="match._id" :stageIndex="stageIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
+                     <MatchElement :match="match" :key="match._id" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
                   </div>
                </div>
             </div>

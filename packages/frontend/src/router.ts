@@ -22,6 +22,16 @@ const routes = [
 	},
 
 	{
+		path: '/Offene-Spiele',
+		name: 'Offene Spiele',
+		component: () => import('@/components/frontend/routes/openGames/_OpenGames.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Offene Spiele',
+			description: 'Offene Spiel'
+		}
+	},
+
+	{
 		path: '/Hall-of-Fame',
 		name: 'Hall Of Fame',
 		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),

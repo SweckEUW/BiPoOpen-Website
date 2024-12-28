@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// @ts-nocheck
+// !!!!!!!!!!
+
+
 import { ref, onUnmounted } from "vue"
 import { getTournamentWithRouterID, getTopTeams, getMVPList, getMatchesGroupPhase, getMatchesKOPhase, getAllTeams} from "@/util/tournamentUtilFunctions.js"
 import { getAmmountOfDrunkenCupsFromteam } from "@/util/tournamentStatsFunctions";
@@ -10,7 +14,7 @@ const route = useRoute()
 
 let tournamentData = tournaments.find((tournament) => tournament.name == route.params.id)!;
 
-let tournament = ref();
+let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
     tournament.value = await getTournamentWithRouterID(route.params.id as string);
 }
@@ -27,10 +31,10 @@ onUnmounted(() => {
 let getAmmountOfMatches = () => {
     let ammountOfMatches = 0;
 
-    getMatchesGroupPhase(tournament.value).forEach((matches:any) => {
+    getMatchesGroupPhase(tournament.value).forEach((matches) => {
         ammountOfMatches += matches.length
     });
-    getMatchesKOPhase(tournament.value).forEach((matches:any) => {
+    getMatchesKOPhase(tournament.value).forEach((matches) => {
         ammountOfMatches += matches.length
     });
 
@@ -41,7 +45,7 @@ let getAmmountOfDrunkenCups = () => {
     let ammountOfDrunkenCups = 0;
 
     let teams = getAllTeams(tournament.value);
-    teams.forEach((team:any) => {
+    teams.forEach((team) => {
         ammountOfDrunkenCups += getAmmountOfDrunkenCupsFromteam(tournament.value, team.name, false);
     });
 
@@ -51,10 +55,10 @@ let getAmmountOfDrunkenCups = () => {
 let getHighestWin = () => {
     let matches = getMatchesGroupPhase(tournament.value);
     matches = matches.concat(getMatchesKOPhase(tournament.value));
-    let allMatches:any = [].concat(...matches);
-    allMatches = allMatches.filter((match:any) => match.result);
+    let allMatches = [].concat(...matches);
+    allMatches = allMatches.filter((match) => match.result);
 
-    allMatches = allMatches.sort((match1:any, match2:any) => {
+    allMatches = allMatches.sort((match1, match2) => {
         let diff1 = Math.abs(match1.result.team1Score - match1.result.team2Score);
         let diff2 = Math.abs(match2.result.team1Score - match2.result.team2Score);
         return diff2 - diff1;

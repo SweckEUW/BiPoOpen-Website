@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue"
-import { getTournamentWithRouterID, getPlayersWithStats, getTopTeams } from "@/util/tournamentUtilFunctions.js"
+import { computed, ref } from "vue"
+import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
-
-let tournaments:any = ref([]);
-let sortValue = ref("wins");
+let tournaments = ref<Tournament[]>([]);
+let sortValue = ref<SortValueHallOfFame>("wins");
 let sortUp = ref(false);
 
+// Initial load tournaments
 let tournamentsToEvaluate = ["2020","2022","2023","2024"]; //2021
 const getTournament = async () => {
-    let tournamentsArray:any = [];
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
         let tournament = await getTournamentWithRouterID(tournamentsToEvaluate[i]);
-        tournamentsArray.push(tournament);
-    }
-    tournaments.value = tournamentsArray;
+        if(tournament)
+            tournaments.value.push(tournament);
+    }   
 }
 getTournament();
 
@@ -25,13 +24,14 @@ window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
 });
 
-const getPlayers = () => {
-    let players:any = [];
+const sortedHallOfFameList = computed(() => {
+    let players:PlayerWithStats[] = [];
 
-    tournaments.value.forEach((tournament:any) => {
+    // Get players from all tournaments with stats. If the same player played in multiple tournaments, add the stats together
+    tournaments.value.forEach((tournament) => {
         let playersWithStats = getPlayersWithStats(tournament);
-        playersWithStats.forEach((player:any) => {
-            let playerInList = players.find((playerTMP:any) => playerTMP.name == player.name);
+        playersWithStats.forEach((player) => {
+            let playerInList = players.find((playerTMP) => playerTMP.name == player.name);
             if(playerInList){
                 playerInList.score += player.score;
                 playerInList.ammountOfMatches += player.ammountOfMatches;
@@ -46,15 +46,13 @@ const getPlayers = () => {
     });
 
     // Calculate correct win
-    players.forEach((player:any) => {
-        let averageWins:any = player.ammountOfMatches == 0 ? 0 : player.wins / player.ammountOfMatches;
-        averageWins *= 100;
-        averageWins = averageWins.toFixed(0);
-        player.averageWins = averageWins;
+    players.forEach((player) => {
+        let averageWins = player.ammountOfMatches == 0 ? 0 : player.wins / player.ammountOfMatches;
+        player.averageWins = Math.round(averageWins * 100);
     });
 
-    // Sort after average ein, win
-    players.sort((player1:any, player2:any) => {
+    // Sort players by wins and averageWins
+    players.sort((player1, player2) => {
         if(player2.wins == player1.wins)
             return player2.averageWins - player1.averageWins;
         
@@ -64,31 +62,30 @@ const getPlayers = () => {
     // Set placement
     for (let i = 0; i < players.length; i++) {
         players[i].placement = i;
-        let playersWithSameScore = players.filter((player:any) => player.averageWins == players[i].averageWins && player.wins == players[i].wins)
+        let playersWithSameScore = players.filter((player) => player.averageWins == players[i].averageWins && player.wins == players[i].wins)
         if(playersWithSameScore.length > 1){
-            playersWithSameScore.forEach((playerWithSameScore:any) => {
+            playersWithSameScore.forEach((playerWithSameScore) => {
                 playerWithSameScore.placement = playersWithSameScore[0].placement;
             });
         }
     }
 
-    return players;
-}
-
-const sortPlayersList = (players:any[]) => {
-    players.sort((player1:any, player2:any) => {
+    // Sort the Players depending on the sortValue
+    players.sort((player1, player2) => {
         if(sortValue.value == "name") // sort strings
             return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
 
         if(player2[sortValue.value] == player1[sortValue.value])
-            return sortUp.value ? player2.placement - player1.placement : player1.placement - player2.placement;
-        return sortUp.value ? player1[sortValue.value] - player2[sortValue.value] : player2[sortValue.value] - player1[sortValue.value]
+            return sortUp.value ? player2.placement! - player1.placement! : player1.placement! - player2.placement!;
+
+        return sortUp.value ? player1[sortValue.value]! - player2[sortValue.value]! : player2[sortValue.value]! - player1[sortValue.value]!
     });
 
     return players;
-}
+});
 
-const setSortValue = (value:string) => {
+
+const setSortValue = (value:SortValueHallOfFame) => {
     if(sortValue.value == value)
         sortUp.value = !sortUp.value;
     else
@@ -121,20 +118,6 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
         <div v-show="tournaments.length == tournamentsToEvaluate.length">
 
-            <!-- <div class="hof-winners">
-                <div class="hof-winner" v-for="tournament,i in tournaments.reverse()">
-                    <div class="hof-winner-icon">
-                        <img :src="trophyIcon" alt="">
-                        <div>{{ 2020 + i }}</div>
-                    </div>
-                    <div class="hof-team">
-                        <div class="hof-team-name">{{ getTopTeams(tournament)[0].name }}</div>
-                        <div>{{ getTopTeams(tournament)[0].players[0] }}</div>
-                        <div>{{ getTopTeams(tournament)[0].players[1] }}</div>
-                    </div>
-                </div>
-            </div> -->
-
             <div class="hof-winners">
                 <div class="hof-winner" v-for="winner in winners">
                     <div class="hof-winner-icon">
@@ -148,7 +131,6 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     </div>
                 </div>
             </div>
-
 
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
@@ -167,8 +149,8 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(player, index) in sortPlayersList(getPlayers())" :key="index">
-                        <td>{{ player.placement + 1}}</td>
+                    <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
+                        <td>{{ player.placement! + 1}}</td>
                         <td>{{ player.name.replace(" ","\n") }}</td>
                         <!-- <td>{{ player.averageScore }}</td> -->
                         <!-- <td>{{ player.score }}</td> -->

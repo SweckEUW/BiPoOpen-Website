@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import ScheduleGroups from '@/components/frontend/routes/tournament/schedule/ScheduleGroups.vue';
 import ScheduleKO from '@/components/frontend/routes/tournament/schedule/ScheduleKO.vue';
+import { PropType } from 'vue';
 
-defineProps(['getTournament','tournament',"isBackend"])
+defineProps({
+   getTournament: {type: Function, required: true },
+   tournament: {type: Object as PropType<Tournament>, required: true },
+   isBackend: {type: Boolean, required: true },
+});
 </script>
 
 <template>

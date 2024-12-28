@@ -32,12 +32,7 @@ export class tournamentCollection{
     }
 
     static async createTournament(request: Request, response: Response) {
-        let tournament = request.body;
-
-        // DEBUG!!
-        if(tournament.teams)
-            for (let i = 0; i < tournament.teams.length; i++)
-                tournament.teams[i]._id = new ObjectId().toString();      
+        let tournament = request.body; 
 
         // Add tournament to collection
         let collection = await tournamentCollection.getTournamentsCollection();
@@ -135,6 +130,30 @@ export class tournamentCollection{
         await collection.updateOne({"_id": {$eq: ObjectId.createFromHexString(tournamentID)}}, {$set: {"koPhase.matches": matches}});
 
         response.json({success: true, message: 'Matches für KO-Phase gesetzt'});
+    }
+
+
+    // OPEN GAMES
+    static async getOpenGames(request: Request, response: Response){
+        let collection = await tournamentCollection.getTournamentsCollection();
+        let tournaments = await collection.find().toArray();
+        
+        if(tournaments)
+            response.json({success: true, message: 'Tournaments gefunden', tournaments: tournaments});
+        else    
+            response.json({success: false, message: 'Keine Tournaments gefunden'}); 
+    }
+
+    static async addOpenGame(request: Request, response: Response) {
+        let team = request.body.team;
+        team._id = new ObjectId().toString();   
+
+        let tournamentID = request.body.tournamentID;
+
+        let collection = await tournamentCollection.getTournamentsCollection();
+        await collection.updateOne({"_id": {$eq: ObjectId.createFromHexString(tournamentID)}}, {$push: {teams: team}});
+
+        response.json({success: true, message:  'Team "' + team.name + '" hinzugefügt'});
     }
 
 }

@@ -1,6 +1,6 @@
 <template>
-    <h1 class="bp-title">{{ "Teamanmeldung 2024" }}</h1>
-   <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdOD6gv1kxf9mcMggg65DbRi_zxZqq0Az0-tIGUqjoovyJWqw/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <h1 class="bp-title">Teamanmeldung 2025</h1>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSf-CzR-P2S2NqVr7xK3g6LMMmC-ccefe5kD6wUB85MS3EHX2w/viewform?embedded=true" width="640" height="897" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
 </template>
 
 <style scoped>

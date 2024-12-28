@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
-import {MongoClient, ServerApiVersion} from "mongodb"
-import { config as DotEnvConfig } from "dotenv";
-import {tournamentCollection} from "./tournamentCollection"
+import { MongoClient, ServerApiVersion } from "mongodb"
+import { config } from "dotenv";
+import { tournamentCollection } from "./tournamentCollection"
+import { openGamesCollection } from "./openGamesCollection"
 
-DotEnvConfig();
+// loads environment variables from .env file into process.env. File should be in root directory of backend folder
+config();
 
 const app = express();
 app.use(cors());
@@ -25,7 +27,7 @@ client.connect().catch(error => {
 }).then(() =>{
   console.log("Connected to Database")
 
-  app.listen(8000, () =>{
+  app.listen(process.env.PORT, () =>{
     console.log('Server started')
   });
 })
@@ -53,6 +55,11 @@ app.post('/setSettings', tournamentCollection.setSettings);
 // K.o Stage
 app.post('/setMatchesGroupPhase', tournamentCollection.setMatchesGroupPhase);
 app.post('/setMatchesKOPhase', tournamentCollection.setMatchesKOPhase);
+
+
+// Open Games
+app.get('/openGames', openGamesCollection.getOpenGames);
+app.post('/addOpenGame', openGamesCollection.addOpenGame);
 
 module.exports = app;
 export default client;
