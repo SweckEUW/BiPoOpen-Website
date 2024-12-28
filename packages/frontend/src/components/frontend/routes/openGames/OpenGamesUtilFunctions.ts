@@ -25,9 +25,11 @@ export const addOpenGame = async (openGame:OpenGame) => {
 export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[]) => {
     let playersWithStats = getPlayersWithStats(openGames);
 
-    // Sort after average wins
+    // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
         if(player2.averageWins == player1.averageWins)
+            return player2.averageScore - player1.averageScore;
+        else if(player2.averageScore == player1.averageScore)
             return player2.wins - player1.wins;
         
         return player2.averageWins - player1.averageWins;
