@@ -9,7 +9,6 @@ type Tournament = {
 
 type Team = {
     _id: string,
-    teamID: string,
     name: string,
     players: string[]
 }

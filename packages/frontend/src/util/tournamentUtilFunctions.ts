@@ -7,7 +7,7 @@ import { convertNumberToCharacter } from "@/util/util.js";
 ////////////////
 // TOURNAMENT //
 ////////////////
-export const addTournament = async (tournament:Tournament) => {
+export const addTournament = async (tournament:any) => {
     let response = await axios.post("/createTournament", tournament);
     console.log(response.data.message);
     return response.data.success as boolean;
@@ -351,7 +351,7 @@ export const generateRandomGroups = async (tournament:Tournament) => {
     // Case: Fixed ammount of Groups
     let groupAmmount = tournament.settings.fixedGroupAmmount;
     for (let i = 0; i < groupAmmount; i++)
-       groups.push({teams: [{ teamID: "" }]});
+       groups.push({teams: []});
     for (let i = 0; i < teams.length; i++)
        groups[i%groupAmmount].teams.push({teamID: teams[i]._id});
     
@@ -553,6 +553,8 @@ export const setMatchesKOPhase = async (tournamentID:string, matches:Match[][]) 
 }
 
 export const initMatchesKOPhase = async (tournament:Tournament) => {
+    // TODO: This is most likely not working
+    
     let matches:Match[][] = [];
     let teamsInKOPhase = tournament.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
     let stages = Math.log2(teamsInKOPhase);
@@ -632,11 +634,11 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
 
                 // Check if all games of group are played. Get first place of picked group1 and set as team1
                 if(!tournament.groupPhase.matches[group1Number].find((match) => !match.result)) 
-                    matchTMP.team1ID = groupsDecoded[group1Number].teams.find(team => team.name == groupsWithStats[group1Number].teams[0].name)!.teamID;
+                    matchTMP.team1ID = groupsDecoded[group1Number].teams.find(team => team.name == groupsWithStats[group1Number].teams[0].name)!._id;
                 
                 // Check if all games of group are played. Get second place of picked group2 and set as team2
                 if(!tournament.groupPhase.matches[group2Number].find((match) => !match.result)) 
-                    matchTMP.team2ID = groupsDecoded[group2Number].teams.find(team => team.name == groupsWithStats[group2Number].teams[1].name)!.teamID;
+                    matchTMP.team2ID = groupsDecoded[group2Number].teams.find(team => team.name == groupsWithStats[group2Number].teams[1].name)!._id;
 
                 matchesTMP[i].push(matchTMP); 
             }

@@ -11,8 +11,7 @@ const getTournaments = async () => {
 getTournaments();
 
 const createTournament = async () => {
-    let tournament:Tournament = {
-        _id: '', // Add a default or generate an ID
+    let tournament = {
         name: tournamentName.value,
         teams: [], // Initialize teams as an empty array
         groupPhase: {
@@ -95,6 +94,7 @@ const createTournament = async () => {
         await getTournaments();
         tournamentName = ref();
         toggleModal();
+        window.location.href = "/Manage/" + tournament.name.replaceAll(' ','-');
     }
 }
 

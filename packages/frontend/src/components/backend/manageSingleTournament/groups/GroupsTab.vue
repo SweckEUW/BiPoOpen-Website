@@ -13,6 +13,8 @@ const props = defineProps({
 });
 
 const changeGroups = async () => {
+   // TODO: This is not working!
+
    // 1. Construct Groups Array from DOM
    let groups:Group[] = [];
 
@@ -21,7 +23,7 @@ const changeGroups = async () => {
       let teams:{teamID: string}[] = [];
       let teamsDomElment = document.getElementById("Group-"+i)!.getElementsByTagName("tbody")[0].getElementsByTagName("tr"); // Get Dom Element of each Group containing Teamname
       for (let y = 0; y < teamsDomElment.length; y++) {
-         let teamID = getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)!.teamID;
+         let teamID = getTeamFromName(props.tournament, teamsDomElment[y].getElementsByTagName("td")[2].innerText)!._id;
          teams.push({teamID: teamID});
       }
 
