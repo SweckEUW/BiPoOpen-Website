@@ -7,7 +7,7 @@ const props = defineProps({
 });
 
 let date = new Date(props.openGame.time);
-let time = date.getHours() + ":" + date.getMinutes();
+let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
 
 let team1Score = props.openGame.team1.players.reduce((acc, player) => acc + player.score, 0);
 let team2Score = props.openGame.team2.players.reduce((acc, player) => acc + player.score, 0);

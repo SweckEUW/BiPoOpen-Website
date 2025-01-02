@@ -18,12 +18,11 @@ export const addOpenGame = async (openGame:OpenGame) => {
 }
 
 
-
 ////////////////
 // STATISTICS //
 ////////////////
-export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[]) => {
-    let playersWithStats = getPlayersWithStats(openGames);
+export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:boolean) => {
+    let playersWithStats = getPlayersWithStats(openGames, oneVersusOne);
 
     // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
@@ -49,15 +48,15 @@ export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[]) => {
     return playersWithStats;
 }
 
-export const getPlayersWithStats = (openGames:OpenGame[]) => {
+export const getPlayersWithStats = (openGames:OpenGame[], oneVersusOne:boolean) => {
     let playerWithStats:PlayerWithStats[] = [];
 
-    let allPlayers = getAllPlayers(openGames);
+    let allPlayers = getAllPlayers(openGames, oneVersusOne);
 
     allPlayers.forEach((playerName) => {
-        let ammountOfMatches = getMatchesFromPlayer(openGames, playerName).length;
-        let score = getAmmountOfHitsFromPlayer(openGames, playerName);
-        let wins = getAmmountOfWinsFromPlayer(openGames, playerName);
+        let ammountOfMatches = getMatchesFromPlayer(openGames, playerName, oneVersusOne).length;
+        let score = getAmmountOfHitsFromPlayer(openGames, playerName, oneVersusOne);
+        let wins = getAmmountOfWinsFromPlayer(openGames, playerName, oneVersusOne);
 
         let player = {
             name: playerName,
@@ -75,38 +74,54 @@ export const getPlayersWithStats = (openGames:OpenGame[]) => {
     return playerWithStats;
 }
 
-export const getAllPlayers = (openGames:OpenGame[]) => {
+export const getAllPlayers = (openGames:OpenGame[], oneVersusOne:boolean) => {
     let allPlayerNames:string[] = [];
-
 
     // Add all players to array
     openGames.forEach(openGame => {
-        allPlayerNames.push(...openGame.team1.players.map(player => player.name));
-        allPlayerNames.push(...openGame.team2.players.map(player => player.name));
+        if(oneVersusOne){
+            if(openGame.team1.players.length == 1 && openGame.team2.players.length == 1){
+                allPlayerNames.push(...openGame.team1.players.map(player => player.name));
+                allPlayerNames.push(...openGame.team2.players.map(player => player.name));
+            }
+        }else{
+            if(openGame.team1.players.length == 2 && openGame.team2.players.length == 2){
+                allPlayerNames.push(...openGame.team1.players.map(player => player.name));
+                allPlayerNames.push(...openGame.team2.players.map(player => player.name));
+            }
+        }
     });
 
     // Remove doublicate player names
     allPlayerNames = allPlayerNames.filter((playerName, index) => allPlayerNames.indexOf(playerName) == index);
     
-    
     return allPlayerNames;
 }
 
-export const getMatchesFromPlayer = (openGames:OpenGame[], playerName:string) => { 
+export const getMatchesFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => { 
     let matchesFromPlayer:OpenGame[] = [];
 
     openGames.forEach((openGame) => {
-        if(openGame.team1.players.map(player => player.name).includes(playerName) || openGame.team2.players.map(player => player.name).includes(playerName))
-            matchesFromPlayer.push(openGame);       
+        if(openGame.team1.players.map(player => player.name).includes(playerName) || openGame.team2.players.map(player => player.name).includes(playerName)){
+            if(oneVersusOne){
+                if(openGame.team1.players.length == 1 || openGame.team2.players.length == 1){
+                    matchesFromPlayer.push(openGame);
+                }
+            }else{
+                if(openGame.team1.players.length == 2 || openGame.team2.players.length == 2){
+                    matchesFromPlayer.push(openGame);
+                }
+            }
+        }
     });
 
     return matchesFromPlayer;
 }
 
-export const getAmmountOfWinsFromPlayer = (openGames:OpenGame[], playerName:string) => {
+export const getAmmountOfWinsFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => {
     let wins = 0;
     
-    let matches = getMatchesFromPlayer(openGames, playerName);
+    let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
     
     matches.forEach((match) => {
         if((match.team1.players.map(player => player.name).includes(playerName))){
@@ -127,10 +142,10 @@ export const getAmmountOfWinsFromPlayer = (openGames:OpenGame[], playerName:stri
     return wins;
 }
 
-export const getAmmountOfHitsFromPlayer = (openGames:OpenGame[], playerName:string) => {
+export const getAmmountOfHitsFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => {
     let score = 0;
 
-    let matches = getMatchesFromPlayer(openGames, playerName);
+    let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
 
     matches.forEach((match) => {
         if(match.team1.players.map(player => player.name).includes(playerName))
