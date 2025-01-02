@@ -35,9 +35,9 @@ export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:
     });
 
     // Set placement
-    for (let i = 0; i < playersWithStats.length; i++) {
+    for (let i = 0; i < playersWithStats.length; i++){
         playersWithStats[i].placement = i;
-        let playersWithSameScore = playersWithStats.filter((player) => player.averageScore == playersWithStats[i].averageScore && player.ammountOfDrunkenCups == playersWithStats[i].ammountOfDrunkenCups)
+        let playersWithSameScore = playersWithStats.filter((player) => player.averageWins == playersWithStats[i].averageWins && player.averageScore == playersWithStats[i].averageScore && player.wins == playersWithStats[i].wins);
         if(playersWithSameScore.length > 1){
             playersWithSameScore.forEach((playerWithSameScore) => {
                 playerWithSameScore.placement = playersWithSameScore[0].placement;
