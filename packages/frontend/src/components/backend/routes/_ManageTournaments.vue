@@ -146,8 +146,20 @@ let tournamentName = ref();
     margin-bottom: 50px;
     filter: drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.3));
     text-decoration: none;
+    width: 50%;
 }
 .ma-tournament:hover{
     background: rgb(207, 207, 207);
+}
+.bp-button{
+    width: 50%;
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+    .ma-tournament, .bp-button {
+        width: 90%;
+        margin-bottom: 25px;
+    }
 }
 </style>

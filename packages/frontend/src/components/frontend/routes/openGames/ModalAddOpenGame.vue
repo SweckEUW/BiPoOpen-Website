@@ -29,7 +29,7 @@ const addGame = async () => {
         let fields = root.getElementsByClassName("rt-modal-team");
         for(let j = 0; j < fields.length; j++){
             let player = (fields[j].getElementsByClassName("rt-modal-input-player")[0] as HTMLInputElement).value.trim();
-            let score = parseFloat((fields[j].getElementsByClassName("rt-modal-input-number")[0] as HTMLInputElement).value).trim();
+            let score = parseFloat((fields[j].getElementsByClassName("rt-modal-input-number")[0] as HTMLInputElement).value.trim());
 
             let openGamePlayer = {
                 name: player,
