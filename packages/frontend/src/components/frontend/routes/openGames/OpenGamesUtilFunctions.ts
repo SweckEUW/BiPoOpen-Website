@@ -26,9 +26,9 @@ export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:
 
     // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
-        if(player2.averageWins == player1.averageWins)
+        if(player2.averageWins == player1.averageWins && player2.wins == player1.wins)
             return player2.averageScore - player1.averageScore;
-        else if(player2.averageScore == player1.averageScore)
+        else if(player2.averageWins == player1.averageWins)
             return player2.wins - player1.wins;
         
         return player2.averageWins - player1.averageWins;
