@@ -161,6 +161,16 @@ const routes = [
 			title: 'Weck BiPo Open - Impressum',
 			description: 'Impressum'
 		}
+	},
+
+	{
+		path: '/Hall-of-Fame-SCW',
+		name: 'Hall Of Fame SCW',
+		component: () => import('@/components/frontend/routes/_HallOfFameSCW.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Hall of Fame SCW',
+			description: 'Hall of Fame SCW'
+		}
 	}
 
 ];
