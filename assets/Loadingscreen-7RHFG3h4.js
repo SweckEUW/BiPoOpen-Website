@@ -1,0 +1,1 @@
+import{_ as c,o,c as a,p as t,h as d,a as e}from"./index-CqSaDUce.js";const n={},_=s=>(t("data-v-59b7bab0"),s=s(),d(),s),r={class:"Loadingscreen"},i=_(()=>e("div",{class:"ls-container"},[e("div",{class:"loader"})],-1)),p=[i];function l(s,h){return o(),a("div",r,p)}const f=c(n,[["render",l],["__scopeId","data-v-59b7bab0"]]);export{f as L};
