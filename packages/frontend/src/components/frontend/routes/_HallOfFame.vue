@@ -35,9 +35,8 @@ const sortedHallOfFameList = computed(() => {
             if(playerInList){
                 playerInList.score += player.score;
                 playerInList.ammountOfMatches += player.ammountOfMatches;
+                playerInList.ammountOfMatchesWithTrackedShots += player.ammountOfMatchesWithTrackedShots;
                 playerInList.ammountOfDrunkenCups += player.ammountOfDrunkenCups;
-                playerInList.averageScore += player.averageScore;
-                playerInList.averageWins += player.averageWins;
                 playerInList.wins += player.wins;
             }else{
                 players.push(player);
@@ -45,10 +44,20 @@ const sortedHallOfFameList = computed(() => {
         });
     });
 
-    // Calculate correct win
+    // Calculate correct average numbers
     players.forEach((player) => {
-        let averageWins = player.ammountOfMatches == 0 ? 0 : player.wins / player.ammountOfMatches;
+        // Calculate correct win
+        let averageWins = player.wins / player.ammountOfMatches;
         player.averageWins = Math.round(averageWins * 100);
+
+        // Calculate correct averageScore
+        player.averageScore = player.score / player.ammountOfMatchesWithTrackedShots;
+        player.averageScore = Math.round(player.averageScore * 100) / 100; // Round average Score
+        if(player.score == 0){
+            // @ts-ignore
+            player.averageScore = "/"; // @ts-ignore
+            player.score = "/";
+        }
     });
 
     // Sort players by wins and averageWins
@@ -140,33 +149,30 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     <tr style="height: auto;">
                         <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                         <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                        <!-- <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th> -->
-                        <!-- <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer insgesamt' : 'Trf.'}}</th> -->
+                        <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                         <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
                         <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spie.'}}</th>
-                        <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Siegwahr.'}}</th>
-                        <!-- <th @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th> -->
+                        <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Sieg. (%)'}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
                         <td>{{ player.placement! + 1}}</td>
                         <td>{{ player.name.replace(" ","\n") }}</td>
-                        <!-- <td>{{ player.averageScore }}</td> -->
-                        <!-- <td>{{ player.score }}</td> -->
+                        <td>{{ player.averageScore }}</td>
                         <td>{{ player.wins }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
                         <td>{{ player.averageWins + "%" }}</td>
-                        <!-- <td>{{ player.ammountOfDrunkenCups }}</td> -->
                     </tr>
                 </tbody>
             </table>
 
             <div v-if="windowWidth < 900" class="hof-explain">
                 <div>*Pl. = Platz</div>
+                <div>*Trfq. = Trefferquote</div>
                 <div>*Sieg. = Siege</div>
                 <div>*Spie. = Spiele</div>
-                <div>*Siegwahr. = Siegwahrscheinlichkeit</div>
+                <div>*Sieg. (%) = Siegwahrscheinlichkeit in %</div>
             </div>
 
         </div>
@@ -206,14 +212,22 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
     margin-right: 20px;
 }
 .hof-winner-icon img{
-    width: 80px;
+    width: 110px;
 }
 .hof-winner-icon div{
     position: absolute;
-    bottom: 5px;
-    left: 22px;
+    bottom: 9px;
+    left: 20px;
+    width: 70px;
+    height: 30px;
     font-weight: bold;
     color: white;
+    font-size: 11px;
+    line-height: 11px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .hof-team{
     flex: 1;
@@ -310,8 +324,11 @@ table td{
         padding-right: 10px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
-        min-width: 100px;
+        max-width: 80px;
         white-space: break-spaces;
+    }
+    th:nth-of-type(6), td:nth-of-type(6){
+        max-width: 50px;
     }
 
     .mvp-arrow-down::after, .mvp-arrow-up::after{
