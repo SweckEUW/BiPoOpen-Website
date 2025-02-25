@@ -1,7 +1,6 @@
 import axios from "axios";
 import { shuffleArray } from "@/util/util.js";
 import { getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfDrunkenCupsFromteam, getAmmountOfWinsFromTeam, getAmmountOfEnemyHitsFromTeam, checkIfTeam1WonVsTeam2, getAmmountOfHitsFromTeam, getAmmountOfWinsFromPlayer } from "@/util/tournamentStatsFunctions.js"
-import { convertNumberToCharacter } from "@/util/util.js"; 
 
 
 ////////////////
@@ -64,11 +63,12 @@ export const getPlayersWithStats = (tournament:Tournament|undefined) => {
             let ammountOfMatches = getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false);
             let score = getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false);
             let wins = getAmmountOfWinsFromPlayer(tournament, teams[i].players[x], false);
-
+            
             let player = {
                 name: teams[i].players[x],
                 score: score,
                 ammountOfMatches: ammountOfMatches,
+                ammountOfMatchesWithTrackedShots: tournament.settings.trackPlayerShots ? ammountOfMatches : 0,
                 ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i].name, false) / 2),
                 wins: wins,
                 averageScore: Math.round((ammountOfMatches == 0 ? 0 : score / ammountOfMatches) * 100) / 100, // TODO: if average is 7 show 7.00
@@ -434,45 +434,45 @@ export const generateRandomMatchesGroupPhase = async (tournament:Tournament) => 
     let groups = getGroupsDecoded(tournament);
  
     for (let i = 0; i < groups.length; i++) {
-        let matchesForGroup = [];
+        let matchesForGroup:Match[] = [];
         let teams = groups[i].teams;
         let ammountOfGames = (teams.length * (teams.length - 1)) / 2;
 
         if(ammountOfGames == 10){ // 5er Gruppen
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[4]._id});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id});
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[4]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
-            matchesForGroup.push({team1ID: teams[3]._id, team2ID: teams[4]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[4]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[4]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[4]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[3]._id, team2ID: teams[4]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[4]._id, _id: ""});
 
         }else if(ammountOfGames == 6){ // 4er Gruppen
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id, _id: ""});
 
         }else if(ammountOfGames == 3){ // 3er Gruppen
             // Hinrunde
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
 
             // Rückrunde
-            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id});
-            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id});
-            // matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id});
+            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
+            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
+            // matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
 
         }else{
             for (let x = 0; x < teams.length; x++){
                 for (let y = x+1; y < teams.length; y++) {
-                    let match = {team1ID: teams[y]._id, team2ID: teams[x]._id};
+                    let match = {team1ID: teams[y]._id, team2ID: teams[x]._id, _id: ""};
                     matchesForGroup.push(match);
                 }
             }
@@ -536,7 +536,7 @@ export const getMatchesKOPhase = (tournament:Tournament|undefined) => {
         stage.forEach((match) => {
             matches[i].push({
                 result: match.result,
-                team1: getTeamFromID(tournament, match.team1ID!)!,
+                team1: getTeamFromID(tournament, match.team1ID!)!, // TODO: getTeamFromID will return undefined for KO-Matches that have placeholder Teams
                 team2: getTeamFromID(tournament, match.team2ID!)!,
                 _id: match._id
             });
@@ -553,42 +553,29 @@ export const setMatchesKOPhase = async (tournamentID:string, matches:Match[][]) 
 }
 
 export const initMatchesKOPhase = async (tournament:Tournament) => {
-    // TODO: This is most likely not working
-    
     let matches:Match[][] = [];
     let teamsInKOPhase = tournament.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
     let stages = Math.log2(teamsInKOPhase);
+
+    // Set Placeholder Matches without TeamIDs or Result for each Stage
     for (let i = 0; i < stages; i++){
         let ammountOfMatches = teamsInKOPhase/(Math.pow(2,i+1));
         matches.push([]);
-        if(i == 0){
-            for (let x = 0; x < ammountOfMatches; x++) {
-                let group1Letter, group2Letter;
-                if(x % 2 == 0){
-                    group1Letter = convertNumberToCharacter(x + 1);
-                    group2Letter = convertNumberToCharacter(x + 2);
-                }else{
-                    group1Letter = convertNumberToCharacter(ammountOfMatches - x + 1);
-                    group2Letter = convertNumberToCharacter(ammountOfMatches - x);
-                }
-
-                // TODO: Placeholder funktion for Frontend. Placeholder shouldnt be in Database
-                // matches[i].push({placeHolderTeam1: "1. Platz - Gruppe "  + group1Letter, placeHolderTeam2: "2. Platz - Gruppe "  + group2Letter});
-            }
-        }else{
-            // for (let x = 0; x < ammountOfMatches; x++)
-            //     matches[i].push({placeHolderTeam1: "TBD", placeHolderTeam2: "TBD"});
-
-            // if(i == stages - 1)
-            //     matches[i].push({placeHolderTeam1: "TBD", placeHolderTeam2: "TBD"});
+        for (let x = 0; x < ammountOfMatches; x++) {
+            let match = {_id: ""}; // Playerholder id. ID will be set by Database
+            matches[i].push(match);
         }
+
+        // Manually add game for 3rd place
+        if(i == stages - 1)
+            matches[i].push({_id: ""});
     }
 
     await setMatchesKOPhase(tournament._id, matches);
 }
 
 // Gets called when Group or KO Phase sets Game Result
-// Loops over all Matches in the KO Phase and 
+// Loops over all Matches in the KO Phase and sets the TeamIDs for the next Stage
 export const updateMatchesKOPhase = async (tournament:Tournament) => {
     let matchesTMP:Match[][] = [];
 

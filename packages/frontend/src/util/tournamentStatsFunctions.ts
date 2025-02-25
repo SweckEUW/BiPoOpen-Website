@@ -75,6 +75,9 @@ export const getAmmountOfDrunkenCupsFromteam = (tournament:Tournament|undefined,
 // PLAYER STATS //
 //////////////////
 export const getAmmountOfHitsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => { 
+    if(!tournament.settings.trackPlayerShots)
+        return 0;
+    
     let score = 0;
 
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);

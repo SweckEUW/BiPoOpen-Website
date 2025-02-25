@@ -23,6 +23,13 @@ const setResultGroupPhase = async () => {
         team2Player2Score: team2Player2Score.value!
     }
 
+    if(!props.tournament.settings.trackPlayerShots){
+        result = {
+            team1Score: team1Score.value!,
+            team2Score: team2Score.value!
+        }
+    }
+
     await setGameResultGroupPhase(props.tournament, props.match._id, result);
     await props.getTournament();
     props.toggleModal();
@@ -37,6 +44,13 @@ const setResultKOPhase = async () => {
        team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
        team2Player1Score: team2Player1Score.value!, 
        team2Player2Score: team2Player2Score.value!
+    }
+
+    if(!props.tournament.settings.trackPlayerShots){
+        result = {
+            team1Score: team1Score.value!,
+            team2Score: team2Score.value!
+        }
     }
 
     await setGameResultKOPhase(props.tournament, props.match._id, result);
