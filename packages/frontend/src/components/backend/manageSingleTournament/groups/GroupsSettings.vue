@@ -15,6 +15,15 @@ const setFixedGroupAmmountOnInput = async (e:FocusEvent) => {
    if(success)
       await props.getTournament();
 }
+
+const setAdvancingTeamsPerGroup = async (e:FocusEvent) => {
+   let inputElement = e.target as HTMLInputElement;
+   let settings = props.tournament.settings;
+   settings.advancingTeamsPerGroup = parseInt(inputElement.value);
+   let success:boolean = await setSettings(props.tournament._id, props.tournament.settings);
+   if(success)
+      await props.getTournament();
+}
 </script>
 
 <template>
@@ -24,6 +33,11 @@ const setFixedGroupAmmountOnInput = async (e:FocusEvent) => {
       <div class="gs-setting">
          <div class="gs-title">Anzahl Gruppen</div>
          <input class="gs-input" type="number" :value="props.tournament.settings.fixedGroupAmmount" @focusout="setFixedGroupAmmountOnInput($event)">
+      </div>
+
+      <div class="gs-setting">
+         <div class="gs-title">Advancing Teams pro Gruppe</div>
+         <input class="gs-input" type="number" :value="props.tournament.settings.advancingTeamsPerGroup" @focusout="setAdvancingTeamsPerGroup($event)">
       </div>
       
       <hr>
