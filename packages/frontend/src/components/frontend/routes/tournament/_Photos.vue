@@ -30,7 +30,7 @@ const setupImages = async () => {
     // create array with urls to images via drive ids. set thumbnail parameter in url to reduce image size for fast loading
     for (let i = 0; i < driveImageIDs.length; i++) {
         let thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w500";
-        let picture = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000"; //TODO: dont use thumnail insead use image in full quality from drive
+        let picture = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000"; //TODO-Minor: dont use thumnail insead use image in full quality from drive
         
         if(driveImageIDs[i].img_id == "1W5chqvZUks8OSy2e3_pxTv1uWFBJZ8WV"){ // Edge case for panorama image 2024
             thumbnail = "https://drive.google.com/thumbnail?&id=" + driveImageIDs[i].img_id + "&sz=w1000";

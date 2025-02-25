@@ -70,7 +70,7 @@ export class tournamentCollection{
         let team = request.body.team;
         let tournamentID = request.body.tournamentID;
 
-        // TODO: Replace complete team element instead of single team values
+        // TODO-Minor: Replace complete team element instead of single team values
         let collection = await tournamentCollection.getTournamentsCollection();
         await collection.updateOne({"_id": {$eq: ObjectId.createFromHexString(tournamentID)}, "teams._id": team._id }, { $set: { "teams.$.name": team.name, "teams.$.players": team.players } });
         
@@ -122,7 +122,7 @@ export class tournamentCollection{
         matches.forEach((stage:any) => {
             stage.forEach((match:any) => {
                 match._id = new ObjectId().toString();    
-            });
+            }); 
         });
 
         let collection = await tournamentCollection.getTournamentsCollection();
