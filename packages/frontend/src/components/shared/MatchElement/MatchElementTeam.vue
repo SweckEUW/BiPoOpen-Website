@@ -7,12 +7,7 @@ const props = defineProps({
     isTeam2: {type: Boolean, required: true },
 });
 
-let team = props.match.team1;
-if(props.isTeam2){
-    team = props.match.team2;
-}
-
-// match.placeHolderTeam2
+let team = props.isTeam2 ? props.match.team2 : props.match.team1;
 let teamScore:undefined|number = undefined;
 let player1Score:undefined|number = undefined;
 let player2Score:undefined|number = undefined;
