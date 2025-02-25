@@ -84,32 +84,35 @@ export const getAmmountOfHitsFromPlayer = (tournament:Tournament, playerName:str
 
     matches.forEach((match) => {
         if(match.team1.players[0] == playerName)
-            score += match.result.team1Player1Score;        
+            score += match.result.team1Player1Score!;        
         if(match.team1.players[1] == playerName)
-            score += match.result.team1Player2Score;
+            score += match.result.team1Player2Score!;
         if(match.team2.players[0] == playerName)
-            score += match.result.team2Player1Score
+            score += match.result.team2Player1Score!;
         if(match.team2.players[1] == playerName)
-            score += match.result.team2Player2Score;
+            score += match.result.team2Player2Score!;
     });
 
     return score;
 }
 
 export const getAmmountEnemyHitsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => { 
+    if(!tournament.settings.trackPlayerShots)
+        return 0;
+
     let score = 0;
     
     let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
 
     matches.forEach((match) => {
         if(match.team1.players[0] == playerName)
-            score += match.result.team2Player1Score;               
+            score += match.result.team2Player1Score!;               
         if(match.team1.players[1] == playerName)
-            score += match.result.team2Player2Score;
+            score += match.result.team2Player2Score!;
         if(match.team2.players[0] == playerName)
-            score += match.result.team1Player1Score          
+            score += match.result.team1Player1Score!;       
         if(match.team2.players[1] == playerName)
-            score += match.result.team1Player2Score;
+            score += match.result.team1Player2Score!;
     });
 
     return score;

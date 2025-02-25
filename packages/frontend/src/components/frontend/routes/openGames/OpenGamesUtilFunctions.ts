@@ -62,6 +62,7 @@ export const getPlayersWithStats = (openGames:OpenGame[], oneVersusOne:boolean) 
             name: playerName,
             score: score,
             ammountOfMatches: ammountOfMatches,
+            ammountOfMatchesWithTrackedShots: ammountOfMatches,
             ammountOfDrunkenCups: getAmmountOfDrunkenCupsFromPlayer(openGames, playerName),
             wins: wins,
             averageScore: Math.round((ammountOfMatches == 0 ? 0 : score / ammountOfMatches) * 100) / 100, // TODO: if average is 7 show 7.00

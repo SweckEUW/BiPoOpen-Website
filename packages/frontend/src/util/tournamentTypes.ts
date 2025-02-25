@@ -53,17 +53,18 @@ type MatchDecoded = {
 
 type MatchResult = {
     team1Score: number,
-    team1Player1Score: number,
-    team1Player2Score: number,
+    team1Player1Score?: number,
+    team1Player2Score?: number,
     team2Score: number,
-    team2Player1Score: number,
-    team2Player2Score: number
+    team2Player1Score?: number,
+    team2Player2Score?: number
 }
 
 type PlayerWithStats = {
     name: string;
     score: number;
     ammountOfMatches: number;
+    ammountOfMatchesWithTrackedShots: number;
     ammountOfDrunkenCups: number;
     wins: number;
     averageScore: number;
@@ -87,4 +88,4 @@ type GroupWithStats = {
 }
 
 type SortValueMVP = 'averageScore'|'placement'|'score'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
-type SortValueHallOfFame = 'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
+type SortValueHallOfFame = 'averageScore'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';

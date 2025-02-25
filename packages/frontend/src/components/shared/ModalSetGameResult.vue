@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const setResultGroupPhase = async () => {
-    let result = {
+    let result:MatchResult = {
         team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
         team1Player1Score: team1Player1Score.value!, 
         team1Player2Score: team1Player2Score.value!, 
@@ -36,7 +36,7 @@ const setResultGroupPhase = async () => {
 }
 
 const setResultKOPhase = async () => {
-    let result = {
+    let result:MatchResult = {
        team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
        team1Player1Score: team1Player1Score.value!, 
        team1Player2Score: team1Player2Score.value!, 

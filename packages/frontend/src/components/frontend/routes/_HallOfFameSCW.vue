@@ -58,7 +58,8 @@ const sortedHallOfFameList = computed(() => {
         player.averageScore = player.score / player.ammountOfMatchesWithTrackedShots;
         player.averageScore = Math.round(player.averageScore * 100) / 100; // Round average Score
         if(player.score == 0){
-            player.averageScore = "/";
+            // @ts-ignore
+            player.averageScore = "/"; // @ts-ignore
             player.score = "/";
         }
     });
