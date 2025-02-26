@@ -115,7 +115,7 @@ const giveArrowClass = (value:string) => {
 let winners = [
     { year: "Karneval 2024", name: "?", player1: "", player2: ""},
     { year: "Batenhorst 2024", name: "Lederlappen", player1: "Nick Brinkrolf", player2: "Fitim Shehi"},
-    { year: "Ostern 2024", name: "Holzbein Kiel", player1: "Leonhard Sürbrock", player2: "Jonas Weck"},
+    { year: "Ostern 2024", name: "Holzbein Kiel", player1: "Leonard Südbrock", player2: "Jonas Weck"},
     { year: "Batenhorst 2023", name: "", player1: "Jens Ossenbrink", player2: "Simon Weck"},
 ]
 let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
