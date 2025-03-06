@@ -555,6 +555,15 @@ export const setMatchesKOPhase = async (tournamentID:string, matches:Match[][]) 
 export const initMatchesKOPhase = async (tournament:Tournament) => {
     let matches:Match[][] = [];
     let teamsInKOPhase = tournament.settings.advancingTeamsPerGroup * tournament.groupPhase.groups.length;
+
+    // Check if teamsInKOPhase is a power of 2. If not, there are not enough teams to play a KO-Phase.  Choose the next power of 2 as teamsInKOPhase
+    if(Math.log2(teamsInKOPhase) % 1 != 0){
+        let power = 1;
+        while (power < teamsInKOPhase) 
+          power *= 2;
+        teamsInKOPhase = power;
+    }
+
     let stages = Math.log2(teamsInKOPhase);
 
     // Set Placeholder Matches without TeamIDs or Result for each Stage
@@ -583,14 +592,19 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
     let groupsDecoded = getGroupsDecoded(tournament);
     let groupsWithStats = getGroupsWithStats(tournament); // getGroups with stats because its sorted after wins. 
 
+
     matches.forEach((stage, i) => {
         matchesTMP.push([]);
 
         if(i == 0) { // First Stage 
             for (let x = 0; x < stage.length; x++) { 
                 let matchTMP = stage[x];
-
+                
+                // groupNumber are the groups that are picked for the K.O-Stage. 
+                // Match groups that are far away from each other so that teams that played together in groupstage wont play again in KO-Stage
                 let group1Number, group2Number;
+                let placeGroup1 = 0;
+                let placeGroup2 = 0;
                 if(x % 2 == 0){
                     group1Number = x;
                     group2Number = x + 1;
@@ -598,6 +612,21 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
                     group1Number = stage.length - x;
                     group2Number = stage.length - x - 1;
                 }
+
+                // 3 Groups and the best 2. advanced 
+                // TODO: This is hardcoded for 3 Groups. Make it dynamic 
+                if(tournament.name == "SCW 3 Karneval 2025"){
+                    if(x == 0){
+                        group1Number = 2;
+                        group2Number = 1;
+                    }
+                    if(x == 1){
+                        placeGroup1 = 1;
+                        group1Number = 1;
+                        group2Number = 0;
+                    }
+                }
+
 
                 // Change first K.o-Stage for 2022 tournament
                 if(tournament.name == "Weck BiPo Open 2022"){
@@ -621,11 +650,11 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
 
                 // Check if all games of group are played. Get first place of picked group1 and set as team1
                 if(!tournament.groupPhase.matches[group1Number].find((match) => !match.result)) 
-                    matchTMP.team1ID = groupsDecoded[group1Number].teams.find(team => team.name == groupsWithStats[group1Number].teams[0].name)!._id;
+                    matchTMP.team1ID = groupsDecoded[group1Number].teams.find(team => team.name == groupsWithStats[group1Number].teams[placeGroup1].name)!._id;
                 
                 // Check if all games of group are played. Get second place of picked group2 and set as team2
                 if(!tournament.groupPhase.matches[group2Number].find((match) => !match.result)) 
-                    matchTMP.team2ID = groupsDecoded[group2Number].teams.find(team => team.name == groupsWithStats[group2Number].teams[1].name)!._id;
+                    matchTMP.team2ID = groupsDecoded[group2Number].teams.find(team => team.name == groupsWithStats[group2Number].teams[placeGroup2].name)!._id;
 
                 matchesTMP[i].push(matchTMP); 
             }

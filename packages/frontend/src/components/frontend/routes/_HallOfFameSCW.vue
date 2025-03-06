@@ -9,7 +9,7 @@ let sortValue = ref<SortValueHallOfFame>("averageWins");
 let sortUp = ref(false);
 
 // Initial load tournaments
-let tournamentsToEvaluate = ["SCW 3 Batenhorst 2023","SCW 3 Ostern 2024", "SCW 3 Batenhorst 2024"];
+let tournamentsToEvaluate = ["SCW 3 Batenhorst 2023","SCW 3 Ostern 2024", "SCW 3 Batenhorst 2024", "SCW 3 Karneval 2025"];
 const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
         let tournament = await getTournamentWithRouterID(tournamentsToEvaluate[i]);
@@ -113,7 +113,7 @@ const giveArrowClass = (value:string) => {
 }
 
 let winners = [
-    { year: "Karneval 2024", name: "?", player1: "", player2: ""},
+    { year: "Karneval 2025", name: "", player1: "Vadim Laukert", player2: "Marcel Brüggehofe"},
     { year: "Batenhorst 2024", name: "Lederlappen", player1: "Nick Brinkrolf", player2: "Fitim Shehi"},
     { year: "Ostern 2024", name: "Holzbein Kiel", player1: "Leonard Südbrock", player2: "Jonas Weck"},
     { year: "Batenhorst 2023", name: "", player1: "Jens Ossenbrink", player2: "Simon Weck"},

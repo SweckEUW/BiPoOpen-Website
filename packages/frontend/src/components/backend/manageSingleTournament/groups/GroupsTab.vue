@@ -12,9 +12,13 @@ const props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true }
 });
 
-const changeGroups = async () => {
-   // TODO: This is not working!
+onMounted(() => {
+   if(props.tournament.groupPhase.groups)
+      initSortable();
+});
 
+
+const changeGroups = async () => {
    // 1. Construct Groups Array from DOM
    let groups:Group[] = [];
 
@@ -32,44 +36,23 @@ const changeGroups = async () => {
 
    // 2. Set Groups in Database
    let success = await setGroups(props.tournament._id, groups);
-   if(success){
-      await props.getTournament();
-      await generateRandomMatchesGroupPhase(props.tournament);
-      await props.getTournament();
-      await initMatchesKOPhase(props.tournament);
-      await props.getTournament();
-      initSortable();
-      toggleModal();
-   }
+   if(success)
+      await initGroupAndKOMatches();
 }
 
-const initSortable = () => {
-   setTimeout(() => {
-      let groupAmmount = props.tournament.settings.fixedGroupAmmount;
-      for (let i = 0; i < groupAmmount; i++){
-         let groupDOM = document.getElementById("Group-"+i)!;
-         let tbody = groupDOM.getElementsByTagName("tbody")[0];
-         new Sortable(tbody, {
-            animation: 150,
-            group: 'shared',
-            handle: ".lt-handle"
-         });
-      }
-   }, 0);
-}
-
-onMounted(() => {
-   if(props.tournament.groupPhase.groups)
-      initSortable();
-});
-
-const generateGroups = async () => {
+const generateRandomGroupsHere = async () => {
    await generateRandomGroups(props.tournament);
+   await initGroupAndKOMatches();
+}
+
+const initGroupAndKOMatches = async () => {
    await props.getTournament();
    await generateRandomMatchesGroupPhase(props.tournament);
    await props.getTournament();
    await initMatchesKOPhase(props.tournament);
    await props.getTournament();
+   initSortable();
+   toggleModal();
 
    // DEBUG!
    // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
@@ -87,8 +70,6 @@ const generateGroups = async () => {
    //       await setGameResultGroupPhase(props.tournament, match._id, result);
    //    });
    // });
-
-   toggleModal();
 }
 
 let generateRandom = ref(false);
@@ -97,6 +78,21 @@ const toggleModal = (generate?:boolean) => {
    showModal.value = !showModal.value;
    if(generate != undefined)
       generateRandom.value = generate;
+}
+
+const initSortable = () => {
+   setTimeout(() => {
+      let groupAmmount = props.tournament.settings.fixedGroupAmmount;
+      for (let i = 0; i < groupAmmount; i++){
+         let groupDOM = document.getElementById("Group-"+i)!;
+         let tbody = groupDOM.getElementsByTagName("tbody")[0];
+         new Sortable(tbody, {
+            animation: 150,
+            group: 'shared',
+            handle: ".lt-handle"
+         });
+      }
+   }, 0);
 }
 </script>
 
@@ -117,7 +113,7 @@ const toggleModal = (generate?:boolean) => {
                <div @click="toggleModal()">Abbrechen</div>
             </template>
             <template #confirm>
-               <div @click="generateRandom ? generateGroups() : changeGroups()">{{ generateRandom ? "Auslosen" : "Umsortieren"}}</div>
+               <div @click="generateRandom ? generateRandomGroupsHere() : changeGroups()">{{ generateRandom ? "Auslosen" : "Umsortieren"}}</div>
             </template>
          </Modal>
       </Transition>
