@@ -5,7 +5,7 @@ const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component: () => import('@/components/frontend/routes/_Home.vue'),
+		component: () => import('@/components/frontend/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open',
 			description: ''
@@ -14,7 +14,7 @@ const routes = [
 	{
 		path: '/Regeln',
 		name: 'Regeln',
-		component: () => import('@/components/frontend/routes/_Rules.vue'),
+		component: () => import('@/components/frontend/_Rules.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Regeln',
 			description: 'Regeln'
@@ -24,7 +24,7 @@ const routes = [
 	{
 		path: '/Offene-Spiele',
 		name: 'Offene Spiele',
-		component: () => import('@/components/frontend/routes/openGames/_OpenGames.vue'),
+		component: () => import('@/components/frontend/openGames/_OpenGames.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Offene Spiele',
 			description: 'Offene Spiel'
@@ -34,7 +34,7 @@ const routes = [
 	{
 		path: '/Hall-of-Fame',
 		name: 'Hall Of Fame',
-		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),
+		component: () => import('@/components/frontend/_HallOfFame.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Hall of Fame',
 			description: 'Hall of Fame'
@@ -44,7 +44,7 @@ const routes = [
 	{
 		path: '/Teamanmeldung',
 		name: 'Teamanmeldung',
-		component: () => import('@/components/frontend/routes/_Teamanmeldung.vue'),
+		component: () => import('@/components/frontend/_Teamanmeldung.vue'),
 		meta: {
 			title: 'Weck BiPo Open 2024 - Teamanmeldung',
 			description: 'Teamanmeldung'
@@ -53,69 +53,15 @@ const routes = [
 
 	// Frontend - Tournament
 	{
-		path: '/:id/Spielplan',
-		name: 'Schedule',
-		component: () => import('@/components/frontend/routes/tournament/schedule/_Schedule.vue'),
+		path: '/:id',
+		name: 'Tournament',
+		component: () => import('@/components/frontend/tournament/_Tournament.vue'),
 		meta: {
-			title: 'Weck BiPo Open REPLACE - Spielplan',
-			description: 'Spielplan'
+			title: 'Weck BiPo Open - REPLACE',
+			description: 'Tournament'
 		}
 	},
-	{
-		path: '/:id/Platzierungen',
-		name: 'Standings',
-		component: () => import('@/components/frontend/routes/tournament/standings/_Standings.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Platzierungen',
-			description: 'Platzierungen'
-		}
-	},
-	{
-		path: '/:id/MVP',
-		name: 'MVP',
-		component: () => import('@/components/frontend/routes/tournament/_MVP.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - MVP',
-			description: 'Most Valuable Player'
-		}
-	},
-	{
-		path: '/:id/Spielplan2',
-		name: 'ScheduleOverview',
-		component: () => import('@/components/frontend/routes/tournament/_ScheduleOverview.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Spielplan-Übersicht',
-			description: 'Spielplan-Übersicht'
-		}
-	},
-	{
-		path: '/:id/Zusammenfassung',
-		name: 'Summary',
-		component: () => import('@/components/frontend/routes/tournament/_Summary.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Zusammenfassung',
-			description: 'Zusammenfassung'
-		}
-	},
-	{
-		path: '/:id/Fotos',
-		name: 'Photos',
-		component: () => import('@/components/frontend/routes/tournament/_Photos.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Fotos',
-			description: 'Fotos'
-		}
-	},
-	{
-		path: '/:id/Teams',
-		name: 'Teams',
-		component: () => import('@/components/frontend/routes/tournament/_Teams.vue'),
-		meta: {
-			title: 'Weck BiPo Open REPLACE - Teams',
-			description: 'Teams'
-		}
-	},
-
+	
 	// Redirect
 	{
 		path: '/Spielplan',
@@ -146,7 +92,7 @@ const routes = [
 	{
 		path: "/:catchAll(.*)",
 		name: "NotFound404",
-		component: () => import('@/components/frontend/routes/_NotFound404.vue'),
+		component: () => import('@/components/frontend/_NotFound404.vue'),
 		meta: {
 			title: 'Weck BiPo Open - 404',
 			description: '404 Seite nicht gefunden'
@@ -156,7 +102,7 @@ const routes = [
 	{
 		path: '/Impressum',
 		name: 'Impressum',
-		component: () => import('@/components/frontend/routes/_Imprint.vue'),
+		component: () => import('@/components/frontend/_Imprint.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Impressum',
 			description: 'Impressum'
@@ -166,7 +112,7 @@ const routes = [
 	{
 		path: '/Hall-of-Fame-SCW',
 		name: 'Hall Of Fame SCW',
-		component: () => import('@/components/frontend/routes/_HallOfFameSCW.vue'),
+		component: () => import('@/components/frontend/_HallOfFameSCW.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Hall of Fame SCW',
 			description: 'Hall of Fame SCW'
@@ -183,7 +129,7 @@ const router = createRouter({
 	}
 });
 
-router.beforeResolve((to, from, next) => {
+router.beforeEach((to, from, next) => {
 	let title = (to.meta.title as string).replace("REPLACE", to.params.id as string)
 	document.title = title;
 	(document.querySelector("meta[property='og:title']")as HTMLMetaElement).content = title;

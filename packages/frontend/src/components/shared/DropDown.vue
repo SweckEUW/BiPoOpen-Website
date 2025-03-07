@@ -20,7 +20,7 @@ window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 </script>
 
 <template>
-	<div class="DropDown" :style="{'maxHeight': menuOpen ? '480px' : '60px'}">
+	<div class="DropDown" :style="{'maxHeight': menuOpen ? '400px' : '60px'}">
 
 		<div class="dd-title" @click="toggleMenu()">
 			<div class="arrow-down" :style="{'transform': menuOpen ? 'rotate(0deg)' : 'rotate(-90deg)'}"></div>
@@ -35,7 +35,6 @@ window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 
 <style scoped>
 .DropDown{
-	overflow: hidden;
 	transition: max-height .5s ease;
 	margin-bottom: 30px;
 }
@@ -53,6 +52,7 @@ window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
+	text-align: center;
 }
 .arrow-down{
 	width: 0; 
@@ -69,6 +69,9 @@ window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 @media (width <= 900px){
 	.dd-title:hover{
 		opacity: 1;
+	}
+	.dd-content{
+
 	}
 }
 </style>

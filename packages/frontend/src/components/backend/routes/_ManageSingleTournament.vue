@@ -6,7 +6,7 @@ import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
 import ScheduleSettings from '@/components/backend/manageSingleTournament/ScheduleSettings.vue';
 import GroupsTab from '@/components/backend/manageSingleTournament/groups/GroupsTab.vue';
-import Schedule from '@/components/frontend/routes/tournament/schedule/Schedule.vue';
+import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
 
 let tournament = ref<Tournament|undefined>();
 

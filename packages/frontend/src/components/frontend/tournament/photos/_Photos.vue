@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, PropType} from "vue"
+import ImageModal from '@/components/frontend/tournament/photos/ImageModal.vue';
 
-import ImageModal from '@/components/frontend/photos/ImageModal.vue';
-import tournaments from '@/assets/tournaments.json';
+const props = defineProps({
+   tournamentPhotos: {type: Object as PropType<any>, required: true }
+});
 
-import { useRoute } from "vue-router";
-const route = useRoute();
-
-
-let tournamentData = tournaments.find((tournament) => tournament.name == route.params.id)!;
-let posterURL = new URL(`/src/assets/${tournamentData.fotos!.poster}`, import.meta.url).href;
+let posterURL = new URL(`/src/assets/${props.tournamentPhotos.poster}`, import.meta.url).href;
 
 onMounted(async () => {
     await setupImages();
@@ -20,7 +17,7 @@ let pictures:any = ref([]);
 const setupImages = async () => {
 
     // Get IDs of images ind drive via json file
-    let driveImageIDsURL = new URL(`/src/assets/${tournamentData.fotos!.driveImageIDs}`, import.meta.url);
+    let driveImageIDsURL = new URL(`/src/assets/${props.tournamentPhotos.driveImageIDs}`, import.meta.url);
     let driveImageIDs:any = await fetch(driveImageIDsURL);
     driveImageIDs = await driveImageIDs.json();
 
@@ -80,31 +77,13 @@ window.onscroll = () => {
 <template>
     <div class="Photos">
 
-        <h1 class="bp-title">{{"Fotos " + route.params.id }}</h1>
-
         <Transition name="fade">
             <ImageModal v-show="showModal" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
-        
         <!-- 2023 -->
-        <div v-if="route.params.id == '2023'">
-            <div class="pt-intro">
-                Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-                <br>
-                Folgt ihm gerne auf Instagram 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
-            </div>
-        </div>  
-
-        <!-- 2024 -->
-        <div v-if="route.params.id == '2024'">
-            <div class="pt-intro">
-                Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
-                <br>
-                Folgt ihm gerne auf Instagram 
-                <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
-            </div>
+        <div v-if="tournamentPhotos.text">
+            <div class="pt-intro" v-html="tournamentPhotos.text"/>
         </div>  
 
         <!-- Poster -->
@@ -122,7 +101,7 @@ window.onscroll = () => {
     </div>
 </template>
 
-<style>
+<style scoped>
 .pt-intro{
     text-align: center;
     font-size: 18px;

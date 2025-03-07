@@ -134,7 +134,7 @@ onMounted(() => {
    padding-bottom: 20px;
    display: flex;
    background-color: white;
-   top: 216px;
+   top: 290px;
 }
 #OpenGamesStatisticsContainer .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
     padding: 5px 10px; 
@@ -184,7 +184,7 @@ onMounted(() => {
 }
 #OpenGamesStatisticsContainer table th{ 
     position: sticky;
-    top: 165px;
+    top: 350px;
     background-color: #FFF;
     color: var(--main-color);
     font-size: 20px;
@@ -232,8 +232,8 @@ onMounted(() => {
 /*MOBILE*/
 @media (width <= 900px){
     #OpenGamesStatisticsContainer .swiper-pagination{
-      top: 172px;
-   }
+      top: 240px;
+    }
     .ogs-text{
         font-size: 16px;
         margin-bottom: 30px;
@@ -253,7 +253,7 @@ onMounted(() => {
         height: 80px;
     }
     #OpenGamesStatisticsContainer table th{ 
-        top: 230px;
+        top: 300px;
         font-size: 15px;
     }
     #OpenGamesStatisticsContainer th:nth-of-type(1), #OpenGamesStatisticsContainer td:nth-of-type(1){

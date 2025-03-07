@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue';
-import ModalAddOpenGame from '@/components/frontend/routes/openGames/ModalAddOpenGame.vue';
-import { getAllOpenGames } from "@/components/frontend/routes/openGames/OpenGamesUtilFunctions";
+import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
+import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { OpenGame } from "./OpenGamesTypes";
 import OpenGameMatchElement from './OpenGameMatchElement.vue';
@@ -75,37 +75,51 @@ const toggleModalAddGame = () => {
 </template>
 
 <style scoped>
+.bp-title{
+    padding-bottom: 10px;   
+}
+.bp-button{
+    position: sticky;
+    top: 155px;
+    z-index: 4;
+}
 .nav-tabs{
-   position: sticky;
-   top: 160px;
-   background: white;
-   z-index: 2;
+    position: sticky;
+    top: 218px;
+    padding-top: 20px;
+    background: white;
+    z-index: 2;
 }
 .nav-link{
-   border-radius: 0px;
-   width: 40vw;
-   padding: 15px 10px;
-   color: var(--secondary-color);
-   font-weight: bold;
+    border-radius: 0px;
+    width: 40vw;
+    padding: 15px 10px;
+    color: var(--secondary-color);
+    font-weight: bold;
 }
 .nav-item{
-   flex: 1;
+    flex: 1;
 }
 .nav-item .active{
-   background-color: var(--main-color) !important;
-   color: white !important;
+    background-color: var(--main-color) !important;
+    color: white !important;
 }
 .nav-item button{
-   width: 100%;
+    width: 100%;
 }
 /* MOBILE */
 @media (width <= 900px){
+    .bp-button{
+        top: 130px;
+        padding: 15px 20px;
+        margin-bottom: 30px;
+    }
    .nav-tabs{
-      top: 130px;
-   }
+        top: 180px;
+    }   
    .nav-link{
-      font-size: 14px;
-      padding: 10px 10px;
-   }
+        font-size: 14px;
+        padding: 10px 10px;
+    }
 }
 </style>

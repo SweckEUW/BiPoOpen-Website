@@ -1,28 +1,13 @@
 <script setup lang="ts">
-import { ref, onUnmounted, computed } from "vue"
+import { ref, onUnmounted, computed, PropType } from "vue"
 import { getTournamentWithRouterID, getMVPList } from "@/util/tournamentUtilFunctions.js"
 
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+let props = defineProps({
+   tournament: {type: Object as PropType<Tournament>, required: true }
+});
 
-import { useRoute } from "vue-router";
-const route = useRoute()
-
-let tournament = ref<Tournament|undefined>();
 let sortValue = ref<SortValueMVP>("averageScore");
 let sortUp = ref(false);
-
-const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID(route.params.id as string);
-}
-getTournament();
-
-let updateInterval = setInterval(() => {
-   getTournament();
-}, 10000);
-
-onUnmounted(() => {
-   clearInterval(updateInterval);
-});
 
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
@@ -30,10 +15,10 @@ window.addEventListener("resize", () => {
 });
 
 const sortedMVPList = computed(() => {
-    if(tournament.value == undefined)
+    if(props.tournament == undefined)
         return [];
     
-    let mvpList = getMVPList(tournament.value);
+    let mvpList = getMVPList(props.tournament);
 
     // Sort the MVP List depenging on the sortValue
     mvpList.sort((player1, player2) => {
@@ -48,7 +33,6 @@ const sortedMVPList = computed(() => {
 
     return mvpList;
 })
-
 
 const setSortValue = (value:SortValueMVP) => {
     if(sortValue.value == value)
@@ -68,17 +52,11 @@ const giveArrowClass = (value:string) => {
 <template>
     <div class="MVP">
         
-        <h1 class="bp-title">{{(route.params.id.length > 5 ? 'MVP ' : "Most Valuable Player ") + (route.params.id as string).replaceAll('-',' ') }}</h1>
-
-        <Loadingscreen v-show="!tournament"/>
-
         <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
             Turnierplan wurde noch nicht erstellt
         </div>
 
         <div v-show="tournament && tournament.groupPhase.groups">
-
-            <div class="mvp-text">Statistiken aller Spieler aus dem Turnier sortiert nach der durchschnittlichen Trefferquote pro Spiel</div>
 
             <table class="table table-hover caption-top">
                 <thead>
@@ -88,7 +66,7 @@ const giveArrowClass = (value:string) => {
                         <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                         <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
                         <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                        <th v-if="windowWidth > 360" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
+                        <th v-if="windowWidth > 375" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -98,7 +76,7 @@ const giveArrowClass = (value:string) => {
                         <td>{{ player.averageScore }}</td>
                         <td>{{ player.score }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
-                        <td v-if="windowWidth > 360">{{ player.ammountOfDrunkenCups }}</td>
+                        <td v-if="windowWidth > 375">{{ player.ammountOfDrunkenCups }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -108,7 +86,7 @@ const giveArrowClass = (value:string) => {
                 <div>*Trfq. = Trefferquote</div>
                 <div>*Trf. = Treffer</div>
                 <div>*Spi. = Spiele</div>
-                <div v-if="windowWidth > 360">*Getru. Becher = Getrunkene Becher</div>
+                <div v-if="windowWidth > 375">*Getru. Becher = Getrunkene Becher</div>
             </div>
         </div>
 
@@ -125,6 +103,7 @@ const giveArrowClass = (value:string) => {
 
 table{
     text-align: center;
+    padding-top: 20px;
 }
 table *{
     vertical-align: middle;
@@ -144,7 +123,7 @@ tbody tr:nth-of-type(3){
 }
 table th{ 
     position: sticky;
-    top: 165px;
+    top: 215px;
     background-color: #FFF;
     color: var(--main-color);
     font-size: 20px;
@@ -190,7 +169,7 @@ table td{
         height: 80px;
     }
     table th{ 
-        top: 140px;
+        top: 190px;
         font-size: 15px;
     }
     th:nth-of-type(1), td:nth-of-type(1){

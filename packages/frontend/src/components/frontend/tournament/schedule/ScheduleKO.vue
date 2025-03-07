@@ -90,7 +90,7 @@ onMounted(() => {
    flex-wrap: wrap;
    position: sticky;
    padding-top: 10px;
-   top: 216px;
+   top: 280px;
    padding-bottom: 20px;
    display: flex;
    background-color: white;
@@ -131,7 +131,7 @@ onMounted(() => {
 /*MOBILE*/
 @media (width <= 900px){
    #GameScheduleContainer .swiper-pagination{
-      top: 172px;
+      top: 230px;
    }
    #GameScheduleContainer .swiper-pagination-bullet {
       font-size: 15px;

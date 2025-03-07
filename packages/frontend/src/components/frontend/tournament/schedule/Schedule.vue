@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ScheduleGroups from '@/components/frontend/routes/tournament/schedule/ScheduleGroups.vue';
-import ScheduleKO from '@/components/frontend/routes/tournament/schedule/ScheduleKO.vue';
+import ScheduleGroups from '@/components/frontend/tournament/schedule/ScheduleGroups.vue';
+import ScheduleKO from '@/components/frontend/tournament/schedule/ScheduleKO.vue';
 import { PropType } from 'vue';
 
 defineProps({
@@ -37,9 +37,10 @@ defineProps({
 <style scoped>
 .nav-tabs{
    position: sticky;
-   top: 160px;
+   top: 210px;
    background: white;
    z-index: 2;
+   padding-top: 20px;
 }
 .nav-link{
    border-radius: 0px;
@@ -61,7 +62,7 @@ defineProps({
 /* MOBILE */
 @media (width <= 900px){
    .nav-tabs{
-      top: 130px;
+      top: 170px;
    }
    .nav-link{
       font-size: 14px;

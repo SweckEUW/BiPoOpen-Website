@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, PropType, watch } from "vue"
+import { onMounted, PropType, watch, ref } from "vue"
 import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
 import { convertNumberToCharacter } from "@/util/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
+import StandingsGroups from '@/components/frontend/tournament/schedule/StandingsGroups.vue';
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -83,18 +85,21 @@ onMounted(() => {
    <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
       <div class="swiper-wrapper">
 
-         <div class="rt-table swiper-slide" v-for="(matchesForGroup ,groupIndex) in getMatchesGroupPhase(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
+         <div class="rt-table swiper-slide" v-for="(group, groupIndex) in getGroupsWithStats(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
 
             <!-- Caption -->
             <div class="rt-caption">{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
 
+            <StandingsGroups :tournament="tournament" :group="group"/>
+
+            <div class="rt-caption">Spiele</div>
+
             <!-- Matches -->
             <div class="rt-matches">
-               <MatchElement v-for="(match, matchIndex) in matchesForGroup" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
+               <MatchElement v-for="(match, matchIndex) in getMatchesGroupPhase(tournament)[groupIndex]" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
             </div>
 
          </div>
-
       </div>
    </div>
 </template>
@@ -102,6 +107,12 @@ onMounted(() => {
 <style>
 .GameScheduleGroups{
    overflow: hidden;
+}
+.rt-caption{
+   margin-bottom: 10px;
+   font-size: 28px;
+   font-weight: bold;
+   color: var(--main-color);
 }
 
 /* Top Swiper Pagination */
@@ -111,7 +122,7 @@ onMounted(() => {
    padding-bottom: 20px;
    display: flex;
    background-color: white;
-   top: 216px;
+   top: 270px;
 }
 #GameScheduleContainer .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
 	padding: 5px 10px; 
@@ -130,17 +141,11 @@ onMounted(() => {
 	color:white;
 	background: var(--main-color);
 }
-.rt-caption{
-   margin-bottom: 10px;
-   font-size: 28px;
-   font-weight: bold;
-   color: var(--main-color);
-}
 
 /* MOBILE */
 @media (width <= 900px){
    #GameScheduleContainer .swiper-pagination{
-      top: 172px;
+      top: 230px;
    }
    .rt-caption{
       font-size: 22px;

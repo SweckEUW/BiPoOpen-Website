@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import router from '@/router.js';
-
 import DropDown from '@/components/shared/DropDown.vue';
-import tournaments from '@/assets/tournaments.json';
 
 let showBurger = ref(false);
 
@@ -20,7 +18,9 @@ const scrollToTop = () => {
 	}
 }
 
-let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
+let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
+
+let tournaments = ['SCW 3 Karneval 2025', 'SCW 3 Batenhorst 2024', 'Weck BiPo Open 2024', 'SCW 3 Ostern 2024', 'SCW 3 Batenhorst 2023', 'Weck BiPo Open 2023', 'Weck BiPo Open 2022', 'Weck BiPo Open 2021', 'Weck BiPo Open 2020'];
 </script>
 
 <template>
@@ -47,23 +47,16 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
 
-				<div v-for="tournament in tournaments" :key="tournament.name">
-					<DropDown :name="tournament.name"> <!-- :isOpen="tournament.name == 'Kirmes 2023'" -->
-						<template #header>
-							<div class="ap-dropdown-title">{{tournament.name}}</div>
-						</template>
-						<template #content>
-							<!-- <router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.year + '/Zusammenfassung'" v-if="tournament.games">Zusammenfassung</router-link> -->
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/Platzierungen'" v-if="tournament.games">Platzierungen</router-link>
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/Spielplan'" v-if="tournament.games">Spielplan</router-link>
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/MVP'" v-if="tournament.mvp">Most Valuable Player</router-link>
-							<!-- <router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/Teams'" v-if="tournament.games">Teams</router-link> -->
-							<!-- <router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/Teams'" v-if="tournament.name == '2024'">Teams</router-link> -->
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.name.replaceAll(' ','-') + '/Fotos'" v-if="tournament.fotos">Fotos</router-link>
-						</template>
-					</DropDown>
-				</div>
-
+				<DropDown :name="'main'" :isOpen="true">
+					<template #header>
+						<div class="ap-menu-title">Turniere</div>
+					</template>
+					<template #content>
+						<div v-for="tournament in tournaments" :key="tournament">
+							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.replaceAll('Weck BiPo Open ','').replaceAll(' ','-')">{{ tournament }}</router-link>
+						</div>
+					</template>
+				</DropDown>
 			</div>
 		</transition>
 
@@ -125,16 +118,6 @@ let logo:string = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 }
 .ap-menu-title:first-of-type{
 	margin-top: 15vh !important;
-}
-.ap-dropdown-title{
-	color: white;
-	font-size: 50px;
-	font-weight: bolder;
-	margin-top: 0px;
-	text-align: center;
-	display: inline-block;
-	transition: .3s opacity ease;
-	margin-right: 20px;
 }
 .ap-dropdown-link{
 	display: inline-block;
@@ -210,15 +193,11 @@ a:hover{
 	.ap-dropdown-link:hover{
 		opacity: 1;
 	}
-
 	.ap-menu-title{
-		font-size: 40px;
-	}
-	.ap-dropdown-title{
-		font-size: 40px;
+		font-size: 35px;
 	}
 	.ap-dropdown-link{
-		font-size: 28px;
+		font-size: 24px;
 	}
 	.DropDown{
 		margin-bottom: 20px;
