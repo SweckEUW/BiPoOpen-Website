@@ -24,6 +24,29 @@ export const addOpenGame = async (openGame:OpenGame) => {
 export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:boolean) => {
     let playersWithStats = getPlayersWithStats(openGames, oneVersusOne);
 
+    // Filter out players that dont have at least 3 Games
+    playersWithStats = playersWithStats.filter((player) => player.ammountOfMatches >= 3);
+
+    // Filter out players that havent played played against at least 3 different teams
+    playersWithStats = playersWithStats.filter((player) => {
+        let matches = getMatchesFromPlayer(openGames, player.name, oneVersusOne);
+        let teams = new Set<string>();
+        matches.forEach((match) => {
+            if(oneVersusOne){
+                if(match.team1.players[0].name == player.name)
+                    teams.add(match.team2.players[0].name);
+                else
+                    teams.add(match.team1.players[0].name);
+            }else{
+                if(match.team1.players.map(player => player.name).includes(player.name))
+                    teams.add(match.team2.players.map(player => player.name).join(","));
+                else
+                    teams.add(match.team1.players.map(player => player.name).join(","));
+            }
+        });
+        return teams.size >= 3;
+    });
+
     // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
         if(player2.averageWins == player1.averageWins && player2.wins == player1.wins)

@@ -7,7 +7,6 @@ import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { convertNumberToCharacter } from '@/util/util';
 
 const props = defineProps({
     openGames: {type: Object as PropType<OpenGame[]>, required: true }
@@ -75,9 +74,14 @@ onMounted(() => {
 </script>
 
 <template> 
+        <div style="padding: 40px 10px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 15px;">
+            Damit ein Spieler in den Statistiken erscheint, muss er mindestens drei Spiele absolviert und gegen mindestens drei verschiedene Teams gespielt haben
+        </div>
+
         <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
 
         <div class="OpenGamesStatistics swiper-container" id="OpenGamesStatisticsSwiper">
+
             <div class="swiper-wrapper">
 
                 <div class="rt-table swiper-slide" v-for="(openGamesStatistic ,groupIndex) in openGamesStatistics" :key="groupIndex">
