@@ -9,7 +9,7 @@ const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID(route.params.id as string);
+    tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
 }
 getTournament();
 
@@ -25,7 +25,7 @@ onUnmounted(() => {
 <template>
     <div class="MVP">
         
-        <h1 class="bp-title">{{"Teams " + route.params.id }}</h1>
+        <h1 class="bp-title">{{"Teams " + route.params.TournamentName }}</h1>
 
         <Loadingscreen v-show="!tournament"/>
 

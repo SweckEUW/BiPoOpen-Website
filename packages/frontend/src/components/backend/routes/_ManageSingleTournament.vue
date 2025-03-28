@@ -12,7 +12,7 @@ let tournament = ref<Tournament|undefined>();
 
 const route = useRoute();
 const getTournament = async () => {
-   let tournamentName = (route.params.id as string).replaceAll("-"," ");
+   let tournamentName = (route.params.TournamentName as string).replaceAll("-"," ");
    tournament.value = await getTournamentByName(tournamentName);
 }
 getTournament();

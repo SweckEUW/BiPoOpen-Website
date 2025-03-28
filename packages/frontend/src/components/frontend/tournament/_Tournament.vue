@@ -5,7 +5,7 @@ import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
 import MVP from '@/components/frontend/tournament/_MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
-import Overview from '@/components/frontend/tournament/_Overview.vue';
+// import Overview from '@/components/frontend/tournament/_Overview.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 import { useRoute } from "vue-router";
@@ -13,7 +13,7 @@ const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
-   tournament.value = await getTournamentWithRouterID(route.params.id as string);
+   tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
 }
 getTournament();
 

@@ -108,9 +108,11 @@ let tournamentName = ref();
 
 <template>
     <div class="Manage">
+        <h1 class="bp-title" style="padding-bottom: 50px; position: inherit;">Tournament Backend</h1>
+
         <div class="bp-button" @click="toggleModal()">Neues Turnier erstellen</div>
         
-        <router-link class="ma-tournament" :to="'/Manage/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
+        <router-link class="ma-tournament" :to="'/Manage/Tournaments/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
 
         <Transition name="fade">
             <Modal v-if="showModal">        

@@ -53,7 +53,7 @@ const routes = [
 
 	// Frontend - Tournament
 	{
-		path: '/:id',
+		path: '/:TournamentName',
 		name: 'Tournament',
 		component: () => import('@/components/frontend/tournament/_Tournament.vue'),
 		meta: {
@@ -72,18 +72,36 @@ const routes = [
 	{
 		path: '/Manage',
 		name: 'Manage',
-		component: () => import('@/components/backend/routes/_ManageTournaments.vue'),
+		component: () => import('@/components/backend/routes/_Manage.vue'),
 		meta: {
-			title: 'Weck BiPo Open REPLACE - Manage',
+			title: 'Weck BiPo Open - Backend',
 			description: ''
 		}
 	},
 	{
-		path: '/Manage/:id',
-		name: 'ManageTournament',
+		path: '/Manage/Tournaments',
+		name: 'Manage Tournaments',
+		component: () => import('@/components/backend/routes/_ManageTournaments.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Tournaments Backend',
+			description: ''
+		}
+	},
+	{
+		path: '/Manage/Tournaments/:TournamentName',
+		name: 'Manage Tournament',
 		component: () => import('@/components/backend/routes/_ManageSingleTournament.vue'),
 		meta: {
-			title: 'Weck BiPo Open REPLACE - Manage',
+			title: 'Weck BiPo Open REPLACE - Backend',
+			description: ''
+		}
+	},
+	{
+		path: '/Manage/OpenGames',
+		name: 'Manage Open Games',
+		component: () => import('@/components/backend/routes/_ManageOpenGames.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Manage Open Games',
 			description: ''
 		}
 	},
@@ -130,11 +148,11 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-	let title = (to.meta.title as string).replace("REPLACE", to.params.id as string)
+	let title = (to.meta.title as string).replace("REPLACE", to.params.TournamentName as string)
 	document.title = title;
 	(document.querySelector("meta[property='og:title']")as HTMLMetaElement).content = title;
 	
-	let description = (to.meta.description as string).replace("REPLACE", to.params.id as string);
+	let description = (to.meta.description as string).replace("REPLACE", to.params.TournamentName as string);
 	(document.querySelector("meta[name=description]") as HTMLMetaElement).content = description;
 	(document.querySelector("meta[property='og:description']")as HTMLMetaElement).content = description;
 

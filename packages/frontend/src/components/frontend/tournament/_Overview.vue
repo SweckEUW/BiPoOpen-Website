@@ -12,11 +12,11 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { useRoute } from "vue-router";
 const route = useRoute()
 
-let tournamentData = tournaments.find((tournament) => tournament.name == route.params.id)!;
+let tournamentData = tournaments.find((tournament) => tournament.name == route.params.TournamentName)!;
 
 let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID(route.params.id as string);
+    tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
 }
 getTournament();
 
@@ -75,7 +75,7 @@ let getHighestWin = () => {
 <template>
     <div class="Summary">
         
-        <h1 class="bp-title">{{"Zusammenfassung " + route.params.id }}</h1>
+        <h1 class="bp-title">{{"Zusammenfassung " + route.params.TournamentName }}</h1>
 
         <Loadingscreen v-show="!tournament"/>
 
