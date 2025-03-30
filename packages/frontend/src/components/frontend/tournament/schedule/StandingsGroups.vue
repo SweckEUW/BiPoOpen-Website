@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, toRaw, onMounted, PropType } from "vue"
+import { ref, PropType } from "vue"
+import { GroupWithStats, Tournament } from "@/types";
 
 defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },

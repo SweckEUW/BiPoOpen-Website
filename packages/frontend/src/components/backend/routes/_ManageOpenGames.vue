@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue';
 import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
-import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
+import { getAllOpenGames } from "@/openGamesFunctions/OpenGamesUtilFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import { OpenGame } from "@/components/frontend/openGames/OpenGamesTypes";
-import OpenGameMatchElement from '@/components/frontend/openGames/OpenGameMatchElement.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { Match } from "@/types";
 
-let openGames = ref<OpenGame[]|undefined>();
+let openGames = ref<Match[]|undefined>();
 let showModalAddGame = ref(false);
 
 const getOpenGames = async () => {
@@ -42,7 +42,8 @@ const toggleModalAddGame = () => {
                 </Transition>
             </Teleport>
 
-            <OpenGameMatchElement v-for="openGame in openGames" :openGame="openGame"/>
+            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+
         </div>
 
     </div>

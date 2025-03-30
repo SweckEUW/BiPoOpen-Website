@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
-
+import { getTournamentByName } from "@/tournamentFunctions/tournamentFunctions.js"
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import { PlayerWithStats, Tournament } from "@/types";
+import { getPlayersWithStats } from "@/tournamentFunctions/tournamentPlayerFunctions";
+
+type SortValueHallOfFame = 'averageScore'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
 
 let tournaments = ref<Tournament[]>([]);
 let sortValue = ref<SortValueHallOfFame>("wins");
@@ -12,7 +15,7 @@ let sortUp = ref(false);
 let tournamentsToEvaluate = ["2020","2022","2023","2024"]; //2021
 const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
-        let tournament = await getTournamentWithRouterID(tournamentsToEvaluate[i]);
+        let tournament = await getTournamentByName(tournamentsToEvaluate[i]);
         if(tournament)
             tournaments.value.push(tournament);
     }   

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, PropType, ref } from 'vue';
 import { OpenGame, SortValueOpenGames } from './OpenGamesTypes';
-import { getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
+import { getAllTimeOpenGamesStatsList } from '../../../openGamesFunctions/OpenGamesUtilFunctions';
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+
+type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageScore'|'averageWins'|'ammountOfDrunkenCups';
 
 const props = defineProps({
     openGames: {type: Object as PropType<OpenGame[]>, required: true }

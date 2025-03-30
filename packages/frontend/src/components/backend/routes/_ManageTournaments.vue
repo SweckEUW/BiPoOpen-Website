@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
-import { getAllTournaments, addTournament } from "@/util/tournamentUtilFunctions";
+import { getAllTournaments, addTournament } from "@/tournamentFunctions/tournamentFunctions";
 
 let tournaments = ref<Tournament[]|undefined>();
 

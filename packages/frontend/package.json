@@ -17,9 +17,9 @@
   "devDependencies": {
     "@types/sortablejs": "^1.15.8",
     "@vitejs/plugin-vue": "^5.0.5",
-    "@vue/tsconfig": "^0.5.1",
+    "@vue/tsconfig": "^0.7.0",
     "typescript": "^5.4.5",
-    "vite": "^5.2.13",
+    "vite": "^6.2.3",
     "vue-tsc": "^2.0.21"
   }
 }

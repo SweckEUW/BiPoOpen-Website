@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { setSettings } from "@/util/tournamentUtilFunctions.js";
+import { setSettings } from "@/tournamentFunctions/tournamentFunctions.js";
 import { PropType } from "vue";
+import { Tournament } from "@/types";
 
 const props = defineProps({
    getTournament: {type: Function, required: true },

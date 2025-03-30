@@ -1,27 +1,25 @@
 import axios from "axios";
-import { OpenGame } from "./OpenGamesTypes";
+import { Match, PlayerWithStats } from "@/types";
 
 /////////////
 // GENERAL //
 /////////////
 export const getAllOpenGames = async () => {
-    let response = await axios.get("/openGames")
-    console.log(response.data.message);
-    if(response.data.success)
-        return response.data.openGames as OpenGame[];
+    let response = await axios.get("/openGames/get");
+    if(response.status == 200)
+        return response.data.openGames as Match[];
 }
 
-export const addOpenGame = async (openGame:OpenGame) => {
-    let response = await axios.post("/addOpenGame", openGame);
-    console.log(response.data.message);
-    return response.data.success as boolean;
+export const addOpenGame = async (openGame:Match) => {
+    let response = await axios.post("/openGames/create", openGame);
+    return response.status == 201
 }
 
 
 ////////////////
 // STATISTICS //
 ////////////////
-export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:boolean) => {
+export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boolean) => {
     let playersWithStats = getPlayersWithStats(openGames, oneVersusOne);
 
     // Filter out players that dont have at least 3 Games
@@ -71,7 +69,7 @@ export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:
     return playersWithStats;
 }
 
-export const getPlayersWithStats = (openGames:OpenGame[], oneVersusOne:boolean) => {
+export const getPlayersWithStats = (openGames:Match[], oneVersusOne:boolean) => {
     let playerWithStats:PlayerWithStats[] = [];
 
     let allPlayers = getAllPlayers(openGames, oneVersusOne);
@@ -98,7 +96,7 @@ export const getPlayersWithStats = (openGames:OpenGame[], oneVersusOne:boolean) 
     return playerWithStats;
 }
 
-export const getAllPlayers = (openGames:OpenGame[], oneVersusOne:boolean) => {
+export const getAllPlayers = (openGames:Match[], oneVersusOne:boolean) => {
     let allPlayerNames:string[] = [];
 
     // Add all players to array
@@ -122,8 +120,8 @@ export const getAllPlayers = (openGames:OpenGame[], oneVersusOne:boolean) => {
     return allPlayerNames;
 }
 
-export const getMatchesFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => { 
-    let matchesFromPlayer:OpenGame[] = [];
+export const getMatchesFromPlayer = (openGames:Match[], playerName:string, oneVersusOne:boolean) => { 
+    let matchesFromPlayer:Match[] = [];
 
     openGames.forEach((openGame) => {
         if(openGame.team1.players.map(player => player.name).includes(playerName) || openGame.team2.players.map(player => player.name).includes(playerName)){
@@ -142,7 +140,7 @@ export const getMatchesFromPlayer = (openGames:OpenGame[], playerName:string, on
     return matchesFromPlayer;
 }
 
-export const getAmmountOfWinsFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => {
+export const getAmmountOfWinsFromPlayer = (openGames:Match[], playerName:string, oneVersusOne:boolean) => {
     let wins = 0;
     
     let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
@@ -166,7 +164,7 @@ export const getAmmountOfWinsFromPlayer = (openGames:OpenGame[], playerName:stri
     return wins;
 }
 
-export const getAmmountOfHitsFromPlayer = (openGames:OpenGame[], playerName:string, oneVersusOne:boolean) => {
+export const getAmmountOfHitsFromPlayer = (openGames:Match[], playerName:string, oneVersusOne:boolean) => {
     let score = 0;
 
     let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
@@ -181,7 +179,7 @@ export const getAmmountOfHitsFromPlayer = (openGames:OpenGame[], playerName:stri
     return score;
 }
 
-export const getAmmountOfDrunkenCupsFromPlayer = (openGames:OpenGame[], playerName:string) => {
+export const getAmmountOfDrunkenCupsFromPlayer = (openGames:Match[], playerName:string) => {
     // let leftOverCups = 0;
     // let enemyHits = 0;
 

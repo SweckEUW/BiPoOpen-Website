@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { onMounted, PropType } from "vue"
-import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { convertNumberToCharacter } from "@/util/util.js"; 
-
+import { convertNumberToCharacter } from "@/util.js"; 
+import { Tournament } from "@/types";
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -60,7 +59,7 @@ onMounted(() => {
 
          <div class="swiper-wrapper">
 
-            <div v-for="(stage, stageIndex) in getMatchesKOPhase(tournament)" :key="stageIndex" class="gsk-stages swiper-slide">
+            <div v-for="(stage, stageIndex) in tournament.koPhase.matches" :key="stageIndex" class="gsk-stages swiper-slide">
                <div class="gsk-stage" :class="{'gsk-stage1': stageIndex == 0, 'gsk-finale': stageIndex == tournament.koPhase.matches.length - 1}">
                   <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
                      <div v-if="stageIndex == tournament.koPhase.matches.length - 1" class="gsk-match-name">{{ (matchIndex == 0 ? "Finale" : "Spiel um Platz 3")}}</div>

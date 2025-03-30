@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
-
+import { getTournamentByName } from "@/tournamentFunctions/tournamentFunctions.js"
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
-import MVP from '@/components/frontend/tournament/_MVP.vue';
+import MVP from '@/components/frontend/tournament/routes/_MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
 // import Overview from '@/components/frontend/tournament/_Overview.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import { Tournament } from "@/types";
 
 import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
-   tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
+   tournament.value = await getTournamentByName(route.params.TournamentName as string);
 }
 getTournament();
 

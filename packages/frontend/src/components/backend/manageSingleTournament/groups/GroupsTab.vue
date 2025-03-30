@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted, PropType } from "vue"
-import { setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase, getGroupsDecoded } from "@/util/tournamentUtilFunctions.js";
-import { convertNumberToCharacter } from "@/util/util.js"; 
-
+import { convertNumberToCharacter } from "@/util.js"; 
+import { Group, Tournament } from "@/types";
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
+import { getTeamFromName } from "@/tournamentFunctions/tournamentTeamFunctions";
+import { generateRandomGroups, generateRandomMatchesGroupPhase, setGroups } from "@/tournamentFunctions/tournamentGroupFunctions";
+import { initMatchesKOPhase } from "@/tournamentFunctions/tournamentKOPhaseFunctions";
 
 const props = defineProps({
    getTournament: {type: Function, required: true },
@@ -126,7 +128,7 @@ const initSortable = () => {
       <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
       <!-- Groups -->
-      <table class="table table-hover caption-top" v-for="(group,index) in getGroupsDecoded(tournament)" :key="index" :id="'Group-' + index">
+      <table class="table table-hover caption-top" v-for="(group,index) in tournament.groupPhase.groups" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
          <thead>
             <tr>

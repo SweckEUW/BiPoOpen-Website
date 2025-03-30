@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted, PropType } from "vue"
-import { setGameResultGroupPhase, setGameResultKOPhase } from "@/util/tournamentUtilFunctions.js";
-
+import { MatchResult, Tournament } from "@/types";
 import Modal from '@/components/shared/Modal.vue';
+import { setGameResultGroupPhase } from "@/tournamentFunctions/tournamentGroupFunctions";
+import { setGameResultKOPhase } from "@/tournamentFunctions/tournamentKOPhaseFunctions";
+import { Match } from "@/types";
 
 const props = defineProps({
     getTournament: {type: Function, required: true },
     tournament: {type: Object as PropType<Tournament>, required: true },
     isGroupPhase: {type: Boolean, required: true },
     toggleModal: {type: Function, required: true },
-    match: {type: Object as PropType<MatchDecoded>, required: true },
+    match: {type: Object as PropType<Match>, required: true },
 });
 
 const setResultGroupPhase = async () => {

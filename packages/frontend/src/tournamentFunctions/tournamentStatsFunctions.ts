@@ -1,5 +1,6 @@
-import { getMatchesFromPlayer, getMatchesFromTeam, getMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
-
+import { getMatchesFromTeam } from "@/tournamentFunctions/tournamentTeamFunctions";
+import { Tournament } from "@/types";
+import { getMatchesFromPlayer } from "./tournamentPlayerFunctions";
 
 ////////////////
 // TEAM STATS //
@@ -142,7 +143,7 @@ export const getAmmountOfWinsFromPlayer = (tournament:Tournament, playerName:str
 export const checkIfTeam1WonVsTeam2 = (tournament:Tournament|undefined, team1Name:string, team2Name:string) => { 
     let team1Won = false;
 
-    let matches = getMatchesGroupPhase(tournament);
+    let matches = tournament?.groupPhase.matches ?? [];
 
     matches.forEach((matchesForGroup) => {
         matchesForGroup.forEach((match) => {

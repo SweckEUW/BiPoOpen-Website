@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { addOpenGame } from "./OpenGamesUtilFunctions";
+import { addOpenGame } from "../../../openGamesFunctions/OpenGamesUtilFunctions";
 import { ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
-import { OpenGame } from "./OpenGamesTypes";
+import { Match } from "@/types";
 
 let ammountOfPlayersTeam1 = ref(1);
 let ammountOfPlayersTeam2 = ref(1);
@@ -14,7 +14,7 @@ const props = defineProps({
 
 const addGame = async () => {
 
-    let openGame:OpenGame = {
+    let openGame = {
         team1: {
             players: []
         },

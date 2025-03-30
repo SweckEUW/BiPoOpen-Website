@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
+import { Match } from "@/types";
 
 const props = defineProps({
-    match: {type: Object as PropType<MatchDecoded>, required: true },
+    match: {type: Object as PropType<Match>, required: true },
     playersVisible: {type: Boolean, required: true },
     isTeam2: {type: Boolean, required: true },
 });
@@ -32,7 +33,7 @@ if(props.match.result){
     >
         <div class="mt-team">
             <!-- TODO: Calculate correct Placeholder name -->
-            <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? "TBD" : "TBD") }}</div>
+            <!-- <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? "TBD" : "TBD") }}</div> -->
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
         <div v-if="team && playersVisible">

@@ -4,8 +4,8 @@
 
 
 import { ref, onUnmounted } from "vue"
-import { getTournamentWithRouterID, getTopTeams, getMVPList, getMatchesGroupPhase, getMatchesKOPhase, getAllTeams} from "@/util/tournamentUtilFunctions.js"
-import { getAmmountOfDrunkenCupsFromteam } from "@/util/tournamentStatsFunctions";
+import { getTournamentByName, getTopTeams, getMVPList, getMatchesGroupPhase, getAllTeams} from "@/tournamentFunctions/tournamentFunctions.js"
+import { getAmmountOfDrunkenCupsFromteam } from "@/tournamentFunctions/tournamentStatsFunctions";
 import tournaments from '@/assets/tournaments.json';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
@@ -16,7 +16,7 @@ let tournamentData = tournaments.find((tournament) => tournament.name == route.p
 
 let tournament = ref<Tournament|undefined>();
 const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
+    tournament.value = await getTournamentByName(route.params.TournamentName as string);
 }
 getTournament();
 

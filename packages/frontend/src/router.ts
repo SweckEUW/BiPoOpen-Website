@@ -5,7 +5,7 @@ const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component: () => import('@/components/frontend/_Home.vue'),
+		component: () => import('@/components/frontend/routes/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open',
 			description: ''
@@ -14,7 +14,7 @@ const routes = [
 	{
 		path: '/Regeln',
 		name: 'Regeln',
-		component: () => import('@/components/frontend/_Rules.vue'),
+		component: () => import('@/components/frontend/routes/_Rules.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Regeln',
 			description: 'Regeln'
@@ -34,7 +34,7 @@ const routes = [
 	{
 		path: '/Hall-of-Fame',
 		name: 'Hall Of Fame',
-		component: () => import('@/components/frontend/_HallOfFame.vue'),
+		component: () => import('@/components/frontend/routes/_HallOfFame.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Hall of Fame',
 			description: 'Hall of Fame'
@@ -42,24 +42,43 @@ const routes = [
 	},
 
 	{
-		path: '/Teamanmeldung',
-		name: 'Teamanmeldung',
-		component: () => import('@/components/frontend/_Teamanmeldung.vue'),
+		path: '/Impressum',
+		name: 'Impressum',
+		component: () => import('@/components/frontend/routes/_Imprint.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2024 - Teamanmeldung',
-			description: 'Teamanmeldung'
-		},
+			title: 'Weck BiPo Open - Impressum',
+			description: 'Impressum'
+		}
+	},
+
+	{
+		path: '/Hall-of-Fame-SCW',
+		name: 'Hall Of Fame SCW',
+		component: () => import('@/components/frontend/routes/_HallOfFameSCW.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Hall of Fame SCW',
+			description: 'Hall of Fame SCW'
+		}
 	},
 
 	// Frontend - Tournament
 	{
 		path: '/:TournamentName',
 		name: 'Tournament',
-		component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+		component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
 		meta: {
 			title: 'Weck BiPo Open - REPLACE',
 			description: 'Tournament'
 		}
+	},
+	{
+		path: '/:TournamentName/Teamanmeldung',
+		name: 'Teamanmeldung',
+		component: () => import('@/components/frontend/tournament/routes/_Teamanmeldung.vue'),
+		meta: {
+			title: 'Weck BiPo Open 2024 - Teamanmeldung',
+			description: 'Teamanmeldung'
+		},
 	},
 	
 	// Redirect
@@ -110,30 +129,10 @@ const routes = [
 	{
 		path: "/:catchAll(.*)",
 		name: "NotFound404",
-		component: () => import('@/components/frontend/_NotFound404.vue'),
+		component: () => import('@/components/frontend/routes/_NotFound404.vue'),
 		meta: {
 			title: 'Weck BiPo Open - 404',
 			description: '404 Seite nicht gefunden'
-		}
-	},
-
-	{
-		path: '/Impressum',
-		name: 'Impressum',
-		component: () => import('@/components/frontend/_Imprint.vue'),
-		meta: {
-			title: 'Weck BiPo Open - Impressum',
-			description: 'Impressum'
-		}
-	},
-
-	{
-		path: '/Hall-of-Fame-SCW',
-		name: 'Hall Of Fame SCW',
-		component: () => import('@/components/frontend/_HallOfFameSCW.vue'),
-		meta: {
-			title: 'Weck BiPo Open - Hall of Fame SCW',
-			description: 'Hall of Fame SCW'
 		}
 	}
 

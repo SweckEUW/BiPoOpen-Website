@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-
-import ModalSetGameResult from '@/components/shared/ModalSetGameResult.vue';
+// import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
 import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
+import { Match } from "@/types";
 
 defineProps({
-   getTournament: {type: Function, required: true },
-   tournament: {type: Object as PropType<Tournament>, required: true },
-   match: {type: Object as PropType<MatchDecoded>, required: true },
-   isGroupPhase: {type: Boolean, required: true },
+   match: {type: Object as PropType<Match>, required: true },
+   // isGroupPhase: {type: Boolean, required: true },
    isBackend: {type: Boolean, required: true },
-   matchIndex: {type: Number },
+   matchIndex: {type: Number, required: false }
 });
 
 let showModal = ref(false);
@@ -27,16 +25,16 @@ let togglePlayersVisible = () => {
 <template>
     <div class="Match" ref="matchHTMLElement">
 
-         <Teleport to="body">
+         <!-- <Teleport to="body">
             <Transition name="fade">
                <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
             </Transition>
-         </Teleport>
+         </Teleport> -->
 
-         <div v-if="isBackend && isGroupPhase" class="mt-handle">
+         <!-- <div v-if="isBackend && isGroupPhase" class="mt-handle">
             <div style="margin-bottom: 5px;"/>
             <div/>
-         </div>
+         </div> -->
 
          <!-- Match Index -->
          <div v-if="matchIndex != undefined" class="mt-index">

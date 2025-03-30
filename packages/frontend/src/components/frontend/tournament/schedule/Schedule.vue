@@ -2,6 +2,7 @@
 import ScheduleGroups from '@/components/frontend/tournament/schedule/ScheduleGroups.vue';
 import ScheduleKO from '@/components/frontend/tournament/schedule/ScheduleKO.vue';
 import { PropType } from 'vue';
+import { Tournament } from "@/types";
 
 defineProps({
    getTournament: {type: Function, required: true },

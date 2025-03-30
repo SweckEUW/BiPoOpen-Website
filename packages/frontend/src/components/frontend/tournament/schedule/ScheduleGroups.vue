@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, PropType, watch, ref } from "vue"
-import { getMatchesGroupPhase, setMatchesGroupPhase } from "@/util/tournamentUtilFunctions.js";
-import { convertNumberToCharacter } from "@/util/util.js"; 
+import { onMounted, PropType, watch } from "vue"
+import { convertNumberToCharacter } from "@/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { getGroupsWithStats } from "@/util/tournamentUtilFunctions.js";
 import StandingsGroups from '@/components/frontend/tournament/schedule/StandingsGroups.vue';
+import { Tournament } from "@/types";
+import { setMatchesGroupPhase, getGroupsWithStats } from "@/tournamentFunctions/tournamentGroupFunctions";
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -19,7 +19,6 @@ const props = defineProps({
 });
 
 const onDragEnd = async (evt:Sortable.SortableEvent) => {
-
    // Get Index of Group via Group Caption html element
    let groupCaption = (evt.target.parentElement!.getElementsByClassName("rt-caption")[0] as HTMLDivElement).innerText;
    let groupIndex = groupCaption.split(" ")[1].toLowerCase().charCodeAt(0) - 97;
@@ -96,7 +95,7 @@ onMounted(() => {
 
             <!-- Matches -->
             <div class="rt-matches">
-               <MatchElement v-for="(match, matchIndex) in getMatchesGroupPhase(tournament)[groupIndex]" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
+               <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
             </div>
 
          </div>

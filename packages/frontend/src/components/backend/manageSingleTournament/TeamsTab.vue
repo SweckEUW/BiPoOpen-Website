@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { addTeam, editTeam, removeTeam } from "@/util/tournamentUtilFunctions.js";
-
+import { Tournament, Team } from "@/types";
 import Modal from '@/components/shared/Modal.vue';
+import { addTeam, editTeam, removeTeam } from "@/tournamentFunctions/tournamentTeamFunctions";
 
 const props = defineProps({
    getTournament: {type: Function, required: true },

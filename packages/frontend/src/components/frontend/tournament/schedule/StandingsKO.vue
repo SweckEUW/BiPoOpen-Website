@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { getTeamsKOPhaseWithStats, checkIfTournamentFinished } from "@/util/tournamentUtilFunctions.js";
+import { checkIfTournamentFinished } from "@/tournamentFunctions/tournamentFunctions.js";
+import { getTeamsKOPhaseWithStats } from "@/tournamentFunctions/tournamentKOPhaseFunctions.js";
+import { Tournament } from "@/types";
 
 defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },

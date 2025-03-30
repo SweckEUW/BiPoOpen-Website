@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useRoute } from "vue-router";
-import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
+import { getTournamentByName } from "@/tournamentFunctions/tournamentFunctions.js"
+import { Tournament } from "@/types";
 
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
 import ScheduleSettings from '@/components/backend/manageSingleTournament/ScheduleSettings.vue';
@@ -12,7 +13,7 @@ let tournament = ref<Tournament|undefined>();
 
 const route = useRoute();
 const getTournament = async () => {
-   let tournamentName = (route.params.TournamentName as string).replaceAll("-"," ");
+   let tournamentName = (route.params.TournamentName as string);
    tournament.value = await getTournamentByName(tournamentName);
 }
 getTournament();

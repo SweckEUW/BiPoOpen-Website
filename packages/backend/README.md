@@ -1,2 +1,0 @@
-# BiPoOpen-Backend
-BiPoOpen-Backend
