@@ -42,11 +42,11 @@ const routes = [
 	},
 
 	{
-		path: '/Teamanmeldung',
+		path: '/2025/Teamanmeldung',
 		name: 'Teamanmeldung',
 		component: () => import('@/components/frontend/_Teamanmeldung.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2024 - Teamanmeldung',
+			title: 'Weck BiPo Open 2025 - Teamanmeldung',
 			description: 'Teamanmeldung'
 		},
 	},
