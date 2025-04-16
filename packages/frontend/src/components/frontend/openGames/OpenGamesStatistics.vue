@@ -75,7 +75,7 @@ onMounted(() => {
 
 <template> 
         <div style="padding: 40px 10px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 15px;">
-            Damit ein Spieler in den Statistiken erscheint, muss er mindestens drei Spiele absolviert und gegen mindestens drei verschiedene Teams gespielt haben
+            Damit ein Spieler in den Statistiken erscheint, muss er gegen mindestens 4 verschiedene Teams gespielt haben
         </div>
 
         <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
