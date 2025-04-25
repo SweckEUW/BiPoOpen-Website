@@ -88,7 +88,7 @@ var timer = setInterval(updateRemainingTime, 1000);
         </div> -->
 
         <!-- Anmeldung -->
-        <!-- <router-link class="ho-share" :to="'/Teamanmeldung'">Anmeldung</router-link> -->
+        <router-link class="ho-share" :to="'/2025/anmeldung'">Weck BiPo Open 2025 Anmeldung</router-link>
 
 
     </div>
