@@ -37,6 +37,7 @@ window.addEventListener("closeAllDropDowns", ((e:CustomEvent) => {
 .DropDown{
 	transition: max-height .5s ease;
 	margin-bottom: 30px;
+	overflow: hidden;
 }
 .dd-title{
 	cursor: pointer;
