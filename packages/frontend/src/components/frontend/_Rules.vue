@@ -45,13 +45,13 @@
         <div>
             Trifft ein Spieler zwei Becher in Folge, muss dieser <strong>"Heaten Up"</strong> sagen.
             Trifft er in der nächsten Runde den dritten Becher in Folge, ist er <strong>"On-Fire"</strong>. Er erhält daraufhin den Ball zurück und darf solange werfen, bis er nicht mehr trifft.
-            Wenn ein Spieler On-Fire ist und gleichzeitig die Balls-Back-Regel greift, wird zuerst die On-Fire regelung ausgespielt: Der Spieler darf so lange weiterwerfen, bis er verfehlt. Anschließend erhält er – durch die Balls-Back-Regel – noch einen zusätzlichen Wurf.
+            Wenn ein Spieler On-Fire ist und gleichzeitig die Balls-Back-Regel greift, wird zuerst die On-Fire-Regelung ausgespielt: Der Spieler darf so lange weiterwerfen, bis er verfehlt. Anschließend erhalten beide Spieler – durch die Balls-Back-Regel – jeweils noch einen zusätzlichen Wurf.
         </div>
 
         <h2>Trickshot</h2>
         <div>
-            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so ist der Werfer erneut dran</strong>. 
-            Der Wurf muss ein Trickshot sein.
+            <strong>Wird ein geworfener, aber nicht getroffener Ball vom Wurfteam gegriffen, bevor dieser den Boden berührt, so darf erneut geworfen werden.</strong>. 
+            Der Wurf muss ein Trickshot sein und die Person die den Ball gefangen hat, muss werfen.
             Zur Verhinderung eines Trickshots hat das andere Team ebenfalls die Möglichkeit, den Ball auf dem gesamten Tisch abzufangen.
             Als Trickshot gilt nicht der Wurf mit der schwachen Hand. 
         </div>
@@ -73,7 +73,7 @@
         <h2>Spielende</h2>
         <div>
             Das Spiel gilt als gewonnen, wenn ein Team alle Becher des Gegners getroffen hat.
-            Befindet sich <strong>nur noch ein Becher im Feld, wird dieser in die Spitze der Pyramide gestellt</strong>. Der Becher wird auch wie beim Re-Rack erst umgestellt, bevor das Team einen Wurf gemacht hat und nicht mitten im Zug. 
+            Befindet sich <strong>nur noch ein Becher im Feld, wird dieser in die Spitze der Pyramide gestellt</strong>. Der Becher wird wie beim Re-Rack erst umgestellt, bevor das Team einen Wurf gemacht hat und nicht mitten im Zug.
             Der letzte Becher muss dabei einzeln getroffen werden (und nicht etwa infolge eines Bounce-Backs oder einer Bombe).
             <strong>Wird der letzte Becher von beiden Bällen getroffen, so ist die Runde direkt gewonnen und die Gentleman's Rule greift nicht.</strong>
         </div>
