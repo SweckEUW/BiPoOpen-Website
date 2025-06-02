@@ -94,7 +94,7 @@ const createTournament = async () => {
         await getTournaments();
         tournamentName = ref();
         toggleModal();
-        window.location.href = "/Manage/" + tournament.name.replaceAll(' ','-');
+        window.location.href = "/Manage/Tournaments/" + tournament.name.replaceAll(' ','-');
     }
 }
 
