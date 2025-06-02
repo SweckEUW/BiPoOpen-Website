@@ -4,32 +4,14 @@ import { getTournamentWithRouterID, getAllTeams } from "@/util/tournamentUtilFun
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
-import { useRoute } from "vue-router";
-const route = useRoute()
-
-let tournament = ref<Tournament|undefined>();
-const getTournament = async () => {
-    tournament.value = await getTournamentWithRouterID(route.params.TournamentName as string);
-}
-getTournament();
-
-let updateInterval = setInterval(() => {
-   getTournament();
-}, 10000);
-
-onUnmounted(() => {
-   clearInterval(updateInterval);
+defineProps({
+   tournament: {type: Object as PropType<Tournament>, required: true }
 });
 </script>
 
 <template>
-    <div class="MVP">
-        
-        <h1 class="bp-title">{{"Teams " + route.params.TournamentName }}</h1>
-
-        <Loadingscreen v-show="!tournament"/>
-
-        <table v-show="tournament" class="table table-hover caption-top">
+    <div class="Teams">
+        <table class="table table-hover caption-top">
          <thead>
             <tr>
                 <th>Nr.</th>
@@ -40,10 +22,10 @@ onUnmounted(() => {
          <tbody>
             <tr v-for="(team, i) in getAllTeams(tournament)" :key="team.name">
                 <td>{{ i+1 }}</td>
-               <td>{{ team.name }}</td>
-               <td>
-                  <div v-for="player in team.players" :key="player">{{ player }}</div>
-               </td>
+                <td>{{ team.name }}</td>
+                <td>
+                    <div v-for="player in team.players" :key="player" style="white-space: nowrap;">{{ player }}</div>
+                </td>
             </tr>
          </tbody>
       </table>
@@ -54,6 +36,7 @@ onUnmounted(() => {
 <style scoped>
 table{
     text-align: center;
+    padding-top: 20px;
 }
 table *{
     vertical-align: middle;
@@ -63,21 +46,15 @@ tbody tr{
 }
 table th{ 
     position: sticky;
-    top: 165px;
+    top: 215px;
     background-color: #FFF;
     color: var(--main-color);
     font-size: 20px;
+    cursor: pointer;
+    z-index: 2;
 }
 table td{
     background: inherit;
-}
-
-th:nth-of-type(1), td:nth-of-type(1){
-    font-weight: 500;
-}
-
-th:nth-of-type(2), td:nth-of-type(2){
-    font-weight: 500;
 }
 
 /*MOBILE*/
@@ -92,8 +69,28 @@ th:nth-of-type(2), td:nth-of-type(2){
         height: 80px;
     }
     table th{ 
-        top: 138px;
+        top: 190px;
         font-size: 15px;
+    }
+    th:nth-of-type(1), td:nth-of-type(1){
+        max-width: 30px;
+        width: 30px;
+        padding-left: 4px;
+        padding-right: 10px;
+    }
+    th:nth-of-type(2), td:nth-of-type(2){
+        min-width: 100px;
+        white-space: break-spaces;
+    }
+}
+
+/*MOBILE S*/
+@media (width <= 360px){
+    table *{
+        font-size: 14px !important;
+    }
+    th:nth-of-type(2), td:nth-of-type(2){
+        max-width: 100px;
     }
 }
 

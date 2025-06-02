@@ -3,6 +3,7 @@ import { ref, onUnmounted } from "vue"
 import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
 
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
+import Teams from '@/components/frontend/tournament/_Teams.vue';
 import MVP from '@/components/frontend/tournament/_MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
 // import Overview from '@/components/frontend/tournament/_Overview.vue';
@@ -30,21 +31,21 @@ const getTournamentPhotos = () => {
       return {
 			driveImageIDs: "2024/driveImageIDs.json",
 			poster: "2024/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-               <br>
-               Folgt ihm gerne auf Instagram 
-               <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
-            `
+         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+            <br>
+            Folgt ihm gerne auf Instagram 
+            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
+         `
 		}
    
    if(tournament.value!.name == "Weck BiPo Open 2023")
       return {
 			driveImageIDs: "2023/driveImageIDs.json",
 			poster: "2023/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
                <br>
                Folgt ihm gerne auf Instagram 
-               <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
+               <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
             `
 		}
 
@@ -84,7 +85,10 @@ const getTournamentPhotos = () => {
                   <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameOverview' + tournament._id">Übersicht</button>
                </li> -->
                <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id">Spielplan</button>
+                  <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id">Teams</button>
+               </li>
+               <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id">Spielplan</button>
                </li>
                <li class="nav-item" v-if="tournament.settings.trackPlayerShots">
                   <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameMVP' + tournament._id">MVP</button>
@@ -98,8 +102,11 @@ const getTournamentPhotos = () => {
             <div class="tab-content" id="GameScheduleContainer">
                <!-- <div class="tab-pane fade show active" :id="'GameOverview' + tournament._id">
                   <Overview/>
-               </div> -->
-               <div class="tab-pane fade show active" :id="'GameSchedule' + tournament._id">
+               </div>  -->
+               <div class="tab-pane fade show active" :id="'Teams' + tournament._id">
+                  <Teams :tournament="tournament"/>
+               </div>
+               <div class="tab-pane fade show" :id="'GameSchedule' + tournament._id">
                   <Schedule :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
                </div>
                <div class="tab-pane fade" :id="'GameMVP' + tournament._id" v-if="tournament.settings.trackPlayerShots">
@@ -119,6 +126,10 @@ const getTournamentPhotos = () => {
    top: 160px;
    background: white;
    z-index: 2;
+}
+.nav{
+   border: none;
+   padding-bottom: 30px;
 }
 .nav-link{
    border-radius: 0px;
@@ -140,8 +151,7 @@ const getTournamentPhotos = () => {
 /* MOBILE */
 @media (width <= 900px){
    .nav-tabs{
-      top: 130px;
-      padding-bottom: 20px;
+      top: 140px;
    }
    .nav-link{
       font-size: 14px;

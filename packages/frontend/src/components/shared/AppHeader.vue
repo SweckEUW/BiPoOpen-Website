@@ -20,7 +20,7 @@ const scrollToTop = () => {
 
 let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
-let tournaments = ['Weck BiPo Open 2024', 'Weck BiPo Open 2023', 'Weck BiPo Open 2022', 'Weck BiPo Open 2021', 'Weck BiPo Open 2020'];
+let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open 2023', 'Weck BiPo Open 2022', 'Weck BiPo Open 2021', 'Weck BiPo Open 2020'];
 </script>
 
 <template>
