@@ -52,7 +52,7 @@ const giveArrowClass = (value:string) => {
 <template>
     <div class="MVP">
         
-        <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="!tournament.groupPhase.groups.length > 0">
+        <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
             Die MVP-Liste ist noch nicht verfügbar
         </div>
 

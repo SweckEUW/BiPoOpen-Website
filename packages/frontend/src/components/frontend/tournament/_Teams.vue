@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
+import { ref, onUnmounted, PropType } from "vue"
 import { getTournamentWithRouterID, getAllTeams } from "@/util/tournamentUtilFunctions.js"
 
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';

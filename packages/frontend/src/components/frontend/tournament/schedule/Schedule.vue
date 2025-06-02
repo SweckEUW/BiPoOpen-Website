@@ -13,7 +13,7 @@ defineProps({
 <template>
    <div class="Schedule">
 
-      <div v-if="!tournament.groupPhase.groups.length > 0" style="text-align: center; font-size: 18px; color: var(--main-color);">
+      <div v-if="tournament.groupPhase.groups.length == 0" style="text-align: center; font-size: 18px; color: var(--main-color);">
          Der Spielplan ist noch nicht verfügbar
       </div>
 
