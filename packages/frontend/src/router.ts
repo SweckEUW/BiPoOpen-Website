@@ -56,6 +56,40 @@ const routes = [
 		path: '/:TournamentName',
 		name: 'Tournament',
 		component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+		children: [
+			{
+				path: 'Teams',
+				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Teams',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'MVP',
+				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - MVP',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'Spielplan',
+				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Spielplan',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'Fotos',
+				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Fotos',
+					description: 'Tournament'
+				}
+			}
+		],
 		meta: {
 			title: 'Weck BiPo Open - REPLACE',
 			description: 'Tournament'
@@ -65,10 +99,12 @@ const routes = [
 	// Redirect
 	{
 		path: '/Spielplan',
-		redirect: '/2024/Spielplan'
+		redirect: '/2025/Spielplan'
 	},
 
-	// Backend
+	/////////////
+	// Backend //
+	/////////////
 	{
 		path: '/Manage',
 		name: 'Manage',

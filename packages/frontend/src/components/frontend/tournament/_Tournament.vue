@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from "vue"
+import { ref, onUnmounted, Ref } from "vue"
 import { getTournamentWithRouterID } from "@/util/tournamentUtilFunctions.js"
 
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
@@ -18,6 +18,17 @@ const getTournament = async () => {
 }
 getTournament();
 
+let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Teams");
+let name = route.path.split("/").pop();
+if(name == "Spielplan")
+   place.value = "Spielplan";
+else if(name == "Teams")
+   place.value = "Teams";
+else if(name == "MVP")
+   place.value = "MVP";
+else if(name == "Fotos")
+   place.value = "Fotos";
+
 let updateInterval = setInterval(() => {
    getTournament();
 }, 10000);
@@ -25,6 +36,11 @@ let updateInterval = setInterval(() => {
 onUnmounted(() => {
    clearInterval(updateInterval);
 });
+
+const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
+   let newURL = window.location.origin + "/" + route.params.TournamentName + '/' + path;
+   window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
+};
 
 const getTournamentPhotos = () => {
    if(tournament.value!.name == "Weck BiPo Open 2024")
@@ -66,7 +82,6 @@ const getTournamentPhotos = () => {
             driveImageIDs: "2020/driveImageIDs.json",
             poster: "2020/poster.jpg"
          }
-   
 }
 </script>
 
@@ -82,37 +97,37 @@ const getTournamentPhotos = () => {
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
                <!-- <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameOverview' + tournament._id">Übersicht</button>
+                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameOverview' + tournament._id">Übersicht</button>
                </li> -->
                <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id">Teams</button>
+                  <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
                </li>
                <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id">Spielplan</button>
+                  <button class="nav-link" :class="{active: place == 'Spielplan'}" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id" @click="changeRouter('Spielplan')">Spielplan</button>
                </li>
                <li class="nav-item" v-if="tournament.settings.trackPlayerShots">
-                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameMVP' + tournament._id">MVP</button>
+                  <button class="nav-link" :class="{active: place == 'MVP'}" data-bs-toggle="tab" :data-bs-target="'#GameMVP' + tournament._id" @click="changeRouter('MVP')">MVP</button>
                </li>
                <li class="nav-item" v-if="getTournamentPhotos()">
-                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameFotos' + tournament._id">Fotos</button>
+                  <button class="nav-link" :class="{active: place == 'Fotos'}" data-bs-toggle="tab" :data-bs-target="'#GameFotos' + tournament._id" @click="changeRouter('Fotos')">Fotos</button>
                </li>
             </ul>
 
             <!-- Content -->
             <div class="tab-content" id="GameScheduleContainer">
-               <!-- <div class="tab-pane fade show active" :id="'GameOverview' + tournament._id">
+               <!-- <div class="tab-pane fade" :id="'GameOverview' + tournament._id">
                   <Overview/>
                </div>  -->
-               <div class="tab-pane fade show active" :id="'Teams' + tournament._id">
+               <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
                </div>
-               <div class="tab-pane fade show" :id="'GameSchedule' + tournament._id">
+               <div class="tab-pane fade show" :class="{active: place == 'Spielplan'}" :id="'GameSchedule' + tournament._id">
                   <Schedule :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
                </div>
-               <div class="tab-pane fade" :id="'GameMVP' + tournament._id" v-if="tournament.settings.trackPlayerShots">
+               <div class="tab-pane fade show" :class="{active: place == 'MVP'}" :id="'GameMVP' + tournament._id" v-if="tournament.settings.trackPlayerShots">
                   <MVP :tournament="tournament"/>
                </div>
-               <div class="tab-pane fade" :id="'GameFotos' + tournament._id" v-if="getTournamentPhotos()">
+               <div class="tab-pane fade show" :class="{active: place == 'Fotos'}" :id="'GameFotos' + tournament._id" v-if="getTournamentPhotos()">
                   <Photos :tournamentPhotos="getTournamentPhotos()"/>
                </div>
          </div>
