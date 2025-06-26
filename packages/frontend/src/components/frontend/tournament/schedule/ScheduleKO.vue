@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, PropType } from "vue"
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { convertNumberToCharacter } from "@/util.js"; 
+import { convertNumberToCharacter } from "@/util"; 
 import { Tournament } from "@/types";
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';

@@ -55,11 +55,11 @@ const giveArrowClass = (value:string) => {
 <template>
     <div class="MVP">
         
-        <div style="text-align: center; margin-top: 50px; font-size: 30px; color: var(--main-color);" v-if="tournament && !tournament.groupPhase.groups">
-            Turnierplan wurde noch nicht erstellt
+        <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
+            Die MVP-Liste ist noch nicht verfügbar
         </div>
 
-        <div v-show="tournament && tournament.groupPhase.groups">
+        <div v-else>
 
             <table class="table table-hover caption-top">
                 <thead>
@@ -202,9 +202,6 @@ table td{
 @media (width <= 360px){
     table *{
         font-size: 14px !important;
-    }
-    .bp-title{
-        font-size: 24px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
         max-width: 100px;

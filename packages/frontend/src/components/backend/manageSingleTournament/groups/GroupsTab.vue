@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted, PropType } from "vue"
-import { convertNumberToCharacter } from "@/util.js"; 
+import { convertNumberToCharacter } from "@/util"; 
 import { Group, Tournament } from "@/types";
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';

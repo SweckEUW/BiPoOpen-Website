@@ -25,7 +25,7 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
     // Filter out players that dont have at least 3 Games
     playersWithStats = playersWithStats.filter((player) => player.ammountOfMatches >= 3);
 
-    // Filter out players that havent played played against at least 3 different teams
+    // Filter out players that havent played played against at least 4 different teams
     playersWithStats = playersWithStats.filter((player) => {
         let matches = getMatchesFromPlayer(openGames, player.name, oneVersusOne);
         let teams = new Set<string>();
@@ -42,7 +42,7 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
                     teams.add(match.team1.players.map(player => player.name).join(","));
             }
         });
-        return teams.size >= 3;
+        return teams.size >= 4;
     });
 
     // Sort after average wins, then after average score

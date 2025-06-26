@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { onMounted, PropType, watch } from "vue"
-import { convertNumberToCharacter } from "@/util.js"; 
+import { convertNumberToCharacter } from "@/util"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import StandingsGroups from '@/components/frontend/tournament/schedule/StandingsGroups.vue';
 import { Tournament } from "@/types";

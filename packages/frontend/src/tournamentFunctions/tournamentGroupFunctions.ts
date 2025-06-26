@@ -1,4 +1,3 @@
-import { getTeamFromID } from "@/tournamentFunctions/tournamentTeamFunctions";
 import { checkIfTeam1WonVsTeam2, getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromTeam } from "@/tournamentFunctions/tournamentStatsFunctions";
 import { updateMatchesKOPhase } from "@/tournamentFunctions/tournamentKOPhaseFunctions";
 import { Team, Tournament, Group, GroupWithStats, Match, MatchResult } from "@/types";

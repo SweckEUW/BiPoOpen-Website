@@ -13,25 +13,33 @@ defineProps({
 
 <template>
    <div class="Schedule">
-      <!-- Tabs -->
-      <ul class="nav nav-tabs justify-content-center">
-         <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameScheduleGroups' + tournament._id">Gruppenphase</button>
-         </li>
-         <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameScheduleKO' + tournament._id">K.o.Phase</button>
-         </li>
-      </ul>
 
-      <!-- Content -->
-      <div class="tab-content" id="GameScheduleContainer">
-         <div class="tab-pane fade show active" :id="'GameScheduleGroups' + tournament._id">
-            <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
-         </div>
-         <div class="tab-pane fade" :id="'GameScheduleKO' + tournament._id">
-            <ScheduleKO :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
+      <div v-if="tournament.groupPhase.groups.length == 0" style="text-align: center; font-size: 18px; color: var(--main-color);">
+         Der Spielplan ist noch nicht verfügbar
+      </div>
+
+      <div v-else>
+         <!-- Tabs -->
+         <ul class="nav nav-tabs justify-content-center">
+            <li class="nav-item">
+               <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#GameScheduleGroups' + tournament._id">Gruppenphase</button>
+            </li>
+            <li class="nav-item">
+               <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameScheduleKO' + tournament._id">K.o.Phase</button>
+            </li>
+         </ul>
+
+         <!-- Content -->
+         <div class="tab-content" id="GameScheduleContainer">
+            <div class="tab-pane fade show active" :id="'GameScheduleGroups' + tournament._id">
+               <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
+            </div>
+            <div class="tab-pane fade" :id="'GameScheduleKO' + tournament._id">
+               <ScheduleKO :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
+            </div>
          </div>
       </div>
+
    </div>
 </template>
 
@@ -41,7 +49,6 @@ defineProps({
    top: 210px;
    background: white;
    z-index: 2;
-   padding-top: 20px;
 }
 .nav-link{
    border-radius: 0px;
@@ -63,7 +70,7 @@ defineProps({
 /* MOBILE */
 @media (width <= 900px){
    .nav-tabs{
-      top: 170px;
+      top: 190px;
    }
    .nav-link{
       font-size: 14px;

@@ -33,7 +33,7 @@ if(props.match.result){
     >
         <div class="mt-team">
             <!-- TODO: Calculate correct Placeholder name -->
-            <!-- <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? "TBD" : "TBD") }}</div> -->
+            <div class="mt-team-name">{{ team ? team.name : (isTeam2 ? "TBD" : "TBD") }}</div>
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
         <div v-if="team && playersVisible">

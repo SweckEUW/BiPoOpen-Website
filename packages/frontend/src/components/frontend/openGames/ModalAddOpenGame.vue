@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { addOpenGame } from "../../../openGamesFunctions/OpenGamesUtilFunctions";
+import { addOpenGame } from "@/openGamesFunctions/OpenGamesUtilFunctions";
 import { ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
 import { Match } from "@/types";

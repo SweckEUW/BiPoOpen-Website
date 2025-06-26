@@ -42,23 +42,13 @@ const routes = [
 	},
 
 	{
-		path: '/Impressum',
-		name: 'Impressum',
-		component: () => import('@/components/frontend/routes/_Imprint.vue'),
+		path: '/2025/Anmeldung',
+		name: 'Teamanmeldung',
+		component: () => import('@/components/frontend/tournament/routes/_Teamanmeldung.vue'),
 		meta: {
-			title: 'Weck BiPo Open - Impressum',
-			description: 'Impressum'
-		}
-	},
-
-	{
-		path: '/Hall-of-Fame-SCW',
-		name: 'Hall Of Fame SCW',
-		component: () => import('@/components/frontend/routes/_HallOfFameSCW.vue'),
-		meta: {
-			title: 'Weck BiPo Open - Hall of Fame SCW',
-			description: 'Hall of Fame SCW'
-		}
+			title: 'Weck BiPo Open 2025 - Anmeldung',
+			description: 'Anmeldung'
+		},
 	},
 
 	// Frontend - Tournament
@@ -66,6 +56,40 @@ const routes = [
 		path: '/:TournamentName',
 		name: 'Tournament',
 		component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
+		children: [
+			{
+				path: 'Teams',
+				component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Teams',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'MVP',
+				component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - MVP',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'Spielplan',
+				component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Spielplan',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'Fotos',
+				component: () => import('@/components/frontend/tournament/routes/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - Fotos',
+					description: 'Tournament'
+				}
+			}
+		],
 		meta: {
 			title: 'Weck BiPo Open - REPLACE',
 			description: 'Tournament'
@@ -84,10 +108,12 @@ const routes = [
 	// Redirect
 	{
 		path: '/Spielplan',
-		redirect: '/2024/Spielplan'
+		redirect: '/2025/Spielplan'
 	},
 
-	// Backend
+	/////////////
+	// Backend //
+	/////////////
 	{
 		path: '/Manage',
 		name: 'Manage',
@@ -147,13 +173,13 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-	let title = (to.meta.title as string).replace("REPLACE", to.params.TournamentName as string)
-	document.title = title;
-	(document.querySelector("meta[property='og:title']")as HTMLMetaElement).content = title;
+	// let title = (to.meta.title as string).replace("REPLACE", to.params.TournamentName as string)
+	// document.title = title;
+	// (document.querySelector("meta[property='og:title']")as HTMLMetaElement).content = title;
 	
-	let description = (to.meta.description as string).replace("REPLACE", to.params.TournamentName as string);
-	(document.querySelector("meta[name=description]") as HTMLMetaElement).content = description;
-	(document.querySelector("meta[property='og:description']")as HTMLMetaElement).content = description;
+	// let description = (to.meta.description as string).replace("REPLACE", to.params.TournamentName as string);
+	// (document.querySelector("meta[name=description]") as HTMLMetaElement).content = description;
+	// (document.querySelector("meta[property='og:description']")as HTMLMetaElement).content = description;
 
 	next();
 });
