@@ -147,7 +147,7 @@ const initSortable = () => {
                <td>{{id+1}}</td>
                <td>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</td>
                <td v-if="team">
-                  <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{player}}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px">{{player.name}}</span>
                </td>
             </tr>
          </tbody>

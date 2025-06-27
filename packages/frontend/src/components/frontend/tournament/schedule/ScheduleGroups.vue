@@ -76,6 +76,28 @@ onMounted(() => {
       }
    });
 });
+
+const setGameResult = () => {
+   // let result:MatchResult = {
+   //    team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
+   //    team1Player1Score: team1Player1Score.value!, 
+   //    team1Player2Score: team1Player2Score.value!, 
+   
+   //    team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
+   //    team2Player1Score: team2Player1Score.value!, 
+   //    team2Player2Score: team2Player2Score.value!
+   // }
+
+   // if(!props.tournament.settings.trackPlayerShots){
+   //    result = {
+   //       team1Score: team1Score.value!,
+   //       team2Score: team2Score.value!
+   //    }
+   // }
+
+   // await setGameResultGroupPhase(props.tournament, props.match._id, result);
+   // await props.getTournament();
+}
 </script>
 
 <template>
@@ -95,7 +117,7 @@ onMounted(() => {
 
             <!-- Matches -->
             <div class="rt-matches">
-               <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" :match="match" :matchIndex="matchIndex" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="true" :isBackend="isBackend"/>
+               <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" :match="match" :isBackend="isBackend" :setGameResult="setGameResult"/>
             </div>
 
          </div>

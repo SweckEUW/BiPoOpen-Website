@@ -1,137 +1,51 @@
 <script setup lang="ts">
-import { ref, onMounted, PropType } from "vue"
-import { MatchResult, Tournament } from "@/types";
+import { PropType, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
-import { setGameResultGroupPhase } from "@/tournamentFunctions/tournamentGroupFunctions";
-import { setGameResultKOPhase } from "@/tournamentFunctions/tournamentKOPhaseFunctions";
-import { Match } from "@/types";
+import { Match, Team } from "@/types";
+import { checkIfMatchFinished, getMatchScore } from "@/tournamentFunctions/tournamentMatchFunctions";
 
 const props = defineProps({
-    getTournament: {type: Function, required: true },
-    tournament: {type: Object as PropType<Tournament>, required: true },
-    isGroupPhase: {type: Boolean, required: true },
-    toggleModal: {type: Function, required: true },
     match: {type: Object as PropType<Match>, required: true },
+    setGameResult: {type: Function as PropType<(match:Match) => void> },
+    toggleModal: {type: Function, required: true },
 });
 
-const setResultGroupPhase = async () => {
-    let result:MatchResult = {
-        team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-        team1Player1Score: team1Player1Score.value!, 
-        team1Player2Score: team1Player2Score.value!, 
-    
-        team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-        team2Player1Score: team2Player1Score.value!, 
-        team2Player2Score: team2Player2Score.value!
-    }
+// Create a copy of the match to avoid modifying the original match object directly
+let copiedMatch = ref(JSON.parse(JSON.stringify(props.match)) as Match);
 
-    if(!props.tournament.settings.trackPlayerShots){
-        result = {
-            team1Score: team1Score.value!,
-            team2Score: team2Score.value!
-        }
-    }
-
-    await setGameResultGroupPhase(props.tournament, props.match._id, result);
-    await props.getTournament();
+const setResult = () => {
+    props.setGameResult!(copiedMatch.value);
     props.toggleModal();
 }
 
-const setResultKOPhase = async () => {
-    let result:MatchResult = {
-       team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-       team1Player1Score: team1Player1Score.value!, 
-       team1Player2Score: team1Player2Score.value!, 
- 
-       team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-       team2Player1Score: team2Player1Score.value!, 
-       team2Player2Score: team2Player2Score.value!
+let getTeamName = (team:Team) => {
+    if(team.name){
+        return team.name;
+    }else{
+        return team.players.map(p => p.name.trim()).filter(name => name.length > 0).join(' & ');
     }
-
-    if(!props.tournament.settings.trackPlayerShots){
-        result = {
-            team1Score: team1Score.value!,
-            team2Score: team2Score.value!
-        }
-    }
-
-    await setGameResultKOPhase(props.tournament, props.match._id, result);
-    await props.getTournament();
-    props.toggleModal();
-}
-
-let team1Score = ref<number>();
-let team1Player1Score = ref<number>();
-let team1Player2Score = ref<number>();
-
-let team2Score = ref<number>();
-let team2Player1Score = ref<number>();
-let team2Player2Score = ref<number>();
-
-onMounted(() => {
-    if(props.match.result){
-        team1Score.value =  props.match.result.team1Score;
-        team1Player1Score.value = props.match.result.team1Player1Score;
-        team1Player2Score.value = props.match.result.team1Player2Score;
-
-        team2Score.value =  props.match.result.team2Score;
-        team2Player1Score.value = props.match.result.team2Player1Score;
-        team2Player2Score.value = props.match.result.team2Player2Score;
-   }
-})
-
-const clearInputs = () => {
-    team1Score = ref<number>();
-    team1Player1Score = ref<number>();
-    team1Player2Score = ref<number>();
-
-    team2Score = ref<number>();
-    team2Player1Score = ref<number>();
-    team2Player2Score = ref<number>();
 }
 </script>
 
 <template>
     <Modal>
         <template #title>Ergebnis eintragen</template>
+
         <template #template>
             <div class="rt-modal-container">
+                
+                <div v-for="(team, teamIndex) in [copiedMatch.team1, copiedMatch.team2]" class="rt-modal-main">
 
-                <div class="rt-modal-main" v-if="tournament.settings.trackPlayerShots">
-                    <div class="rt-modal-team">{{ match.team1.name }}</div>
-                    <div class="rt-modal-result">{{ (team1Player1Score ?  team1Player1Score : 0) + (team1Player2Score ?  team1Player2Score : 0) }}</div>
-                    <div class="rt-modal-result">{{ (team2Player1Score ?  team2Player1Score : 0) + (team2Player2Score ?  team2Player2Score : 0) }}</div>
-                    <div class="rt-modal-team">{{ match.team2.name }}</div>
-                </div>
-
-                <div class="rt-modal-main" v-else>
-                    <div class="rt-modal-team">{{ match.team1.name }}</div>
-                    <input class="rt-modal-input" type="number" min="0" max="10" v-model="team1Score" placeholder="0">
-                    <input class="rt-modal-input" type="number" min="0" max="10" v-model="team2Score" placeholder="0">
-                    <div class="rt-modal-team">{{ match.team2.name }}</div>
-                </div>
-
-                <div class="rt-modal-players" v-if="tournament.settings.trackPlayerShots">
-                    <div>
-                        <div style="display: flex; margin-bottom: 10px;">
-                            <div class="rt-modal-player" style="text-align: right;">{{ match.team1.players[0] }}</div>
-                            <input class="rt-modal-input" type="number" min="0" max="10" v-model="team1Player1Score" placeholder="0">
-                        </div>
-                        <div style="display: flex;">
-                            <div class="rt-modal-player" style="text-align: right;">{{ match.team1.players[1] }}</div>
-                            <input class="rt-modal-input" type="number" min="0" max="10" v-model="team1Player2Score" placeholder="0">
-                        </div>
+                    <!-- Header - Team Name + Team Score -->
+                    <div class="rt-modal-team">
+                        <div class="rt-modal-team-name" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ getTeamName(team) }}</div>
+                        <div class="rt-modal-team-score" :style="{ order: teamIndex === 0 ? 0 : -1 }">{{ getMatchScore(copiedMatch, teamIndex == 0) }}</div>
                     </div>
 
-                    <div>
-                        <div style="display: flex; margin-bottom: 10px;">
-                            <input class="rt-modal-input" type="number" min="0" max="10" v-model="team2Player1Score" placeholder="0">
-                            <div class="rt-modal-player">{{ match.team2.players[0] }}</div>  
-                        </div>
-                        <div style="display: flex;">
-                            <input class="rt-modal-input" type="number" min="0" max="10" v-model="team2Player2Score" placeholder="0">
-                            <div class="rt-modal-player">{{ match.team2.players[1] }}</div>
-                        </div>
+                    <!-- Players - Player Name + Player Score -->
+                    <div v-for="player in team.players" class="rt-modal-player">
+                        <div :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ player.name }}</div>
+                        <input type="number" v-model="player.score" placeholder="0" :style="{ order: teamIndex === 0 ? 0 : -1 }"> 
                     </div>
                 </div>
 
@@ -140,50 +54,57 @@ const clearInputs = () => {
 
         <!-- Button 1 -->
         <template #cancle>
-            <div @click="clearInputs(); toggleModal();">Abbrechen</div>
+            <div @click="toggleModal();">Abbrechen</div>
         </template>
 
         <!-- Button 2 -->
         <template #confirm>
-            <div @click="isGroupPhase ? setResultGroupPhase(): setResultKOPhase();">{{ match.result ? 'Bearbeiten' : 'Eintragen' }}</div>
+            <div @click="setResult()">{{ checkIfMatchFinished(copiedMatch) ? 'Bearbeiten' : 'Eintragen' }}</div>
         </template>
     </Modal>
 </template>
 
 <style scoped>
 .rt-modal-container{
-   margin-bottom: 20px;
-   white-space: nowrap;
-}
-.rt-modal-main{
-   display: flex;
-   margin-bottom: 20px;
-   font-weight: bold;
-}
-.rt-modal-result{
-   width: 50px;
-   margin: 0px 10px;
-   text-align: center;
-}
-.rt-modal-input{
-   width: 50px;
-   margin: 0px 10px;
-   text-align: center;
-}
-.rt-modal-team{
-   width: 280px;
-   font-size: 20px;
-}
-.rt-modal-team:first-child{
-   text-align: right;
-}
-.rt-modal-players{
    display: flex;
    justify-content: center;
 }
-.rt-modal-player{
-   width: 200px;
+.rt-modal-main{
+    width: 50%;
 }
+.rt-modal-team{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+.rt-modal-team-name{
+    flex: 1;
+    white-space: nowrap;
+}
+.rt-modal-team div{
+    font-size: 20px;
+}
+.rt-modal-team-score{
+    width: 50px;
+    text-align: center;
+    margin: 0 10px;
+}
+.rt-modal-player{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.rt-modal-player div{
+    flex: 1;
+}
+.rt-modal-player input, .rt-modal-team input{
+   width: 50px;
+   margin: 0px 10px;
+   text-align: center;
+}
+
 
 /* Remove arrows from input field */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -192,12 +113,5 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
-}
-
-/*MOBILE*/
-@media (width <= 900px){
-    .rt-modal-player, .rt-modal-team{
-        white-space: break-spaces;
-    }
 }
 </style>

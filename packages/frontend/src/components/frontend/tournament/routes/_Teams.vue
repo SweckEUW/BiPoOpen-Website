@@ -24,7 +24,7 @@ defineProps({
                 <td>{{ i+1 }}</td>
                 <td>{{ team.name }}</td>
                 <td>
-                    <div v-for="player in team.players" :key="player" style="white-space: nowrap;">{{ player }}</div>
+                    <div v-for="player in team.players" :key="player" style="white-space: nowrap;">{{ player.name }}</div>
                 </td>
             </tr>
          </tbody>

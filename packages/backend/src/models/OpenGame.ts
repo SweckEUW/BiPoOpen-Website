@@ -31,4 +31,4 @@ const OpenGameSchema = new Schema(
     }
 );
 
-export default mongoose.model('OpenGame', OpenGameSchema);
+export default mongoose.model('OpenGame', OpenGameSchema, "openGames");

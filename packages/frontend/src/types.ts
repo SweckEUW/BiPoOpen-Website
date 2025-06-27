@@ -31,16 +31,6 @@ export type Match = {
     _id: string,
     team1: Team,
     team2: Team,
-    result?: MatchResult
-}
-
-export type MatchResult = {
-    team1Score: number,
-    team1Player1Score?: number,
-    team1Player2Score?: number,
-    team2Score: number,
-    team2Player1Score?: number,
-    team2Player2Score?: number
 }
 
 export type Team = {
@@ -49,22 +39,11 @@ export type Team = {
     players: Player[]
 }
 
-export type Player = string;
-
-// export type OpenGame = {
-//     team1: OpenGameTeam,
-//     team2: OpenGameTeam,
-//     time: number
-// }
-
-// export type OpenGameTeam = {
-//     players: OpenGamePlayer[]
-// }
-
-// export type OpenGamePlayer = {
-//     name: string,
-//     score: number
-// }
+export type Player = {
+    _id: string,
+    name: string,
+    score: number
+};
 
 // Stats
 export type GroupWithStats = {  
@@ -73,7 +52,7 @@ export type GroupWithStats = {
 
 export type TeamWithStats = {  
     name: string;
-    players: string[];
+    players: Player[];
     wins: number;
     score: string;
     games: number;

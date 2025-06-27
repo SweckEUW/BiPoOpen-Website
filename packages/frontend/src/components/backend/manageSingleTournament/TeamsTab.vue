@@ -33,8 +33,8 @@ let showModalEditTeam = ref(false);
 const toggleModalEditTeam = (team?:Team) => {
    if(team){
       teamnameInput.value = team.name;
-      player1Input.value = team.players[0];
-      player2Input.value = team.players[1];
+      player1Input.value = team.players[0].name;
+      player2Input.value = team.players[1].name;
 
       selectedTeam.value = team;
    }
@@ -153,11 +153,11 @@ const removeTeamButton = async () => {
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team, id) in tournament.teams" @click="toggleModalEditTeam(team)" :key="team.name">
+            <tr v-for="(team, id) in tournament.teams" @click="toggleModalEditTeam(team)">
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>
-                  <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{ player }}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px">{{ player.name }}</span>
                </td>
             </tr>
          </tbody>

@@ -33,7 +33,7 @@ window.addEventListener("resize", () => {
                 <tr v-for="(team,i) in group.teams" :key="team.name">
                     <td>{{ i+1 }}</td>
                     <td>{{team.name}}</td>
-                    <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
+                    <td><span v-for="player in team.players">{{windowWidth > 900 ? player.name : player.name.split(" ")[0]}}</span></td>
                     <td>{{ team.wins }}</td>
                     <td>{{ team.games }}</td>
                     <td v-if="tournament.settings.trackTeamShots">{{ team.score }}</td>

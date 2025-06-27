@@ -1,6 +1,7 @@
 import { getAllTeams } from "@/tournamentFunctions/tournamentTeamFunctions";
 import { getAmmountOfDrunkenCupsFromteam, getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromPlayer } from "@/tournamentFunctions/tournamentStatsFunctions";
-import { Team, Tournament, MatchResult, PlayerWithStats } from "@/types";
+import { Tournament, PlayerWithStats, Match } from "@/types";
+import { checkIfMatchFinished } from "./tournamentMatchFunctions";
 
 export const getPlayersWithStats = (tournament:Tournament|undefined) => {
     if(!tournament)
@@ -11,16 +12,16 @@ export const getPlayersWithStats = (tournament:Tournament|undefined) => {
     
     for (let i = 0; i < teams.length; i++) {
         for (let x = 0; x < teams[i].players.length; x++) {
-            let ammountOfMatches = getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x], false);
-            let score = getAmmountOfHitsFromPlayer(tournament, teams[i].players[x], false);
-            let wins = getAmmountOfWinsFromPlayer(tournament, teams[i].players[x], false);
+            let ammountOfMatches = getAmmountOfMatchesFromPlayer(tournament, teams[i].players[x].name, false);
+            let score = getAmmountOfHitsFromPlayer(tournament, teams[i].players[x].name, false);
+            let wins = getAmmountOfWinsFromPlayer(tournament, teams[i].players[x].name, false);
             
             let player = {
-                name: teams[i].players[x],
+                name: teams[i].players[x].name,
                 score: score,
                 ammountOfMatches: ammountOfMatches,
                 ammountOfMatchesWithTrackedShots: tournament.settings.trackPlayerShots ? ammountOfMatches : 0,
-                ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i].name, false) / 2),
+                ammountOfDrunkenCups: Math.ceil(getAmmountOfDrunkenCupsFromteam(tournament, teams[i].name!, false) / 2),
                 wins: wins,
                 averageScore: Math.round((ammountOfMatches == 0 ? 0 : score / ammountOfMatches) * 100) / 100, // TODO: if average is 7 show 7.00
                 averageWins: Math.round((ammountOfMatches == 0 ? 0 : wins / ammountOfMatches) * 100) / 100,
@@ -58,17 +59,12 @@ export const getMVPList = (tournament:Tournament) => {
     return playersWithStats;
 }
 
-export const getMatchesFromPlayer = (tournament:Tournament|undefined, playerName:string, onlyGroupPhase:boolean) => { 
+export const getFinishedMatchesFromPlayer = (tournament:Tournament|undefined, playerName:string, onlyGroupPhase:boolean) => { 
     if(!tournament)
         return [];
 
     // This is not MatchDecoded because the result is not null!
-    let matchesFromPlayer:{
-        _id: string,
-        team1: Team,
-        team2: Team,
-        result: MatchResult
-    }[] = [];
+    let matchesFromPlayer:Match[] = [];
 
     let matches = tournament.groupPhase.matches;
     if(!onlyGroupPhase)
@@ -76,18 +72,13 @@ export const getMatchesFromPlayer = (tournament:Tournament|undefined, playerName
 
     matches.forEach((groups) => {
         groups.forEach((match) => {
-            if(match.result){
+            if(checkIfMatchFinished(match)){
                 if(
-                    match.team1.players[0] == playerName || match.team1.players[1] == playerName ||
-                    match.team2.players[0] == playerName || match.team2.players[1] == playerName
+                    match.team1.players[0].name == playerName || match.team1.players[1].name == playerName ||
+                    match.team2.players[0].name == playerName || match.team2.players[1].name == playerName
                 ){
                     // Workarround because compiler is not able to check if match.result is null
-                    matchesFromPlayer.push({
-                        _id: match._id,
-                        team1: match.team1,
-                        team2: match.team2,
-                        result: match.result!
-                    });       
+                    matchesFromPlayer.push(match);       
                 }
             }
         });

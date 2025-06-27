@@ -84,4 +84,4 @@ const TournamentSchema = new Schema(
     }
 );
 
-export default mongoose.model<ITournamentModel>('Tournament', TournamentSchema);
+export default mongoose.model<ITournamentModel>('Tournament', TournamentSchema, "tournaments");

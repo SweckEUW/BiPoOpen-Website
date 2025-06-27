@@ -45,9 +45,9 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const updateOpenGame = (req: Request, res: Response, next: NextFunction) => {
-    const openGameID = req.params.openGameID;
-
-    OpenGame.findById(openGameID)
+    const openGameId = req.params.openGameId;
+    
+    OpenGame.findById(openGameId)
         .then((openGame) => {
             if (openGame) {
                 openGame.set(req.body);

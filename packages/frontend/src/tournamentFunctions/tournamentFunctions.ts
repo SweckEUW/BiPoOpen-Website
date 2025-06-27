@@ -1,5 +1,6 @@
 import { Tournament, TournamentSettings } from "@/types";
 import axios from "axios";
+import { checkIfMatchFinished } from "./tournamentMatchFunctions";
 
 ////////////////
 // TOURNAMENT //
@@ -21,8 +22,9 @@ export const getTournamentByName = async (tournamentName:string) => {
 
     let response = await axios.get("/tournaments/get/" + tournamentName);
     if(response.status == 200){
-        console.log(response.data.tournament);
-        return response.data.tournament as Tournament;
+        let tournament = response.data.tournament as Tournament;
+        tournament = convertTournament(tournament);
+        return tournament;
     }
 }
 
@@ -38,10 +40,42 @@ export const checkIfTournamentFinished = (tournament:Tournament) => {
     let matches = tournament.groupPhase.matches.concat(tournament.koPhase.matches);
     matches.forEach((groups) => {
         groups.forEach((match) => {
-            if(!match.result)
+            if(!checkIfMatchFinished(match))
                 tournamentFinished = false;  
         });
     });
 
     return tournamentFinished;
+}
+
+const convertTournament = (tournament:any) => {
+    // Set result to player scores
+    for(let i = 0; i < tournament.groupPhase.matches.length; i++) {
+        let group = tournament.groupPhase.matches[i];
+        for(let j = 0; j < group.length; j++) {
+            let match = group[j];
+            if(match.result){
+                match.team1.players[0].score = match.result.team1Player1Score;
+                match.team1.players[1].score = match.result.team1Player2Score;
+                match.team2.players[0].score = match.result.team2Player1Score;
+                match.team2.players[1].score = match.result.team2Player2Score;
+            }
+        }
+    }
+
+    for(let i = 0; i < tournament.koPhase.matches.length; i++) {
+        let group = tournament.koPhase.matches[i];
+        for(let j = 0; j < group.length; j++) {
+            let match = group[j];
+            if(match.result){
+                match.team1.players[0].score = match.result.team1Player1Score;
+                match.team1.players[1].score = match.result.team1Player2Score;
+                match.team2.players[0].score = match.result.team2Player1Score;
+                match.team2.players[1].score = match.result.team2Player2Score;
+            }
+        }
+    }
+
+    // console.log(tournament);
+    return tournament as Tournament;
 }

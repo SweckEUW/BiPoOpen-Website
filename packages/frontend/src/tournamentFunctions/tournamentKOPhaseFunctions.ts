@@ -1,7 +1,7 @@
 import { getTeamFromID, getTopTeams } from "@/tournamentFunctions/tournamentTeamFunctions";
 import { getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromTeam } from "@/tournamentFunctions/tournamentStatsFunctions";
 import { getGroupsWithStats } from "@/tournamentFunctions/tournamentGroupFunctions";
-import { Team, Tournament, Match, MatchResult, TeamWithStats } from "@/types";
+import { Team, Tournament, Match, TeamWithStats } from "@/types";
 import axios from "axios";
 
 export const getTeamsKOPhase = (tournament:Tournament) => {

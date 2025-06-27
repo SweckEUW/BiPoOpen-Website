@@ -15,6 +15,11 @@ export const addOpenGame = async (openGame:Match) => {
     return response.status == 201
 }
 
+export const updateOpenGame = async (openGame:Match) => {
+    let response = await axios.patch("/openGames/update/" + openGame._id, openGame);
+    return response.status == 200;
+}
+
 
 ////////////////
 // STATISTICS //

@@ -60,7 +60,7 @@ const toggleModalAddGame = () => {
             <!-- Content -->
             <div class="tab-content" id="OpenGamesStatisticsContainer">
                 <div class="tab-pane fade show active" :id="'OpenGamesMain'">
-                    <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+                    <MatchElement v-for="openGame in openGames" :match="openGame"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
                 </div>
 
                 <div class="tab-pane fade" :id="'OpenGamesStats'">

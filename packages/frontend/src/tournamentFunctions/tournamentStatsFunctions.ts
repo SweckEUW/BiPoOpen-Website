@@ -1,6 +1,7 @@
 import { getMatchesFromTeam } from "@/tournamentFunctions/tournamentTeamFunctions";
 import { Tournament } from "@/types";
-import { getMatchesFromPlayer } from "./tournamentPlayerFunctions";
+import { getFinishedMatchesFromPlayer } from "./tournamentPlayerFunctions";
+import { checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
 
 ////////////////
 // TEAM STATS //
@@ -80,77 +81,38 @@ export const getAmmountOfHitsFromPlayer = (tournament:Tournament, playerName:str
         return 0;
     
     let score = 0;
-
-    let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
-
-    matches.forEach((match) => {
-        if(match.team1.players[0] == playerName)
-            score += match.result.team1Player1Score!;        
-        if(match.team1.players[1] == playerName)
-            score += match.result.team1Player2Score!;
-        if(match.team2.players[0] == playerName)
-            score += match.result.team2Player1Score!;
-        if(match.team2.players[1] == playerName)
-            score += match.result.team2Player2Score!;
-    });
-
-    return score;
-}
-
-export const getAmmountEnemyHitsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => { 
-    if(!tournament.settings.trackPlayerShots)
-        return 0;
-
-    let score = 0;
-    
-    let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
 
     matches.forEach((match) => {
-        if(match.team1.players[0] == playerName)
-            score += match.result.team2Player1Score!;               
-        if(match.team1.players[1] == playerName)
-            score += match.result.team2Player2Score!;
-        if(match.team2.players[0] == playerName)
-            score += match.result.team1Player1Score!;       
-        if(match.team2.players[1] == playerName)
-            score += match.result.team1Player2Score!;
+        [match.team1, match.team2].forEach((team) => {
+            team.players.forEach((player) => {
+                if(player.name == playerName)
+                    score += player.score;
+            });
+        });
     });
 
     return score;
 }
 
 export const getAmmountOfMatchesFromPlayer = (tournament:Tournament|undefined, playerName:string, onlyGroupPhase:boolean) => { 
-    let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
     return matches.length;
 }
 
 export const getAmmountOfWinsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => {
     let wins = 0;
-    
-    let matches = getMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
     
     matches.forEach((match) => {
-        if((match.team1.players[0] == playerName || match.team1.players[1] == playerName) && match.result.team1Score > match.result.team2Score)
-            wins ++;
-        
-        if((match.team2.players[0] == playerName || match.team2.players[1] == playerName) && match.result.team2Score > match.result.team1Score)
-            wins ++;
-    });
-
-    return wins;
-}
-
-export const checkIfTeam1WonVsTeam2 = (tournament:Tournament|undefined, team1Name:string, team2Name:string) => { 
-    let team1Won = false;
-
-    let matches = tournament?.groupPhase.matches ?? [];
-
-    matches.forEach((matchesForGroup) => {
-        matchesForGroup.forEach((match) => {
-            if(match.result && match.team1.name == team1Name && match.team2.name == team2Name)
-                team1Won = match.result.team1Score > match.result.team2Score;   
+        [match.team1, match.team2].forEach((team) => {
+            team.players.forEach((player) => {
+                if(player.name == playerName && checkIfTeam1WonVsTeam2(match)) { // TODO; Ich glaube das ist nicht richtig 
+                    wins ++;
+                }
+            });
         });
     });
 
-    return team1Won;
+    return wins;
 }

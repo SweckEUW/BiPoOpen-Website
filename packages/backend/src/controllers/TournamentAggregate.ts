@@ -1,6 +1,27 @@
-import mongoose from "mongoose";
-
 export const tournamentAggregation = () => [
+    // Strukturiere das Teams Array so um, dass jeder player im team ein object anstatt eines strings ist, das Object hat name und id
+    {
+      $addFields: {
+        teams: {
+          $map: {
+            input: "$teams",
+            as: "team",
+            in: {
+              _id: "$$team._id",
+              name: "$$team.name",
+              players: {
+                $map: {
+                  input: "$$team.players",
+                  as: "player",
+                  in: { name: "$$player", id: "$$player" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     // Gruppenteams mit Team-Details ersetzen
     {
       $addFields: {

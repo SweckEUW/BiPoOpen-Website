@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
 import { getAllOpenGames } from "@/openGamesFunctions/OpenGamesUtilFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import { Match } from "@/types";
+import { updateOpenGame } from "@/openGamesFunctions/OpenGamesUtilFunctions";
 
 let openGames = ref<Match[]|undefined>();
 let showModalAddGame = ref(false);
 
 const getOpenGames = async () => {
-    openGames.value = await getAllOpenGames();
-    openGames.value = openGames.value!.reverse()
+    let openGamesWrongOrder = await getAllOpenGames();
+    openGames.value = openGamesWrongOrder!.reverse();
 }
 getOpenGames();
 
-let updateInterval = setInterval(() => {
-    getOpenGames();
-}, 10000);
-
-onUnmounted(() => {
-   clearInterval(updateInterval);
-});
-
 const toggleModalAddGame = () => {
     showModalAddGame.value = !showModalAddGame.value;
+}
+
+const setGameResult = async (match:Match) => {
+    await updateOpenGame(match);
+    await getOpenGames();
 }
 </script>
 
@@ -42,8 +40,7 @@ const toggleModalAddGame = () => {
                 </Transition>
             </Teleport>
 
-            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
-
+            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true" :setGameResult="setGameResult"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
         </div>
 
     </div>

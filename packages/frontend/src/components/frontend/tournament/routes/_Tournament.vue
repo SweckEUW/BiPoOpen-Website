@@ -19,6 +19,7 @@ const getTournament = async () => {
 }
 getTournament();
 
+
 let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Teams");
 let name = route.path.split("/").pop();
 if(name == "Spielplan")

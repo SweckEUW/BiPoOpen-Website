@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-// import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
+import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
 import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
 import { Match } from "@/types";
+import { checkIfMatchFinished } from "@/tournamentFunctions/tournamentMatchFunctions";
 
-defineProps({
+const props = defineProps({
    match: {type: Object as PropType<Match>, required: true },
-   // isGroupPhase: {type: Boolean, required: true },
-   isBackend: {type: Boolean, required: true },
-   matchIndex: {type: Number, required: false }
+   setGameResult: {type: Function as PropType<(match:Match) => void> },
+   isBackend: {type: Boolean, default: false},
 });
 
 let showModal = ref(false);
@@ -18,28 +18,29 @@ const toggleModal = () => {
 
 let playersVisible = ref(false);
 let togglePlayersVisible = () => {
-   playersVisible.value = !playersVisible.value;
+   if(props.match.team1.players.length != 1) // Only toggle players visibility if there are at least 2 players in the team
+      playersVisible.value = !playersVisible.value;
 }
 </script>
 
 <template>
     <div class="Match" ref="matchHTMLElement">
 
-         <!-- <Teleport to="body">
+         <Teleport to="body">
             <Transition name="fade">
-               <ModalSetGameResult v-if="showModal" :tournament="tournament" :getTournament="getTournament" :toggleModal="toggleModal" :match="match" :isGroupPhase="isGroupPhase"/>
+               <ModalSetGameResult v-if="showModal" :toggleModal="toggleModal" :match="match" :setGameResult="setGameResult"/>
             </Transition>
-         </Teleport> -->
+         </Teleport>
 
-         <!-- <div v-if="isBackend && isGroupPhase" class="mt-handle">
+         <!-- <div v-if="isBackend" class="mt-handle">
             <div style="margin-bottom: 5px;"/>
             <div/>
          </div> -->
 
          <!-- Match Index -->
-         <div v-if="matchIndex != undefined" class="mt-index">
+         <!-- <div v-if="matchIndex != undefined" class="mt-index">
            <div>{{ matchIndex + 1 + '.' }}</div> 
-         </div>
+         </div> -->
 
          <!-- Team Name & Score -->
          <div class="mt-teams" @click="togglePlayersVisible()">
@@ -48,10 +49,10 @@ let togglePlayersVisible = () => {
          </div>
 
          <!-- VS. -->
-         <div v-if="!match.result && !isBackend || !match.team1 || !match.team2" class="mt-vs">vs.</div>
+         <div v-if="!checkIfMatchFinished(match) && !isBackend || !match.team1 || !match.team2" class="mt-vs">vs.</div>
 
          <!-- Enter Result Button -->
-         <div v-if="isBackend && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">{{ match.result ? 'Bearbeiten' : 'Eintragen'}}</div>
+         <div v-if="isBackend && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">{{ checkIfMatchFinished(match) ? 'Bearbeiten' : 'Eintragen'}}</div>
 
     </div>
 </template>
