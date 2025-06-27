@@ -44,7 +44,7 @@ var timer = setInterval(updateRemainingTime, 1000);
     <div class="Home">
         <h1 class="ho-title-1">BiPo Open 2025</h1>
 
-        <div v-if="!countdownOver">
+        <div v-if="!countdownOver" style="display: flex; flex-direction: column;">
             <h1 class="ho-title-2">Samstag 28.06.2025 - 14:00 Uhr</h1>
 
             <div class="ho-timer">
@@ -72,29 +72,29 @@ var timer = setInterval(updateRemainingTime, 1000);
             <!-- <div class="ho-share-container">
                 <router-link class="ho-share" :to="'/2024/Teams'">Teilnehmende Teams</router-link>
             </div> -->
+            
+            <!-- Share via Whatsapp -->
+            <!-- <div class="ho-share">
+                <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
+            </div> -->
+
+            <!-- Anmeldung -->
+            <!-- <router-link class="ho-share" :to="'/2025/anmeldung'">Weck BiPo Open 2025 Anmeldung</router-link> -->
+
+            <!-- Teilnehmende Teams -->
+            <!-- <router-link class="ho-share" :to="'/2025'">Weck BiPo Open 2025 Teams</router-link> -->
+
+            <!-- Spielplan -->
+            <router-link class="ho-share" :to="'/2025/Spielplan'">Weck BiPo Open 2025 Spielplan</router-link>
 
         </div>
 
         <div v-if="countdownOver" class="ho-links">
-            <router-link class="ho-share" :to="'/2025/Platzierungen'">Platzierungen</router-link>
             <router-link class="ho-share" :to="'/2025/Spielplan'">Spielplan</router-link>
-            <router-link class="ho-share" :to="'/2025/MVP'">MVP-Tabelle</router-link>
-            <router-link class="ho-share" :to="'/2025/Fotos'">Fotos</router-link>
+            <router-link class="ho-share" :to="'/2025/MVP'">MVP</router-link>
+            <router-link class="ho-share" :to="'/Regeln'">Regeln</router-link>
         </div>
 
-        <!-- Share via Whatsapp -->
-        <!-- <div class="ho-share">
-            <a :href="'whatsapp://send?text=' + shareWhatsappText" data-action="share/whatsapp/share">Share via Whatsapp</a>
-        </div> -->
-
-        <!-- Anmeldung -->
-        <!-- <router-link class="ho-share" :to="'/2025/anmeldung'">Weck BiPo Open 2025 Anmeldung</router-link> -->
-
-        <!-- Teilnehmende Teams -->
-        <!-- <router-link class="ho-share" :to="'/2025'">Weck BiPo Open 2025 Teams</router-link> -->
-
-        <!-- Spielplan -->
-        <router-link class="ho-share" :to="'/2025/Spielplan'">Weck BiPo Open 2025 Spielplan</router-link>
     </div>
 </template>
 
