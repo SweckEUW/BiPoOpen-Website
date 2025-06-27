@@ -91,7 +91,10 @@ var timer = setInterval(updateRemainingTime, 1000);
         <!-- <router-link class="ho-share" :to="'/2025/anmeldung'">Weck BiPo Open 2025 Anmeldung</router-link> -->
 
         <!-- Teilnehmende Teams -->
-        <router-link class="ho-share" :to="'/2025'">Weck BiPo Open 2025 Teams</router-link>
+        <!-- <router-link class="ho-share" :to="'/2025/Teams'">Weck BiPo Open 2025 Teams</router-link> -->
+
+        <!-- Spielplan -->
+        <router-link class="ho-share" :to="'/2025/Spielplan'">Weck BiPo Open 2025 Spielplan</router-link>
     </div>
 </template>
 
