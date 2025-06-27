@@ -592,7 +592,6 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
     let groupsDecoded = getGroupsDecoded(tournament);
     let groupsWithStats = getGroupsWithStats(tournament); // getGroups with stats because its sorted after wins. 
 
-
     matches.forEach((stage, i) => {
         matchesTMP.push([]);
 
@@ -604,7 +603,7 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
                 // Match groups that are far away from each other so that teams that played together in groupstage wont play again in KO-Stage
                 let group1Number, group2Number;
                 let placeGroup1 = 0;
-                let placeGroup2 = 0;
+                let placeGroup2 = 1;
                 if(x % 2 == 0){
                     group1Number = x;
                     group2Number = x + 1;
@@ -622,6 +621,7 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
                     }
                     if(x == 1){
                         placeGroup1 = 1;
+                        placeGroup2 = 0;
                         group1Number = 1;
                         group2Number = 0;
                     }
