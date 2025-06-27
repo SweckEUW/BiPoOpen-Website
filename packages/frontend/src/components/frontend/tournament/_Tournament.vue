@@ -18,7 +18,7 @@ const getTournament = async () => {
 }
 getTournament();
 
-let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Teams");
+let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Spielplan");
 let name = route.path.split("/").pop();
 if(name == "Spielplan")
    place.value = "Spielplan";
@@ -99,9 +99,9 @@ const getTournamentPhotos = () => {
                <!-- <li class="nav-item">
                   <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameOverview' + tournament._id">Übersicht</button>
                </li> -->
-               <li class="nav-item">
+               <!-- <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
-               </li>
+               </li> -->
                <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Spielplan'}" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id" @click="changeRouter('Spielplan')">Spielplan</button>
                </li>
@@ -118,9 +118,9 @@ const getTournamentPhotos = () => {
                <!-- <div class="tab-pane fade" :id="'GameOverview' + tournament._id">
                   <Overview/>
                </div>  -->
-               <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
+               <!-- <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
-               </div>
+               </div> -->
                <div class="tab-pane fade show" :class="{active: place == 'Spielplan'}" :id="'GameSchedule' + tournament._id">
                   <Schedule :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
                </div>
