@@ -9,7 +9,7 @@ let sortValue = ref<SortValueHallOfFame>("wins");
 let sortUp = ref(false);
 
 // Initial load tournaments
-let tournamentsToEvaluate = ["2020","2022","2023","2024"]; //2021
+let tournamentsToEvaluate = ["2020","2022","2023","2024","2025"]; //2021
 const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
         let tournament = await getTournamentWithRouterID(tournamentsToEvaluate[i]);
@@ -109,6 +109,7 @@ const giveArrowClass = (value:string) => {
 }
 
 let winners = [
+    { year: "2025", name: "Weck-Knicken", player1: "Nick Brinkrolf", player2: "Simon Weck"},
     { year: "2024", name: "Team Vogelnest", player1: "Lewin Pohlschmidt", player2: "Mattis Post"},
     { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
     { year: "2022", name: "Taube Nüsschen", player1: "Patrick Pohlmann", player2: "Tim Becker"},
