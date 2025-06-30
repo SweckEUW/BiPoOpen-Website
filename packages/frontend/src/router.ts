@@ -5,7 +5,7 @@ const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component: () => import('@/components/frontend/_Home.vue'),
+		component: () => import('@/components/frontend/routes/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open',
 			description: ''
