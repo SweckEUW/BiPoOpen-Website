@@ -43,45 +43,65 @@ const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
 };
 
 const getTournamentPhotos = () => {
-   if(tournament.value!.name == "Weck BiPo Open 2024")
+   // if(tournament.value!.name == "Weck BiPo Open 2025"){
+   //    return {
+	// 		driveImageIDs: "2025/driveImageIDs.json",
+	// 		poster: "2025/poster.png",
+   //       text: `
+   //          Ein riesiges Dankeschön geht an Patrik Finger, der auch beim Weck BiPo Open 2025 als Fotograf mit am Start war.
+   //          <br>
+   //          Schaut gern auf seinem Instagram-Profil vorbei:
+   //          <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
+   //       `
+	// 	}
+   // }
+
+   if(tournament.value!.name == "Weck BiPo Open 2024"){
       return {
 			driveImageIDs: "2024/driveImageIDs.json",
 			poster: "2024/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+         text: `
+            Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
             <br>
             Folgt ihm gerne auf Instagram 
             <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
          `
 		}
-   
-   if(tournament.value!.name == "Weck BiPo Open 2023")
+   }
+
+   if(tournament.value!.name == "Weck BiPo Open 2023"){
       return {
 			driveImageIDs: "2023/driveImageIDs.json",
 			poster: "2023/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-               <br>
-               Folgt ihm gerne auf Instagram 
-               <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
-            `
+         text: `
+            Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+            <br>
+            Folgt ihm gerne auf Instagram 
+            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
+         `
 		}
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2022")
+   if(tournament.value!.name == "Weck BiPo Open 2022"){
       return {
             driveImageIDs: "2022/driveImageIDs.json",
             poster: "2022/poster.jpg"
          }
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2021")
+   if(tournament.value!.name == "Weck BiPo Open 2021"){
       return {
             driveImageIDs: "2021/driveImageIDs.json",
             poster: "2021/poster.jpg"
          }
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2020")
+   if(tournament.value!.name == "Weck BiPo Open 2020"){
       return {
             driveImageIDs: "2020/driveImageIDs.json",
             poster: "2020/poster.jpg"
          }
+   }
 }
 </script>
 
