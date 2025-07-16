@@ -42,6 +42,18 @@ const routes = [
 	},
 
 	{
+		path: '/BiPo-Knecht',
+		name: 'BiPo-Knecht',
+		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
+		meta: {
+			title: 'Weck BiPo Open Knecht',
+			description: 'BiPo Knecht'
+		}
+	},
+
+	
+
+	{
 		path: '/2025/Anmeldung',
 		name: 'Teamanmeldung',
 		component: () => import('@/components/frontend/_Teamanmeldung.vue'),

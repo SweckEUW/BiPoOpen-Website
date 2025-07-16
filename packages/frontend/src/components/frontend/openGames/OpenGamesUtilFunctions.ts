@@ -44,6 +44,10 @@ export const getAllTimeOpenGamesStatsList = (openGames:OpenGame[], oneVersusOne:
                     teams.add(match.team1.players.map(player => player.name).join(","));
             }
         });
+
+        if(player.name == "David Jones")
+            console.log(teams);
+
         return teams.size >= 4;
     });
 
