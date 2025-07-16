@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, PropType} from "vue"
+import { ref, onMounted, PropType } from "vue"
 import ImageModal from '@/components/frontend/tournament/photos/ImageModal.vue';
 
 const props = defineProps({
@@ -78,7 +78,7 @@ window.onscroll = () => {
     <div class="Photos">
 
         <Transition name="fade">
-            <ImageModal v-show="showModal" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
+            <ImageModal v-if="showModal" :toggleModal="toggleModal" :pictures="pictures" :index="modalImageIndex"/>
         </Transition>
 
         <!-- 2023 -->
