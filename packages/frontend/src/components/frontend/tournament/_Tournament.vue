@@ -134,7 +134,7 @@ const getTournamentPhotos = () => {
             </ul>
 
             <!-- Content -->
-            <div class="tab-content" id="GameScheduleContainer">
+            <div class="tab-content">
                <!-- <div class="tab-pane fade" :id="'GameOverview' + tournament._id">
                   <Overview/>
                </div>  -->
