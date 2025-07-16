@@ -40,6 +40,7 @@ onUnmounted(() => {
 const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
    let newURL = window.location.origin + "/" + route.params.TournamentName + '/' + path;
    window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
+   window.scrollTo({top: 0, behavior: 'instant' });
 };
 
 const getTournamentPhotos = () => {
