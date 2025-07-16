@@ -43,18 +43,18 @@ const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
 };
 
 const getTournamentPhotos = () => {
-   // if(tournament.value!.name == "Weck BiPo Open 2025"){
-   //    return {
-	// 		driveImageIDs: "2025/driveImageIDs.json",
-	// 		poster: "2025/poster.png",
-   //       text: `
-   //          Ein riesiges Dankeschön geht an Patrik Finger, der auch beim Weck BiPo Open 2025 als Fotograf mit am Start war.
-   //          <br>
-   //          Schaut gern auf seinem Instagram-Profil vorbei:
-   //          <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
-   //       `
-	// 	}
-   // }
+   if(tournament.value!.name == "Weck BiPo Open 2025"){
+      return {
+			driveImageIDs: "2025/driveImageIDs.json",
+			poster: "2025/poster.png",
+         text: `
+            Ein riesiges Dankeschön geht an Patrik Finger, der auch beim Weck BiPo Open 2025 als Fotograf mit am Start war.
+            <br>
+            Schaut gern auf seinem Instagram-Profil vorbei:
+            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
+         `
+		}
+   }
 
    if(tournament.value!.name == "Weck BiPo Open 2024"){
       return {
