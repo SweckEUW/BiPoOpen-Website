@@ -6,9 +6,9 @@
         <p>
             Simon Weck
             <br/>
-            Heinrichstraße 9B
+            Kaspar-von-Zumbusch-Straße 6
             <br/>
-            33602 Bielefeld
+            33378 Rheda-Wiedenbrück
         </p>
 
         <h2>Vertreten durch:</h2>
@@ -25,9 +25,9 @@
         <p>
             Simon Weck
             <br/>
-            Heinrichstraße 9B
+            Kaspar-von-Zumbusch-Straße 6
             <br/>
-            33602 Bielefeld
+            33378 Rheda-Wiedenbrück
         </p>
 
         <h2 style="margin-bottom: 0;">Haftungsausschluss:</h2>
