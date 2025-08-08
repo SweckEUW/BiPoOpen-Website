@@ -137,7 +137,7 @@ const setGameResult = () => {
 }
 
 /* Top Swiper Pagination */
-#GameScheduleContainer .swiper-pagination, .Standings .swiper-pagination{
+.Schedule .swiper-pagination, .Standings .swiper-pagination{
    position: sticky;
    padding-top: 10px;
    padding-bottom: 20px;
@@ -145,7 +145,7 @@ const setGameResult = () => {
    background-color: white;
    top: 270px;
 }
-#GameScheduleContainer .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
+.Schedule .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
 	padding: 5px 10px; 
 	border-radius: 0;
 	width: auto;
@@ -158,14 +158,14 @@ const setGameResult = () => {
    flex: 1 1 0;
    text-align: center;
 }
-#GameScheduleContainer .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
+.Schedule .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
 	color:white;
 	background: var(--main-color);
 }
 
 /* MOBILE */
 @media (width <= 900px){
-   #GameScheduleContainer .swiper-pagination{
+   .Schedule .swiper-pagination{
       top: 230px;
    }
    .rt-caption{

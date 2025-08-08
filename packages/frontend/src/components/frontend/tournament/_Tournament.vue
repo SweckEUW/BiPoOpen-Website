@@ -17,7 +17,7 @@ const getTournament = async () => {
 }
 getTournament();
 
-let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Teams");
+let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Spielplan");
 let name = route.path.split("/").pop();
 if(name == "Spielplan")
    place.value = "Spielplan";
@@ -39,48 +39,69 @@ onUnmounted(() => {
 const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
    let newURL = window.location.origin + "/" + route.params.TournamentName + '/' + path;
    window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
+   window.scrollTo({top: 0, behavior: 'instant' });
 };
 
 const getTournamentPhotos = () => {
-   if(tournament.value!.name == "Weck BiPo Open 2024")
+   if(tournament.value!.name == "Weck BiPo Open 2025"){
+      return {
+			driveImageIDs: "2025/driveImageIDs.json",
+			poster: "2025/poster.png",
+         text: `
+            Ein riesiges Dankeschön geht an Patrik Finger, der auch beim Weck BiPo Open 2025 als Fotograf mit am Start war.
+            <br>
+            Schaut gern auf seinem Instagram-Profil vorbei:
+            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
+         `
+		}
+   }
+
+   if(tournament.value!.name == "Weck BiPo Open 2024"){
       return {
 			driveImageIDs: "2024/driveImageIDs.json",
 			poster: "2024/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
+         text: `
+            Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2024 wieder als Fotograf tätig war. 
             <br>
             Folgt ihm gerne auf Instagram 
             <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>  
          `
 		}
-   
-   if(tournament.value!.name == "Weck BiPo Open 2023")
+   }
+
+   if(tournament.value!.name == "Weck BiPo Open 2023"){
       return {
 			driveImageIDs: "2023/driveImageIDs.json",
 			poster: "2023/poster.jpg",
-         text: `Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
-               <br>
-               Folgt ihm gerne auf Instagram 
-               <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
-            `
+         text: `
+            Ein großes Dankeschön an Patrik Finger, der am Weck BiPo Open 2023 über 1500 Fotos geschossen hat. 
+            <br>
+            Folgt ihm gerne auf Instagram 
+            <a href="https://www.instagram.com/fingerontrigger" target="_blank">@fingerontrigger</a>
+         `
 		}
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2022")
+   if(tournament.value!.name == "Weck BiPo Open 2022"){
       return {
             driveImageIDs: "2022/driveImageIDs.json",
             poster: "2022/poster.jpg"
          }
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2021")
+   if(tournament.value!.name == "Weck BiPo Open 2021"){
       return {
             driveImageIDs: "2021/driveImageIDs.json",
             poster: "2021/poster.jpg"
          }
+   }
 
-   if(tournament.value!.name == "Weck BiPo Open 2020")
+   if(tournament.value!.name == "Weck BiPo Open 2020"){
       return {
             driveImageIDs: "2020/driveImageIDs.json",
             poster: "2020/poster.jpg"
          }
+   }
 }
 </script>
 
@@ -97,7 +118,7 @@ const getTournamentPhotos = () => {
             <ul class="nav nav-tabs justify-content-center">
                <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
-               </li>
+               </li> -->
                <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Spielplan'}" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id" @click="changeRouter('Spielplan')">Spielplan</button>
                </li>
@@ -113,7 +134,7 @@ const getTournamentPhotos = () => {
             <div class="tab-content" id="GameScheduleContainer">
                <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
-               </div>
+               </div> -->
                <div class="tab-pane fade show" :class="{active: place == 'Spielplan'}" :id="'GameSchedule' + tournament._id">
                   <Schedule :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
                </div>

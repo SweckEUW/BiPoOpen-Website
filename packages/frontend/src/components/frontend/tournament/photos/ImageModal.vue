@@ -39,10 +39,6 @@ onMounted(() => {
     }, 0); 
 });
 
-watch(() => props.index, () => {
-    swiper.activeIndex = props.index
-});
-
 // const downloadImage = async () => {
 // }
 </script>

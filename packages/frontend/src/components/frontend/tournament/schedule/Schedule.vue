@@ -29,7 +29,7 @@ defineProps({
          </ul>
 
          <!-- Content -->
-         <div class="tab-content" id="GameScheduleContainer">
+         <div class="tab-content">
             <div class="tab-pane fade show active" :id="'GameScheduleGroups' + tournament._id">
                <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
             </div>
