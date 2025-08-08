@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onUnmounted, computed, PropType } from "vue"
-import { getTournamentWithRouterID, getMVPList } from "@/util/tournamentUtilFunctions.js"
+import { ref, computed, PropType } from "vue"
+import { getMVPList } from "@/util/tournamentPlayerFunctions";
 
 let props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true }

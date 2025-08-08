@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, onUnmounted, PropType } from "vue"
-import { getTournamentWithRouterID, getAllTeams } from "@/util/tournamentUtilFunctions.js"
-
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import { PropType } from "vue"
+import { getAllTeams } from "@/util/tournamentTeamFunctions";
 
 defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true }
@@ -24,7 +22,7 @@ defineProps({
                 <td>{{ i+1 }}</td>
                 <td>{{ team.name }}</td>
                 <td>
-                    <div v-for="player in team.players" :key="player" style="white-space: nowrap;">{{ player }}</div>
+                    <div v-for="player in team.players" :key="player.name" style="white-space: nowrap;">{{ player.name }}</div>
                 </td>
             </tr>
          </tbody>

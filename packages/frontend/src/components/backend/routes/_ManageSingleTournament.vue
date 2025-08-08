@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useRoute } from "vue-router";
-import { getTournamentByName } from "@/util/tournamentUtilFunctions.js"
-
 import TeamsTab from '@/components/backend/manageSingleTournament/TeamsTab.vue';
 import ScheduleSettings from '@/components/backend/manageSingleTournament/ScheduleSettings.vue';
 import GroupsTab from '@/components/backend/manageSingleTournament/groups/GroupsTab.vue';
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
+import { getTournamentByName } from "@/util/tournamentFunctions";
 
 let tournament = ref<Tournament|undefined>();
 

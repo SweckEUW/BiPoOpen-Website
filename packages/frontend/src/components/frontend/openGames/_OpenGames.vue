@@ -3,11 +3,9 @@ import { onUnmounted, ref } from 'vue';
 import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
 import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import { OpenGame } from "./OpenGamesTypes";
-import OpenGameMatchElement from './OpenGameMatchElement.vue';
 import OpenGamesStatistics from './OpenGamesStatistics.vue';
-
-let openGames = ref<OpenGame[]|undefined>();
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+let openGames = ref<Match[]|undefined>();
 let showModalAddGame = ref(false);
 
 const getOpenGames = async () => {
@@ -61,7 +59,7 @@ const toggleModalAddGame = () => {
             <div class="tab-content" id="OpenGamesStatisticsContainer">
                 <div class="tab-pane fade show active" :id="'OpenGamesMain'">
                     <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
-                    <OpenGameMatchElement v-for="openGame in openGames" :openGame="openGame"/>
+                    <MatchElement v-for="openGame in openGames" :match="openGame"/>
                 </div>
 
                 <div class="tab-pane fade" :id="'OpenGamesStats'">

@@ -35,7 +35,7 @@ window.addEventListener("resize", () => {
                 <tr v-for="team in getTeamsKOPhaseWithStats(tournament)" :key="team.name">
                     <td>{{ team.placement! + 1 }}</td>
                     <td>{{team.name}}</td>
-                    <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
+                    <td><span v-for="player in team.players" :key="player.name">{{player.name}}</span></td>
                     <td>{{ team.wins }}</td>
                     <td>{{ team.games }}</td>
                     <td v-if="tournament.settings.trackTeamShots">{{ team.score }}</td>

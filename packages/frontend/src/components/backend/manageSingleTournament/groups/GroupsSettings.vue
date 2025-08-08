@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { setSettings } from "@/util/tournamentUtilFunctions.js";
+import { setSettings } from "@/util/tournamentFunctions";
 import { PropType } from "vue";
 
 const props = defineProps({

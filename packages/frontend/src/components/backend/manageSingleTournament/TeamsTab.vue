@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { PropType, ref } from "vue"
-import { addTeam, editTeam, removeTeam } from "@/util/tournamentUtilFunctions.js";
-
 import Modal from '@/components/shared/Modal.vue';
+import { addTeam, editTeam, removeTeam } from "@/util/tournamentTeamFunctions";
 
 const props = defineProps({
    getTournament: {type: Function, required: true },
@@ -32,9 +31,9 @@ const toggleModalCreateTeam = () => {
 let showModalEditTeam = ref(false);
 const toggleModalEditTeam = (team?:Team) => {
    if(team){
-      teamnameInput.value = team.name;
-      player1Input.value = team.players[0];
-      player2Input.value = team.players[1];
+      teamnameInput.value = team.name!;
+      player1Input.value = team.players[0].name;
+      player2Input.value = team.players[1].name;
 
       selectedTeam.value = team;
    }
@@ -157,7 +156,7 @@ const removeTeamButton = async () => {
                <td>{{ id + 1 }}</td>
                <td>{{ team.name }}</td>
                <td>
-                  <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{ player }}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px" :key="player.name">{{ player.name }}</span>
                </td>
             </tr>
          </tbody>

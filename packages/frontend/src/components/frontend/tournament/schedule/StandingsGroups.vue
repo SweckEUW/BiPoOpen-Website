@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRaw, onMounted, PropType } from "vue"
+import { ref, PropType } from "vue"
 
 defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },
@@ -29,10 +29,10 @@ window.addEventListener("resize", () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(team,i) in group.teams" :key="team.name">
+                <tr v-for="(team,i) in group.teams">
                     <td>{{ i+1 }}</td>
                     <td>{{team.name}}</td>
-                    <td><span v-for="player in team.players" :key="player">{{windowWidth > 900 ? player : player.split(" ")[0]}}</span></td>
+                    <td><span v-for="player in team.players">{{player.name}}</span></td>
                     <td>{{ team.wins }}</td>
                     <td>{{ team.games }}</td>
                     <td v-if="tournament.settings.trackTeamShots">{{ team.score }}</td>

@@ -4,16 +4,19 @@ import axios from "axios";
 // GENERAL //
 /////////////
 export const getAllOpenGames = async () => {
-    let response = await axios.get("/openGames")
-    console.log(response.data.message);
-    if(response.data.success)
+    let response = await axios.get("/openGames/get");
+    if(response.status == 200)
         return response.data.openGames as Match[];
 }
 
 export const addOpenGame = async (openGame:Match) => {
-    let response = await axios.post("/addOpenGame", openGame);
-    console.log(response.data.message);
-    return response.data.success as boolean;
+    let response = await axios.post("/openGames/create", openGame);
+    return response.status == 201
+}
+
+export const updateOpenGame = async (openGame:Match) => {
+    let response = await axios.patch("/openGames/update/" + openGame._id, openGame);
+    return response.status == 200;
 }
 
 
@@ -43,9 +46,6 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
                     teams.add(match.team1!.players.map(player => player.name).join(","));
             }
         });
-
-        if(player.name == "David Jones")
-            console.log(teams);
 
         return teams.size >= 4;
     });

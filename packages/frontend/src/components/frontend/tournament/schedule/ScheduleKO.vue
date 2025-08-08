@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { onMounted, PropType } from "vue"
-import { getMatchesKOPhase } from "@/util/tournamentUtilFunctions.js";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { convertNumberToCharacter } from "@/util/util.js"; 
-
+import { convertNumberToCharacter } from "@/util/util"; 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -50,6 +48,28 @@ onMounted(() => {
    //    root.style.height = element.offsetHeight + "px";
    // });
 });
+
+const setGameResult = () => {
+   // let result:MatchResult = {
+   //    team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
+   //    team1Player1Score: team1Player1Score.value!, 
+   //    team1Player2Score: team1Player2Score.value!, 
+
+   //    team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
+   //    team2Player1Score: team2Player1Score.value!, 
+   //    team2Player2Score: team2Player2Score.value!
+   // }
+
+   // if(!props.tournament.settings.trackPlayerShots){
+   //    result = {
+   //       team1Score: team1Score.value!,
+   //       team2Score: team2Score.value!
+   //    }
+   // }
+
+   // await setGameResultKOPhase(props.tournament, props.match._id, result);
+   // await props.getTournament();
+}
 </script>
 
 <template>
@@ -60,12 +80,12 @@ onMounted(() => {
 
          <div class="swiper-wrapper">
 
-            <div v-for="(stage, stageIndex) in getMatchesKOPhase(tournament)" :key="stageIndex" class="gsk-stages swiper-slide">
+            <div v-for="(stage, stageIndex) in tournament.koPhase.matches" :key="stageIndex" class="gsk-stages swiper-slide">
                <div class="gsk-stage" :class="{'gsk-stage1': stageIndex == 0, 'gsk-finale': stageIndex == tournament.koPhase.matches.length - 1}">
                   <div class="gsk-match" v-for="(match, matchIndex) in stage" :key="matchIndex">
                      <div v-if="stageIndex == tournament.koPhase.matches.length - 1" class="gsk-match-name">{{ (matchIndex == 0 ? "Finale" : "Spiel um Platz 3")}}</div>
                      <div v-if="stageIndex != tournament.koPhase.matches.length - 1" class="gsk-match-table">{{ "Tisch " + convertNumberToCharacter(matchIndex + 1) }}</div>
-                     <MatchElement :match="match" :key="match._id" :getTournament="getTournament" :tournament="tournament" :isGroupPhase="false" :isBackend="isBackend"/>
+                     <MatchElement :match="match" :key="match._id" :isGroupPhase="false" :isBackend="isBackend" :setGameResult="setGameResult"/>
                   </div>
                </div>
             </div>

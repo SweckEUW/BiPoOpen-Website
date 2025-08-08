@@ -30,6 +30,7 @@
     position: absolute;
     background: white;
     padding: 50px;
+    width: 50%;
 }
 /* Title */
 .mo-title{

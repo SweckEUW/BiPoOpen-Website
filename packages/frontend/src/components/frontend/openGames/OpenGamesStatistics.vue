@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, PropType, ref } from 'vue';
-import { OpenGame, SortValueOpenGames } from './OpenGamesTypes';
 import { getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
 
 import Swiper from 'swiper';
@@ -9,7 +8,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 const props = defineProps({
-    openGames: {type: Object as PropType<OpenGame[]>, required: true }
+    openGames: {type: Object as PropType<Match[]>, required: true }
 });
 
 let sortValue = ref<SortValueOpenGames>("averageWins");

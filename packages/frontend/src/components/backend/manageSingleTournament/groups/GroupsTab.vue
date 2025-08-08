@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { ref, onMounted, PropType } from "vue"
-import { setGroups, generateRandomGroups, getTeamFromName, generateRandomMatchesGroupPhase, initMatchesKOPhase, getGroupsDecoded } from "@/util/tournamentUtilFunctions.js";
-import { convertNumberToCharacter } from "@/util/util.js"; 
-
+import { convertNumberToCharacter } from "@/util/util"; 
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
+import { getTeamFromName } from "@/util/tournamentTeamFunctions";
+import { generateRandomGroups, generateRandomMatchesGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
+import { initMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 
 const props = defineProps({
    getTournament: {type: Function, required: true },
@@ -126,7 +127,7 @@ const initSortable = () => {
       <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
       <!-- Groups -->
-      <table class="table table-hover caption-top" v-for="(group,index) in getGroupsDecoded(tournament)" :key="index" :id="'Group-' + index">
+      <table class="table table-hover caption-top" v-for="(group,index) in tournament.groupPhase.groups" :key="index" :id="'Group-' + index">
          <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
          <thead>
             <tr>
@@ -145,7 +146,7 @@ const initSortable = () => {
                <td>{{id+1}}</td>
                <td>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</td>
                <td v-if="team">
-                  <span v-for="player in team.players" style="margin-right: 15px" :key="player">{{player}}</span>
+                  <span v-for="player in team.players" style="margin-right: 15px">{{player.name}}</span>
                </td>
             </tr>
          </tbody>

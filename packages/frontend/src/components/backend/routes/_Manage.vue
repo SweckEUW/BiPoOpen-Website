@@ -1,7 +1,6 @@
 <template>
     <div class="Manage">
         <h1 class="bp-title" style="position: inherit; margin-bottom: 50px;">BiPo Open Backend</h1>
-        
         <router-link class="ma-tournament" :to="'/Manage/OpenGames'">Open Games</router-link>
         <router-link class="ma-tournament" :to="'/Manage/Tournaments'">Tournaments</router-link>
     </div>

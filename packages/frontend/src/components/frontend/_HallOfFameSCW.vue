@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import { getTournamentWithRouterID, getPlayersWithStats } from "@/util/tournamentUtilFunctions.js"
-
+import { getTournamentByName } from "@/util/tournamentFunctions";
+import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 let tournaments = ref<Tournament[]>([]);
@@ -12,7 +12,7 @@ let sortUp = ref(false);
 let tournamentsToEvaluate = ["SCW 3 Batenhorst 2023","SCW 3 Ostern 2024", "SCW 3 Batenhorst 2024", "SCW 3 Karneval 2025"];
 const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
-        let tournament = await getTournamentWithRouterID(tournamentsToEvaluate[i]);
+        let tournament = await getTournamentByName(tournamentsToEvaluate[i]);
         if(tournament)
             tournaments.value.push(tournament);
     }   

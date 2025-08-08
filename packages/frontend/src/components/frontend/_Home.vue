@@ -40,67 +40,67 @@ var timer = setInterval(updateRemainingTime, 1000);
 
 // let shareWhatsappText = "Weck BiPo Open 2024 🌟 findet am Samstag den *29.06.2024* um *14:00 Uhr* statt 💥! Es sind noch " + daysRef.value + " Tage " + + hoursRef.value + " Stunden " + + minutesRef.value + " Minuten " + + secondsRef.value + " Sekunden bis zum Turnierstart⏰! Willst du mein Teampartner💑 sein?"
 
-const exampleOpenGame: OpenGame = {
-    team1: {
-        players: [
-            { name: "Alice", score: 5 },
-            { name: "Bob", score: 3 }
-        ]
-    },
-    team2: {
-        players: [
-            { name: "Charlie", score: 4 },
-            { name: "Diana", score: 6 }
-        ]
-    },
-    time: Date.now()
-};
+// const exampleOpenGame: Match = {
+//     team1: {
+//         players: [
+//             { name: "Alice", score: 5 },
+//             { name: "Bob", score: 3 }
+//         ]
+//     },
+//     team2: {
+//         players: [
+//             { name: "Charlie", score: 4 },
+//             { name: "Diana", score: 6 }
+//         ]
+//     },
+//     time: Date.now()
+// };
 
-let convert = async () => {
-    let openGames = await getAllOpenGames();
-    openGames?.forEach(game => {
-        let converted = convertOpenGameToMatch(game);
-    });
-}
+// let convert = async () => {
+//     let openGames = await getAllOpenGames();
+//     openGames?.forEach(game => {
+//         let converted = convertOpenGameToMatch(game);
+//     });
+// }
 
-function convertOpenGameToMatch(openGame: OpenGame): Match {
-    // Dummy-ID-Generator für Beispiel
-    const genId = () => Math.random().toString(36).substring(2, 10);
+// function convertOpenGameToMatch(openGame: OpenGame): Match {
+//     // Dummy-ID-Generator für Beispiel
+//     const genId = () => Math.random().toString(36).substring(2, 10);
 
-    const team1: Team = {
-        _id: genId(),
-        name: "Team 1",
-        players: openGame.team1.players.map(p => ({
-            _id: genId(),
-            name: p.name
-        }))
-    };
+//     const team1: Team = {
+//         _id: genId(),
+//         name: "Team 1",
+//         players: openGame.team1.players.map(p => ({
+//             _id: genId(),
+//             name: p.name
+//         }))
+//     };
 
-    const team2: Team = {
-        _id: genId(),
-        name: "Team 2",
-        players: openGame.team2.players.map(p => ({
-            _id: genId(),
-            name: p.name
-        }))
-    };
+//     const team2: Team = {
+//         _id: genId(),
+//         name: "Team 2",
+//         players: openGame.team2.players.map(p => ({
+//             _id: genId(),
+//             name: p.name
+//         }))
+//     };
 
-    const result: MatchResult = {
-        team1Score: openGame.team1.players.reduce((sum, p) => sum + p.score, 0),
-        team1Player1Score: openGame.team1.players[0]?.score,
-        team1Player2Score: openGame.team1.players[1]?.score,
-        team2Score: openGame.team2.players.reduce((sum, p) => sum + p.score, 0),
-        team2Player1Score: openGame.team2.players[0]?.score,
-        team2Player2Score: openGame.team2.players[1]?.score
-    };
+//     const result: MatchResult = {
+//         team1Score: openGame.team1.players.reduce((sum, p) => sum + p.score, 0),
+//         team1Player1Score: openGame.team1.players[0]?.score,
+//         team1Player2Score: openGame.team1.players[1]?.score,
+//         team2Score: openGame.team2.players.reduce((sum, p) => sum + p.score, 0),
+//         team2Player1Score: openGame.team2.players[0]?.score,
+//         team2Player2Score: openGame.team2.players[1]?.score
+//     };
 
-    return {
-        _id: genId(),
-        team1,
-        team2,
-        result
-    };
-}
+//     return {
+//         _id: genId(),
+//         team1,
+//         team2,
+//         result
+//     };
+// }
 </script>
 
 <template>
@@ -156,7 +156,7 @@ function convertOpenGameToMatch(openGame: OpenGame): Match {
         <!-- Teilnehmende Teams -->
         <router-link class="ho-share" :to="'/2025'">Weck BiPo Open 2025 Teams</router-link>
 
-        <div @click="convert()" style="padding: 20px; background-color: var(--main-color); color: white; cursor: pointer;">Test</div>
+        <!-- <div @click="convert()" style="padding: 20px; background-color: var(--main-color); color: white; cursor: pointer;">Test</div> -->
     </div>
 </template>
 

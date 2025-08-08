@@ -1,30 +1,21 @@
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue';
-import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
-import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
+import { ref } from 'vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import { OpenGame } from "@/components/frontend/openGames/OpenGamesTypes";
-import OpenGameMatchElement from '@/components/frontend/openGames/OpenGameMatchElement.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { getAllOpenGames, updateOpenGame } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 
-let openGames = ref<OpenGame[]|undefined>();
-let showModalAddGame = ref(false);
+let openGames = ref<Match[]|undefined>();
 
 const getOpenGames = async () => {
-    openGames.value = await getAllOpenGames();
-    openGames.value = openGames.value!.reverse()
+    let openGamesWrongOrder = await getAllOpenGames();
+    openGames.value = openGamesWrongOrder!.reverse();
 }
 getOpenGames();
 
-let updateInterval = setInterval(() => {
-    getOpenGames();
-}, 10000);
 
-onUnmounted(() => {
-   clearInterval(updateInterval);
-});
-
-const toggleModalAddGame = () => {
-    showModalAddGame.value = !showModalAddGame.value;
+const setGameResult = async (match:Match) => {
+    await updateOpenGame(match);
+    await getOpenGames();
 }
 </script>
 
@@ -36,13 +27,7 @@ const toggleModalAddGame = () => {
         <Loadingscreen v-show="!openGames"/>
 
         <div v-if="openGames">
-            <Teleport to="body">
-                <Transition name="fade">
-                    <ModalAddOpenGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :getOpenGames="getOpenGames"/>
-                </Transition>
-            </Teleport>
-
-            <OpenGameMatchElement v-for="openGame in openGames" :openGame="openGame"/>
+            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true" :setGameResult="setGameResult"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
         </div>
 
     </div>
