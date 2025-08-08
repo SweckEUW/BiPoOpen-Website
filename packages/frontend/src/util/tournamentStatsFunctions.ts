@@ -102,16 +102,14 @@ export const getAmmountOfMatchesFromPlayer = (tournament:Tournament|undefined, p
 
 export const getAmmountOfWinsFromPlayer = (tournament:Tournament, playerName:string, onlyGroupPhase:boolean) => {
     let wins = 0;
+
     let matches = getFinishedMatchesFromPlayer(tournament,playerName,onlyGroupPhase);
-    
     matches.forEach((match) => {
-        [match.team1, match.team2].forEach((team) => {
-            team.players.forEach((player) => {
-                if(player.name == playerName && checkIfTeam1WonVsTeam2(match)) { // TODO; Ich glaube das ist nicht richtig 
-                    wins ++;
-                }
-            });
-        });
+        let didTeam1Win = checkIfTeam1WonVsTeam2(match);
+        if(match.team1.players.some((player) => player.name == playerName) && didTeam1Win)
+           wins++;
+        if(match.team2.players.some((player) => player.name == playerName) && !didTeam1Win)
+           wins++;
     });
 
     return wins;

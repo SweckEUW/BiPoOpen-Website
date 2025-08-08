@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
 
-let tournaments = ref<Tournament[]>([]);
+let tournaments:Tournament[] = [];
 let sortValue = ref<SortValueHallOfFame>("wins");
 let sortUp = ref(false);
+let sortedHallOfFameList:PlayerWithStats[] = [];
+let isLoading = ref(true);
 
 // Initial load tournaments
 let tournamentsToEvaluate = ["2020","2022","2023","2024","2025"]; //2021
@@ -14,8 +16,11 @@ const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
         let tournament = await getTournamentByName(tournamentsToEvaluate[i]);
         if(tournament)
-            tournaments.value.push(tournament);
-    }   
+            tournaments.push(tournament);
+    }
+
+    sortedHallOfFameList = getSortedHallOfFameList();
+    isLoading.value = false;
 }
 getTournament();
 
@@ -24,11 +29,11 @@ window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
 });
 
-const sortedHallOfFameList = computed(() => {
+const getSortedHallOfFameList = () => {
     let players:PlayerWithStats[] = [];
 
     // Get players from all tournaments with stats. If the same player played in multiple tournaments, add the stats together
-    tournaments.value.forEach((tournament) => {
+    tournaments.forEach((tournament) => {
         let playersWithStats = getPlayersWithStats(tournament);
         playersWithStats.forEach((player) => {
             let playerInList = players.find((playerTMP) => playerTMP.name == player.name);
@@ -43,6 +48,7 @@ const sortedHallOfFameList = computed(() => {
             }
         });
     });
+
 
     // Calculate correct average numbers
     players.forEach((player) => {
@@ -91,7 +97,7 @@ const sortedHallOfFameList = computed(() => {
     });
 
     return players;
-});
+};
 
 
 const setSortValue = (value:SortValueHallOfFame) => {
@@ -124,9 +130,9 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
         
         <h1 class="bp-title">{{"Hall of Fame" }}</h1>
 
-        <Loadingscreen v-show="tournaments.length != tournamentsToEvaluate.length"/>
+        <Loadingscreen v-if="isLoading"/>
 
-        <div v-show="tournaments.length == tournamentsToEvaluate.length">
+        <div v-show="!isLoading">
 
             <div class="hof-winners">
                 <div class="hof-winner" v-for="winner in winners">

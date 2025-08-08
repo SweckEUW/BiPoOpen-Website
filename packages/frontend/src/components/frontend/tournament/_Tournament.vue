@@ -116,7 +116,7 @@ const getTournamentPhotos = () => {
 
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
-               <li class="nav-item">
+               <!-- <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
                </li> -->
                <li class="nav-item">
@@ -132,7 +132,7 @@ const getTournamentPhotos = () => {
 
             <!-- Content -->
             <div class="tab-content" id="GameScheduleContainer">
-               <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
+               <!-- <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
                </div> -->
                <div class="tab-pane fade show" :class="{active: place == 'Spielplan'}" :id="'GameSchedule' + tournament._id">

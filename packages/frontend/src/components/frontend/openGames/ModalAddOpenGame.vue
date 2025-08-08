@@ -9,15 +9,19 @@ let ammountOfPlayersTeam2 = ref(1);
 const props = defineProps({
     toggleModalAddGame: {type: Function, required: true },
     getOpenGames: {type: Function, required: true },
+    openGameNames: {type: Array, required: true }
 });
 
 const addGame = async () => {
 
     let openGame:Match = {
+        _id: "",
         team1: {
+            _id: "",
             players: []
         },
         team2: {
+            _id: "",
             players: []
         },
         time: new Date().getTime()
@@ -31,6 +35,7 @@ const addGame = async () => {
             let score = parseFloat((fields[j].getElementsByClassName("rt-modal-input-number")[0] as HTMLInputElement).value.trim());
 
             let openGamePlayer = {
+                _id: "",
                 name: player,
                 score: score
             }
@@ -63,7 +68,12 @@ const addGame = async () => {
                     <!-- <div class="rt-modal-score" :style="{textAlign: i == 1 ? 'right' : 'left'}">{{ 0 }}</div> -->
 
                     <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
-                        <input class="rt-modal-input-player" type="string" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
+                        <input list="openGameNames" class="rt-modal-input-player" type="string" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
+                        
+                        <datalist id="openGameNames">
+                            <option v-for="name in openGameNames" :value="name"/>
+                        </datalist>
+
                         <input class="rt-modal-input-number" type="number" placeholder="0">
                     </div>
 

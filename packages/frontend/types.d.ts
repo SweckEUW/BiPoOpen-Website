@@ -34,6 +34,7 @@ declare global {
         _id: string;
         team1: Team;
         team2: Team;
+        time: number?;
     };
 
     type Team = {

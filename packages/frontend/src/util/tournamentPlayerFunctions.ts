@@ -1,6 +1,6 @@
 import { getAllTeams } from "@/util/tournamentTeamFunctions";
 import { getAmmountOfDrunkenCupsFromteam, getAmmountOfHitsFromPlayer, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromPlayer } from "@/util/tournamentStatsFunctions";
-import { checkIfMatchFinished } from "./tournamentMatchFunctions";
+import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 
 export const getPlayersWithStats = (tournament:Tournament|undefined) => {
     if(!tournament)
@@ -62,7 +62,6 @@ export const getFinishedMatchesFromPlayer = (tournament:Tournament|undefined, pl
     if(!tournament)
         return [];
 
-    // This is not MatchDecoded because the result is not null!
     let matchesFromPlayer:Match[] = [];
 
     let matches = tournament.groupPhase.matches;
@@ -76,7 +75,6 @@ export const getFinishedMatchesFromPlayer = (tournament:Tournament|undefined, pl
                     match.team1.players[0].name == playerName || match.team1.players[1].name == playerName ||
                     match.team2.players[0].name == playerName || match.team2.players[1].name == playerName
                 ){
-                    // Workarround because compiler is not able to check if match.result is null
                     matchesFromPlayer.push(match);       
                 }
             }

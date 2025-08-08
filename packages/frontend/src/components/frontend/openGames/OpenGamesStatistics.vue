@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, PropType, ref } from 'vue';
 import { getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
-
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -73,7 +72,7 @@ onMounted(() => {
 </script>
 
 <template> 
-        <div style="padding: 40px 10px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 15px;">
+        <div style="padding: 15px 0px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 14px;">
             Damit ein Spieler in den Statistiken erscheint, muss er gegen mindestens 4 verschiedene Teams gespielt haben
         </div>
 
@@ -90,8 +89,8 @@ onMounted(() => {
                             <tr style="height: auto;">
                                 <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                                 <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                                <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                                 <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
+                                <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                                 <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                                 <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Siegwahr.'}}</th>
                                 <!-- <th v-if="windowWidth > 360" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th> -->
@@ -101,8 +100,8 @@ onMounted(() => {
                             <tr v-for="(player, index) in openGamesStatistic" :key="index">
                                 <td>{{ player.placement! + 1}}</td>
                                 <td>{{ player.name.replace(" ","\n") }}</td>
-                                <td>{{ player.ammountOfMatches }}</td>
                                 <td>{{ player.wins }}</td>
+                                <td>{{ player.ammountOfMatches }}</td>
                                 <td>{{ player.averageScore }}</td>
                                 <td>{{ player.averageWins + "%" }}</td>
                                 <!-- <td v-if="windowWidth > 360">{{ player.ammountOfDrunkenCups }}</td> -->
@@ -235,7 +234,7 @@ onMounted(() => {
 /*MOBILE*/
 @media (width <= 900px){
     #OpenGamesStatisticsContainer .swiper-pagination{
-      top: 240px;
+      top: 235px;
     }
     .ogs-text{
         font-size: 16px;
@@ -248,6 +247,7 @@ onMounted(() => {
     }
     #OpenGamesStatisticsContainer table{
         width: 100%;
+        margin-top: 0px;
     }
     #OpenGamesStatisticsContainer table *{
         font-size: 15px;
@@ -256,7 +256,7 @@ onMounted(() => {
         height: 80px;
     }
     #OpenGamesStatisticsContainer table th{ 
-        top: 300px;
+        top: 295px;
         font-size: 15px;
     }
     #OpenGamesStatisticsContainer th:nth-of-type(1), #OpenGamesStatisticsContainer td:nth-of-type(1){

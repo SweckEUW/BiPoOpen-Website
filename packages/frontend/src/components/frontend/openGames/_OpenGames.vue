@@ -1,26 +1,38 @@
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
 import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import OpenGamesStatistics from './OpenGamesStatistics.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-let openGames = ref<Match[]|undefined>();
+
+let openGames:Match[] = [];
+let isLoading = ref(true);
 let showModalAddGame = ref(false);
+let openGameNames:string[] = [];
+
+let getOpenGameDate = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
+}
 
 const getOpenGames = async () => {
-    openGames.value = await getAllOpenGames();
-    openGames.value = openGames.value!.reverse()
+    openGames = await getAllOpenGames();
+    openGames = openGames!.reverse();
+
+    // Get all names from openGames for autocomplete
+    openGameNames = [
+        ...new Set(
+            openGames.flatMap(game =>
+                [...game.team1.players, ...game.team2.players].map(p => p.name)
+            )
+        )
+    ];
+
+    isLoading.value = false;
 }
 getOpenGames();
-
-let updateInterval = setInterval(() => {
-    getOpenGames();
-}, 10000);
-
-onUnmounted(() => {
-   clearInterval(updateInterval);
-});
 
 const toggleModalAddGame = () => {
     showModalAddGame.value = !showModalAddGame.value;
@@ -28,20 +40,20 @@ const toggleModalAddGame = () => {
 </script>
 
 <template>
-    <div class="HallofFame">
+    <div class="OpenGames">
         
-        <h1 class="bp-title">{{"Offene Spiele"}}</h1>
+        <h1 class="bp-title">Offene Spiele</h1>
 
-        <Loadingscreen v-show="!openGames"/>
+        <Loadingscreen v-if="isLoading"/>
 
-        <div v-if="openGames">
+        <div v-show="!isLoading">
 
             <!-- Add Game Button -->
             <div class="bp-button" @click="toggleModalAddGame()">Spiel eintragen</div>
 
             <Teleport to="body">
                 <Transition name="fade">
-                    <ModalAddOpenGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :getOpenGames="getOpenGames"/>
+                    <ModalAddOpenGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :getOpenGames="getOpenGames" :openGameNames="openGameNames"/>
                 </Transition>
             </Teleport>
 
@@ -58,8 +70,10 @@ const toggleModalAddGame = () => {
             <!-- Content -->
             <div class="tab-content" id="OpenGamesStatisticsContainer">
                 <div class="tab-pane fade show active" :id="'OpenGamesMain'">
-                    <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
-                    <MatchElement v-for="openGame in openGames" :match="openGame"/>
+                    <div v-for="openGame in openGames" :key="openGame.time!" style="margin-top: 10px;"> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+                        <div class="og-time">{{ getOpenGameDate(openGame.time!) }}</div>
+                        <MatchElement :match="openGame"/> 
+                    </div>
                 </div>
 
                 <div class="tab-pane fade" :id="'OpenGamesStats'">
@@ -73,6 +87,11 @@ const toggleModalAddGame = () => {
 </template>
 
 <style scoped>
+.og-time{
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: var(--main-color);
+}
 .bp-title{
     padding-bottom: 10px;   
 }
@@ -105,15 +124,17 @@ const toggleModalAddGame = () => {
 .nav-item button{
     width: 100%;
 }
+
 /* MOBILE */
 @media (width <= 900px){
     .bp-button{
-        top: 130px;
+        top: 133px;
         padding: 15px 20px;
-        margin-bottom: 30px;
+        margin-bottom: 0px;
     }
    .nav-tabs{
-        top: 180px;
+        top: 186px;
+        padding-top: 10px;
     }   
    .nav-link{
         font-size: 14px;
