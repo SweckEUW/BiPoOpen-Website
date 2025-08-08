@@ -1,6 +1,6 @@
-import { getMatchesFromTeam } from "@/util/tournamentTeamFunctions";
+import { getFinishedMatchesFromTeam } from "@/util/tournamentTeamFunctions";
 import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
-import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
+import { checkIfTeam1WonVsTeam2, getMatchScore } from "@/util/tournamentMatchFunctions";
 
 ////////////////
 // TEAM STATS //
@@ -8,12 +8,12 @@ import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 export const getAmmountOfWinsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => {
     let wins = 0;
     
-    let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
     matches.forEach((match) => {
-        if(match.team1.name == teamName && match.result.team1Score > match.result.team2Score)
+        if(match.team1.name == teamName && checkIfTeam1WonVsTeam2(match))
             wins ++;
-        if(match.team2.name == teamName && match.result.team2Score > match.result.team1Score)
+        if(match.team2.name == teamName && !checkIfTeam1WonVsTeam2(match))
             wins ++;
     });
 
@@ -23,12 +23,13 @@ export const getAmmountOfWinsFromTeam = (tournament:Tournament|undefined, teamNa
 export const getAmmountOfHitsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
     let score = 0;
 
-    let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromTeam(tournament,teamName,onlyGroupPhase);
+
     matches.forEach((match) => {
         if(match.team1.name == teamName)
-            score += match.result.team1Score;        
+            score += getMatchScore(match, true)!;        
         if(match.team2.name == teamName)
-            score += match.result.team2Score;        
+            score += getMatchScore(match, false)!;        
     });
 
     return score;
@@ -37,13 +38,13 @@ export const getAmmountOfHitsFromTeam = (tournament:Tournament|undefined, teamNa
 export const getAmmountOfEnemyHitsFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
     let score = 0;
     
-    let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
     matches.forEach((match) => {
         if(match.team1.name == teamName)
-            score += match.result.team2Score;               
+            score += getMatchScore(match, false)!;               
         if(match.team2.name == teamName)
-            score += match.result.team1Score       
+            score += getMatchScore(match, true)!;       
     });
 
     return score;
@@ -53,20 +54,20 @@ export const getAmmountOfDrunkenCupsFromteam = (tournament:Tournament|undefined,
     let leftOverCups = 0;
     let enemyHits = 0;
 
-    let matches = getMatchesFromTeam(tournament,teamName,onlyGroupPhase);
+    let matches = getFinishedMatchesFromTeam(tournament,teamName,onlyGroupPhase);
 
     matches.forEach((match) => {
         // Getroffene Becher vom Gegner die Getrunken wurden
         if(match.team1.name == teamName)
-            enemyHits += match.result.team2Score;               
+            enemyHits += getMatchScore(match, false)!;
         if(match.team2.name == teamName)
-            enemyHits += match.result.team1Score;           
+            enemyHits += getMatchScore(match, true)!;
 
         // Stehengebliebene Becher vom Gegner bei Niederlage
-        if(match.team1.name == teamName && match.result.team1Score < match.result.team2Score)
-            leftOverCups += match.result.team2Score - match.result.team1Score;
-        if(match.team2.name == teamName && match.result.team1Score > match.result.team2Score)
-            leftOverCups += match.result.team1Score - match.result.team2Score;
+        if(match.team1.name == teamName && !checkIfTeam1WonVsTeam2(match))
+            leftOverCups += getMatchScore(match, false)! - getMatchScore(match, true)!;
+        if(match.team2.name == teamName && checkIfTeam1WonVsTeam2(match))
+            leftOverCups += getMatchScore(match, true)! - getMatchScore(match, false)!;
     });
 
     return (leftOverCups + enemyHits);

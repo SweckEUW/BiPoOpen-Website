@@ -1,5 +1,3 @@
-import { getTopTeams } from "@/util/tournamentTeamFunctions";
-import { getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromTeam } from "@/util/tournamentStatsFunctions";
 import { getGroupsWithStats } from "@/util/tournamentGroupFunctions";
 import axios from "axios";
 
@@ -80,7 +78,7 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
                 // Match groups that are far away from each other so that teams that played together in groupstage wont play again in KO-Stage
                 let group1Number, group2Number;
                 let placeGroup1 = 0;
-                let placeGroup2 = 0;
+                let placeGroup2 = 1;
                 if(x % 2 == 0){
                     group1Number = x;
                     group2Number = x + 1;
@@ -98,6 +96,7 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
                     }
                     if(x == 1){
                         placeGroup1 = 1;
+                        placeGroup2 = 0;
                         group1Number = 1;
                         group2Number = 0;
                     }
@@ -187,66 +186,4 @@ export const setGameResultKOPhase = async (tournament:Tournament, matchID:string
 
     await setMatchesKOPhase(tournament._id, matches);
     await updateMatchesKOPhase(tournament);
-}
-
-export const getTeamsKOPhaseWithStats = (tournament:Tournament) => {
-    let teams:TeamWithStats[] = [];
-
-    let teamsKOPhase = getTeamsKOPhase(tournament);
-    for (let i = 0; i < teamsKOPhase.length; i++) {
-        
-        let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamsKOPhase[i].name, false);
-        let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamsKOPhase[i].name, false);
-
-        let team = {
-            name: teamsKOPhase[i].name,
-            players: teamsKOPhase[i].players,
-            wins: getAmmountOfWinsFromTeam(tournament, teamsKOPhase[i].name, false),
-            games: getAmmountOfMatchesFromPlayer(tournament, teamsKOPhase[i].players[0], false),
-            score: ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam,
-            scoreDifference: ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam,
-            hits: ammountOfHitsFromTeam,
-        }        
-
-        teams.push(team);
-    }
-
-
-    // Sort after ammount of games, wins
-    teams = teams.sort((team1, team2) => {
-        if(team1.games == team2.games)
-            return team2.wins - team1.wins;
-
-        return team2.games - team1.games;
-    });
-
-    // Set placement
-    for (let i = 0; i < teams.length; i++) {
-        teams[i].placement = i;
-
-        // Top 4 Teams in Array
-        let topTeams = getTopTeams(tournament);
-
-        // Check if teams have the same ammount of games and give them same placement
-        let isTeamInTop4 = topTeams.map((team) => team.name).includes(teams[i].name);
-        if(!isTeamInTop4){
-            let teamsWithSameScore = teams.filter((team) => team.games == teams[i].games);
-            if(teamsWithSameScore.length > 1){
-                teamsWithSameScore.forEach((teamWithSameWin) => {
-                    teamWithSameWin.placement = teamsWithSameScore[0].placement;
-                });
-            }
-        }
-
-        // Top 4 Teams get placement from function
-        if(isTeamInTop4)
-            teams[i].placement = topTeams.map((team) => team.name).indexOf(teams[i].name);
-    }
-
-    // Finally sort again for placement
-    teams = teams.sort((team1, team2) => {
-        return team1.placement! - team2.placement!;
-    });
-
-    return teams;
 }

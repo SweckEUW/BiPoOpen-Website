@@ -2,6 +2,7 @@ import { getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMa
 import { updateMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { shuffleArray } from "@/util/util";
 import axios from "axios";
+import { checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
 
 export const setGroups = async (tournamentID:string, groups:Group[]) => {
     let response = await axios.post("/setGroups", {tournamentID: tournamentID, groups: groups})
@@ -32,14 +33,14 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
         groupsWithStats.push({teams: []});
         
         for (let x = 0; x < tournamentGroups[i].teams.length; x++) {
-
-            let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, tournamentGroups[i].teams[x].name, true);
-            let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, tournamentGroups[i].teams[x].name, true);
+            let teamName = tournamentGroups[i].teams[x].name!;
+            let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamName, true);
+            let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamName, true);
 
             let team = {
                 name: tournamentGroups[i].teams[x].name,
                 players: tournamentGroups[i].teams[x].players,
-                wins: getAmmountOfWinsFromTeam(tournament, tournamentGroups[i].teams[x].name, true),
+                wins: getAmmountOfWinsFromTeam(tournament, teamName, true),
                 games: getAmmountOfMatchesFromPlayer(tournament, tournamentGroups[i].teams[x].players[0].name, true),
                 score: ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam,
                 scoreDifference: ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam,
@@ -51,18 +52,19 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
     }
 
     // Sort after wins, hit difference and direct win against component
-    // groupsWithStats.forEach((group) => {
-    //     group.teams = group.teams.sort((team1, team2) => {
-    //         if (team1.hits == team2.hits && team1.scoreDifference == team2.scoreDifference && team1.wins == team2.wins)
-    //             return checkIfTeam1WonVsTeam2(tournament, team1.name, team2.name) ? 1 : -1;
-    //         else if (team2.scoreDifference == team1.scoreDifference && team1.wins == team2.wins)
-    //             return team2.hits - team1.hits;
-    //         else if(team1.wins == team2.wins)
-    //             return team2.scoreDifference - team1.scoreDifference;
+    groupsWithStats.forEach((group) => {
+        group.teams = group.teams.sort((team1, team2) => {
+            // TODO: Implement check if team 1 vs team 2 function inside group
+            // if (team1.hits == team2.hits && team1.scoreDifference == team2.scoreDifference && team1.wins == team2.wins)
+            //     return checkIfTeam1WonVsTeam2(tournament, team1.name, team2.name) ? 1 : -1;
+            if (team2.scoreDifference == team1.scoreDifference && team1.wins == team2.wins)
+                return team2.hits - team1.hits;
+            else if(team1.wins == team2.wins)
+                return team2.scoreDifference - team1.scoreDifference;
 
-    //         return team2.wins - team1.wins;
-    //     });
-    // });
+            return team2.wins - team1.wins;
+        });
+    });
     
     return groupsWithStats;
 }

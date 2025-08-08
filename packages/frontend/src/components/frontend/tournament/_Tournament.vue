@@ -6,7 +6,6 @@ import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
 import Teams from '@/components/frontend/tournament/_Teams.vue';
 import MVP from '@/components/frontend/tournament/_MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
-// import Overview from '@/components/frontend/tournament/_Overview.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 import { useRoute } from "vue-router";
@@ -96,9 +95,6 @@ const getTournamentPhotos = () => {
 
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
-               <!-- <li class="nav-item">
-                  <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#GameOverview' + tournament._id">Übersicht</button>
-               </li> -->
                <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
                </li>
@@ -115,9 +111,6 @@ const getTournamentPhotos = () => {
 
             <!-- Content -->
             <div class="tab-content" id="GameScheduleContainer">
-               <!-- <div class="tab-pane fade" :id="'GameOverview' + tournament._id">
-                  <Overview/>
-               </div>  -->
                <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
                </div>

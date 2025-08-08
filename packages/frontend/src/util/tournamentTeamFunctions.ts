@@ -1,4 +1,5 @@
 import axios from "axios";
+import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 
 export const addTeam = async (tournamentID:string, team:{name: string; players: string[];}) => {
     let response = await axios.post("/addTeam", {tournamentID: tournamentID, team: team})
@@ -40,54 +41,11 @@ export const getAllTeams = (tournament:Tournament|undefined) => {
     return teams;
 }
 
-// returns top 4 teams as array
-export const getTopTeams = (tournament:Tournament|undefined) => {
+export const getFinishedMatchesFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
     if(!tournament)
         return [];
 
-    let matches = tournament.koPhase.matches;
-
-    // If not all Games are played out there are no top 4 Teams
-    for (let i = 0; i < matches.length; i++){
-        for (let x = 0; x < matches[i].length; x++) {
-            if(!matches[i][x].result){
-                return [];
-            }
-        }
-    }
-
-
-    let topTeams:Team[] = [];
-
-    if(matches.length > 0){
-        let firstPlaceMatch = matches[matches.length-1][0];
-        let firstPlace = firstPlaceMatch.result!.team1Score > firstPlaceMatch.result!.team2Score ? firstPlaceMatch.team1 : firstPlaceMatch.team2;
-        let secondPlace = firstPlaceMatch.result!.team1Score > firstPlaceMatch.result!.team2Score ? firstPlaceMatch.team2 : firstPlaceMatch.team1;
-
-        let thirdPlaceMatch = matches[matches.length-1][1];
-        let thirdPlace = thirdPlaceMatch.result!.team1Score > thirdPlaceMatch.result!.team2Score ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2;
-        let fourthPlace = thirdPlaceMatch.result!.team1Score > thirdPlaceMatch.result!.team2Score ? thirdPlaceMatch.team2 : thirdPlaceMatch.team1; 
-
-        topTeams.push(firstPlace);
-        topTeams.push(secondPlace);
-        topTeams.push(thirdPlace);
-        topTeams.push(fourthPlace);
-    }
-
-    return topTeams;
-}
-
-export const getMatchesFromTeam = (tournament:Tournament|undefined, teamName:string, onlyGroupPhase:boolean) => { 
-    if(!tournament)
-        return [];
-
-    // Same workarround as in getMatchesFromPlayer
-    let matchesFromTeam:{
-        _id: string,
-        team1: Team,
-        team2: Team,
-        result: MatchResult
-    }[] = [];
+    let matchesFromTeam:Match[] = [];
 
     let matches = tournament.groupPhase.matches;
     if(!onlyGroupPhase)
@@ -95,14 +53,9 @@ export const getMatchesFromTeam = (tournament:Tournament|undefined, teamName:str
 
     matches.forEach((groups) => {
         groups.forEach((match) => {
-            if(match.result){
+            if(checkIfMatchFinished(match)){
                 if(match.team1.name == teamName || match.team2.name == teamName){
-                    matchesFromTeam.push({
-                        _id: match._id,
-                        team1: match.team1,
-                        team2: match.team2,
-                        result: match.result!
-                    });       
+                    matchesFromTeam.push(match);    
                 }
             }
         });
