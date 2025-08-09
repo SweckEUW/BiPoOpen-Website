@@ -6,8 +6,6 @@ const props = defineProps({
    tournamentPhotos: {type: Object as PropType<any>, required: true }
 });
 
-let posterURL = new URL(`/src/assets/${props.tournamentPhotos.poster}`, import.meta.url).href;
-
 onMounted(async () => {
     await setupImages();
     adjustImageGrid();
@@ -17,8 +15,7 @@ let pictures:any = ref([]);
 const setupImages = async () => {
 
     // Get IDs of images ind drive via json file
-    let driveImageIDsURL = new URL(`/src/assets/${props.tournamentPhotos.driveImageIDs}`, import.meta.url);
-    let driveImageIDs:any = await fetch(driveImageIDsURL);
+    let driveImageIDs:any = await fetch(props.tournamentPhotos.driveImageIDs);
     driveImageIDs = await driveImageIDs.json();
 
     // Sort array
@@ -88,7 +85,7 @@ window.onscroll = () => {
 
         <!-- Poster -->
         <div class="pt-poster">
-            <img :src="posterURL">
+            <img :src="tournamentPhotos.poster">
         </div>
 
         <!-- Image Grid -->
