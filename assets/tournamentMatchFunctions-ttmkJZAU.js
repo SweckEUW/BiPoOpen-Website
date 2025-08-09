@@ -1,0 +1,1 @@
+const c=e=>e.team1&&e.team2?e.team1.players[0].score!=null:!1,n=e=>{let r=a(e,!0),t=a(e,!1);if(!(r===void 0||t===void 0))return r>t},a=(e,r)=>c(e)?(r?e.team1:e.team2).players.reduce((o,s)=>o+(s.score||0),0):void 0;export{n as a,c,a as g};
