@@ -1,4 +1,4 @@
-import{M as Ot}from"./MatchElement-CEZ3I0ds.js";import{d as Ze,r as Zt,c as I,b as _,a as ge,t as M,u as q,F as ae,l as _e,o as E,E as Ct,A as Qt,j as Pt,e as lt,k as At,s as Jt,_ as en}from"./index-Dnq6APu-.js";import{d as tn,f as nn,h as on,i as rn}from"./tournamentPlayerFunctions-B0v7JTHf.js";import{S as kt,P as Nt}from"./pagination-BggEmHhs.js";/**!
+import{M as Ot}from"./MatchElement-JrAik9hy.js";import{d as Ze,r as Zt,c as I,b as _,a as ge,t as M,u as q,F as ae,l as _e,o as E,E as Ct,A as Qt,j as Pt,e as lt,k as At,s as Jt,_ as en}from"./index-C0la4iLJ.js";import{d as tn,f as nn,h as on,i as rn}from"./tournamentPlayerFunctions-C7yLyacq.js";import{S as kt,P as Nt}from"./pagination-BggEmHhs.js";/**!
  * Sortable 1.15.2
  * @author	RubaXa   <trash@rubaxa.org>
  * @author	owenm    <owen23355@gmail.com>
