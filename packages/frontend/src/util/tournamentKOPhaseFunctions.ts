@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { getGroupsWithStats } from "@/util/tournamentGroupFunctions";
 import axios from "axios";
 

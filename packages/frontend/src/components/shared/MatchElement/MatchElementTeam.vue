@@ -23,11 +23,11 @@ let teamName = computed(() => {
 });
 
 let teamScore = computed(() => {
-    return getMatchScore(props.match, !props.isTeam2);
+    return getMatchScore(props.match, !props.isTeam2)!;
 });
 
 let opponentTeamScore = computed(() => {
-    return getMatchScore(props.match, props.isTeam2);
+    return getMatchScore(props.match, props.isTeam2)!;
 });
 </script>
 

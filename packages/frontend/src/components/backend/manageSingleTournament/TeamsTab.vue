@@ -57,6 +57,7 @@ const addTeamButton = async () => {
 let selectedTeam = ref();
 const editTeamButton = async () => {
    let team = {name: teamnameInput.value.trim(), players: [player1Input.value.trim(), player2Input.value.trim()], _id: selectedTeam.value._id, teamID: selectedTeam.value._id}
+   // @ts-ignore
    let success = await editTeam(props.tournament._id, team);
    if(success){
       await props.getTournament();

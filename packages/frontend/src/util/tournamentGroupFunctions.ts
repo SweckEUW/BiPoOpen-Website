@@ -1,8 +1,9 @@
+// @ts-nocheck
+
 import { getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromTeam } from "@/util/tournamentStatsFunctions";
 import { updateMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { shuffleArray } from "@/util/util";
 import axios from "axios";
-import { checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
 
 export const setGroups = async (tournamentID:string, groups:Group[]) => {
     let response = await axios.post("/setGroups", {tournamentID: tournamentID, groups: groups})

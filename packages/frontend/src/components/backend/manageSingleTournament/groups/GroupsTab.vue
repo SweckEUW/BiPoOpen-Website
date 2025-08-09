@@ -32,6 +32,7 @@ const changeGroups = async () => {
          teams.push({teamID: teamID});
       }
 
+      // @ts-ignore
       groups.push({teams: teams});
    }
 

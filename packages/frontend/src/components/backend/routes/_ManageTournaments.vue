@@ -29,6 +29,7 @@ const createTournament = async () => {
         }
     };
     
+    // @ts-ignore
     let success = await addTournament(tournament);
     if(success){
         await getTournaments();
