@@ -3,25 +3,26 @@ import mongoose from "mongoose";
 import OpenGame from "../models/OpenGame";
 
 const createOpenGame = (req: Request, res: Response, next: NextFunction) => {
-    const { team1, team2, time } = req.body;
+    const { team1, team2, time, turns } = req.body;
 
     const openGame = new OpenGame({
         _id: new mongoose.Types.ObjectId(),
         team1,
         team2,
-        time
+        time,
+        turns: turns || [] // Falls noch keine Runden vorhanden sind
     });
 
     openGame
         .save()
-        .then((openGame) => { res.status(201).json({ openGame })})
-        .catch((error) => { res.status(500).json({ error });});
+        .then((openGame) => res.status(201).json({ openGame }))
+        .catch((error) => res.status(500).json({ error }));
 };
 
 const readOpenGame = (req: Request, res: Response, next: NextFunction) => {
     const openGameID = req.params.openGameID;
 
-    OpenGame.findOne({ id: openGameID })
+    OpenGame.findOne({ _id: openGameID })
         .then((openGame) => {
             if (openGame) {
                 res.status(200).json({ openGame });

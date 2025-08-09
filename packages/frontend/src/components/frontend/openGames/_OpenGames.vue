@@ -9,7 +9,6 @@ import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 let openGames:Match[] = [];
 let isLoading = ref(true);
 let showModalAddGame = ref(false);
-let openGameNames:string[] = [];
 
 let getOpenGameDate = (dateNumber:number) => {
     let date = new Date(dateNumber);
@@ -20,16 +19,6 @@ let getOpenGameDate = (dateNumber:number) => {
 const getOpenGames = async () => {
     openGames = await getAllOpenGames();
     openGames = openGames!.reverse();
-
-    // Get all names from openGames for autocomplete
-    openGameNames = [
-        ...new Set(
-            openGames.flatMap(game =>
-                [...game.team1.players, ...game.team2.players].map(p => p.name)
-            )
-        )
-    ];
-
     isLoading.value = false;
 }
 getOpenGames();
@@ -53,7 +42,7 @@ const toggleModalAddGame = () => {
 
             <Teleport to="body">
                 <Transition name="fade">
-                    <ModalAddOpenGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :getOpenGames="getOpenGames" :openGameNames="openGameNames"/>
+                    <ModalAddOpenGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :getOpenGames="getOpenGames"/>
                 </Transition>
             </Teleport>
 

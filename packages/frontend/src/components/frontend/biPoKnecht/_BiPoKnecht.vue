@@ -1,60 +1,71 @@
 <template>
     <div class="BiPoKnecht">
-        <ModalEnterTeam v-if="modalVisible" :startGame="startGame"/>
+        <ModalEnterTeam v-if="modalEnterTeamVisible" :startGame="startGame"/>
 
-        <div v-if="!modalVisible" class="bik-game">
-            <Rack :isTeam1="false" :infoText="infoText" :activeTeamIndex="activeTeamIndex" :activeTeam="activeTeam" :activePlayer="activePlayer" :performTurn="performTurn" :activePlayerIndex="activePlayerIndex"/>
-            <Rack :isTeam1="true" :infoText="infoText" :activeTeamIndex="activeTeamIndex" :activeTeam="activeTeam" :activePlayer="activePlayer" :performTurn="performTurn" :activePlayerIndex="activePlayerIndex"/>
+        <ModalGameOver v-if="modalGameOverVisible" :match="match"/>
+
+        <div v-if="!modalEnterTeamVisible" class="bik-game">
+            <Rack v-for="i in 2"
+                :isTeam1="i != 1" :infoText="infoText" :activeTeamIndex="activeTeamIndex" :activeTeam="activeTeam" :activePlayer="activePlayer" :turns="turns" :modifier="modifier" :setModifier="setModifier" :setModalGameOverVisible="setModalGameOverVisible"
+                :activePlayerIndex="activePlayerIndex" :cupsHit="i == 1 ? cupsHitTeam2 : cupsHitTeam1" :cupsHitEnemyTeam="i == 1 ? cupsHitTeam1 : cupsHitTeam2" :switchActivePlayer="switchActivePlayer" :setInfoText="setInfoText"
+            />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Rack from '@/components/frontend/biPoKnecht/Rack.vue';
 import ModalEnterTeam from './ModalEnterTeam.vue';
+import ModalGameOver from './ModalGameOver.vue';
 
-let infoText = ref("Spieler 1 von Team 1 ist am Zug!");
-let modalVisible= ref(false);
-let teams = ref({
+let infoText = ref("Bob ist am Zug!");
+let modalEnterTeamVisible= ref(false);
+let modalGameOverVisible= ref(false);
+let match = ref<Match>({
+    _id: "placeholder",
     team1: {
-        players: ["Spieler 1", "Spieler 2"]
+        _id: "placeholder",
+        players: [
+            {_id: "placeholder", name: "Bob", score: 0},
+            {_id: "placeholder", name: "Ralf", score: 0}
+        ]
     },
     team2: {
-        players: ["Spieler 1", "Spieler 2"]
-    }
+        _id: "placeholder",
+        players: [
+            {_id: "placeholder", name: "Emily", score: 0},
+            {_id: "placeholder", name: "Heinz", score: 0}
+        ]
+    },
+    time: new Date().getTime()
 });
 
-let turns = [];
+let turns = ref<Turn[]>([]);
+let activeTeamIndex = ref(0); // 0 für Team 1, 1 für Team 2
+let activePlayerIndex = ref(0); // Index des aktiven Spielers im Team
+let modifier = ref<'bouncer' | 'trickshot' | undefined>(undefined);
+
+let cupsHitTeam1 = ref<number[]>([]); // Array to store hit cups
+let cupsHitTeam2 = ref<number[]>([]); // Array to store hit cups
 
 let activeTeam = computed(() => {
-    return activeTeamIndex.value === 0 ? teams.value.team1 : teams.value.team2;
+    return activeTeamIndex.value === 0 ? match.value.team1 : match.value.team2;
 });
+
 let activePlayer = computed(() => {
     return activeTeam.value.players[activePlayerIndex.value];
 });
 
-let startGame = (teams:any) => {
-    teams.value = teams; // Teams speichern
-    modalVisible.value = false; // Modal schließen
-    infoText.value = activeTeam.value.players[activePlayerIndex.value] + " ist am Zug!";
+let startGame = (matchHere:Match, startTeamIndex:number) => {
+    match.value = matchHere; // Teams speichern
+    modalEnterTeamVisible.value = false; // Modal schließen
+    activeTeamIndex.value = startTeamIndex; // Setze das startende Team
+    infoText.value = activeTeam.value.players[activePlayerIndex.value].name + " ist am Zug!";
 }
 
-let activeTeamIndex = ref(0); // 0 für Team 1, 1 für Team 2
-let activePlayerIndex = ref(0); // Index des aktiven Spielers im Team
-
-let performTurn = (cupIndex:number|null) => {
-    turns.push({
-        team: activeTeam.value,
-        player: activePlayer.value,
-        cupIndex: cupIndex
-    });
-
-    switchActivePlayer();
-}
-
-let switchActivePlayer = () => {
-    let nextActivePlayerIndex = activePlayerIndex.value + 1;
+let switchActivePlayer = (teamIndex?:number, playerIndex?:number) => {
+    let nextActivePlayerIndex = playerIndex != undefined ? playerIndex : activePlayerIndex.value + 1;
 
     if (nextActivePlayerIndex > activeTeam.value.players.length - 1) {
         nextActivePlayerIndex = 0;
@@ -64,10 +75,65 @@ let switchActivePlayer = () => {
         activeTeamIndex.value = nextActiveTeamIndex;
     }
 
+    if(teamIndex != undefined)
+        activeTeamIndex.value = teamIndex;
+
     activePlayerIndex.value = nextActivePlayerIndex;
 
     // Aktualisiere den Info-Text
-    infoText.value = activeTeam.value.players[activePlayerIndex.value] + " ist am Zug!";
+    infoText.value = activeTeam.value.players[activePlayerIndex.value].name + " ist am Zug!";
+}
+
+let setModifier = (newModifier:'bouncer' | 'trickshot' | undefined) => {
+  if(modifier.value == newModifier)
+    modifier.value = undefined;
+  else
+    modifier.value = newModifier;
+}
+
+let setInfoText = (newInfoText:string) => {
+  infoText.value = newInfoText;
+}
+
+let setModalGameOverVisible = (isVisible:boolean) => {
+  modalGameOverVisible.value = isVisible;
+}
+
+// Watch modalGameOverVisible
+watch(modalGameOverVisible, () => {
+  if(modalGameOverVisible.value){
+    match.value.turns = turns.value;
+
+    // Calculate player scores from turns
+    match.value.turns.forEach((turn, index) => {
+        let player = getPlayer(match.value, turn.teamIndex, turn.playerIndex);
+
+        if(turn.type == 'bouncer')
+            player.score += 2;
+
+        if(turn.type == 'lastCup')
+            player.score += 1;
+
+        if(turn.type == 'bomb')
+            player.score += 1.5;
+
+        if(turn.type == 'ballsback')
+            player.score += 1;
+
+        if(turn.type == 'hit'){
+            if(turn.playerIndex == 0 && match.value.turns![index+1].type == 'bomb') // In case the next throw is a bomb
+                player.score += 1.5;
+            else
+                player.score += 1;
+        }
+    });
+  }
+});
+
+let getPlayer = (match:Match, teamIndex: number, playerIndex: number) => {
+  const team = teamIndex == 0 ? match.team1 : match.team2;
+  const player = team.players[playerIndex];
+  return player;
 }
 </script>
 

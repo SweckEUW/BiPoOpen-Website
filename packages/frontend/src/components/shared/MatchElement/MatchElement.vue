@@ -20,6 +20,27 @@ let togglePlayersVisible = () => {
    if(props.match.team1.players.length != 1) // Only toggle players visibility if there are at least 2 players in the team
       playersVisible.value = !playersVisible.value;
 }
+
+let getPlayerName = (teamIndex: number, playerIndex: number) => {
+   const team = teamIndex == 0 ? props.match.team1 : props.match.team2;
+   const player = team.players[playerIndex];
+   return player.name;
+}
+
+let getCorrectTurnName = (turnType:Turn['type']) => {
+   switch(turnType) {
+      case 'hit': return 'Treffer';
+      case 'miss': return 'Nullwurf';
+      case 'airball': return 'Airball';
+      case 'bomb': return 'Bombe';
+      case 'bouncer': return 'Bouncer';
+      case 'trickshot': return 'Trickshot';
+      case 'onfire': return 'On Fire';
+      case 'ballsback': return 'Treffer - Balls Back';
+      case 'lastCup': return 'Letzter Becher';
+      default: return turnType;
+   }
+}
 </script>
 
 <template>
@@ -45,6 +66,12 @@ let togglePlayersVisible = () => {
          <div class="mt-teams" @click="togglePlayersVisible()">
             <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible"/> <!-- Team 1 -->
             <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible"/> <!-- Team 2 -->
+            <div v-if="match.turns && match.turns.length > 0  && playersVisible" class="mt-history">
+               <div>Spiel Verlauf</div>
+                <div class="mt-turn" v-for="(turn, index) in match.turns" :style="{ 'background-color': turn.teamIndex == 0 ? 'var(--main-color)' : 'var(--secondary-color)' }">
+                  {{ index + 1 + '. ' + getPlayerName(turn.teamIndex, turn.playerIndex) + ' - ' + getCorrectTurnName(turn.type) }}
+                </div>
+            </div>
          </div>
 
          <!-- VS. -->
@@ -52,7 +79,6 @@ let togglePlayersVisible = () => {
 
          <!-- Enter Result Button -->
          <div v-if="isBackend && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">{{ checkIfMatchFinished(match) ? 'Bearbeiten' : 'Eintragen'}}</div>
-
     </div>
 </template>
 
@@ -101,6 +127,15 @@ let togglePlayersVisible = () => {
    padding: 10px;
 }
 
+.mt-history{
+   margin-top: 20px;
+}
+.mt-turn{
+   width: 100%;
+   padding: 10px;
+   margin-bottom: 5px;
+   color: white;
+}
 
 /*MOBILE*/
 @media (width <= 900px){

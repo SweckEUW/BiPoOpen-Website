@@ -34,7 +34,8 @@ declare global {
         _id: string;
         team1: Team;
         team2: Team;
-        time: number?;
+        time?: number;
+        turns?: Turn[];
     };
 
     type Team = {
@@ -48,6 +49,24 @@ declare global {
         name: string;
         score: number;
     };
+
+    type Turn = {
+        playerIndex: number;
+        teamIndex: number;
+        type: 'hit' | 'miss' | 'airball' | 'bomb' | 'bouncer' | 'trickshot' | 'onfire' | 'ballsback' | 'lastCup';
+        data: HitTurn | MissTurn | AirballTurn | BombTurn | BouncerTurn | TrickshotTurn | OnFireTurn | BallsBackTurn | LastCupTurn;
+        time: number; 
+    };
+
+    type HitTurn = { cupIndex: number };
+    type MissTurn = { };
+    type AirballTurn = { };
+    type BombTurn = { cupIndex1: number, cupIndex2: number, cupIndex3: number };
+    type BouncerTurn = { cupIndex1: number, cupIndex2: number };
+    type TrickshotTurn = {  };
+    type OnFireTurn = { cupIndex: number };
+    type BallsBackTurn = { cupIndex1: number };
+    type LastCupTurn = { cupIndex: number };
 
     // Stats
     type GroupWithStats = {  

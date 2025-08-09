@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { addOpenGame } from "./OpenGamesUtilFunctions";
-import { ref } from "vue"
+import { addOpenGame, getAllOpenGameNames } from "./OpenGamesUtilFunctions";
+import { onMounted, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
 
 let ammountOfPlayersTeam1 = ref(1);
 let ammountOfPlayersTeam2 = ref(1);
 
+let openGameNames = ref<string[]>([]);
+onMounted(async () => {
+    openGameNames.value = await getAllOpenGameNames();
+});
+
 const props = defineProps({
     toggleModalAddGame: {type: Function, required: true },
-    getOpenGames: {type: Function, required: true },
-    openGameNames: {type: Array, required: true }
+    getOpenGames: {type: Function, required: true }
 });
 
 const addGame = async () => {
-
     let openGame:Match = {
         _id: "",
         team1: {
@@ -53,7 +56,6 @@ const addGame = async () => {
         props.toggleModalAddGame();
     }
 }
-
 </script>
 
 <template>
@@ -69,7 +71,6 @@ const addGame = async () => {
 
                     <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
                         <input list="openGameNames" class="rt-modal-input-player" type="string" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
-                        
                         <datalist id="openGameNames">
                             <option v-for="name in openGameNames" :value="name"/>
                         </datalist>

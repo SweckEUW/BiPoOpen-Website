@@ -21,6 +21,25 @@ export const updateOpenGame = async (openGame:Match) => {
     return response.status == 200;
 }
 
+export const getAllOpenGameNames = async () => {
+    let allOpenGames = await getAllOpenGames();
+
+    let openGameNames = [
+        ...new Set(
+            allOpenGames.flatMap(game =>
+                [...game.team1.players, ...game.team2.players].map(
+                    p => p.name
+                        .split(" ")
+                        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+                        .join(" ")
+                )
+            )
+        )
+    ];
+
+    return openGameNames;
+}
+
 
 ////////////////
 // STATISTICS //
@@ -37,12 +56,12 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
         let teams = new Set<string>();
         matches.forEach((match) => {
             if(oneVersusOne){
-                if(match.team1!.players[0].name == player.name)
+                if(match.team1!.players[0].name.toLowerCase() == player.name)
                     teams.add(match.team2!.players[0].name);
                 else
                     teams.add(match.team1!.players[0].name);
             }else{
-                if(match.team1!.players.map(player => player.name).includes(player.name))
+                if(match.team1!.players.map(player => player.name.toLowerCase()).includes(player.name))
                     teams.add(match.team2!.players.map(player => player.name).join(","));
                 else
                     teams.add(match.team1!.players.map(player => player.name).join(","));
@@ -72,6 +91,14 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
             });
         }
     }
+
+    // Set the first letter of each word to uppercase
+    playersWithStats.forEach((player) => {
+        player.name = player.name
+            .split(" ")
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+            .join(" ");
+    });
 
     return playersWithStats;
 }
@@ -121,6 +148,8 @@ export const getAllPlayers = (openGames:Match[], oneVersusOne:boolean) => {
         }
     });
 
+    allPlayerNames = allPlayerNames.map(playerName => playerName.toLowerCase());
+
     // Remove doublicate player names
     allPlayerNames = allPlayerNames.filter((playerName, index) => allPlayerNames.indexOf(playerName) == index);
     
@@ -131,7 +160,7 @@ export const getMatchesFromPlayer = (openGames:Match[], playerName:string, oneVe
     let matchesFromPlayer:Match[] = [];
 
     openGames.forEach((openGame) => {
-        if(openGame.team1!.players.map(player => player.name).includes(playerName) || openGame.team2!.players.map(player => player.name).includes(playerName)){
+        if(openGame.team1!.players.map(player => player.name.toLowerCase()).includes(playerName) || openGame.team2!.players.map(player => player.name.toLowerCase()).includes(playerName)){
             if(oneVersusOne){
                 if(openGame.team1!.players.length == 1 || openGame.team2!.players.length == 1){
                     matchesFromPlayer.push(openGame);
@@ -153,14 +182,14 @@ export const getAmmountOfWinsFromPlayer = (openGames:Match[], playerName:string,
     let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
     
     matches.forEach((match) => {
-        if((match.team1!.players.map(player => player.name).includes(playerName))){
+        if((match.team1!.players.map(player => player.name.toLowerCase()).includes(playerName))){
             let team1Score = match.team1!.players.reduce((acc, player) => acc + player.score, 0);
             let team2Score = match.team2!.players.reduce((acc, player) => acc + player.score, 0);
             if(team1Score > team2Score)
                 wins ++;
         }
 
-        if((match.team2!.players.map(player => player.name).includes(playerName))){
+        if((match.team2!.players.map(player => player.name.toLowerCase()).includes(playerName))){
             let team1Score = match.team1!.players.reduce((acc, player) => acc + player.score, 0);
             let team2Score = match.team2!.players.reduce((acc, player) => acc + player.score, 0);
             if(team2Score > team1Score)
@@ -177,10 +206,10 @@ export const getAmmountOfHitsFromPlayer = (openGames:Match[], playerName:string,
     let matches = getMatchesFromPlayer(openGames, playerName, oneVersusOne);
 
     matches.forEach((match) => {
-        if(match.team1.players.map(player => player.name).includes(playerName))
-            score += match.team1.players.find(player => player.name == playerName)!.score;
-        if(match.team2.players.map(player => player.name).includes(playerName))
-            score += match.team2.players.find(player => player.name == playerName)!.score;
+        if(match.team1.players.map(player => player.name.toLowerCase()).includes(playerName))
+            score += match.team1.players.find(player => player.name.toLowerCase() == playerName)!.score;
+        if(match.team2.players.map(player => player.name.toLowerCase()).includes(playerName))
+            score += match.team2.players.find(player => player.name.toLowerCase() == playerName)!.score;
     });
 
     return score;
