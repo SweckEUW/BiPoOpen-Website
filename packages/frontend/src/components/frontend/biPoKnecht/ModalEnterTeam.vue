@@ -71,7 +71,7 @@ const cancel = () => {
                 <div v-for="i in 2" :id="'addOpenGameModal-team-' + i" class="rt-modal-container">
 
                     <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
-                        <input list="bipoKnechtGames" id="openGameNames" class="rt-modal-input-player" :value="'Team' + i + '-Spieler' + index" type="string" :placeholder="'Spieler ' + index" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
+                        <input list="bipoKnechtGames" id="openGameNames" class="rt-modal-input-player" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
                         <datalist id="bipoKnechtGames">
                             <option v-for="name in openGameNames" :value="name"/>
                         </datalist>

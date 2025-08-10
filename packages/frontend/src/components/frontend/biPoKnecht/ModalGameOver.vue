@@ -1,5 +1,5 @@
 <template>
-    <Modal>
+    <Modal class="ModalGameOver">
         <template #title>Spiel Beendet</template>
 
         <template #template>
@@ -70,7 +70,7 @@ let endGame = async () => {
 </script>
 
 <style>
-.mo-container{
+.ModalGameOver .mo-container{
     height: 90%;
     overflow: auto;
 }

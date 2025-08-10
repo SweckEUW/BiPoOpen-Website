@@ -20,22 +20,22 @@ import ModalEnterTeam from './ModalEnterTeam.vue';
 import ModalGameOver from './ModalGameOver.vue';
 
 let infoText = ref("Bob ist am Zug!");
-let modalEnterTeamVisible= ref(false);
+let modalEnterTeamVisible= ref(true);
 let modalGameOverVisible= ref(false);
 let match = ref<Match>({
     _id: "placeholder",
     team1: {
         _id: "placeholder",
         players: [
-            {_id: "placeholder", name: "Bob", score: 0},
-            {_id: "placeholder", name: "Ralf", score: 0}
+            {_id: "placeholder", name: "", score: 0},
+            {_id: "placeholder", name: "", score: 0}
         ]
     },
     team2: {
         _id: "placeholder",
         players: [
-            {_id: "placeholder", name: "Emily", score: 0},
-            {_id: "placeholder", name: "Heinz", score: 0}
+            {_id: "placeholder", name: "", score: 0},
+            {_id: "placeholder", name: "", score: 0}
         ]
     },
     time: new Date().getTime()
