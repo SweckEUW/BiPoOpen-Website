@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref } from 'vue';
-import { getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
+import { computed, onMounted, PropType, Ref, ref } from 'vue';
+import { getAllOpenGames, getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -54,7 +54,9 @@ const giveArrowClass = (value:string) => {
         return sortUp.value ? "ogs-arrow ogs-arrow-up" : "ogs-arrow ogs-arrow-down";
 }
 
-onMounted(() => {
+const playersWith0Hits = ref<(Player & { time: number })[]>([]);
+
+onMounted(async () => {
     new Swiper('#OpenGamesStatisticsSwiper',{
         modules: [Pagination],
         initialSlide: 0,
@@ -68,12 +70,34 @@ onMounted(() => {
             }
         }
     });
-});
+
+
+    let openGames = await getAllOpenGames();
+    openGames.forEach(match => {
+        match.team1.players.forEach(player => {
+            if(player.score == 0) playersWith0Hits.value.push({...player, time: match.time!});
+        });
+        match.team2.players.forEach(player => {
+            if(player.score == 0) playersWith0Hits.value.push({...player, time: match.time!});
+        });
+    });
+})
+
+let getOpenGameDate = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
+}
 </script>
 
 <template> 
         <div style="padding: 15px 0px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 14px;">
             Damit ein Spieler in den Statistiken erscheint, muss er gegen mindestens 4 verschiedene Teams gespielt haben
+        </div>
+
+        <div style="padding: 15px 0px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 14px;">
+           {{'Nackte Meile Tracker:'}}
+           <div v-for="player in playersWith0Hits">{{ player.name }} - {{ getOpenGameDate(player.time) }}</div>
         </div>
 
         <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
