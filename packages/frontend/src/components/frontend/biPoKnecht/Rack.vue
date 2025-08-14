@@ -1,5 +1,5 @@
 <template>
-  <div class="Rack" :style="{ 'transform': isTeam1 ? 'rotate(0deg)' : 'rotate(180deg)'}">
+  <div class="Rack" :style="{ 'transform': isTeam1 ? 'rotate(0deg)' : 'rotate(180deg)', 'height': isActiveTeam ? '30%' : '70%' }">
 
     <div v-show="isActiveTeam" class="ra-middle">
       <div style="width: 100%; text-align: center;">{{ infoText }}</div>
@@ -36,8 +36,8 @@
           :style="{ 
             'background': getCupColor(rowIndex, circleIndex), 
             'pointer-events': cupsHit.includes(getCupIndex(rowIndex, circleIndex)) ? 'none' : 'auto',
-            'width': isActiveTeam ? '13dvw' : '20dvw',
-            'height': isActiveTeam ? '13dvw' : '20dvw'
+            'width': isActiveTeam ? '13dvw' : '17dvw',
+            'height': isActiveTeam ? '13dvw' : '17dvw'
           }"
         />
       </div>
@@ -313,6 +313,10 @@ let hideBalls = () => {
     for(let i = 0; i < 2; i++){
       let ball = getBallHtmlElement(props.activeTeamIndex == 0 ? 1 : 0, i);
       ball.style.opacity = '0';
+      ball.style.top = 'auto';
+      ball.style.bottom = 'auto';
+      ball.style.left = 'auto';
+      ball.style.right = 'auto';
     }
   }
 }
@@ -342,6 +346,7 @@ let addTurn = (turnType:Turn['type'], turnData:Turn['data']) => {
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
+  height: 50%;
 }
 
 .ra-middle{
@@ -373,8 +378,8 @@ let addTurn = (turnType:Turn['type'], turnData:Turn['data']) => {
 }
 .ra-ball{
   width: 30px;
+  height: 30px;
   opacity: 0;
-  aspect-ratio: 1;
   position: absolute;
   border-radius: 50%;
   pointer-events: none;

@@ -51,6 +51,7 @@ const MatchSchema = new Schema(
     team1: { type: TeamSchema, required: true },
     team2: { type: TeamSchema, required: true },
     time: { type: Number },
+    endTime: { type: Number },
     turns: { type: [TurnSchema], default: [] }
   },
   { versionKey: false }

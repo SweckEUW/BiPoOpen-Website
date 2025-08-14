@@ -17,8 +17,7 @@ const toggleModal = () => {
 
 let playersVisible = ref(false);
 let togglePlayersVisible = () => {
-   if(props.match.team1.players.length != 1) // Only toggle players visibility if there are at least 2 players in the team
-      playersVisible.value = !playersVisible.value;
+   playersVisible.value = !playersVisible.value;
 }
 
 let getPlayerName = (teamIndex: number, playerIndex: number) => {
@@ -40,6 +39,13 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
       case 'lastCup': return 'Letzter Becher';
       default: return turnType;
    }
+}
+
+function formatGameDuration(startTime:number, endTime:number) {
+  const diff = endTime - startTime;
+  const minutes = Math.floor(diff / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  return `${minutes}:${String(seconds).padStart(2, '0')} Minuten`;
 }
 </script>
 
@@ -66,7 +72,10 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
          <div class="mt-teams" @click="togglePlayersVisible()">
             <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible"/> <!-- Team 1 -->
             <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible"/> <!-- Team 2 -->
+
+            <!-- Spielverlauf -->
             <div v-if="match.turns && match.turns.length > 0  && playersVisible" class="mt-history">
+               <div>{{ 'Dauer: ' + formatGameDuration(match.time!, match.endTime!) }}</div>
                <div>Spiel Verlauf</div>
                 <div class="mt-turn" v-for="(turn, index) in match.turns" :style="{ 'background-color': turn.teamIndex == 0 ? 'var(--main-color)' : 'var(--secondary-color)' }">
                   {{ index + 1 + '. ' + getPlayerName(turn.teamIndex, turn.playerIndex) + ' - ' + getCorrectTurnName(turn.type) }}

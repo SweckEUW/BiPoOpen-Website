@@ -25,40 +25,50 @@ onMounted(async () => {
 
 const setMatch = () => {
     match = {
-        _id: "",
+        _id: "placeholder",
         team1: {
-            _id: "",
+            _id: "placeholder",
             players: []
         },
         team2: {
-            _id: "",
+            _id: "placeholder",
             players: []
-        },
-        time: new Date().getTime()
+        }
     }
 
     for (let i = 1; i < 3; i++) {
         let root = document.getElementById("addOpenGameModal-team-"+i)!;
         let fields = root.getElementsByClassName("rt-modal-team");
         for(let j = 0; j < fields.length; j++){
-            let player = (fields[j].getElementsByClassName("rt-modal-input-player")[0] as HTMLInputElement).value.trim();
+            let playerName = (fields[j].getElementsByClassName("rt-modal-input-player")[0] as HTMLInputElement).value.trim();
 
             let openGamePlayer = {
-                _id: "",
-                name: player,
+                _id: "placeholder",
+                name: playerName,
                 score: 0
             }
 
-            if(i == 1)
+            if(i == 1){
                 match.team1.players.push(openGamePlayer);
-            else
+                if(fields.length == 1) // Add "Fake" Player 2 for 1v1
+                    match.team1.players.push({_id: "placeholder", name: playerName, score: 0});
+            }
+            else{
                 match.team2.players.push(openGamePlayer);
+                if(fields.length == 1)
+                    match.team2.players.push({_id: "placeholder", name: playerName, score: 0});
+            }
         }
     }
 }
 
 const cancel = () => {
     router.go(-1);
+}
+
+function getPlayerNames(players:Player[]) {
+  const uniqueNames = [...new Set(players.map(p => p.name))];
+  return uniqueNames.join(', ');
 }
 </script>
 
@@ -85,8 +95,8 @@ const cancel = () => {
             </div>
 
             <div v-if="showWhosStartingUI">
-                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 0 ? 1 : 0.3 }" @click="startTeamIndex = 0">{{ match.team1.players.map(player => player.name).join(', ') }}</div>
-                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 1 ? 1 : 0.3 }" @click="startTeamIndex = 1" style="margin-bottom: 40px;">{{ match.team2.players.map(player => player.name).join(', ') }}</div>
+                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 0 ? 1 : 0.3 }" @click="startTeamIndex = 0">{{ getPlayerNames(match.team1.players) }}</div>
+                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 1 ? 1 : 0.3 }" @click="startTeamIndex = 1" style="margin-bottom: 40px;">{{ getPlayerNames(match.team2.players) }}</div>
             </div>
         </template>
 

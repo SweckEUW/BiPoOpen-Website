@@ -35,6 +35,7 @@ declare global {
         team1: Team;
         team2: Team;
         time?: number;
+        endTime?: number;
         turns?: Turn[];
     };
 

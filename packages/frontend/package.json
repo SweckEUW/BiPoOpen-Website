@@ -20,6 +20,7 @@
     "@vue/tsconfig": "^0.7.0",
     "typescript": "^5.4.5",
     "vite": "^6.2.3",
-    "vue-tsc": "^2.0.21"
+    "vue-tsc": "^2.0.21",
+    "vite-plugin-mkcert": "^1.17.5"
   }
 }

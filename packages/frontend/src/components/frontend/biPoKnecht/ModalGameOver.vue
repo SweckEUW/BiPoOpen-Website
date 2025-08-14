@@ -7,13 +7,15 @@
             <div>Spiel Ergebnis</div>
             <div class="mgo-result">
                 <div v-for="team in [match.team1, match.team2]" class="mgo-team">
-                    <div class="mgo-team-score">{{ team.players.reduce((acc, player) => acc + player.score, 0) }}</div>
+                    <div class="mgo-team-score" v-if="team.players.length > 1">{{ team.players.reduce((acc, player) => acc + player.score, 0) }}</div>
                     <div v-for="player in team.players" class="mgo-player">
                         <div class="mgo-player-name">{{ player.name }}</div>
                         <div class="mgo-player-score">{{ player.score }}</div>
                     </div>
                 </div>
             </div>
+
+            <div>{{ 'Dauer: ' + formatGameDuration(match.time!, match.endTime!) }}</div>
 
             <div class="mgo-history">
                 <div>Spiel Verlauf</div>
@@ -46,6 +48,13 @@ let getPlayerName = (teamIndex: number, playerIndex: number) => {
   return player.name;
 }
 
+function formatGameDuration(startTime:number, endTime:number) {
+  const diff = endTime - startTime;
+  const minutes = Math.floor(diff / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+  return `${minutes}:${String(seconds).padStart(2, '0')} Minuten`;
+}
+
 let getCorrectTurnName = (turnType:Turn['type']) => {
   switch(turnType) {
     case 'hit': return 'Treffer';
@@ -62,6 +71,7 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
 }
 
 let endGame = async () => {
+    console.log(props.match);
     let success = await addOpenGame(props.match);
     if(success){
         router.push({path: '/Offene-Spiele'});
@@ -106,10 +116,15 @@ let endGame = async () => {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 5px;
+    align-items: center;
 }
 .mgo-team:nth-child(2) .mgo-player{
     flex-direction: row-reverse;
+}
+.mgo-player-name{
+    white-space: nowrap;
+    font-size: 16px;
 }
 
 /* History */

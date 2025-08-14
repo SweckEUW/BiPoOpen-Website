@@ -3,13 +3,14 @@ import mongoose from "mongoose";
 import OpenGame from "../models/OpenGame";
 
 const createOpenGame = (req: Request, res: Response, next: NextFunction) => {
-    const { team1, team2, time, turns } = req.body;
+    const { team1, team2, time, turns, endTime } = req.body;
 
     const openGame = new OpenGame({
         _id: new mongoose.Types.ObjectId(),
         team1,
         team2,
         time,
+        endTime,
         turns: turns || [] // Falls noch keine Runden vorhanden sind
     });
 
