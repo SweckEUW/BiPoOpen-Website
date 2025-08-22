@@ -18,13 +18,13 @@ const props = defineProps({
 
 const addGame = async () => {
     let openGame:Match = {
-        _id: "",
+        _id: "placeholder",
         team1: {
-            _id: "",
+            _id: "placeholder",
             players: []
         },
         team2: {
-            _id: "",
+            _id: "placeholder",
             players: []
         },
         time: new Date().getTime()
@@ -38,7 +38,7 @@ const addGame = async () => {
             let score = parseFloat((fields[j].getElementsByClassName("rt-modal-input-number")[0] as HTMLInputElement).value.trim());
 
             let openGamePlayer = {
-                _id: "",
+                _id: "placeholder",
                 name: player,
                 score: score
             }
