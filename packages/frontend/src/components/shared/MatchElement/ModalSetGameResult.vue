@@ -7,6 +7,7 @@ const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
     setGameResult: {type: Function as PropType<(match:Match) => void> },
     toggleModal: {type: Function, required: true },
+    editName: {type: Boolean, default: false},
 });
 
 // Create a copy of the match to avoid modifying the original match object directly
@@ -43,7 +44,8 @@ let getTeamName = (team:Team) => {
 
                     <!-- Players - Player Name + Player Score -->
                     <div v-for="player in team.players" class="rt-modal-player">
-                        <div :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ player.name }}</div>
+                        <div v-if="!editName" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ player.name }}</div>
+                        <input v-if="editName" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }" v-model="player.name">
                         <input type="number" v-model="player.score" placeholder="0" :style="{ order: teamIndex === 0 ? 0 : -1 }"> 
                     </div>
                 </div>
@@ -104,6 +106,10 @@ let getTeamName = (team:Team) => {
    text-align: center;
 }
 
+.rt-modal-player input:first-child{
+    width: 200px;
+}
+
 
 /* Remove arrows from input field */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -112,5 +118,18 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
+}
+
+/*MOBILE*/
+@media (width <= 900px){
+    .rt-modal-team-name{
+        white-space: wrap;
+        font-size: 14px !important;
+    }
+    .rt-modal-team-score{
+        width: 50px;
+        text-align: center;
+        margin: 0 10px;
+    }
 }
 </style>

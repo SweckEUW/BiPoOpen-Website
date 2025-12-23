@@ -8,6 +8,7 @@ const props = defineProps({
    match: {type: Object as PropType<Match>, required: true },
    setGameResult: {type: Function as PropType<(match:Match) => void> },
    isBackend: {type: Boolean, default: false},
+   editName: {type: Boolean, default: false},
 });
 
 let showModal = ref(false);
@@ -54,7 +55,7 @@ function formatGameDuration(startTime:number, endTime:number) {
 
          <Teleport to="body">
             <Transition name="fade">
-               <ModalSetGameResult v-if="showModal" :toggleModal="toggleModal" :match="match" :setGameResult="setGameResult"/>
+               <ModalSetGameResult v-if="showModal" :toggleModal="toggleModal" :match="match" :setGameResult="setGameResult" :editName="editName"/>
             </Transition>
          </Teleport>
 

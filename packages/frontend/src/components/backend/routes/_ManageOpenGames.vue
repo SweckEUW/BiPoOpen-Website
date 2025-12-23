@@ -27,7 +27,7 @@ const setGameResult = async (match:Match) => {
         <Loadingscreen v-show="!openGames"/>
 
         <div v-if="openGames">
-            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true" :setGameResult="setGameResult"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true" :setGameResult="setGameResult" :editName="true"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
         </div>
 
     </div>
