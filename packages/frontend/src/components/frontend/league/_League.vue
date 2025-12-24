@@ -51,7 +51,7 @@ let sortValue = ref<SortValueMVP>("averageScore");
 let sortUp = ref(false);
 
 let players = [
-    { placement: 0, name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/hangover-heroes.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
+    { placement: 0, name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
     { placement: 0, name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.png`, import.meta.url),  averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
     { placement: 0, name: "Insane", logo: new URL(`/src/assets/league/teams/Insane.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
     { placement: 0, name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
