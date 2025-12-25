@@ -62,6 +62,16 @@ const routes = [
 		}
 	},
 
+	{
+		path: '/League',
+		name: 'BiPo League',
+		component: () => import('@/components/frontend/league/_League.vue'),
+		meta: {
+			title: 'Weck BiPo League',
+			description: 'BiPo League'
+		}
+	},
+
 	
 
 	{

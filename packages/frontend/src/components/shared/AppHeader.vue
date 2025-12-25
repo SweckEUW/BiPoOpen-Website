@@ -47,7 +47,7 @@ let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
 				<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-Knecht'">BiPo Knecht</router-link> -->
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-League'">BiPo League</router-link>
+				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/League'">BiPo League</router-link>
 
 				<DropDown :name="'main'" :isOpen="true">
 					<template #header>

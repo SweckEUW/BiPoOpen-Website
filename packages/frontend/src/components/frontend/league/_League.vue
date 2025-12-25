@@ -53,8 +53,10 @@ let sortUp = ref(false);
 let players = [
     { placement: 0, name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
     { placement: 0, name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.png`, import.meta.url),  averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Insane", logo: new URL(`/src/assets/league/teams/Insane.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
+    { placement: 0, name: "Sgt. Insane", logo: new URL(`/src/assets/league/teams/Insane.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
     { placement: 0, name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
+    { placement: 0, name: "Don Promillo", logo: new URL(`/src/assets/league/teams/Don-Promillo.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
+    { placement: 0, name: "Wonne", logo: new URL(`/src/assets/league/teams/Wonne.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
 ]
 
 let windowWidth = ref(window.screen.width);
