@@ -77,11 +77,11 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.png`, import.meta.url).href },
     { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
     { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
-    { name: "FC Longus Pongus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
+    { name: "FC Pongus Longus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
     { name: "Nick", logo: "" },
     { name: "Sally", logo: "" },
     { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.png`, import.meta.url).href },
-    { name: "Schauf", logo: "" }
+    { name: "1. BPC Schauf", logo: new URL(`/src/assets/league/teams/BPC-Schauf.png`, import.meta.url).href }
 ]
 
 const getLeagueGames = async () => {
