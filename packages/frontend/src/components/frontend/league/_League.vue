@@ -111,7 +111,7 @@ const toggleModalAddGame = () => {
 }
 .nav-tabs{
     position: sticky;
-    top: 218px;
+    top: 160px;
     padding-top: 20px;
     background: white;
     z-index: 2;

@@ -117,7 +117,7 @@ tbody tr:nth-of-type(3){
 }
 table th{ 
     position: sticky;
-    top: 150px;
+    top: 260px;
     background-color: #FFF;
     color: var(--main-color);
     font-size: 20px;
