@@ -3,8 +3,7 @@
     <table class="table table-hover caption-top">
         <thead>
             <tr style="height: auto;">
-                <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Team'}}</th>
+                <th colspan="2" @click="setSortValue('placement')" :class="giveArrowClass('placement')" class="text-left!">Team</th>
                 <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                 <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'S'}}</th>
                 <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
@@ -53,7 +52,7 @@ const props = defineProps({
     leagueGames: {type: Array as () => Match[], required: true }
 });
 
-let sortValue = ref<SortValueLeague>("wins");
+let sortValue = ref<SortValueLeague>("placement");
 let sortUp = ref(false);
 
 const sortedLeaguePlayers = computed(() => {

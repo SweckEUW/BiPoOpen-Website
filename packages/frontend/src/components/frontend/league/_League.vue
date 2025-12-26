@@ -78,7 +78,8 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
     { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
     { name: "FC Longus Pongus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
-    { name: "Nick", logo: "" }
+    { name: "Nick", logo: "" },
+    { name: "Sally", logo: "" },
 ]
 
 const getLeagueGames = async () => {
