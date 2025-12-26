@@ -12,6 +12,12 @@
         "build:backend": "npm run build --workspace=bipoopen-backend"
     },
     "devDependencies": {
-        "sass-embedded": "^1.97.1"
+        "sass-embedded": "^1.97.1",
+        "@tailwindcss/vite": "^4.1.18",
+        "tailwindcss": "^4.1.18"
+    },
+    "dependencies": {
+        "@primevue/themes": "^4.5.4",
+        "primevue": "^4.5.4"
     }
 }

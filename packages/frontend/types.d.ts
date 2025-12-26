@@ -47,6 +47,7 @@ declare global {
 
     type Player = {
         _id: string;
+        logo?: string;
         name: string;
         score: number;
     };
@@ -97,6 +98,12 @@ declare global {
         placement?: number;
     };
 
+    type LeaguePlayer = {
+        name: string;
+        logo: string;
+    }
+    
+    type SortValueLeague = 'placement'|'name'|'ammountOfMatches'|'wins'|'score'|'averageScore';
     type SortValueMVP = 'averageScore'|'placement'|'score'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
     type SortValueHallOfFame = 'averageScore'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
     type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageScore'|'averageWins'|'ammountOfDrunkenCups';

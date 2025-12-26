@@ -1,84 +1,87 @@
-
 <template>
-    <h1 class="bp-title">BiPo League</h1>
-    <div class="lg-logo">
-        <img src="@/assets/league/BiPo-League-Logo.png" alt="BiPo League Logo">
-    </div>
-
-    <div class="MVP">
-        <table class="table table-hover caption-top">
-            <thead>
-                <tr style="height: auto;">
-                    <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                    <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Team'}}</th>
-                    <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                    <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'S'}}</th>
-                    <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
-                    <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(player, index) in players" :key="index">
-                    <td>{{ player.placement! + 1}}</td>
-                    <td>
-                        <div class="mvp-name">
-                            <img :src="player.logo" alt="">
-                            <div>{{ player.name.replace(" ","\n") }}</div>
-                        </div>
-                    </td>
-                    <td>{{ player.ammountOfMatches }}</td>
-                    <td>{{ player.wins }}</td>
-                    <td>{{ player.score }}</td>
-                    <td>{{ player.averageScore }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div v-if="windowWidth < 900" class="mvp-explain">
-            <div>*Pl. = Platz</div>
-            <div>*Spi. = Spiele</div>
-            <div>*S = Siege</div>
-            <div>*Trf. = Treffer</div>
-            <div>*Trfq. = Trefferquote</div>
+    <div class="League">
+        
+        <h1 class="bp-title">BiPo League</h1>
+        <div class="lg-logo">
+            <img src="@/assets/league/BiPo-League-Logo.png" alt="BiPo League Logo">
         </div>
+
+        <Loadingscreen v-if="isLoading"/>
+
+        <div v-show="!isLoading">
+
+            <!-- Tabs -->
+            <ul class="nav nav-tabs justify-content-center">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#LeagueTable'">Tabelle</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#LeagueGames'">Spiele</button>
+                </li>
+            </ul>
+
+            <!-- Content -->
+            <div class="tab-content" id="OpenGamesStatisticsContainer">
+                <div class="tab-pane fade show active" :id="'LeagueTable'">
+                   <LeagueTable :leaguePlayers="leaguePlayers" :leagueGames="leagueGames" />
+                </div>
+
+                <div class="tab-pane fade" :id="'LeagueGames'">
+                    <!-- Add Game Button -->
+                    <div class="bp-button" @click="toggleModalAddGame()">Spiel eintragen</div>
+
+                    <Teleport to="body">
+                        <Transition name="fade">
+                            <ModalAddLeagueGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :leaguePlayers="leaguePlayers" />
+                        </Transition>
+                    </Teleport>
+
+                    <div v-for="match in leagueGames" :key="match.time!" style="margin-top: 10px;">
+                        <MatchElement :match="match"/> 
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref } from 'vue';
+import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import LeagueTable from './LeagueTable.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
+import { getAllLeagueGames } from './LeagueUtilFunctions';
 
-let sortValue = ref<SortValueMVP>("averageScore");
-let sortUp = ref(false);
+let showModalAddGame = ref(false);
+let isLoading = ref(false);
+let leagueGames = ref<Match[]>([]);
 
-let players = [
-    { placement: 0, name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.png`, import.meta.url),  averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Cupfire Squad", logo: new URL(`/src/assets/league/teams/Cupfire-Squad.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Don Promillo", logo: new URL(`/src/assets/league/teams/Don-Promillo.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Wonne", logo: new URL(`/src/assets/league/teams/Wonne.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
-    { placement: 0, name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url), averageScore: 0, score: 0, ammountOfMatches: 0, wins: 0},
+let leaguePlayers:LeaguePlayer[] = [
+    { name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url).href },
+    { name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.png`, import.meta.url).href },
+    { name: "Cupfire Squad", logo: new URL(`/src/assets/league/teams/Cupfire-Squad.png`, import.meta.url).href },
+    { name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.png`, import.meta.url).href },
+    { name: "Don Promillo", logo: new URL(`/src/assets/league/teams/Don-Promillo.png`, import.meta.url).href },
+    { name: "Wonne", logo: new URL(`/src/assets/league/teams/Wonne.png`, import.meta.url).href },
+    { name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.png`, import.meta.url).href },
+    { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
+    { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
+    { name: "Nick", logo: "" },
+    { name: "Jerome", logo: "" },
 ]
 
-let windowWidth = ref(window.screen.width);
-window.addEventListener("resize", () => {
-    windowWidth.value = window.screen.width;
-});
-
-const setSortValue = (value:SortValueMVP) => {
-    if(sortValue.value == value)
-        sortUp.value = !sortUp.value;
-    else
-        sortUp.value = false;
-
-    sortValue.value = value;
+const getLeagueGames = async () => {
+    leagueGames.value = await getAllLeagueGames();
+    leagueGames.value = leagueGames.value.reverse();
+    isLoading.value = false;
 }
+getLeagueGames();
 
-const giveArrowClass = (value:string) => {
-    if(value == sortValue.value)
-        return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
+const toggleModalAddGame = () => {
+    showModalAddGame.value = !showModalAddGame.value;
 }
 </script>
 
@@ -94,138 +97,44 @@ const giveArrowClass = (value:string) => {
     margin-bottom: 20px;
 }
 
-table{
-    text-align: center;
-    padding-top: 20px;
+.nav{
+   border: none;
+   padding-bottom: 30px;
 }
-table *{
-    vertical-align: middle;
-    border: none;
-}
-tbody tr{
-    font-size: 18px;
-}
-tbody tr:nth-of-type(1){
-    background: var(--secondary-color-weak);
-    font-size: 22px;
-}
-tbody tr:nth-of-type(2){
-    background: #e6faff;
-}
-tbody tr:nth-of-type(3){
-    background: #f4fdff;
-}
-table th{ 
+.nav-tabs{
     position: sticky;
-    top: 150px;
-    background-color: #FFF;
-    color: var(--main-color);
-    font-size: 20px;
-    cursor: pointer;
+    top: 218px;
+    padding-top: 20px;
+    background: white;
     z-index: 2;
 }
-table td{
-    background: inherit;
+.nav-link{
+    border-radius: 0px;
+    width: 40vw;
+    padding: 15px 10px;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+.nav-item{
+    flex: 1;
+}
+.nav-item .active{
+    background-color: var(--main-color) !important;
+    color: white !important;
+}
+.nav-item button{
+    width: 100%;
 }
 
-.mvp-name{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    padding-left: 30px;
-}
-.mvp-name img{
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    margin-right: 20px;
-}
-.mvp-name div{
-    text-align: left;
-}
-.mvp-arrow-down::after, .mvp-arrow-up::after{
-    content: ' ';
-    position: relative;
-    left: 10px;
-    border: 8px solid transparent;
-}
-.mvp-arrow-down::after{
-    top: 18px;
-    border-top-color: var(--main-color);
-}
-.mvp-arrow-up::after{
-    bottom: 18px;
-    border-bottom-color: var(--main-color);
-}
-
-/*MOBILE*/
+/* MOBILE */
 @media (width <= 900px){
-    .mvp-text{
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
-    .mvp-explain{
-        font-size: 14px;
-        color: var(--main-color);
-        margin-bottom: 30px;
-    }
-    table{
-        width: 100%;
-    }
-    table *{
-        font-size: 15px;
-    }
-    tr{
-        height: 80px;
-    }
-    table th{ 
+   .nav-tabs{
         top: 130px;
-        font-size: 15px;
-    }
-    th:nth-of-type(1), td:nth-of-type(1){
-        max-width: 30px;
-        width: 30px;
-        padding-left: 4px;
-        padding-right: 10px;
-    }
-    th:nth-of-type(2), td:nth-of-type(2){
-        white-space: break-spaces;
-    }
-
-    .mvp-arrow-down::after, .mvp-arrow-up::after{
-        left: 5px;
-        border-width: 6px;
-    }
-    .mvp-arrow-down::after{
-        top: 15px;
-    }
-    .mvp-arrow-up::after{
-        bottom: 15px;
-    }
-    .mvp-name{
-        padding-left: 10px;
-    }
-    .mvp-name img{
-        margin-right: 10px;
-        width: 60px;
-        height: 60px;
-    }
-}
-
-/*MOBILE S*/
-@media (width <= 376px){
-    table *{
-        font-size: 14px !important;
-    }
-    .mvp-text{
-        font-size: 15px;
-    }
-    .mvp-name{
+        padding-top: 10px;
+    }   
+   .nav-link{
         font-size: 14px;
-    }
-    .mvp-name img{
-        width: 40px;
-        height: 40px;
+        padding: 10px 10px;
     }
 }
 </style>

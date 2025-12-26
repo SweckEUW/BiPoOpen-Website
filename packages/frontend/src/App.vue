@@ -38,6 +38,7 @@ onBeforeMount(() => {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Overpass:wght@100&display=swap');
+@import "tailwindcss";
 
 :root {
   --main-color: #EA5160;

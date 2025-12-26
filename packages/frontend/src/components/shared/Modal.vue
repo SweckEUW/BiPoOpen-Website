@@ -72,7 +72,7 @@
     width: 100%;
 }
 .mo-button{
-    flex-grow: 1;
+    width: 50%;
 }
 .mo-button div{
     background: var(--main-color);

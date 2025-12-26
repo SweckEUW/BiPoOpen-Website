@@ -30,6 +30,10 @@ let instaIcon = new URL(`/src/assets/icons/instagram.png`, import.meta.url).href
 .af-socials{
 	margin-bottom: 5px;
 }
+.af-socials a{
+	display: flex;
+	justify-content: center;
+}
 img{
 	width: 25px;
 	height: 25px;
