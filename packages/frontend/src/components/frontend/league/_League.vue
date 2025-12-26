@@ -80,7 +80,7 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "FC Longus Pongus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
     { name: "Nick", logo: "" },
     { name: "Sally", logo: "" },
-    { name: "Giulia", logo: "" },
+    { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.png`, import.meta.url).href },
     { name: "Schauf", logo: "" }
 ]
 
