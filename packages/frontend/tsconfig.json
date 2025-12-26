@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "target": "ESNext", 
-    "moduleResolution": "Node",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
     "removeComments": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "baseUrl": ".",  
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-    },                
+      "@/*": ["src/*"]
+    }
   }
 }
