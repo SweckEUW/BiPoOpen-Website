@@ -1,1 +1,0 @@
-import{_ as a,c as o,o as c,a as s}from"./index-BZ-R9y6Z.js";const n={},r={class:"Loadingscreen"};function t(d,e){return c(),o("div",r,[...e[0]||(e[0]=[s("div",{class:"ls-container"},[s("div",{class:"loader"})],-1)])])}const i=a(n,[["render",t],["__scopeId","data-v-59b7bab0"]]);export{i as L};
