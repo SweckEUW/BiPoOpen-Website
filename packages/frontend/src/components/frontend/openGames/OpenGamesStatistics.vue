@@ -11,6 +11,11 @@
 
     <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
 
+    <div class="flex w-full justify-center items-center pb-[20px]">
+        <div class="mr-[20px]" style="color: var(--main-color)">{{  withoutEastGermany ? "Ohne Ost-Deutschland" : "Mit Ost-Deutschland" }}</div>
+        <ToggleSwitch v-model="withoutEastGermany" :pt="{slider: { style: 'background-color: var(--main-color);'}}"/>
+    </div>
+
     <div class="OpenGamesStatistics swiper-container" id="OpenGamesStatisticsSwiper">
 
         <div class="swiper-wrapper">
@@ -64,6 +69,7 @@ import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import ToggleSwitch from 'primevue/toggleswitch';
 
 const props = defineProps({
     openGames: {type: Object as PropType<Match[]>, required: true }
@@ -72,14 +78,26 @@ const props = defineProps({
 let sortValue = ref<SortValueOpenGames>("averageWins");
 let sortUp = ref(false);
 
+let withoutEastGermany = ref(true);
+
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
     windowWidth.value = window.screen.width;
 });
 
 const openGamesStatistics = computed(() => {
-    let openGamesStatisticsOneVersusOne = getAllTimeOpenGamesStatsList(props.openGames, true);
-    let openGamesStatisticsTwoVersusTwo = getAllTimeOpenGamesStatsList(props.openGames, false);
+    let filteredOpenGames = props.openGames;
+    if(withoutEastGermany.value){
+        let eastGermanyPlayers = ["Edu Schimpf", "Alex Klein", "Linda Jahrberg", "Emely Müller", "Leo Straub", "Lea Ableitner", "Nico Sanchez"];
+        filteredOpenGames = props.openGames.filter((match) => {
+            let team1HasEastGermanyPlayer = match.team1.players.some((player) => eastGermanyPlayers.includes(player.name));
+            let team2HasEastGermanyPlayer = match.team2.players.some((player) => eastGermanyPlayers.includes(player.name));
+            return !team1HasEastGermanyPlayer && !team2HasEastGermanyPlayer;
+        });
+    }
+
+    let openGamesStatisticsOneVersusOne = getAllTimeOpenGamesStatsList(filteredOpenGames, true);
+    let openGamesStatisticsTwoVersusTwo = getAllTimeOpenGamesStatsList(filteredOpenGames, false);
 
     let combinedList = [openGamesStatisticsOneVersusOne, openGamesStatisticsTwoVersusTwo];
 
