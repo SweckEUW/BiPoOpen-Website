@@ -15,8 +15,14 @@
             <tr v-for="(player, index) in sortedLeaguePlayers" :key="index">
                 <td>{{ player.placement! + 1}}</td>
                 <td>
-                    <div class="lg-name">
-                        <img :src="props.leaguePlayers.find(lp => lp.name === player.name)?.logo" alt="">
+                    <div class="lg-team">
+                        <Image class="lg-logo" :src="props.leaguePlayers.find(lp => lp.name === player.name)?.logo" preview 
+                            :pt="{ 
+                                toolbar: { style: 'display: none' },
+                                previewMask: { style: 'background: transparent; opacity: 0' },
+                                mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
+                            }"
+                        />
                         <div>{{ player.name.replace(" ","\n") }}</div>
                     </div>
                 </td>
@@ -40,6 +46,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
 import { getLeagueList } from "./LeagueUtilFunctions";
+import Image from "primevue/image";
 
 const props = defineProps({
     leaguePlayers: {type: Array as () => LeaguePlayer[], required: true },
@@ -121,19 +128,18 @@ table td{
     background: inherit;
 }
 
-.lg-name{
+.lg-team{
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding-left: 30px;
 }
-.lg-name img{
-    width: 100px;
-    height: 100px;
+.lg-logo{
+    width: 80px;
+    height: 80px;
     object-fit: contain;
     margin-right: 20px;
 }
-.lg-name div{
+.lg-team div{
     text-align: left;
 }
 .mvp-arrow-down::after, .mvp-arrow-up::after{
@@ -153,10 +159,6 @@ table td{
 
 /*MOBILE*/
 @media (width <= 900px){
-    .mvp-text{
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
     .lg-explain{
         font-size: 14px;
         color: var(--main-color);
@@ -179,12 +181,11 @@ table td{
         max-width: 30px;
         width: 30px;
         padding-left: 4px;
-        padding-right: 10px;
+        padding-right: 0px;
     }
     th:nth-of-type(2), td:nth-of-type(2){
         white-space: break-spaces;
     }
-
     .mvp-arrow-down::after, .mvp-arrow-up::after{
         left: 5px;
         border-width: 6px;
@@ -195,13 +196,10 @@ table td{
     .mvp-arrow-up::after{
         bottom: 15px;
     }
-    .lg-name{
-        padding-left: 10px;
-    }
-    .lg-name img{
+    .lg-logo{
         margin-right: 10px;
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
     }
 }
 
@@ -210,13 +208,10 @@ table td{
     table *{
         font-size: 14px !important;
     }
-    .mvp-text{
-        font-size: 15px;
-    }
-    .lg-name{
+    .lg-team{
         font-size: 14px;
     }
-    .lg-name img{
+    .lg-logo{
         width: 40px;
         height: 40px;
     }

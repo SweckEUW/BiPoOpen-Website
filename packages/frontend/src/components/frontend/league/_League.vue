@@ -3,7 +3,13 @@
         
         <h1 class="bp-title">BiPo League</h1>
         <div class="lg-logo">
-            <img src="@/assets/league/BiPo-League-Logo.png" alt="BiPo League Logo">
+            <Image :src="BipoLeagueLogo" preview 
+                :pt="{ 
+                    toolbar: { style: 'display: none' },
+                    previewMask: { style: 'background: transparent; opacity: 0' },
+                    mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
+                }"
+            />
         </div>
 
         <Loadingscreen v-if="isLoading"/>
@@ -54,6 +60,8 @@ import LeagueTable from './LeagueTable.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
 import { getAllLeagueGames } from './LeagueUtilFunctions';
+import Image from "primevue/image";
+const BipoLeagueLogo = new URL(`/src/assets/league/BiPo-League-Logo.png`, import.meta.url).href;
 
 let showModalAddGame = ref(false);
 let isLoading = ref(false);
@@ -69,8 +77,8 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.png`, import.meta.url).href },
     { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
     { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
-    { name: "Nick", logo: "" },
-    { name: "Jerome", logo: "" },
+    { name: "FC Longus Pongus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
+    { name: "Nick", logo: "" }
 ]
 
 const getLeagueGames = async () => {
@@ -91,7 +99,7 @@ const toggleModalAddGame = () => {
     display: flex;
     justify-content: center;
 }
-.lg-logo img{
+.lg-logo span{
     width: 100px;
     height: auto;
     margin-bottom: 20px;

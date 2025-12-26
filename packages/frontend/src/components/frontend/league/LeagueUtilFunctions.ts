@@ -143,6 +143,8 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
         // if(player1.wins == player2.wins)
         //     return player2.scoreDifference! - player1.scoreDifference!;
 
+        if(player1.wins == player2.wins)
+            return player1.name.localeCompare(player2.name);
         return player2.wins - player1.wins;
     });
     
