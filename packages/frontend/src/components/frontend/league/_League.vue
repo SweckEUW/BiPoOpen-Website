@@ -38,11 +38,11 @@
 
                     <Teleport to="body">
                         <Transition name="fade">
-                            <ModalAddLeagueGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :setMatch="setMatch" :leaguePlayers="leaguePlayers" />
+                            <ModalAddLeagueGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :setMatch="setMatch" :leaguePlayers="leaguePlayers" :getLeagueGames="getLeagueGames"/>
                         </Transition>
                     </Teleport>
 
-                    <BiPoKnecht v-if="match" :match="match" :isLeagueGame="true"/>
+                    <!-- <BiPoKnecht v-if="match" :match="match" :isLeagueGame="true"/> -->
 
                     <div v-for="match in leagueGames" :key="match.time!" style="margin-top: 10px;">
                         <div style="color: var(--main-color)">{{ getGameTime(match.time!) }}</div>
@@ -64,7 +64,7 @@ import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
 import { getAllLeagueGames } from './LeagueUtilFunctions';
 import Image from "primevue/image";
-import BiPoKnecht from '@/components/frontend/biPoKnecht/BiPoKnecht.vue';
+// import BiPoKnecht from '@/components/frontend/biPoKnecht/BiPoKnecht.vue';
 const BipoLeagueLogo = new URL(`/src/assets/league/BiPo-League-Logo.png`, import.meta.url).href;
 
 let showModalAddGame = ref(false);
@@ -87,7 +87,7 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.png`, import.meta.url).href },
     { name: "Schaufautomat", logo: new URL(`/src/assets/league/teams/BPC-Schauf.png`, import.meta.url).href },
     { name: "Anime Dude", logo: new URL(`/src/assets/league/teams/Anime-Dude.png`, import.meta.url).href },
-    { name: "Sally", logo: "" }
+    { name: "SallyWin All-in", logo: new URL(`/src/assets/league/teams/SallyWin-All-in.png`, import.meta.url).href }
 ]
 
 let setMatch = (newMatch: Match) => {
