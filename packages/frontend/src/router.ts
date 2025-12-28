@@ -46,7 +46,17 @@ const routes = [
 		name: 'BiPo-Knecht',
 		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
 		meta: {
-			title: 'Weck BiPo Open Knecht',
+			title: 'Weck BiPo Knecht',
+			description: 'BiPo Knecht'
+		}
+	},
+
+		{
+		path: '/Knecht',
+		name: 'BiPo-Knecht',
+		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
+		meta: {
+			title: 'Weck BiPo Knecht',
 			description: 'BiPo Knecht'
 		}
 	},

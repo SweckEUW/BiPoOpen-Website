@@ -1,30 +1,60 @@
+
+<template>
+    <Modal>
+        <template #title>{{ 'Teams eintragen' }}</template>
+
+        <template #template>
+            <div class="rt-modal">
+                <div v-for="i in 2" :id="'addOpenGameModal-team-' + i" class="rt-modal-container">
+
+                    <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
+                        <input list="bipoKnechtGames" id="openGameNames" class="rt-modal-input-player" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
+                        <datalist id="bipoKnechtGames">
+                            <option v-for="name in openGameNames" :value="name"/>
+                        </datalist>
+                    </div>
+
+                    <div class="rt-modal-buttons">
+                        <div @click="i == 1 ? ammountOfPlayersTeam1++ : ammountOfPlayersTeam2++">+</div>
+                    </div>
+
+                </div>
+            </div>
+        </template>
+
+        <!-- Button 1 -->
+        <template #cancle>
+            <div @click = cancel();>Abbrechen</div>
+        </template>
+
+        <!-- Button 2 -->   
+        <template #confirm>
+            <div @click="createMatch();">Weiter</div>
+        </template>
+    </Modal>
+</template>
+
 <script setup lang="ts">
 import { onMounted, PropType, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
 import router from '@/router.js';
 import { getAllOpenGameNames } from "../openGames/OpenGamesUtilFunctions";
 
-defineProps({
-   startGame: {type: Function as PropType<(match:Match, startTeamIndex:number) => void>, required: true }
+let props = defineProps({
+    setMatch: {type: Function as PropType<(match:Match) => void>, required: true }
 });
 
 let ammountOfPlayersTeam1 = ref(1);
 let ammountOfPlayersTeam2 = ref(1);
 
-let showWhosStartingUI = ref(false);
-
 let openGameNames = ref<string[]>([]);
-
-let match:Match;
-
-let startTeamIndex = ref(0);
 
 onMounted(async () => {
     openGameNames.value = await getAllOpenGameNames();
 });
 
-const setMatch = () => {
-    match = {
+const createMatch = () => {
+    let match:Match = {
         _id: "placeholder",
         team1: {
             _id: "placeholder",
@@ -60,58 +90,14 @@ const setMatch = () => {
             }
         }
     }
+
+    props.setMatch(match);
 }
 
 const cancel = () => {
     router.go(-1);
 }
-
-function getPlayerNames(players:Player[]) {
-  const uniqueNames = [...new Set(players.map(p => p.name))];
-  return uniqueNames.join(', ');
-}
 </script>
-
-<template>
-    <Modal>
-        <template #title>{{ showWhosStartingUI ? 'Wer soll anfangen?' : 'Teams eintragen' }}</template>
-
-        <template #template>
-            <div class="rt-modal" v-show="!showWhosStartingUI">
-                <div v-for="i in 2" :id="'addOpenGameModal-team-' + i" class="rt-modal-container">
-
-                    <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
-                        <input list="bipoKnechtGames" id="openGameNames" class="rt-modal-input-player" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
-                        <datalist id="bipoKnechtGames">
-                            <option v-for="name in openGameNames" :value="name"/>
-                        </datalist>
-                    </div>
-
-                    <div class="rt-modal-buttons">
-                        <div @click="i == 1 ? ammountOfPlayersTeam1++ : ammountOfPlayersTeam2++">+</div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div v-if="showWhosStartingUI">
-                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 0 ? 1 : 0.3 }" @click="startTeamIndex = 0">{{ getPlayerNames(match.team1.players) }}</div>
-                <div class="rt-modal-startteam-selector" :style="{ opacity: startTeamIndex === 1 ? 1 : 0.3 }" @click="startTeamIndex = 1" style="margin-bottom: 40px;">{{ getPlayerNames(match.team2.players) }}</div>
-            </div>
-        </template>
-
-        <!-- Button 1 -->
-        <template #cancle>
-            <div @click = cancel();>Abbrechen</div>
-        </template>
-
-        <!-- Button 2 -->   
-        <template #confirm>
-            <div @click="showWhosStartingUI = true; setMatch()" v-show="!showWhosStartingUI">Weiter</div>
-            <div @click="startGame(match, startTeamIndex)" v-show="showWhosStartingUI">Spiel starten</div>
-        </template>
-    </Modal>
-</template>
 
 <style scoped>
 .rt-modal{
@@ -158,13 +144,6 @@ function getPlayerNames(players:Player[]) {
     height: 50px;
     border-radius: 50%;
     margin: 0px 15px;
-}
-
-.rt-modal-startteam-selector{
-    padding: 15px 10px;
-    background-color: var(--main-color);
-    color: white;
-    margin: 10px 0px;
 }
 
 /* Remove arrows from input field */

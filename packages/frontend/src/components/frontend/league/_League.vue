@@ -38,11 +38,14 @@
 
                     <Teleport to="body">
                         <Transition name="fade">
-                            <ModalAddLeagueGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :leaguePlayers="leaguePlayers" />
+                            <ModalAddLeagueGame v-if="showModalAddGame" :toggleModalAddGame="toggleModalAddGame" :setMatch="setMatch" :leaguePlayers="leaguePlayers" />
                         </Transition>
                     </Teleport>
 
+                    <BiPoKnecht v-if="match" :match="match" :isLeagueGame="true"/>
+
                     <div v-for="match in leagueGames" :key="match.time!" style="margin-top: 10px;">
+                        <div style="color: var(--main-color)">{{ getGameTime(match.time!) }}</div>
                         <MatchElement :match="match"/> 
                     </div>
                 </div>
@@ -61,11 +64,13 @@ import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
 import { getAllLeagueGames } from './LeagueUtilFunctions';
 import Image from "primevue/image";
+import BiPoKnecht from '@/components/frontend/biPoKnecht/BiPoKnecht.vue';
 const BipoLeagueLogo = new URL(`/src/assets/league/BiPo-League-Logo.png`, import.meta.url).href;
 
 let showModalAddGame = ref(false);
 let isLoading = ref(false);
 let leagueGames = ref<Match[]>([]);
+let match = ref<Match>();
 
 let leaguePlayers:LeaguePlayer[] = [
     { name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url).href },
@@ -85,6 +90,11 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "Sally", logo: "" }
 ]
 
+let setMatch = (newMatch: Match) => {
+    match.value = newMatch;
+    showModalAddGame.value = false;
+}
+
 const getLeagueGames = async () => {
     leagueGames.value = await getAllLeagueGames();
     leagueGames.value = leagueGames.value.reverse();
@@ -94,6 +104,12 @@ getLeagueGames();
 
 const toggleModalAddGame = () => {
     showModalAddGame.value = !showModalAddGame.value;
+}
+
+let getGameTime = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
 }
 </script>
 

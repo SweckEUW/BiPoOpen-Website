@@ -52,7 +52,7 @@ const props = defineProps({
     leagueGames: {type: Array as () => Match[], required: true }
 });
 
-let sortValue = ref<SortValueLeague>("placement");
+let sortValue = ref<SortValueLeague>("wins");
 let sortUp = ref(false);
 
 const sortedLeaguePlayers = computed(() => {
@@ -168,6 +168,9 @@ table td{
     }
     table *{
         font-size: 15px;
+    }
+    .table>:not(caption)>*>* {
+        padding: 10px 4px;
     }
     tr{
         height: 80px;

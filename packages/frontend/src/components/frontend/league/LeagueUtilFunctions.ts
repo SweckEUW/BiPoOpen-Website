@@ -29,16 +29,18 @@ export const getPlayersWithStats = (leagueGames:Match[], leaguePlayers: LeaguePl
     let playerWithStats:PlayerWithStats[] = [];
 
     leaguePlayers.forEach((leaguePlayer) => {
-        let ammountOfMatches = getMatchesFromPlayer(leagueGames, leaguePlayer.name).length;
-        let ammountOfHitsFromPlayer = getAmmountOfHitsFromPlayer(leagueGames, leaguePlayer.name);
-        let ammountOfEnemyHitsFromPlayer = getAmmountOfEnemyHitsFromPlayer(leagueGames, leaguePlayer.name);
-        let wins = getAmmountOfWinsFromPlayer(leagueGames, leaguePlayer.name);
+        let name = leaguePlayer.name.toLocaleLowerCase();
+
+        let ammountOfMatches = getMatchesFromPlayer(leagueGames, name).length;
+        let ammountOfHitsFromPlayer = getAmmountOfHitsFromPlayer(leagueGames, name);
+        let ammountOfEnemyHitsFromPlayer = getAmmountOfEnemyHitsFromPlayer(leagueGames, name);
+        let wins = getAmmountOfWinsFromPlayer(leagueGames, name);
 
         let player = {
             name: leaguePlayer.name,
             ammountOfMatches: ammountOfMatches,
             ammountOfMatchesWithTrackedShots: ammountOfMatches,
-            ammountOfDrunkenCups: getAmmountOfDrunkenCupsFromPlayer(leagueGames, leaguePlayer.name),
+            ammountOfDrunkenCups: getAmmountOfDrunkenCupsFromPlayer(leagueGames, name),
             wins: wins,
             looses: ammountOfMatches - wins,
             averageWins: Math.round((ammountOfMatches == 0 ? 0 : wins / ammountOfMatches) * 100),
@@ -150,11 +152,6 @@ export const getAmmountOfDrunkenCupsFromPlayer = (openGames:Match[], playerName:
 
 export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[]) => {
     let playersWithStats = getPlayersWithStats(leagueMatches, leaguePlayers);
-
-    // Sort after average hit cups per game
-    playersWithStats.sort((player1, player2) => {
-        return player2.wins - player1.wins;
-    });
 
     // Sort after wins, hit difference and direct win against component
     playersWithStats.sort((player1, player2) => {
