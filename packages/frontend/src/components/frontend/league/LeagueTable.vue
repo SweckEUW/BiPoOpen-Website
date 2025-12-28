@@ -6,8 +6,8 @@
                 <th colspan="2" @click="setSortValue('placement')" :class="giveArrowClass('placement')" class="text-left!">Team</th>
                 <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                 <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'S'}}</th>
-                <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
-                <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                <th @click="setSortValue('looses')" :class="giveArrowClass('looses')">{{ windowWidth > 900 ? 'Niederlagen' : 'N'}}</th>
+                <th>{{ windowWidth > 900 ? 'Trefferverhältnis' :'Trfv.'}}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,8 +27,8 @@
                 </td>
                 <td>{{ player.ammountOfMatches }}</td>
                 <td>{{ player.wins }}</td>
-                <td>{{ player.score }}</td>
-                <td>{{ player.averageScore }}</td>
+                <td>{{ player.ammountOfMatches - player.wins }}</td>
+                <td>{{ player.hitDifference }}</td>
             </tr>
         </tbody>
     </table>

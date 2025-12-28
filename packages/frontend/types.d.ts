@@ -76,26 +76,29 @@ declare global {
     };
 
     type TeamWithStats = {  
+        placement?: number;
         name: string;
         players: Player[];
         wins: number;
-        score: string;
-        games: number;
-        scoreDifference: number;
+        hitDifference: string;
+        hitDifferenceNumber: number;
+        ammountOfMatches: number;
         hits: number;
-        placement?: number;
     };
 
     type PlayerWithStats = {
+        placement?: number;
         name: string;
-        score: number;
+        wins: number;
+        looses: number;
+        averageWins: number;
+        hits: number;
+        hitDifference: string;
+        hitDifferenceNumber: number;
+        averageHits: number;
         ammountOfMatches: number;
         ammountOfMatchesWithTrackedShots: number;
         ammountOfDrunkenCups: number;
-        wins: number;
-        averageScore: number;
-        averageWins: number;
-        placement?: number;
     };
 
     type LeaguePlayer = {
@@ -103,8 +106,8 @@ declare global {
         logo: string;
     }
     
-    type SortValueLeague = 'placement'|'name'|'ammountOfMatches'|'wins'|'score'|'averageScore';
-    type SortValueMVP = 'averageScore'|'placement'|'score'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
-    type SortValueHallOfFame = 'averageScore'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
-    type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageScore'|'averageWins'|'ammountOfDrunkenCups';
+    type SortValueLeague = 'placement'|'name'|'ammountOfMatches'|'wins'|'looses';
+    type SortValueMVP = 'averageHits'|'placement'|'hits'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
+    type SortValueHallOfFame = 'averageHits'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
+    type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageHits'|'averageWins'|'ammountOfDrunkenCups';
 }

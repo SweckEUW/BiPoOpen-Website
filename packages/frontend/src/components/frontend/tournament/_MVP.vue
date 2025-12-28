@@ -12,8 +12,8 @@
                     <tr style="height: auto;">
                         <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                         <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                        <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
-                        <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
+                        <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                        <th @click="setSortValue('hits')" :class="giveArrowClass('hits')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
                         <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                         <th v-if="windowWidth > 375" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
                     </tr>
@@ -22,8 +22,8 @@
                     <tr v-for="(player, index) in sortedMVPList" :key="index">
                         <td>{{ player.placement! + 1}}</td>
                         <td>{{ player.name.replace(" ","\n") }}</td>
-                        <td>{{ player.averageScore }}</td>
-                        <td>{{ player.score }}</td>
+                        <td>{{ player.averageHits.toFixed(2) }}</td>
+                        <td>{{ player.hits }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
                         <td v-if="windowWidth > 375">{{ player.ammountOfDrunkenCups }}</td>
                     </tr>
@@ -50,7 +50,7 @@ let props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true }
 });
 
-let sortValue = ref<SortValueMVP>("averageScore");
+let sortValue = ref<SortValueMVP>("averageHits");
 let sortUp = ref(false);
 
 let windowWidth = ref(window.screen.width);

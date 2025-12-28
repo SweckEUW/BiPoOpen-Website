@@ -78,10 +78,11 @@ let leaguePlayers:LeaguePlayer[] = [
     { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
     { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
     { name: "FC Pongus Longus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
-    { name: "Nick", logo: "" },
-    { name: "Sally", logo: "" },
+    { name: "BPC Knick", logo:  new URL(`/src/assets/league/teams/BPC-Knick.png`, import.meta.url).href },
     { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.png`, import.meta.url).href },
-    { name: "1. BPC Schauf", logo: new URL(`/src/assets/league/teams/BPC-Schauf.png`, import.meta.url).href }
+    { name: "Schaufautomat", logo: new URL(`/src/assets/league/teams/BPC-Schauf.png`, import.meta.url).href },
+    { name: "Anime Dude", logo: new URL(`/src/assets/league/teams/Anime-Dude.png`, import.meta.url).href },
+    { name: "Sally", logo: "" }
 ]
 
 const getLeagueGames = async () => {
@@ -106,6 +107,9 @@ const toggleModalAddGame = () => {
     width: 100px;
     height: auto;
     margin-bottom: 20px;
+}
+:deep(.lg-logo img){
+    object-fit: contain !important;
 }
 
 .nav{

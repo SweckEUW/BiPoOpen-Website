@@ -29,7 +29,7 @@
                             <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
                             <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
                             <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                            <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                            <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                             <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Siegwahr.'}}</th>
                             <!-- <th v-if="windowWidth > 360" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th> -->
                         </tr>
@@ -40,7 +40,7 @@
                             <td>{{ player.name.replace(" ","\n") }}</td>
                             <td>{{ player.wins }}</td>
                             <td>{{ player.ammountOfMatches }}</td>
-                            <td>{{ player.averageScore }}</td>
+                            <td>{{ player.averageHits.toFixed(2) }}</td>
                             <td>{{ player.averageWins + "%" }}</td>
                             <!-- <td v-if="windowWidth > 360">{{ player.ammountOfDrunkenCups }}</td> -->
                         </tr>

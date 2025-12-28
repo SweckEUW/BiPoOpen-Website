@@ -1,4 +1,5 @@
 import axios from "axios";
+import { h } from "vue";
 
 /////////////
 // GENERAL //
@@ -29,17 +30,22 @@ export const getPlayersWithStats = (leagueGames:Match[], leaguePlayers: LeaguePl
 
     leaguePlayers.forEach((leaguePlayer) => {
         let ammountOfMatches = getMatchesFromPlayer(leagueGames, leaguePlayer.name).length;
-        let score = getAmmountOfHitsFromPlayer(leagueGames, leaguePlayer.name);
+        let ammountOfHitsFromPlayer = getAmmountOfHitsFromPlayer(leagueGames, leaguePlayer.name);
+        let ammountOfEnemyHitsFromPlayer = getAmmountOfEnemyHitsFromPlayer(leagueGames, leaguePlayer.name);
         let wins = getAmmountOfWinsFromPlayer(leagueGames, leaguePlayer.name);
+
         let player = {
             name: leaguePlayer.name,
-            score: score,
             ammountOfMatches: ammountOfMatches,
             ammountOfMatchesWithTrackedShots: ammountOfMatches,
             ammountOfDrunkenCups: getAmmountOfDrunkenCupsFromPlayer(leagueGames, leaguePlayer.name),
             wins: wins,
-            averageScore: Math.round((ammountOfMatches == 0 ? 0 : score / ammountOfMatches) * 100) / 100, // TODO: if average is 7 show 7.00
+            looses: ammountOfMatches - wins,
             averageWins: Math.round((ammountOfMatches == 0 ? 0 : wins / ammountOfMatches) * 100),
+            hits: ammountOfHitsFromPlayer,
+            averageHits: ammountOfMatches === 0 ? 0 : ammountOfHitsFromPlayer / ammountOfMatches,
+            hitDifference: ammountOfHitsFromPlayer + " : " + ammountOfEnemyHitsFromPlayer,
+            hitDifferenceNumber: ammountOfHitsFromPlayer - ammountOfEnemyHitsFromPlayer
         };
 
         playerWithStats.push(player); 
@@ -101,6 +107,21 @@ export const getAmmountOfHitsFromPlayer = (leagueGames:Match[], playerName:strin
     return score;
 }
 
+export const getAmmountOfEnemyHitsFromPlayer = (leagueGames:Match[], playerName:string) => {
+    let enemyScore = 0;
+
+    let matches = getMatchesFromPlayer(leagueGames, playerName);
+    
+    matches.forEach((match) => {
+        if(match.team1.players.map(player => player.name.toLowerCase()).includes(playerName))
+            enemyScore += match.team2.players.reduce((acc, player) => acc + player.score, 0);
+        if(match.team2.players.map(player => player.name.toLowerCase()).includes(playerName))
+            enemyScore += match.team1.players.reduce((acc, player) => acc + player.score, 0);
+    });
+
+    return enemyScore;
+}
+
 export const getAmmountOfDrunkenCupsFromPlayer = (openGames:Match[], playerName:string) => {
     // let leftOverCups = 0;
     // let enemyHits = 0;
@@ -137,14 +158,10 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
 
     // Sort after wins, hit difference and direct win against component
     playersWithStats.sort((player1, player2) => {
-        // TODO: Implement check if player 1 vs player 2 function inside group
-        // if (player1.hits == player2.hits && player1.scoreDifference == player2.scoreDifference && player1.wins == player2.wins)
-        //     return checkIfPlayer1WonVsPlayer2(tournament, player1.name, player2.name) ? 1 : -1;
-        // if(player1.wins == player2.wins)
-        //     return player2.scoreDifference! - player1.scoreDifference!;
-
-        if(player1.wins == player2.wins)
-            return player1.name.localeCompare(player2.name);
+        if(player1.wins == player2.wins && player1.hitDifferenceNumber == player2.hitDifferenceNumber)
+            return player1.name.localeCompare(player2.name);  // TODO: Replace with direct win check
+        else if(player1.wins == player2.wins)
+            return player2.hitDifferenceNumber - player1.hitDifferenceNumber;
         return player2.wins - player1.wins;
     });
     
@@ -152,7 +169,8 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
     // Set placement
     for (let i = 0; i < playersWithStats.length; i++) {
         playersWithStats[i].placement = i;
-        let playersWithSameScore = playersWithStats.filter((player) => player.averageScore == playersWithStats[i].averageScore && player.ammountOfDrunkenCups == playersWithStats[i].ammountOfDrunkenCups)
+
+        let playersWithSameScore = playersWithStats.filter((player) => player.wins == playersWithStats[i].wins && player.hitDifferenceNumber == playersWithStats[i].hitDifferenceNumber)
         if(playersWithSameScore.length > 1){
             playersWithSameScore.forEach((playerWithSameScore) => {
                 playerWithSameScore.placement = playersWithSameScore[0].placement;
