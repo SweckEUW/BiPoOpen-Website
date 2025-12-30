@@ -2,15 +2,24 @@
 <template>
 
     <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[80%] rounded-xs mobile-sheet" :blockScroll="true"  :showCloseIcon="false">
-        <!-- <template #header>
-            <div class="w-full flex justify-content-center">
-                <div class="drag-handle"></div>
+        <template #header>
+            <div class="w-full flex justify-content-center" v-if="selectedLeaguePlayer">
+                <!-- <div class="drag-handle"></div> -->
+                <Image class="h-[150px]" :src="selectedLeaguePlayer.logo" preview
+                    :pt="{ 
+                        toolbar: { style: 'display: none' },
+                        previewMask: { style: 'background: transparent; opacity: 0' },
+                        mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
+                    }"
+                />
             </div>
-        </template> -->
+        </template>
 
-        <div v-if="selectedLeaguePlayer" v-for="match in gamesFromSelectedLeaguePlayer" :key="match.time!" style="margin-top: 10px;">
-            <div style="color: var(--main-color)">{{ getGameTime(match. time!) }}</div>
-            <MatchElement :match="match"/> 
+        <div v-if="selectedLeaguePlayer" >
+            <div v-for="match in gamesFromSelectedLeaguePlayer" :key="match.time!" style="margin-top: 10px;">
+                <div style="color: var(--main-color)">{{ getGameTime(match. time!) }}</div>
+                <MatchElement :match="match"/> 
+            </div>
         </div>
     </Drawer>
 
@@ -27,16 +36,10 @@
         <tbody>
             <tr v-for="(player, index) in sortedLeaguePlayers" :key="index">
                 <td>{{ player.placement! + 1}}</td>
-                <td>
+                <td @click="selectedLeaguePlayer = leaguePlayers.find(lp => lp.name === player.name); leaguePlayerOverviewVisible = true">
                     <div class="lg-team">
-                        <Image class="lg-logo" :src="props.leaguePlayers.find(lp => lp.name === player.name)?.logo" preview 
-                            :pt="{ 
-                                toolbar: { style: 'display: none' },
-                                previewMask: { style: 'background: transparent; opacity: 0' },
-                                mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
-                            }"
-                        />
-                        <div @click="selectedLeaguePlayer = leaguePlayers.find(lp => lp.name === player.name); leaguePlayerOverviewVisible = true">{{ player.name.replace(" ","\n") }}</div>
+                        <img class="lg-logo" :src="props.leaguePlayers.find(lp => lp.name === player.name)?.logo">
+                        <div>{{ player.name.replace(" ","\n") }}</div>
                     </div>
                 </td>
                 <td>{{ player.ammountOfMatches }}</td>
