@@ -1,3 +1,63 @@
+
+<template>
+    <Modal>
+        <template #title>Ergebnis eintragen</template>
+
+        <template #template>
+            <div class="w-full flex flex-col gap-[5px]">
+                <div class="grid grid-cols-2 gap-[5px]">
+                    <div 
+                        v-for="(team, teamIndex) in [copiedMatch.team1, copiedMatch.team2]" 
+                        class="flex items-center font-bold h-full"
+                    >
+                        <div class="flex flex-1 items-center gap-2 w-full h-full"
+                            :class="teamIndex === 0 ? 'flex-row justify-end text-right' : 'flex-row-reverse justify-end text-left'">
+                            
+                            <div class="break-words leading-tight flex-1">
+                                {{ getTeamName(team) }}
+                            </div>
+
+                            <div class="w-[50px] text-center shrink-0">
+                                {{ getMatchScore(copiedMatch, teamIndex == 0) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-[5px]">
+                    <div v-for="(team, teamIndex) in [copiedMatch.team1, copiedMatch.team2]">
+                        
+                        <div v-for="player in team.players" class="flex flex-row gap-[5px] mb-[5px]">
+                            <template v-if="teamIndex === 0">
+                                <div v-if="!editName" class="text-right flex-1">{{ player.name }}</div>
+                                <input v-if="editName" class="text-right flex-1" v-model="player.name">
+                                <input class="!w-[50px] text-center shrink-0" type="number" v-model="player.score" placeholder="0">
+                            </template>
+
+                            <template v-else>
+                                <input class="!w-[50px] text-center shrink-0" type="number" v-model="player.score" placeholder="0">
+                                <div v-if="!editName" class="text-left flex-1">{{ player.name }}</div>
+                                <input v-if="editName" class="text-left flex-1" v-model="player.name">
+                            </template>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Button 1 -->
+        <template #cancle>
+            <div @click="toggleModal();">Abbrechen</div>
+        </template>
+
+        <!-- Button 2 -->
+        <template #confirm>
+            <div @click="setResult()">{{ checkIfMatchFinished(copiedMatch) ? 'Bearbeiten' : 'Eintragen' }}</div>
+        </template>
+    </Modal>
+</template>
+
 <script setup lang="ts">
 import { PropType, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
@@ -27,90 +87,7 @@ let getTeamName = (team:Team) => {
 }
 </script>
 
-<template>
-    <Modal>
-        <template #title>Ergebnis eintragen</template>
-
-        <template #template>
-            <div class="rt-modal-container">
-                
-                <div v-for="(team, teamIndex) in [copiedMatch.team1, copiedMatch.team2]" class="rt-modal-main">
-
-                    <!-- Header - Team Name + Team Score -->
-                    <div class="rt-modal-team">
-                        <div class="rt-modal-team-name" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ getTeamName(team) }}</div>
-                        <div class="rt-modal-team-score" :style="{ order: teamIndex === 0 ? 0 : -1 }">{{ getMatchScore(copiedMatch, teamIndex == 0) }}</div>
-                    </div>
-
-                    <!-- Players - Player Name + Player Score -->
-                    <div v-for="player in team.players" class="rt-modal-player">
-                        <div v-if="!editName" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }">{{ player.name }}</div>
-                        <input v-if="editName" :style="{ textAlign: teamIndex === 0 ? 'right' : 'left' }" v-model="player.name">
-                        <input type="number" v-model="player.score" placeholder="0" :style="{ order: teamIndex === 0 ? 0 : -1 }"> 
-                    </div>
-                </div>
-
-            </div>
-        </template>
-
-        <!-- Button 1 -->
-        <template #cancle>
-            <div @click="toggleModal();">Abbrechen</div>
-        </template>
-
-        <!-- Button 2 -->
-        <template #confirm>
-            <div @click="setResult()">{{ checkIfMatchFinished(copiedMatch) ? 'Bearbeiten' : 'Eintragen' }}</div>
-        </template>
-    </Modal>
-</template>
-
 <style scoped>
-.rt-modal-container{
-   display: flex;
-   justify-content: center;
-}
-.rt-modal-main{
-    width: 50%;
-}
-.rt-modal-team{
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    font-weight: bold;
-    margin: 20px 0;
-}
-.rt-modal-team-name{
-    flex: 1;
-    white-space: nowrap;
-}
-.rt-modal-team div{
-    font-size: 20px;
-}
-.rt-modal-team-score{
-    width: 50px;
-    text-align: center;
-    margin: 0 10px;
-}
-.rt-modal-player{
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-.rt-modal-player div{
-    flex: 1;
-}
-.rt-modal-player input, .rt-modal-team input{
-   width: 50px;
-   margin: 0px 10px;
-   text-align: center;
-}
-
-.rt-modal-player input:first-child{
-    width: 200px;
-}
-
-
 /* Remove arrows from input field */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -118,18 +95,5 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
 }
 input[type=number] {
   -moz-appearance: textfield;
-}
-
-/*MOBILE*/
-@media (width <= 900px){
-    .rt-modal-team-name{
-        white-space: wrap;
-        font-size: 14px !important;
-    }
-    .rt-modal-team-score{
-        width: 50px;
-        text-align: center;
-        margin: 0 10px;
-    }
 }
 </style>

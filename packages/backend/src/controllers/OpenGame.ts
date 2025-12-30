@@ -49,15 +49,16 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
 const updateOpenGame = (req: Request, res: Response, next: NextFunction) => {
     const openGameId = req.params.openGameId;
     
+
     OpenGame.findById(openGameId)
         .then((openGame) => {
             if (openGame) {
                 openGame.set(req.body);
 
                 openGame
-                    .save()
+                    .save({ validateBeforeSave: false})
                     .then((openGame) => res.status(201).json({ openGame }))
-                    .catch((error) => res.status(500).json({ error }));
+                    .catch((error) => { console.log(error); res.status(500).json({ error }) });
             } else {
                 res.status(404).json({ message: 'not found' });
             }
