@@ -6,7 +6,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import OpenGamesStatistics from './OpenGamesStatistics.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 
-let openGames:Match[] = [];
+let openGames = ref<Match[]>([]);
 let isLoading = ref(true);
 let showModalAddGame = ref(false);
 
@@ -17,8 +17,8 @@ let getOpenGameDate = (dateNumber:number) => {
 }
 
 const getOpenGames = async () => {
-    openGames = await getAllOpenGames();
-    openGames = openGames!.reverse();
+    openGames.value = await getAllOpenGames();
+    openGames.value = openGames.value.reverse();
     isLoading.value = false;
 }
 getOpenGames();
