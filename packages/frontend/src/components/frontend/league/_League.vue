@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import LeagueTable from './LeagueTable.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
@@ -65,29 +65,29 @@ import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
 import { getAllLeagueGames } from './LeagueUtilFunctions';
 import Image from "primevue/image";
 // import BiPoKnecht from '@/components/frontend/biPoKnecht/BiPoKnecht.vue';
-const BipoLeagueLogo = new URL(`/src/assets/league/BiPo-League-Logo.png`, import.meta.url).href;
+const BipoLeagueLogo = new URL(`/src/assets/league/BiPo-League-Logo.webp`, import.meta.url).href;
 
 let showModalAddGame = ref(false);
-let isLoading = ref(false);
+let isLoading = ref(true);
 let leagueGames = ref<Match[]>([]);
 let match = ref<Match>();
 
 let leaguePlayers:LeaguePlayer[] = [
-    { name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.png`, import.meta.url).href },
-    { name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.png`, import.meta.url).href },
-    { name: "Cupfire Squad", logo: new URL(`/src/assets/league/teams/Cupfire-Squad.png`, import.meta.url).href },
-    { name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.png`, import.meta.url).href },
-    { name: "Don Promillo", logo: new URL(`/src/assets/league/teams/Don-Promillo.png`, import.meta.url).href },
-    { name: "Wonne", logo: new URL(`/src/assets/league/teams/Wonne.png`, import.meta.url).href },
-    { name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.png`, import.meta.url).href },
-    { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.png`, import.meta.url).href },
-    { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.png`, import.meta.url).href },
-    { name: "FC Pongus Longus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.png`, import.meta.url).href },
-    { name: "BPC Knick", logo:  new URL(`/src/assets/league/teams/BPC-Knick.png`, import.meta.url).href },
-    { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.png`, import.meta.url).href },
-    { name: "Schaufautomat", logo: new URL(`/src/assets/league/teams/BPC-Schauf.png`, import.meta.url).href },
-    { name: "Anime Dude", logo: new URL(`/src/assets/league/teams/Anime-Dude.png`, import.meta.url).href },
-    { name: "SallyWin All-in", logo: new URL(`/src/assets/league/teams/SallyWin-All-in.png`, import.meta.url).href }
+    { name: "Hangover Heroes", logo: new URL(`/src/assets/league/teams/Hangover-Heroes.webp`, import.meta.url).href },
+    { name: "Hopfenstreife", logo: new URL(`/src/assets/league/teams/Hopfenstreife.webp`, import.meta.url).href },
+    { name: "Cupfire Squad", logo: new URL(`/src/assets/league/teams/Cupfire-Squad.webp`, import.meta.url).href },
+    { name: "Lokomotive Wiedenbrück", logo: new URL(`/src/assets/league/teams/Lokomotive-Wiedenbrueck.webp`, import.meta.url).href },
+    { name: "Don Promillo", logo: new URL(`/src/assets/league/teams/Don-Promillo.webp`, import.meta.url).href },
+    { name: "Wonne", logo: new URL(`/src/assets/league/teams/Wonne.webp`, import.meta.url).href },
+    { name: "El Gunto", logo: new URL(`/src/assets/league/teams/El-Gunto.webp`, import.meta.url).href },
+    { name: "BPC Likör", logo: new URL(`/src/assets/league/teams/BPC-Likoer.webp`, import.meta.url).href },
+    { name: "Schlauti Saufmann", logo: new URL(`/src/assets/league/teams/Schlauti-Saufmann.webp`, import.meta.url).href },
+    { name: "FC Pongus Longus", logo: new URL(`/src/assets/league/teams/FC-Pongus-Longus.webp`, import.meta.url).href },
+    { name: "BPC Knick", logo:  new URL(`/src/assets/league/teams/BPC-Knick.webp`, import.meta.url).href },
+    { name: "Ostgold", logo:  new URL(`/src/assets/league/teams/Ostgold.webp`, import.meta.url).href },
+    { name: "Schaufautomat", logo: new URL(`/src/assets/league/teams/BPC-Schauf.webp`, import.meta.url).href },
+    { name: "Anime Dude", logo: new URL(`/src/assets/league/teams/Anime-Dude.webp`, import.meta.url).href },
+    { name: "SallyWin All-in", logo: new URL(`/src/assets/league/teams/SallyWin-All-in.webp`, import.meta.url).href }
 ]
 
 let setMatch = (newMatch: Match) => {
