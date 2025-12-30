@@ -1,5 +1,19 @@
 
 <template>
+
+    <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[80%] rounded-xs mobile-sheet" :blockScroll="true"  :showCloseIcon="false">
+        <!-- <template #header>
+            <div class="w-full flex justify-content-center">
+                <div class="drag-handle"></div>
+            </div>
+        </template> -->
+
+        <div v-if="selectedLeaguePlayer" v-for="match in gamesFromSelectedLeaguePlayer" :key="match.time!" style="margin-top: 10px;">
+            <div style="color: var(--main-color)">{{ getGameTime(match. time!) }}</div>
+            <MatchElement :match="match"/> 
+        </div>
+    </Drawer>
+
     <table class="table table-hover caption-top">
         <thead>
             <tr style="height: auto;">
@@ -22,7 +36,7 @@
                                 mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
                             }"
                         />
-                        <div>{{ player.name.replace(" ","\n") }}</div>
+                        <div @click="selectedLeaguePlayer = leaguePlayers.find(lp => lp.name === player.name); leaguePlayerOverviewVisible = true">{{ player.name.replace(" ","\n") }}</div>
                     </div>
                 </td>
                 <td>{{ player.ammountOfMatches }}</td>
@@ -46,6 +60,8 @@
 import { computed, ref } from "vue"
 import { getLeagueList } from "./LeagueUtilFunctions";
 import Image from "primevue/image";
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import Drawer from 'primevue/drawer';
 
 const props = defineProps({
     leaguePlayers: {type: Array as () => LeaguePlayer[], required: true },
@@ -54,6 +70,14 @@ const props = defineProps({
 
 let sortValue = ref<SortValueLeague>("wins");
 let sortUp = ref(false);
+
+let leaguePlayerOverviewVisible = ref(false);
+let selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
+
+const gamesFromSelectedLeaguePlayer = computed(() => {
+    if(!selectedLeaguePlayer.value) return [];
+    return props.leagueGames.filter((match) => match.team1.players.find(player => player.name === selectedLeaguePlayer.value?.name) || match.team2.players.find(player => player.name === selectedLeaguePlayer.value?.name));
+});
 
 const sortedLeaguePlayers = computed(() => {
     let leaguePlayersList = getLeagueList(props.leagueGames, props.leaguePlayers);
@@ -89,6 +113,12 @@ const setSortValue = (value:SortValueLeague) => {
 const giveArrowClass = (value:string) => {
     if(value == sortValue.value)
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
+}
+
+let getGameTime = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
 }
 </script>
 
@@ -154,6 +184,28 @@ table td{
 .mvp-arrow-up::after{
     bottom: 18px;
     border-bottom-color: var(--main-color);
+}
+
+/* 1. Design für den "Griff" (Strich) */
+.drag-handle {
+  width: 40px;          /* Breite des Strichs */
+  height: 5px;          /* Dicke des Strichs */
+  background-color: var(--main-color); /* Hellgrau */
+  border-radius: 10px;  /* Runde Enden */
+  margin: 0 auto;       /* Zentrieren */
+  cursor: grab;         /* Zeigt an, dass man ziehen kann */
+}
+
+/* 2. Styling der Sidebar selbst (nur für Mobile-Look) */
+.mobile-sheet {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+/* PrimeVue Header Padding anpassen, damit der Strich nicht zu viel Platz frisst */
+.mobile-sheet .p-sidebar-header {
+    padding: 10px 0 5px 0 !important;
+    justify-content: center; /* Stellt sicher, dass der Slot zentriert ist */
 }
 
 /*MOBILE*/
