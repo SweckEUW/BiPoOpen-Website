@@ -1,23 +1,33 @@
 
 <template>
 
-    <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[80%] rounded-xs mobile-sheet" :blockScroll="true"  :showCloseIcon="false">
+    <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[80%] rounded-xs mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-content-center" v-if="selectedLeaguePlayer">
                 <!-- <div class="drag-handle"></div> -->
-                <Image class="h-[150px]" :src="selectedLeaguePlayer.logo" preview
-                    :pt="{ 
-                        toolbar: { style: 'display: none' },
-                        previewMask: { style: 'background: transparent; opacity: 0' },
-                        mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
-                    }"
-                />
+
+                <div class="flex flex-column align-items-center">
+                    <div class="font-bold text-[20px]">{{ selectedLeaguePlayer.name }}</div>
+                    <Image class="h-[150px]" :src="selectedLeaguePlayer.logo" preview
+                        :pt="{ 
+                            toolbar: { style: 'display: none' },
+                            previewMask: { style: 'background: transparent; opacity: 0' },
+                            mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
+                        }"
+                    />
+                </div>
             </div>
         </template>
 
-        <div v-if="selectedLeaguePlayer" >
-            <div v-for="match in gamesFromSelectedLeaguePlayer" :key="match.time!" style="margin-top: 10px;">
-                <div style="color: var(--main-color)">{{ getGameTime(match. time!) }}</div>
+        <div v-if="selectedLeaguePlayer">
+            <div class="mt-[10px] font-bold text-[20px]">Absolvierte Spiele</div>
+            <div v-for="match in gamesFromSelectedLeaguePlayer.matchesPlayed" style="margin-top: 10px;">
+                <div v-if="match.time">{{ getGameTime(match.time) }}</div>
+                <MatchElement :match="match"/> 
+            </div>
+
+            <div class="mt-[40px] font-bold text-[20px]">Offene Spiele</div>
+            <div v-for="match in gamesFromSelectedLeaguePlayer.matchesToPlay" style="margin-top: 10px;">
                 <MatchElement :match="match"/> 
             </div>
         </div>
@@ -34,9 +44,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(player, index) in sortedLeaguePlayers" :key="index">
+            <tr v-for="(player, index) in sortedLeaguePlayers" :key="index" @click="selectedLeaguePlayer = leaguePlayers.find(lp => lp.name === player.name); leaguePlayerOverviewVisible = true">
                 <td>{{ player.placement! + 1}}</td>
-                <td @click="selectedLeaguePlayer = leaguePlayers.find(lp => lp.name === player.name); leaguePlayerOverviewVisible = true">
+                <td>
                     <div class="lg-team">
                         <img class="lg-logo" :src="props.leaguePlayers.find(lp => lp.name === player.name)?.logo">
                         <div>{{ player.name.replace(" ","\n") }}</div>
@@ -78,8 +88,28 @@ let leaguePlayerOverviewVisible = ref(false);
 let selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
 
 const gamesFromSelectedLeaguePlayer = computed(() => {
-    if(!selectedLeaguePlayer.value) return [];
-    return props.leagueGames.filter((match) => match.team1.players.find(player => player.name === selectedLeaguePlayer.value?.name) || match.team2.players.find(player => player.name === selectedLeaguePlayer.value?.name));
+    if(!selectedLeaguePlayer.value) return { matchesPlayed: [] as Match[], matchesToPlay: [] as Match[] };
+
+    let matchesPlayed = props.leagueGames.filter((match) => match.team1.players.find(player => player.name === selectedLeaguePlayer.value?.name) || match.team2.players.find(player => player.name === selectedLeaguePlayer.value?.name));
+
+    let matchesToPlay:Match[] = [];
+
+    let selectedPlayerName = selectedLeaguePlayer.value.name;
+    props.leaguePlayers.forEach(player => {
+        if(player.name === selectedPlayerName) return;
+
+        if(matchesPlayed.find(match => (match.team1.players.find(p => p.name === player.name) || match.team2.players.find(p => p.name === player.name))))
+            return;
+
+        let newMatch = {
+            team1: { _id: "", players: [ {name: selectedLeaguePlayer.value!.name} ] },
+            team2: { _id: "", players: [ {name: player.name} ] }
+        } as Match;
+
+        matchesToPlay.push(newMatch);
+    });
+    
+    return { matchesPlayed: matchesPlayed, matchesToPlay: matchesToPlay };
 });
 
 const sortedLeaguePlayers = computed(() => {
