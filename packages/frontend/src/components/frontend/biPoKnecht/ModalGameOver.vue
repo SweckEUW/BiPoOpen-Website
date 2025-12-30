@@ -36,10 +36,12 @@
 import Modal from '@/components/shared/Modal.vue';
 import { PropType } from 'vue';
 import router from '@/router.js';
+import { addLeagueGame } from '../league/LeagueUtilFunctions';
 import { addOpenGame } from '../openGames/OpenGamesUtilFunctions';
 
 const props = defineProps({
-  match: { type: Object as PropType<Match>, required: true }
+    match: { type: Object as PropType<Match>, required: true },
+    isLeagueGame: {type: Boolean, required: false, default: false }
 });
 
 let getPlayerName = (teamIndex: number, playerIndex: number) => {
@@ -71,11 +73,18 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
 }
 
 let endGame = async () => {
-    console.log(props.match);
-    let success = await addOpenGame(props.match);
-    if(success){
-        router.push({path: '/Offene-Spiele'});
-    } 
+    if(props.isLeagueGame){
+        let success = await addLeagueGame(props.match);
+        if(success){
+            router.push({path: '/League'});
+        } 
+    }
+    else{
+        let success = await addOpenGame(props.match);
+        if(success){
+            router.push({path: '/Offene-Spiele'});
+        }
+    }
 }   
 </script>
 
@@ -83,6 +92,9 @@ let endGame = async () => {
 .ModalGameOver .mo-container{
     height: 90%;
     overflow: auto;
+}
+.mo-button{
+   width: 100%;
 }
 </style>
 

@@ -74,7 +74,7 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
     // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
         if(player2.averageWins == player1.averageWins && player2.wins == player1.wins)
-            return player2.averageScore - player1.averageScore;
+            return player2.averageHits - player1.averageHits;
         else if(player2.averageWins == player1.averageWins)
             return player2.wins - player1.wins;
         
@@ -84,7 +84,7 @@ export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boo
     // Set placement
     for (let i = 0; i < playersWithStats.length; i++){
         playersWithStats[i].placement = i;
-        let playersWithSameScore = playersWithStats.filter((player) => player.averageWins == playersWithStats[i].averageWins && player.averageScore == playersWithStats[i].averageScore && player.wins == playersWithStats[i].wins);
+        let playersWithSameScore = playersWithStats.filter((player) => player.averageWins == playersWithStats[i].averageWins && player.averageHits == playersWithStats[i].averageHits && player.wins == playersWithStats[i].wins);
         if(playersWithSameScore.length > 1){
             playersWithSameScore.forEach((playerWithSameScore) => {
                 playerWithSameScore.placement = playersWithSameScore[0].placement;
@@ -110,18 +110,21 @@ export const getPlayersWithStats = (openGames:Match[], oneVersusOne:boolean) => 
 
     allPlayers.forEach((playerName) => {
         let ammountOfMatches = getMatchesFromPlayer(openGames, playerName, oneVersusOne).length;
-        let score = getAmmountOfHitsFromPlayer(openGames, playerName, oneVersusOne);
+        let hits = getAmmountOfHitsFromPlayer(openGames, playerName, oneVersusOne);
         let wins = getAmmountOfWinsFromPlayer(openGames, playerName, oneVersusOne);
 
         let player = {
             name: playerName,
-            score: score,
+            hits: hits,
             ammountOfMatches: ammountOfMatches,
             ammountOfMatchesWithTrackedShots: ammountOfMatches,
             ammountOfDrunkenCups: getAmmountOfDrunkenCupsFromPlayer(openGames, playerName),
             wins: wins,
-            averageScore: Math.round((ammountOfMatches == 0 ? 0 : score / ammountOfMatches) * 100) / 100, // TODO: if average is 7 show 7.00
             averageWins: Math.round((ammountOfMatches == 0 ? 0 : wins / ammountOfMatches) * 100),
+            averageHits: ammountOfMatches == 0 ? 0 : hits / ammountOfMatches, 
+            looses: ammountOfMatches - wins,
+            hitDifference: "",
+            hitDifferenceNumber: 0
         };
 
         playerWithStats.push(player); 

@@ -1,3 +1,47 @@
+<template>
+    <div class="MVP">
+        
+        <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
+            Die MVP-Liste ist noch nicht verfügbar
+        </div>
+
+        <div v-else>
+
+            <table class="table table-hover caption-top">
+                <thead>
+                    <tr style="height: auto;">
+                        <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
+                        <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
+                        <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                        <th @click="setSortValue('hits')" :class="giveArrowClass('hits')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
+                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
+                        <th v-if="windowWidth > 375" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(player, index) in sortedMVPList" :key="index">
+                        <td>{{ player.placement! + 1}}</td>
+                        <td>{{ player.name.replace(" ","\n") }}</td>
+                        <td>{{ player.averageHits.toFixed(2) }}</td>
+                        <td>{{ player.hits }}</td>
+                        <td>{{ player.ammountOfMatches }}</td>
+                        <td v-if="windowWidth > 375">{{ player.ammountOfDrunkenCups }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div v-if="windowWidth < 900" class="mvp-explain">
+                <div>*Pl. = Platz</div>
+                <div>*Trfq. = Trefferquote</div>
+                <div>*Trf. = Treffer</div>
+                <div>*Spi. = Spiele</div>
+                <div v-if="windowWidth > 375">*Getru. Becher = Getrunkene Becher</div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
 <script setup lang="ts">
 import { ref, computed, PropType } from "vue"
 import { getMVPList } from "@/util/tournamentPlayerFunctions";
@@ -6,7 +50,7 @@ let props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true }
 });
 
-let sortValue = ref<SortValueMVP>("averageScore");
+let sortValue = ref<SortValueMVP>("averageHits");
 let sortUp = ref(false);
 
 let windowWidth = ref(window.screen.width);
@@ -48,50 +92,6 @@ const giveArrowClass = (value:string) => {
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
 }
 </script>
-
-<template>
-    <div class="MVP">
-        
-        <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
-            Die MVP-Liste ist noch nicht verfügbar
-        </div>
-
-        <div v-else>
-
-            <table class="table table-hover caption-top">
-                <thead>
-                    <tr style="height: auto;">
-                        <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                        <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                        <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
-                        <th @click="setSortValue('score')" :class="giveArrowClass('score')">{{ windowWidth > 900 ? 'Treffer' : 'Trf.'}}</th>
-                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
-                        <th v-if="windowWidth > 375" @click="setSortValue('ammountOfDrunkenCups')" :class="giveArrowClass('ammountOfDrunkenCups')">{{ windowWidth > 900 ? 'Getrunkene Becher' : 'Getru. Becher'}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(player, index) in sortedMVPList" :key="index">
-                        <td>{{ player.placement! + 1}}</td>
-                        <td>{{ player.name.replace(" ","\n") }}</td>
-                        <td>{{ player.averageScore }}</td>
-                        <td>{{ player.score }}</td>
-                        <td>{{ player.ammountOfMatches }}</td>
-                        <td v-if="windowWidth > 375">{{ player.ammountOfDrunkenCups }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div v-if="windowWidth < 900" class="mvp-explain">
-                <div>*Pl. = Platz</div>
-                <div>*Trfq. = Trefferquote</div>
-                <div>*Trf. = Treffer</div>
-                <div>*Spi. = Spiele</div>
-                <div v-if="windowWidth > 375">*Getru. Becher = Getrunkene Becher</div>
-            </div>
-        </div>
-
-    </div>
-</template>
 
 <style scoped>
 .mvp-text{

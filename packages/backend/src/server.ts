@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { config } from './config/config';
 import tournamentRoutes from './routes/Tournament';
 import openGameRoutes from './routes/OpenGame';
+import leagueGameRoutes from './routes/LeagueGame';
 
 const router = express();
 
@@ -10,7 +11,7 @@ const router = express();
 mongoose.connect(config.mongo.url, { retryWrites: true, w: 'majority', dbName: "bipoopen"}).then(() => {
     console.log('MongoDB connected');
     StartServer();
-}).catch((err) => {
+}).catch((err) => { 
     console.log('MongoDB connection error:', err);
 });
 
@@ -47,6 +48,7 @@ const StartServer = () => {
     // Routes
     router.use('/tournaments', tournamentRoutes);
     router.use('/openGames', openGameRoutes);
+    router.use('/leagueGames', leagueGameRoutes);
 
     // Error handling
     router.use((req, res, next) => {

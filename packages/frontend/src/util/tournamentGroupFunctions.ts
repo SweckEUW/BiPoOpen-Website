@@ -42,9 +42,9 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
                 name: tournamentGroups[i].teams[x].name,
                 players: tournamentGroups[i].teams[x].players,
                 wins: getAmmountOfWinsFromTeam(tournament, teamName, true),
-                games: getAmmountOfMatchesFromPlayer(tournament, tournamentGroups[i].teams[x].players[0].name, true),
-                score: ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam,
-                scoreDifference: ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam,
+                ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, tournamentGroups[i].teams[x].players[0].name, true),
+                hitDifference: ammountOfHitsFromTeam + " : " + ammountOfEnemyHitsFromTeam,
+                hitDifferenceNumber: ammountOfHitsFromTeam - ammountOfEnemyHitsFromTeam,
                 hits: ammountOfHitsFromTeam
             }
 
@@ -55,13 +55,10 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
     // Sort after wins, hit difference and direct win against component
     groupsWithStats.forEach((group) => {
         group.teams = group.teams.sort((team1, team2) => {
-            // TODO: Implement check if team 1 vs team 2 function inside group
-            // if (team1.hits == team2.hits && team1.scoreDifference == team2.scoreDifference && team1.wins == team2.wins)
-            //     return checkIfTeam1WonVsTeam2(tournament, team1.name, team2.name) ? 1 : -1;
-            if (team2.scoreDifference == team1.scoreDifference && team1.wins == team2.wins)
+            if (team2.hitDifferenceNumber == team1.hitDifferenceNumber && team1.wins == team2.wins)
                 return team2.hits - team1.hits;
             else if(team1.wins == team2.wins)
-                return team2.scoreDifference - team1.scoreDifference;
+                return team2.hitDifferenceNumber - team1.hitDifferenceNumber;
 
             return team2.wins - team1.wins;
         });

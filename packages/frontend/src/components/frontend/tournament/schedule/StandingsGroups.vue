@@ -34,9 +34,9 @@ window.addEventListener("resize", () => {
                     <td>{{team.name}}</td>
                     <td><span v-for="player in team.players">{{player.name}}</span></td>
                     <td>{{ team.wins }}</td>
-                    <td>{{ team.games }}</td>
-                    <td v-if="tournament.settings.trackTeamShots">{{ team.score }}</td>
-                    <td v-if="tournament.settings.trackTeamShots && windowWidth > 360">{{ team.scoreDifference }}</td>
+                    <td>{{ team.ammountOfMatches }}</td>
+                    <td v-if="tournament.settings.trackTeamShots">{{ team.hits }}</td>
+                    <td v-if="tournament.settings.trackTeamShots && windowWidth > 360">{{ team.hitDifference }}</td>
                 </tr>
             </tbody>
         </table>

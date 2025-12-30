@@ -10,8 +10,5 @@
         "dev:backend": "npm run dev --workspace=bipoopen-backend",
         "build": "npm run build --workspace=bipoopen-frontend",
         "build:backend": "npm run build --workspace=bipoopen-backend"
-    },
-    "devDependencies": {
-        "sass-embedded": "^1.97.1"
     }
 }

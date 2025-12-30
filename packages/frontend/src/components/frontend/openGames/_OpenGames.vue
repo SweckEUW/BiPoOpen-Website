@@ -1,33 +1,3 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
-import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import OpenGamesStatistics from './OpenGamesStatistics.vue';
-import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-
-let openGames = ref<Match[]>([]);
-let isLoading = ref(true);
-let showModalAddGame = ref(false);
-
-let getOpenGameDate = (dateNumber:number) => {
-    let date = new Date(dateNumber);
-    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
-}
-
-const getOpenGames = async () => {
-    openGames.value = await getAllOpenGames();
-    openGames.value = openGames.value.reverse();
-    isLoading.value = false;
-}
-getOpenGames();
-
-const toggleModalAddGame = () => {
-    showModalAddGame.value = !showModalAddGame.value;
-}
-</script>
-
 <template>
     <div class="OpenGames">
         
@@ -59,9 +29,9 @@ const toggleModalAddGame = () => {
             <!-- Content -->
             <div class="tab-content" id="OpenGamesStatisticsContainer">
                 <div class="tab-pane fade show active" :id="'OpenGamesMain'">
-                    <div v-for="openGame in openGames" :key="openGame.time!" style="margin-top: 10px;"> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
-                        <div class="og-time">{{ getOpenGameDate(openGame.time!) }}</div>
-                        <MatchElement :match="openGame"/> 
+                    <div v-for="match in openGames" :key="match.time!" style="margin-top: 10px;"> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+                        <div class="og-time">{{ getGameTime(match.time!) }}</div>
+                        <MatchElement :match="match"/> 
                     </div>
                 </div>
 
@@ -74,6 +44,36 @@ const toggleModalAddGame = () => {
 
     </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import ModalAddOpenGame from '@/components/frontend/openGames/ModalAddOpenGame.vue';
+import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
+import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import OpenGamesStatistics from './OpenGamesStatistics.vue';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+
+let openGames = ref<Match[]>([]);
+let isLoading = ref(true);
+let showModalAddGame = ref(false);
+
+let getGameTime = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
+}
+
+const getOpenGames = async () => {
+    openGames.value = await getAllOpenGames();
+    openGames.value = openGames.value.reverse();
+    isLoading.value = false;
+}
+getOpenGames();
+
+const toggleModalAddGame = () => {
+    showModalAddGame.value = !showModalAddGame.value;
+}
+</script>
 
 <style scoped>
 .og-time{

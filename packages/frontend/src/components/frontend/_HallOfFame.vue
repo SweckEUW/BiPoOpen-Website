@@ -38,7 +38,7 @@ const getSortedHallOfFameList = () => {
         playersWithStats.forEach((player) => {
             let playerInList = players.find((playerTMP) => playerTMP.name == player.name);
             if(playerInList){
-                playerInList.score += player.score;
+                playerInList.hits += player.hits;
                 playerInList.ammountOfMatches += player.ammountOfMatches;
                 playerInList.ammountOfMatchesWithTrackedShots += player.ammountOfMatchesWithTrackedShots;
                 playerInList.ammountOfDrunkenCups += player.ammountOfDrunkenCups;
@@ -56,13 +56,13 @@ const getSortedHallOfFameList = () => {
         let averageWins = player.wins / player.ammountOfMatches;
         player.averageWins = Math.round(averageWins * 100);
 
-        // Calculate correct averageScore
-        player.averageScore = player.score / player.ammountOfMatchesWithTrackedShots;
-        player.averageScore = Math.round(player.averageScore * 100) / 100; // Round average Score
-        if(player.score == 0){
+        // Calculate correct averageHits
+        player.averageHits = player.hits / player.ammountOfMatchesWithTrackedShots;
+        player.averageHits = Math.round(player.averageHits * 100) / 100; // Round average Hits
+        if(player.hits == 0){
             // @ts-ignore
-            player.averageScore = "/"; // @ts-ignore
-            player.score = "/";
+            player.averageHits = "/"; // @ts-ignore
+            player.hits = "/";
         }
     });
 
@@ -156,7 +156,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     <tr style="height: auto;">
                         <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
                         <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                        <th @click="setSortValue('averageScore')" :class="giveArrowClass('averageScore')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
+                        <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
                         <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
                         <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spie.'}}</th>
                         <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Sieg. (%)'}}</th>
@@ -166,7 +166,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                     <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
                         <td>{{ player.placement! + 1}}</td>
                         <td>{{ player.name.replace(" ","\n") }}</td>
-                        <td>{{ player.averageScore }}</td>
+                        <td>{{ player.averageHits }}</td>
                         <td>{{ player.wins }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
                         <td>{{ player.averageWins + "%" }}</td>

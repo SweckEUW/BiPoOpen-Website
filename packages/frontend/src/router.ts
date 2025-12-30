@@ -46,7 +46,17 @@ const routes = [
 		name: 'BiPo-Knecht',
 		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
 		meta: {
-			title: 'Weck BiPo Open Knecht',
+			title: 'Weck BiPo Knecht',
+			description: 'BiPo Knecht'
+		}
+	},
+
+		{
+		path: '/Knecht',
+		name: 'BiPo-Knecht',
+		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
+		meta: {
+			title: 'Weck BiPo Knecht',
 			description: 'BiPo Knecht'
 		}
 	},
@@ -55,6 +65,16 @@ const routes = [
 	{
 		path: '/BiPo-League',
 		name: 'BiPo-League',
+		component: () => import('@/components/frontend/league/_League.vue'),
+		meta: {
+			title: 'Weck BiPo League',
+			description: 'BiPo League'
+		}
+	},
+
+	{
+		path: '/League',
+		name: 'BiPo League',
 		component: () => import('@/components/frontend/league/_League.vue'),
 		meta: {
 			title: 'Weck BiPo League',
