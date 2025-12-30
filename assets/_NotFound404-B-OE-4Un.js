@@ -1,0 +1,1 @@
+import{_ as s,c as o,o as n,a as t}from"./index-fApTNo9T.js";const a={},c={class:"NotFound404"};function d(r,e){return n(),o("div",c,[...e[0]||(e[0]=[t("h1",{class:"bp-title",style:{"margin-top":"150px"}},"404",-1),t("h1",{class:"bp-title"},"Seite nicht gefunden",-1)])])}const i=s(a,[["render",d],["__scopeId","data-v-1df93d12"]]);export{i as default};
