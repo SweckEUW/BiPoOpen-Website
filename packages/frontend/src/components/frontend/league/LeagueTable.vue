@@ -168,15 +168,26 @@ tbody tr{
     font-size: 18px;
 }
 tbody tr:nth-of-type(1){
-    background: var(--secondary-color-weak);
+    background: #96deee;
     font-size: 22px;
 }
 tbody tr:nth-of-type(2){
-    background: #e6faff;
+    background: #c1f1fd;
 }
 tbody tr:nth-of-type(3){
-    background: #f4fdff;
+    background: #dbf8ff;
 }
+tbody tr:nth-last-of-type(3){
+    background: #f3d4d7;
+    font-size: 22px;
+}
+tbody tr:nth-last-of-type(2){
+    background: #eeaab1;
+}
+tbody tr:nth-last-of-type(1){
+    background: #e97f89;
+}
+
 table th{ 
     position: sticky;
     top: 260px;
