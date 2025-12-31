@@ -14,7 +14,7 @@
 
         <Loadingscreen v-if="isLoading"/>
 
-        <div v-show="!isLoading">
+        <div v-if="!isLoading">
 
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
@@ -57,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import LeagueTable from './LeagueTable.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';

@@ -155,11 +155,22 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
 
     // Sort after wins, hit difference and direct win against component
     playersWithStats.sort((player1, player2) => {
-        if(player1.wins == player2.wins && player1.hitDifferenceNumber == player2.hitDifferenceNumber)
-            return player1.name.localeCompare(player2.name);  // TODO: Replace with direct win check
-        else if(player1.wins == player2.wins)
+        // 1. Priorität: Anzahl der Siege (wins)
+        if (player1.wins !== player2.wins) {
+            return player2.wins - player1.wins;
+        }
+
+        // 2. Priorität: Trefferdifferenz (hitDifferenceNumber)
+        if (player1.hitDifferenceNumber !== player2.hitDifferenceNumber) {
             return player2.hitDifferenceNumber - player1.hitDifferenceNumber;
-        return player2.wins - player1.wins;
+        }
+
+        // 3. Priorität: Erzielte Treffer (Mehr ist besser)
+        // HINWEIS: Ersetze 'hitsWon' mit deiner Variable für die eigenen Treffer
+        const p1OwnHits = parseInt(player1.hitDifference.split(':')[0]);
+        const p2OwnHits = parseInt(player2.hitDifference.split(':')[0]);
+
+        return p2OwnHits - p1OwnHits;
     });
     
 
@@ -167,7 +178,11 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
     for (let i = 0; i < playersWithStats.length; i++) {
         playersWithStats[i].placement = i;
 
-        let playersWithSameScore = playersWithStats.filter((player) => player.wins == playersWithStats[i].wins && player.hitDifferenceNumber == playersWithStats[i].hitDifferenceNumber)
+        let playersWithSameScore = playersWithStats.filter((player) => 
+            player.wins == playersWithStats[i].wins && 
+            player.hitDifferenceNumber == playersWithStats[i].hitDifferenceNumber &&
+            player.hitDifference.split(':')[0] == playersWithStats[i].hitDifference.split(':')[0]
+        )
         if(playersWithSameScore.length > 1){
             playersWithSameScore.forEach((playerWithSameScore) => {
                 playerWithSameScore.placement = playersWithSameScore[0].placement;
