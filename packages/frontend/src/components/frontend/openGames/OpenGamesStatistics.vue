@@ -78,7 +78,7 @@ const props = defineProps({
 let sortValue = ref<SortValueOpenGames>("averageWins");
 let sortUp = ref(false);
 
-let withoutEastGermany = ref(true);
+let withoutEastGermany = ref(false);
 
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
