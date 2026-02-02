@@ -19,24 +19,31 @@
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
                 <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#OpenGamesMain'">Vergangene Spiele</button>
+                    <button class="nav-link active" data-bs-toggle="tab" :data-bs-target="'#OpenGamesStats'">Statistiken</button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#OpenGamesStats'">Statistiken</button>
+                    <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#OpenGamesMain'">Spiele</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#OpenGamesNackteMeile'">Nackte Meilen</button>
                 </li>
             </ul>
 
             <!-- Content -->
             <div class="tab-content" id="OpenGamesStatisticsContainer">
-                <div class="tab-pane fade show active" :id="'OpenGamesMain'">
+                <div class="tab-pane fade show active" :id="'OpenGamesStats'">
+                    <OpenGamesStatistics :openGames="openGames"/>
+                </div>
+
+                <div class="tab-pane fade" :id="'OpenGamesMain'">
                     <div v-for="match in openGames" :key="match.time!" style="margin-top: 10px;"> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
                         <div class="og-time">{{ getGameTime(match.time!) }}</div>
                         <MatchElement :match="match"/> 
                     </div>
                 </div>
 
-                <div class="tab-pane fade" :id="'OpenGamesStats'">
-                    <OpenGamesStatistics :openGames="openGames"/>
+                <div class="tab-pane fade" :id="'OpenGamesNackteMeile'">
+                    <NackteMeilenTracker :openGames="openGames"/>
                 </div>
             </div>
 
@@ -52,6 +59,7 @@ import { getAllOpenGames } from "@/components/frontend/openGames/OpenGamesUtilFu
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import OpenGamesStatistics from './OpenGamesStatistics.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import NackteMeilenTracker from './NackteMeilenTracker.vue';
 
 let openGames = ref<Match[]>([]);
 let isLoading = ref(true);
