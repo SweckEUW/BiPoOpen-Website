@@ -83,6 +83,7 @@
             Nachdem das gegnerische Team den letzten Becher getroffen hat greift die Gentleman's Rule und das andere Team darf nachwerfen. 
             Trifft dieses Team nun ebenfalls seine letzten Becher, geht das Spiel in die Verlängerung mit 2x3 Cups (Ausnahme: trifft nach der Gentleman's Rule das Nachwerferteam seinen letzten Becher mit beiden Bällen, so hat dieses Team direkt gewonnen).
             <strong>Ein Spieler kann bei der Gentleman's Rule solange in Folge werfen, bis er nicht mehr trifft.</strong>
+            Zusätzliche Würfe (z. B. durch „On-Fire“ oder „Balls-Back“) werden nicht mit der Gentleman’s Rule addiert. Werden beide Regeln gleichzeitig ausgelöst, erhält der Spieler trotzdem nur einen weiteren Wurf.
         </div>
     </div>
 </template>
