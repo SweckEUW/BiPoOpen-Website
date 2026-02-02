@@ -168,14 +168,17 @@ tbody tr{
     font-size: 18px;
 }
 tbody tr:nth-of-type(1){
-    background: #96deee;
+    background: #8fe4f7;
     font-size: 22px;
 }
 tbody tr:nth-of-type(2){
-    background: #c1f1fd;
+    background: #aaeafa;
 }
 tbody tr:nth-of-type(3){
-    background: #dbf8ff;
+    background: #b5ecfa;
+}
+tbody tr:nth-of-type(4){
+    background: #c6f2fd;
 }
 tbody tr:nth-last-of-type(3){
     background: #f3d4d7;
