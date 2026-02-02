@@ -24,6 +24,9 @@
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#LeagueGames'">Spiele</button>
                 </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" :data-bs-target="'#LeagueInfo'">Info</button>
+                </li>
             </ul>
 
             <!-- Content -->
@@ -48,6 +51,32 @@
                         <div style="color: var(--main-color)">{{ getGameTime(match.time!) }}</div>
                         <MatchElement :match="match"/> 
                     </div>
+                </div>
+
+                <div class="tab-pane fade" :id="'LeagueInfo'">
+                    <h1 class="bp-title">Info zur BiPo League</h1>
+
+                    <h2>Wettbewerbsmodus & Dauer</h2>
+                    <ul>
+                        <li><strong>System:</strong> 1 gegen 1 (Jeder gegen Jeden) mit Hin- und Rückspiel.</li>
+                        <li><strong>Regeln:</strong> Offizielle BiPo-Open-Regeln, jedoch <u>ohne</u> „On-Fire“.</li>
+                        <li><strong>Saison:</strong> Dauer: 6 Monate. Abschluss: Final-Four-Turnier.</li>
+                        <li><strong>Final Four:</strong> Die Top 4 spielen um den Titel (1. gegen 4., 2. gegen 3.). Halbfinale und Finale im Best-of-3-Modus.</li>
+                    </ul>
+
+                    <h2>Termine & Ablauf</h2>
+                    <ul>
+                        <li><strong>Flexibilität:</strong> Matches können an festen Spieltagen oder flexibel (z. B. auf Partys) stattfinden.</li>
+                        <li><strong>Schiedsrichter:</strong> Pflicht bei jedem Match. Der Schiedsrichter muss selbst Ligaspieler sein und das Protokoll führen.</li>
+                        <li><strong>Quote:</strong> Ziel sind ca. 5 Spiele pro Monat, um auf ~30 Saisonspiele zu kommen.</li>
+                    </ul>
+
+                    <h2>Auf- und Abstieg</h2>
+                    <p>
+                        Um die Dynamik der Liga zu erhalten, steigen am Saisonende die letztplatzierten Spieler direkt in die untere Liga ab. 
+                        Im Gegenzug steigen die bestplatzierten Spieler der unteren Liga direkt auf.
+                        (Optional: Relegationsspiele sind möglich, falls zwei Spieler punktgleich sind.)
+                    </p>
                 </div>
             </div>
 
@@ -155,6 +184,17 @@ let getGameTime = (dateNumber:number) => {
 }
 .nav-item button{
     width: 100%;
+}
+
+h2{
+    font-size: 24px;
+    width: 100%;
+    text-align: center;
+    color: var(--secondary-color);
+    margin-top: 20px;
+}
+ul{
+    padding: 0;
 }
 
 /* MOBILE */

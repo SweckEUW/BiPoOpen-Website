@@ -55,7 +55,7 @@
                 <td>{{ player.ammountOfMatches }}</td>
                 <td>{{ player.wins }}</td>
                 <td>{{ player.ammountOfMatches - player.wins }}</td>
-                <td>{{ player.hitDifference }}</td>
+                <td style="white-space: pre-line;">{{ `${player.hitDifference}\n(${player.hitDifferenceNumber > 0 ? '+' : ''}${player.hitDifferenceNumber})` }}</td>
             </tr>
         </tbody>
     </table>
@@ -113,18 +113,22 @@ const gamesFromSelectedLeaguePlayer = computed(() => {
 });
 
 const sortedLeaguePlayers = computed(() => {
+
     let leaguePlayersList = getLeagueList(props.leagueGames, props.leaguePlayers);
 
-    // Sort the MVP List depenging on the sortValue
-    leaguePlayersList.sort((player1, player2) => {
-        if(sortValue.value == "name") // sort strings
-            return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
+    // if(sortValue.value == "null")
+    //     return leaguePlayersList;
 
-        if(player2[sortValue.value] == player1[sortValue.value])
-            return sortUp.value ? player2.placement! - player1.placement! : player1.placement! - player2.placement!;
+    // // Sort the MVP List depenging on the sortValue
+    // leaguePlayersList.sort((player1, player2) => {
+    //     if(sortValue.value == "name") // sort strings
+    //         return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
+
+    //     if(player2[sortValue.value] == player1[sortValue.value])
+    //         return sortUp.value ? player2.placement! - player1.placement! : player1.placement! - player2.placement!;
         
-        return sortUp.value ? player1[sortValue.value]! - player2[sortValue.value]! : player2[sortValue.value]! - player1[sortValue.value]!;
-    });
+    //     return sortUp.value ? player1[sortValue.value]! - player2[sortValue.value]! : player2[sortValue.value]! - player1[sortValue.value]!;
+    // });
 
     return leaguePlayersList;
 })
@@ -144,6 +148,7 @@ const setSortValue = (value:SortValueLeague) => {
 }
 
 const giveArrowClass = (value:string) => {
+    return "";
     if(value == sortValue.value)
         return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
 }
