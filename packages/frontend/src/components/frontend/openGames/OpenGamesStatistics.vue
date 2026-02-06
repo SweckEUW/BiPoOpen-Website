@@ -1,7 +1,7 @@
 
 <template> 
     <div style="padding: 15px 0px; text-align: center; color: var(--main-color); font-weight: bold; font-size: 14px;">
-        Damit ein Spieler in den Statistiken erscheint, muss er gegen mindestens 10 Spiele gespielt haben
+        Damit ein Spieler in den Statistiken erscheint, muss er mindestens 10 Spiele gespielt haben
     </div>
 
     <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
