@@ -85,11 +85,11 @@ const routes = [
 	
 
 	{
-		path: '/2025/Anmeldung',
+		path: '/2026/Anmeldung',
 		name: 'Teamanmeldung',
 		component: () => import('@/components/frontend/_Teamanmeldung.vue'),
 		meta: {
-			title: 'Weck BiPo Open 2025 - Anmeldung',
+			title: 'Weck BiPo Open 2026 - Anmeldung',
 			description: 'Anmeldung'
 		},
 	},
@@ -142,7 +142,7 @@ const routes = [
 	// Redirect
 	{
 		path: '/Spielplan',
-		redirect: '/2025/Spielplan'
+		redirect: '/2026/Spielplan'
 	},
 
 	/////////////

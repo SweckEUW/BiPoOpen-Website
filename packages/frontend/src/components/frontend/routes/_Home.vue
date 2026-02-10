@@ -79,21 +79,21 @@ var timer = setInterval(updateRemainingTime, 1000);
             </div> -->
 
             <!-- Anmeldung -->
-            <!-- <router-link class="ho-share" :to="'/2025/anmeldung'">Weck BiPo Open 2025 Anmeldung</router-link> -->
+            <!-- <router-link class="ho-share" :to="'/2026/Anmeldung'">Weck BiPo Open 2026 Anmeldung</router-link> -->
 
             <!-- Teilnehmende Teams -->
-            <!-- <router-link class="ho-share" :to="'/2025'">Weck BiPo Open 2025 Teams</router-link> -->
+            <!-- <router-link class="ho-share" :to="'/2026'">Weck BiPo Open 2026 Teams</router-link> -->
 
             <!-- Spielplan -->
-            <!-- <router-link class="ho-share" :to="'/2025/Spielplan'">Weck BiPo Open 2025 Spielplan</router-link> -->
+            <!-- <router-link class="ho-share" :to="'/2026/Spielplan'">Weck BiPo Open 2026 Spielplan</router-link> -->
 
             <!-- Fotos -->
-            <router-link class="ho-share" :to="'/2025/Fotos'">Weck BiPo Open 2025 Fotos</router-link>
+            <router-link class="ho-share" :to="'/2026/Fotos'">Weck BiPo Open 2026 Fotos</router-link>
         </div>
 
         <div v-if="countdownOver" class="ho-links">
-            <router-link class="ho-share" :to="'/2025/Spielplan'">Spielplan</router-link>
-            <router-link class="ho-share" :to="'/2025/MVP'">MVP</router-link>
+            <router-link class="ho-share" :to="'/2026/Spielplan'">Spielplan</router-link>
+            <router-link class="ho-share" :to="'/2026/MVP'">MVP</router-link>
             <router-link class="ho-share" :to="'/Regeln'">Regeln</router-link>
         </div>
 
