@@ -88,7 +88,7 @@ var timer = setInterval(updateRemainingTime, 1000);
             <!-- <router-link class="ho-share" :to="'/2026/Spielplan'">Weck BiPo Open 2026 Spielplan</router-link> -->
 
             <!-- Fotos -->
-            <router-link class="ho-share" :to="'/2026/Fotos'">Weck BiPo Open 2026 Fotos</router-link>
+            <router-link class="ho-share" :to="'/2025/Fotos'">Weck BiPo Open 2025 Fotos</router-link>
         </div>
 
         <div v-if="countdownOver" class="ho-links">
