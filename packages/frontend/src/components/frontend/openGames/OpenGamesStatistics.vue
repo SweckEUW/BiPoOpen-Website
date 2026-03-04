@@ -15,7 +15,7 @@
 
         <div class="swiper-wrapper">
 
-            <div class="rt-table swiper-slide" v-for="(openGamesStatistic ,groupIndex) in openGamesStatistics" :key="groupIndex">
+            <div class="rt-table swiper-slide" v-for="(openGamesStatistic, groupIndex) in openGamesStatistics" :key="groupIndex">
 
                 <table class="table table-hover caption-top">
                     <thead>
@@ -30,7 +30,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(player, index) in openGamesStatistic" :key="index">
+                        <tr v-for="(player, index) in openGamesStatistic.stats" :key="index">
                             <td>{{ player.placement! + 1}}</td>
                             <td>{{ player.name.replace(" ","\n") }}</td>
                             <td>{{ player.wins }}</td>
@@ -51,6 +51,17 @@
                     <!-- <div v-if="windowWidth > 360">*Getru. Becher = Getrunkene Becher</div> -->
                 </div>
 
+                <Accordion>
+                    <AccordionPanel value="0">
+                        <AccordionHeader style="color: var(--main-color)">Spieler mit weniger als 10 Spielen</AccordionHeader>
+                        <AccordionContent>
+                            <div v-for="(player) in openGamesStatistic.lessThan10Games">
+                                {{ player.name }} : {{ player.ammountOfMatches }}
+                            </div>
+                        </AccordionContent>
+                    </AccordionPanel>
+                </Accordion>
+
             </div>
 
         </div>
@@ -59,12 +70,16 @@
 
 <script setup lang="ts">
 import { computed, onMounted, PropType, ref } from 'vue';
-import { getAllTimeOpenGamesStatsList } from './OpenGamesUtilFunctions';
+import { getAllTimeOpenGamesStatsList, getPlayersWithStats } from './OpenGamesUtilFunctions';
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import ToggleSwitch from 'primevue/toggleswitch';
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 
 const props = defineProps({
     openGames: {type: Object as PropType<Match[]>, required: true }
@@ -109,7 +124,16 @@ const openGamesStatistics = computed(() => {
         });
     })
 
-    return combinedList;
+    return {
+        "1vs1": {
+            stats: openGamesStatisticsOneVersusOne,
+            lessThan10Games: getPlayersWithStats(filteredOpenGames, true).filter((player) => player.ammountOfMatches < 10).sort((player1, player2) => player2.ammountOfMatches - player1.ammountOfMatches)  
+        },
+        "2vs2": {
+            stats: openGamesStatisticsTwoVersusTwo,
+            lessThan10Games: getPlayersWithStats(filteredOpenGames, false).filter((player) => player.ammountOfMatches < 10).sort((player1, player2) => player2.ammountOfMatches - player1.ammountOfMatches)  
+        }
+    };
 })
 
 const setSortValue = (value:SortValueOpenGames) => {

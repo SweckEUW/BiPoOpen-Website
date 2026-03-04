@@ -47,33 +47,31 @@ export const getAllOpenGameNames = async () => {
 export const getAllTimeOpenGamesStatsList = (openGames:Match[], oneVersusOne:boolean) => {
     let playersWithStats = getPlayersWithStats(openGames, oneVersusOne);
 
-    // Filter out players that dont have at least 3 Games
-    playersWithStats = playersWithStats.filter((player) => player.ammountOfMatches >= 3);
+    // Filter out players that dont have at least 10 Games
+    playersWithStats = playersWithStats.filter((player) => player.ammountOfMatches >= 10);
 
     // Filter out players that havent played played at least 10 games
-    playersWithStats = playersWithStats.filter((player) => {
-        let matches = getMatchesFromPlayer(openGames, player.name, oneVersusOne);
+    // playersWithStats = playersWithStats.filter((player) => {
+    //     // Player against at least 4 different teams
+    //     let teams = new Set<string>();
 
-        return matches.length >= 10;
+    //     let matches = getMatchesFromPlayer(openGames, player.name, oneVersusOne);
+    //     matches.forEach((match) => {
+    //         if(oneVersusOne){
+    //             if(match.team1!.players[0].name.toLowerCase() == player.name)
+    //                 teams.add(match.team2!.players[0].name);
+    //             else
+    //                 teams.add(match.team1!.players[0].name);
+    //         }else{
+    //             if(match.team1!.players.map(player => player.name.toLowerCase()).includes(player.name))
+    //                 teams.add(match.team2!.players.map(player => player.name).join(","));
+    //             else
+    //                 teams.add(match.team1!.players.map(player => player.name).join(","));
+    //         }
+    //     });
 
-        // Player against at least 4 different teams
-        // let teams = new Set<string>();
-        // matches.forEach((match) => {
-        //     if(oneVersusOne){
-        //         if(match.team1!.players[0].name.toLowerCase() == player.name)
-        //             teams.add(match.team2!.players[0].name);
-        //         else
-        //             teams.add(match.team1!.players[0].name);
-        //     }else{
-        //         if(match.team1!.players.map(player => player.name.toLowerCase()).includes(player.name))
-        //             teams.add(match.team2!.players.map(player => player.name).join(","));
-        //         else
-        //             teams.add(match.team1!.players.map(player => player.name).join(","));
-        //     }
-        // });
-
-        // return teams.size >= 4;
-    });
+    //     return teams.size >= 4;
+    // });
 
     // Sort after average wins, then after average score
     playersWithStats.sort((player1, player2) => {
