@@ -5,9 +5,9 @@
         <template #template>
             <div class="alg-modal">
 
-                <div class="w-full flex gap-[5px]">
+                <div class="w-full flex gap-[5px] mb-[20px]">
                     <div  v-for="(player, index) in players" class="w-[50%] flex flex-col justify-center align-items-center gap-[5px]" :key="index">
-                        <Select v-model="players[index]" :options="leaguePlayers" optionLabel="name" scrollHeight="300px" :placeholder="'Team ' + (index + 1)" class="w-full h-[120px]"
+                        <Select v-model="players[index]" :options="leaguePlayers" optionLabel="name" scrollHeight="300px" :placeholder="'Team ' + (index + 1)" class="w-full h-[120px] mb-[10px]"
                             :pt="{ 
                                 overlay: { style: 'width: 90%;' }, 
                                 label: { style: 'display: flex; align-items: center; justify-content: center;' },
@@ -35,7 +35,7 @@
                     </div>                    
                 </div>
 
-                <div class="mt-[20px] mb-[20px]">
+                <!-- <div class="mt-[20px] mb-[20px]">
                     <div>Schiedsrichter</div>
                     <Select :options="leaguePlayers" optionLabel="name" scrollHeight="300px" :placeholder="'Schiedsrichter'" class="w-full h-[120px]"
                         :pt="{ 
@@ -60,7 +60,7 @@
                             </div>
                         </template>
                     </Select>
-                </div>
+                </div> -->
             </div>
         </template>
 
