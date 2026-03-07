@@ -1,8 +1,26 @@
+<template>
+    <div class="HallofFame">
+        
+        <h1 class="bp-title">Open Games Backend</h1>
+
+        <Loadingscreen v-show="!openGames"/>
+
+        <div v-if="openGames">
+            <div v-for="openGame in openGames" :key="openGame._id">
+                <div class="og-time">{{ getGameTime(openGame.time!) }}</div>
+                <MatchElement
+                    :match="openGame" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
+                /> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+            </div>
+        </div>
+    </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { getAllOpenGames, updateOpenGame } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
+import { getAllOpenGames, updateOpenGame, deleteOpenGame } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 
 let openGames = ref<Match[]|undefined>();
 
@@ -17,23 +35,25 @@ const setGameResult = async (match:Match) => {
     await updateOpenGame(match);
     await getOpenGames();
 }
+
+const deleteMatch = async (match:Match) => {
+    await deleteOpenGame(match);
+    await getOpenGames();
+}
+
+let getGameTime = (dateNumber:number) => {
+    let date = new Date(dateNumber);
+    let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+    return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
+}
 </script>
 
-<template>
-    <div class="HallofFame">
-        
-        <h1 class="bp-title">Open Games Backend</h1>
-
-        <Loadingscreen v-show="!openGames"/>
-
-        <div v-if="openGames">
-            <MatchElement v-for="openGame in openGames" :match="openGame" :isBackend="true" :setGameResult="setGameResult" :editName="true"/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
-        </div>
-
-    </div>
-</template>
-
 <style scoped>
+.og-time{
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: var(--main-color);
+}
 .bp-title{
     padding-bottom: 10px;   
 }

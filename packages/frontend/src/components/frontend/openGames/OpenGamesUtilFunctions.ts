@@ -21,6 +21,11 @@ export const updateOpenGame = async (openGame:Match) => {
     return response.status == 200;
 }
 
+export const deleteOpenGame = async (openGame: Match) => {
+    let response = await axios.delete("/openGames/delete/" + openGame._id);
+    return response.status == 200;
+}
+
 export const getAllOpenGameNames = async () => {
     let allOpenGames = await getAllOpenGames();
 

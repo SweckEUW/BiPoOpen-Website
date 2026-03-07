@@ -66,15 +66,13 @@ const updateLeagueGame = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const deleteLeagueGame = (req: Request, res: Response, next: NextFunction) => {
-    const leagueGameID = req.params.leagueGameID;
+    const leagueGameId = req.params.leagueGameId;
 
-    LeagueGame.findByIdAndDelete(leagueGameID)
+    LeagueGame.findByIdAndDelete(leagueGameId)
         .then((leagueGame) => {
-            if (leagueGame) {
-                res.status(200).json({ message: "League Game deleted" });
-            } else {
-                res.status(404).json({ message: "League Game not found" });
-            }
+            if (leagueGame) return res.status(200).json({ message: "League Game deleted" });
+            
+            return res.status(404).json({ message: "League Game not found" });
         })
         .catch((error) => {
             return res.status(500).json({ error });

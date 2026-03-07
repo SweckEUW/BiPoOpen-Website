@@ -4,6 +4,7 @@ import controller from "../controllers/LeagueGame";
 const router = express.Router();
 
 router.post("/create", controller.createLeagueGame);
+router.delete("/delete/:leagueGameId", controller.deleteLeagueGame);
 router.get("/get", controller.readAll);
 router.patch("/update/:leagueGameId", controller.updateLeagueGame);
 

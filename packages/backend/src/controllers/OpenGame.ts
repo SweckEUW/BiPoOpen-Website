@@ -67,15 +67,13 @@ const updateOpenGame = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const deleteOpenGame = (req: Request, res: Response, next: NextFunction) => {
-    const openGameID = req.params.openGameID;
+    const openGameId = req.params.openGameId;
 
-    OpenGame.findByIdAndDelete(openGameID)
+    OpenGame.findByIdAndDelete(openGameId)
         .then((openGame) => {
-            if (openGame) {
-                res.status(200).json({ message: "Open Game deleted" });
-            } else {
-                res.status(404).json({ message: "Open Game not found" });
-            }
+            if (openGame) return res.status(200).json({ message: "Open Game deleted" });
+            
+            return res.status(404).json({ message: "Open Game not found" });
         })
         .catch((error) => {
             return res.status(500).json({ error });

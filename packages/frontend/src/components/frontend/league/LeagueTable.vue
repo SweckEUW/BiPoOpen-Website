@@ -20,15 +20,23 @@
         </template>
 
         <div v-if="selectedLeaguePlayer">
-            <div class="mt-[10px] font-bold text-[20px]">Absolvierte Spiele</div>
-            <div v-for="match in gamesFromSelectedLeaguePlayer.matchesPlayed" style="margin-top: 10px;">
-                <div v-if="match.time">{{ getGameTime(match.time) }}</div>
-                <MatchElement :match="match"/> 
-            </div>
+            <div v-for="round in orderedRounds" :key="round.name" class="mb-[40px]">
+                <div class="font-bold text-[24px] capitalize">{{ round.name }}</div>
 
-            <div class="mt-[40px] font-bold text-[20px]">Offene Spiele</div>
-            <div v-for="match in gamesFromSelectedLeaguePlayer.matchesToPlay" style="margin-top: 10px;">
-                <MatchElement :match="match"/> 
+                <div class="mt-[10px] font-bold text-[20px]">
+                    Absolvierte Spiele {{ round.data.matchesPlayed.length }}/{{ round.data.matchesPlayed.length + round.data.matchesToPlay.length }}
+                </div>
+                <div v-for="match in round.data.matchesPlayed" style="margin-top: 10px;">
+                    <div v-if="match.time">{{ getGameTime(match.time) }}</div>
+                    <MatchElement :match="match"/> 
+                </div>
+
+                <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
+                    <div class="font-bold text-[20px]">Offene Spiele</div>
+                    <div v-for="match in round.data.matchesToPlay" style="margin-top: 10px;">
+                        <MatchElement :match="match"/> 
+                    </div>
+                </div>
             </div>
         </div>
     </Drawer>
@@ -87,29 +95,71 @@ let sortUp = ref(false);
 let leaguePlayerOverviewVisible = ref(false);
 let selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
 
+// Create ordered array for rendering
+const orderedRounds = computed(() => {
+    const games = gamesFromSelectedLeaguePlayer.value;
+    if (!games) return [];
+
+    const hinrunde = { name: 'hinrunde', data: games.hinrunde };
+    const rückrunde = { name: 'rückrunde', data: games.rückrunde };
+
+    // Swap order if Hinrunde is completed
+    if (games.hinrunde.matchesToPlay.length === 0) return [rückrunde, hinrunde];
+
+    return [hinrunde, rückrunde];
+});
+
 const gamesFromSelectedLeaguePlayer = computed(() => {
-    if(!selectedLeaguePlayer.value) return { matchesPlayed: [] as Match[], matchesToPlay: [] as Match[] };
+    const result = {
+        hinrunde: {
+            matchesPlayed: [] as Match[],
+            matchesToPlay: [] as Match[]
+        },
+        rückrunde: {
+            matchesPlayed: [] as Match[],
+            matchesToPlay: [] as Match[]
+        }
+    };
 
-    let matchesPlayed = props.leagueGames.filter((match) => match.team1.players.find(player => player.name === selectedLeaguePlayer.value?.name) || match.team2.players.find(player => player.name === selectedLeaguePlayer.value?.name));
+    if (!selectedLeaguePlayer.value) return result;
 
-    let matchesToPlay:Match[] = [];
+    const selectedPlayerName = selectedLeaguePlayer.value.name;
+    // Track match count per opponent
+    const matchCounts: Record<string, number> = {};
 
-    let selectedPlayerName = selectedLeaguePlayer.value.name;
+    const allMatchesPlayed = props.leagueGames.filter((match) => 
+        match.team1.players.some(p => p.name === selectedPlayerName) || 
+        match.team2.players.some(p => p.name === selectedPlayerName)
+    );
+
+    // Distribute played matches
+    allMatchesPlayed.forEach(match => {
+        const isTeam1 = match.team1.players.some(p => p.name === selectedPlayerName);
+        const opponentName = isTeam1 ? match.team2.players[0].name : match.team1.players[0].name;
+
+        matchCounts[opponentName] = (matchCounts[opponentName] || 0) + 1;
+
+        if (matchCounts[opponentName] === 1) result.hinrunde.matchesPlayed.push(match);
+        if (matchCounts[opponentName] === 2) result.rückrunde.matchesPlayed.push(match);
+    });
+
+    // Calculate remaining matches
     props.leaguePlayers.forEach(player => {
-        if(player.name === selectedPlayerName) return;
+        if (player.name === selectedPlayerName) return;
 
-        if(matchesPlayed.find(match => (match.team1.players.find(p => p.name === player.name) || match.team2.players.find(p => p.name === player.name))))
-            return;
-
-        let newMatch = {
-            team1: { _id: "", players: [ {name: selectedLeaguePlayer.value!.name} ] },
-            team2: { _id: "", players: [ {name: player.name} ] }
+        const played = matchCounts[player.name] || 0;
+        
+        const newMatch = {
+            team1: { _id: "", players: [{ name: selectedPlayerName }] },
+            team2: { _id: "", players: [{ name: player.name }] }
         } as Match;
 
-        matchesToPlay.push(newMatch);
+        if (played === 0) result.hinrunde.matchesToPlay.push(newMatch);
+        if (played === 0) result.rückrunde.matchesToPlay.push({ ...newMatch });
+        if (played === 1) result.rückrunde.matchesToPlay.push(newMatch);
     });
     
-    return { matchesPlayed: matchesPlayed, matchesToPlay: matchesToPlay };
+    return result;
 });
 
 const sortedLeaguePlayers = computed(() => {

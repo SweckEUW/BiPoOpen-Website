@@ -21,6 +21,11 @@ export const updateLeagueGame = async (leagueGame:Match) => {
     let response = await axios.patch("/leagueGames/update/" + leagueGame._id, leagueGame);
     return response.status == 200;
 }
+
+export const deleteLeagueGame = async (leagueGame: Match) => {
+    let response = await axios.delete("/leagueGames/delete/" + leagueGame._id);
+    return response.status == 200;
+}
     
 ////////////////
 // STATISTICS //

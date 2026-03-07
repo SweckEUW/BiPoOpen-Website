@@ -51,6 +51,10 @@
             <div @click="toggleModal();">Abbrechen</div>
         </template>
 
+        <template #delete v-if="deleteMatch">
+            <div v-if="deleteMatch" @click="deleteGame()">Löschen</div>
+        </template>
+
         <!-- Button 2 -->
         <template #confirm>
             <div @click="setResult()">{{ checkIfMatchFinished(copiedMatch) ? 'Bearbeiten' : 'Eintragen' }}</div>
@@ -66,6 +70,7 @@ import { checkIfMatchFinished, getMatchScore } from "@/util/tournamentMatchFunct
 const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
     setGameResult: {type: Function as PropType<(match:Match) => void> },
+    deleteMatch: {type: Function as PropType<(match:Match) => void> },
     toggleModal: {type: Function, required: true },
     editName: {type: Boolean, default: false},
 });
@@ -75,6 +80,11 @@ let copiedMatch = ref(JSON.parse(JSON.stringify(props.match)) as Match);
 
 const setResult = () => {
     props.setGameResult!(copiedMatch.value);
+    props.toggleModal();
+}
+
+const deleteGame = () => {
+    props.deleteMatch!(copiedMatch.value);
     props.toggleModal();
 }
 

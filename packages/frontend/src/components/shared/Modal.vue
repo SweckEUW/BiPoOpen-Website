@@ -6,8 +6,15 @@
             <div class="mo-template"><slot name="template">Content</slot></div>
 
             <div class="mo-buttons">
-                <div class="mo-button" style="margin-right: 5px" v-if="$slots.cancle"><slot name="cancle">Cancle</slot></div>
-                <div class="mo-button" v-if="$slots.confirm"><slot name="confirm">Confirm</slot></div>   
+                <div class="mo-button" style="margin-right: 5px" v-if="$slots.cancle">
+                    <slot name="cancle">Cancle</slot>
+                </div>
+                <div class="mo-button" style="margin-right: 5px" v-if="$slots.delete">
+                    <slot name="delete">Delete</slot>
+                </div>
+                <div class="mo-button" v-if="$slots.confirm">
+                    <slot name="confirm">Confirm</slot>
+                </div>   
             </div>
         </div>
     </div>

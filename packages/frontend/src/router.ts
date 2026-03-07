@@ -184,6 +184,15 @@ const routes = [
 			description: ''
 		}
 	},
+	{
+		path: '/Manage/LeagueGames',
+		name: 'Manage League Games',
+		component: () => import('@/components/backend/routes/_ManageLeagueGames.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Manage League Games',
+			description: ''
+		}
+	},
 	
 	// 404
 	{
