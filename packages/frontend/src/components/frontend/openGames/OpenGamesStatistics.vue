@@ -7,8 +7,8 @@
     <div class="swiper-pagination" id="OpenGamesStatisticsSwiper-Pagination"/>
 
     <div class="flex w-full justify-center items-center pb-[20px]">
-        <div class="mr-[20px]" style="color: var(--main-color)">{{  withoutEastGermany ? "Ohne Ost-Deutschland" : "Mit Ost-Deutschland" }}</div>
-        <ToggleSwitch v-model="withoutEastGermany" :pt="{slider: { style: withoutEastGermany ? 'background-color: var(--main-color);' : ''}}"/>
+        <div class="mr-[20px]" style="color: var(--main-color)">{{  withEastGermany ? "Mit Ost-Deutschland" : "Ohne Ost-Deutschland" }}</div>
+        <ToggleSwitch v-model="withEastGermany" :pt="{slider: { style: withEastGermany ? 'background-color: var(--main-color)' : 'background-color: gray'}}"/>
     </div>
 
     <div class="OpenGamesStatistics swiper-container" id="OpenGamesStatisticsSwiper">
@@ -88,7 +88,7 @@ const props = defineProps({
 let sortValue = ref<SortValueOpenGames>("averageWins");
 let sortUp = ref(false);
 
-let withoutEastGermany = ref(false);
+let withEastGermany = ref(true);
 
 let windowWidth = ref(window.screen.width);
 window.addEventListener("resize", () => {
@@ -97,7 +97,7 @@ window.addEventListener("resize", () => {
 
 const openGamesStatistics = computed(() => {
     let filteredOpenGames = props.openGames;
-    if(withoutEastGermany.value){
+    if(!withEastGermany.value){
         let eastGermanyPlayers = ["Edu Schimpf", "Alex Klein", "Linda Jahrberg", "Emely Müller", "Leo Straub", "Lea Ableitner", "Nico Sanchez"];
         filteredOpenGames = props.openGames.filter((match) => {
             let team1HasEastGermanyPlayer = match.team1.players.some((player) => eastGermanyPlayers.includes(player.name));
