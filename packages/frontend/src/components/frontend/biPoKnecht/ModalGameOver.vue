@@ -65,9 +65,12 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
     case 'bomb': return 'Bombe';
     case 'bouncer': return 'Bouncer';
     case 'trickshot': return 'Trickshot';
-    case 'onfire': return 'On Fire';
+    case 'onfire': return 'On Fire 🔥';
     case 'ballsback': return 'Treffer - Balls Back';
     case 'lastCup': return 'Letzter Becher';
+    case 'rerack': return 'Re-Rack';
+    case 'deathcup': return 'Deathcup ☠️';
+    case 'overtimeStart': return '🏆 Verlängerung';
     default: return turnType;
   }
 }

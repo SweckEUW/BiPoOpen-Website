@@ -28,6 +28,9 @@ export type TurnAnalysis = {
     onfire: number;
     ballsback: number;
     lastCup: number;
+    rerack: number;
+    deathcup: number;
+    overtimeStart: number;
     total: number;
 };
 
@@ -179,7 +182,7 @@ const calculateTrends = (matchHistory: { match: Match; time: number }[], playerN
 };
 
 const analyzeTurns = (matchHistory: { match: Match }[], playerName: string): { turnAnalysis: TurnAnalysis; cupHeatmap: CupHeatmap } => {
-    let analysis: TurnAnalysis = { hit: 0, miss: 0, airball: 0, bomb: 0, bouncer: 0, trickshot: 0, onfire: 0, ballsback: 0, lastCup: 0, total: 0 };
+    let analysis: TurnAnalysis = { hit: 0, miss: 0, airball: 0, bomb: 0, bouncer: 0, trickshot: 0, onfire: 0, ballsback: 0, lastCup: 0, rerack: 0, deathcup: 0, overtimeStart: 0, total: 0 };
     let heatmap: CupHeatmap = new Array(10).fill(0);
 
     matchHistory.forEach(({ match }) => {

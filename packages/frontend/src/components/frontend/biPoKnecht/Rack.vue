@@ -2,7 +2,11 @@
   <div class="Rack" :style="{ 'transform': isTeam1 ? 'rotate(0deg)' : 'rotate(180deg)', 'height': isActiveTeam ? '30%' : '70%' }">
 
     <div v-show="isActiveTeam" class="ra-middle">
-      <div style="width: 100%; text-align: center;">{{ infoText }}</div>
+      <div class="ra-infotext">
+        <span>{{ infoText }}</span>
+        <span v-if="currentPlayerHeat == 2" class="ra-heat-badge">🔥 Heatin' Up!</span>
+        <span v-if="currentPlayerHeat >= 3" class="ra-heat-badge ra-heat-badge--fire">🔥🔥🔥 ON FIRE!</span>
+      </div>
       <div class="ra-buttons">
         <div class="ra-button" @click="setModifier('bouncer')" :style="{ 
           'background': modifier == 'bouncer' ? '#6e1a22' : (isTeam1 ? 'var(--main-color)' : 'var(--secondary-color)')
@@ -10,14 +14,18 @@
         >
           Bouncer
         </div>
-        <div class="ra-button" @click="setModifier('trickshot')" :style="{ 
-          'background': modifier == 'trickshot' ? '#6e1a22' : (isTeam1 ? 'var(--main-color)' : 'var(--secondary-color)')
+        <div class="ra-button" @click="performDirectTrickshot()" :style="{ 
+          'background': isTeam1 ? 'var(--main-color)' : 'var(--secondary-color)'
           }"
         >
-          Trickshot
+          Trickshot!
         </div>
       </div>
-      <div class="ra-button" v-if="reRackAvailable" @click="performReRack()">Re-Rack</div>
+      <div class="ra-buttons">
+        <div class="ra-button ra-button--danger" v-if="cupsHitEnemyTeam.length > 0 && !isSelectingCup" @click="performDeathCup()">☠️ Deathcup</div>
+        <div class="ra-button ra-button--undo" v-if="!isSelectingCup && hasUndoHistory" @click="undoLastTurn()">↩ Rückgängig</div>
+      </div>
+      <div class="ra-button ra-button--rerack" v-if="reRackAvailable && !isSelectingCup" @click="performReRack()" >Re-Rack ({{ 2 - performedReRacks }} übrig)</div>
     </div>
 
     <!-- Nullwurf -->
@@ -57,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, PropType } from 'vue';
+import { computed, PropType, ref } from 'vue';
 
 const props = defineProps({
   isTeam1: { type: Boolean, required: true },
@@ -73,147 +81,304 @@ const props = defineProps({
   modifier: { type: null as unknown as PropType<'bouncer' | 'trickshot' | undefined>, required: true },
   setModifier: { type: Function as PropType<(newModifier:'bouncer' | 'trickshot' | undefined) => void>, required: true },
   setInfoText: { type: Function as PropType<(newInfoText:string) => void>, required: true },
-  setModalGameOverVisible: { type: Function as PropType<(isVisible:boolean) => void>, required: true }
+  setModalGameOverVisible: { type: Function as PropType<(isVisible:boolean) => void>, required: true },
+  // New props
+  gamePhase: { type: String as PropType<GamePhase>, required: true },
+  playerHeatMap: { type: Object as PropType<Record<string, number>>, required: true },
+  updatePlayerHeat: { type: Function as PropType<(teamIndex: number, playerIndex: number, hit: boolean) => void>, required: true },
+  performedReRacks: { type: Number, required: true },
+  onIncrementReRacks: { type: Function as PropType<() => void>, required: true },
+  undoLastTurn: { type: Function as PropType<() => void>, required: true },
+  saveState: { type: Function as PropType<() => void>, required: true },
+  triggerOvertime: { type: Function as PropType<(startingTeamIndex: number) => void>, required: true },
+  hasUndoHistory: { type: Boolean, required: true },
 });
 
-let performedReRacks = 0;
-let tmpTurnHits:number[] = [];
+let isSelectingCup = ref(false);
+let tmpTurnHits: number[] = [];
+
+let currentPlayerHeat = computed(() => {
+  const key = `${props.activeTeamIndex}-${props.activePlayerIndex}`;
+  return props.playerHeatMap[key] || 0;
+});
 
 let getCupIndex = (row:number, cupIndex:number) => {
   const zeroBasedRow = row - 1;
   const zeroBasedIndex = cupIndex - 1;
-  let index = (zeroBasedRow * (zeroBasedRow + 1)) / 2 + zeroBasedIndex;
-  return index; 
+  return (zeroBasedRow * (zeroBasedRow + 1)) / 2 + zeroBasedIndex;
+}
+
+// Determine if we are currently in Gentleman's Rule phase by inspecting the turns array.
+// GM rule: the DEFENDING team throws after the ATTACKING team hit their last cup AND completed their round.
+let computeIsGMPhase = (): boolean => {
+  const turns = props.turns;
+
+  // Find the most recent overtimeStart index (so we only look at lastCup turns after it)
+  let overtimeStartIdx = -1;
+  for (let i = turns.length - 1; i >= 0; i--) {
+    if (turns[i].type === 'overtimeStart') { overtimeStartIdx = i; break; }
+  }
+
+  // Find the most recent lastCup turn after the most recent overtimeStart
+  let lastCupTurn: Turn | undefined;
+  let lastCupIdx = -1;
+  for (let i = turns.length - 1; i >= 0; i--) {
+    if (turns[i].type === 'lastCup' && i > overtimeStartIdx) {
+      lastCupTurn = turns[i]; lastCupIdx = i; break;
+    }
+  }
+
+  if (!lastCupTurn) return false;
+
+  // Defending team (not the attacker who hit lastCup) must be active
+  if (lastCupTurn.teamIndex === props.activeTeamIndex) return false;
+
+  // The attacking team must have COMPLETED their round (player 1 threw)
+  if (lastCupTurn.playerIndex === 1) return true; // lastCup was by player 1 → round complete
+
+  // Check if player 1 of the attacking team threw after lastCup
+  for (let i = lastCupIdx + 1; i < turns.length; i++) {
+    if (turns[i].teamIndex === lastCupTurn.teamIndex && turns[i].playerIndex === 1) return true;
+  }
+
+  return false;
+}
+
+let getLastCupTurn = (): Turn | undefined => {
+  for (let i = props.turns.length - 1; i >= 0; i--) {
+    if (props.turns[i].type === 'lastCup') return props.turns[i];
+  }
+  return undefined;
 }
 
 let performTurn = async (turnType:Turn['type'], turnData:Turn['data']) => {
+  // Save state for undo BEFORE any changes
+  props.saveState();
+
   let ball = getBallHtmlElement(props.activeTeamIndex == 0 ? 1 : 0, props.activePlayerIndex);
   ball.style.opacity = '1';
 
   if(turnType == 'miss'){
-    console.log("Miss");
     moveBallToArea(ball, `ra-null-team-${props.activeTeamIndex == 0 ? 1 : 0}`);
   }
-
   if(turnType == 'airball'){
-    console.log("Airball");
     moveBallToArea(ball, `ra-airball-team-${props.activeTeamIndex == 0 ? 1 : 0}`);
   }
-
   if(turnType == 'hit'){
-    console.log("Hit");
     tmpTurnHits.push((turnData as HitTurn).cupIndex);
     moveBallToCup(ball, (turnData as HitTurn).cupIndex);
   }
 
+  // --- BOUNCER MODIFIER ---
   if(props.modifier == 'bouncer' && turnType == 'hit'){
-    console.log("Bouncer");
     props.setInfoText(props.activePlayer.name + " bitte den zweiten Becher vom Bouncer auswählen!");
     props.setModifier(undefined);
-    
+    isSelectingCup.value = true;
+    const cupIndex2 = await performCupSelection();
+    isSelectingCup.value = false;
     turnType = 'bouncer';
-    turnData = {
-      cupIndex1: (turnData as HitTurn).cupIndex,
-      cupIndex2: await performCupSelection()
-    } satisfies BouncerTurn;
-
-    // Mark secont Hit
-    tmpTurnHits.push((turnData as BouncerTurn).cupIndex2);
-  } 
-
-  if(props.modifier == 'trickshot' && turnType == 'miss'){
-    console.log("Trickshot");
-    turnType = 'trickshot';
-
-    addTurn(turnType, turnData);
-
-    // Same Player Again for Trickshot
-    props.switchActivePlayer(props.activeTeamIndex, props.activePlayerIndex); 
-    props.setModifier(undefined);
-    props.setInfoText(props.activePlayer.name + " bitte Trickshot eintragen!");
-    return
+    turnData = { cupIndex1: (turnData as HitTurn).cupIndex, cupIndex2 } satisfies BouncerTurn;
+    tmpTurnHits.push(cupIndex2);
   }
 
-  // handle bomb & balls back
-  let lastTurn = props.turns[props.turns.length - 1];
-  if(props.activePlayerIndex != 0 && (lastTurn.type == 'bouncer' || lastTurn.type == 'hit') && (turnType == 'hit' || turnType == 'bouncer')){
-    let lastTurnHitCupIndex = lastTurn.type == 'hit' ? (lastTurn.data as HitTurn).cupIndex : (lastTurn.data as BouncerTurn).cupIndex1;
-    let thisTurnHitCupIndex = turnType == 'hit' ? (turnData as HitTurn).cupIndex : (turnData as BouncerTurn).cupIndex1;
-    if(lastTurnHitCupIndex == thisTurnHitCupIndex){
-      console.log("Bomb");
+  // --- GENTLEMAN'S RULE CHECK ---
+  const isGMPhase = computeIsGMPhase();
 
-      props.setInfoText(props.activePlayer.name + " bitte den zweiten Becher der Bombe auswählen!");
-      let selectedCup1 = await performCupSelection();
-
-      props.setInfoText(props.activePlayer.name + " bitte den dritten Becher der Bombe auswählen!");
-      let selectedCup2 = await performCupSelection();
-      
-      turnType = 'bomb';
-      turnData = {
-        cupIndex1: (turnData as HitTurn).cupIndex,
-        cupIndex2: selectedCup1,
-        cupIndex3: selectedCup2
-      } satisfies BombTurn;
-
-      tmpTurnHits.push(selectedCup1, selectedCup2);
-    }else{
-      console.log("balls back");
-
-      turnType = 'ballsback';
-      turnData = {
-        cupIndex1: (turnData as HitTurn).cupIndex
-      } satisfies BallsBackTurn;
+  if(isGMPhase) {
+    // ===== GENTLEMAN'S RULE MODE =====
+    if(turnType == 'miss' || turnType == 'airball') {
+      // Miss during GM rule
+      props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, false);
+      tmpTurnHits = [];
+      hideBallsForce();
+      addTurn(turnType, turnData);
+      if(props.activePlayerIndex === 0) {
+        // Player 0 missed → player 1 takes over
+        props.switchActivePlayer(props.activeTeamIndex, 1);
+        props.setInfoText(props.activePlayer.name + " ist am Zug (Gentleman's Rule)!");
+      } else {
+        // Player 1 also missed → attacking team wins (game over)
+        props.setModalGameOverVisible(true);
+      }
+      props.setModifier(undefined);
+      return;
     }
 
+    if(turnType == 'hit' || turnType == 'bouncer') {
+      const hitsToAdd = [...new Set(tmpTurnHits)].filter(ci => !props.cupsHit.includes(ci));
+
+      // Check if all enemy cups will be cleared
+      if(props.cupsHit.length + hitsToAdd.length >= 10) {
+        // All cups cleared during GM rule → Overtime!
+        for(const ci of hitsToAdd) props.cupsHit.push(ci);
+        tmpTurnHits = [];
+        hideBallsForce();
+        props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, true);
+        addTurn(turnType, turnData);
+        addTurn('overtimeStart', {} as OvertimeStartTurn);
+        // The attacking team (who originally hit lastCup) starts overtime
+        const lastCupT = getLastCupTurn();
+        const startingTeam = lastCupT ? lastCupT.teamIndex : props.activeTeamIndex;
+        props.triggerOvertime(startingTeam);
+        props.setModifier(undefined);
+        return;
+      }
+
+      // Hit during GM rule → same player continues (throw until miss)
+      for(const ci of hitsToAdd) props.cupsHit.push(ci);
+      tmpTurnHits = [];
+      hideBallsForce();
+      props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, true);
+      addTurn(turnType, turnData);
+      props.switchActivePlayer(props.activeTeamIndex, props.activePlayerIndex); // same player
+      const heat = props.playerHeatMap[`${props.activeTeamIndex}-${props.activePlayerIndex}`] || 0;
+      if(heat >= 3) props.setInfoText(props.activePlayer.name + " ist ON FIRE! 🔥🔥🔥 (Gentleman's Rule)");
+      else props.setInfoText(props.activePlayer.name + " weiter werfen (Gentleman's Rule)!");
+      props.setModifier(undefined);
+      return;
+    }
+  }
+
+  // ===== NORMAL PLAY =====
+
+  // --- BOMB & BALLS BACK (only for player 1's throw, same team) ---
+  let lastTurn = props.turns[props.turns.length - 1];
+  if(props.activePlayerIndex != 0 && lastTurn &&
+     (lastTurn.type == 'bouncer' || lastTurn.type == 'hit') &&
+     lastTurn.teamIndex === props.activeTeamIndex &&
+     (turnType == 'hit' || turnType == 'bouncer')){
+
+    let lastCupIndex = lastTurn.type == 'hit' ? (lastTurn.data as HitTurn).cupIndex : (lastTurn.data as BouncerTurn).cupIndex1;
+    let thisCupIndex = turnType == 'hit' ? (turnData as HitTurn).cupIndex : (turnData as BouncerTurn).cupIndex1;
+
+    if(lastCupIndex == thisCupIndex){
+      // BOMB!
+      props.setInfoText(props.activePlayer.name + " bitte den zweiten Becher der Bombe auswählen!");
+      isSelectingCup.value = true;
+      let cup2 = await performCupSelection();
+      props.setInfoText(props.activePlayer.name + " bitte den dritten Becher der Bombe auswählen!");
+      let cup3 = await performCupSelection();
+      isSelectingCup.value = false;
+      turnType = 'bomb';
+      turnData = { cupIndex1: thisCupIndex, cupIndex2: cup2, cupIndex3: cup3 } satisfies BombTurn;
+      tmpTurnHits.push(cup2, cup3);
+      props.updatePlayerHeat(props.activeTeamIndex, 0, true);
+      props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, true);
+      moveTmpTurnHitsToCupsHit();
+      hideBalls();
+      addTurn(turnType, turnData);
+      // Check if bomb cleared all cups (direct win, no GM rule per rules)
+      if(props.cupsHit.length >= 10) {
+        props.setModalGameOverVisible(true);
+        return;
+      }
+      props.switchActivePlayer(props.activeTeamIndex, 0); // Balls Back
+      props.setModifier(undefined);
+      return;
+    } else {
+      // BALLS BACK
+      props.updatePlayerHeat(props.activeTeamIndex, 0, true);
+      props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, true);
+      turnType = 'ballsback';
+      turnData = { cupIndex1: thisCupIndex } satisfies BallsBackTurn;
+      moveTmpTurnHitsToCupsHit();
+      hideBalls();
+      addTurn(turnType, turnData);
+      // Check if balls-back cleared all cups (direct win)
+      if(props.cupsHit.length >= 10) {
+        props.setModalGameOverVisible(true);
+        return;
+      }
+      props.switchActivePlayer(props.activeTeamIndex, 0); // Balls Back
+      props.setModifier(undefined);
+      return;
+    }
+  }
+
+  // --- UPDATE HEAT ---
+  if(turnType == 'miss' || turnType == 'airball') {
+    props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, false);
+  }
+  if(turnType == 'hit' || turnType == 'bouncer') {
+    props.updatePlayerHeat(props.activeTeamIndex, props.activePlayerIndex, true);
+  }
+
+  // --- LAST CUP CHECK ---
+  if((turnType == 'hit' || turnType == 'bouncer') &&
+     props.cupsHit.length + [...new Set(tmpTurnHits)].filter(ci => !props.cupsHit.includes(ci)).length >= 10 &&
+     !props.turns.some(t => t.type === 'lastCup' && t.teamIndex !== props.activeTeamIndex)) {
+    // Only set lastCup for the first team's last cup (not if opponent already has a lastCup)
+    const hitCupIndex = turnType == 'bouncer' ? (turnData as BouncerTurn).cupIndex1 : (turnData as HitTurn).cupIndex;
+    turnType = 'lastCup';
+    turnData = { cupIndex: hitCupIndex } satisfies LastCupTurn;
+  }
+
+  // --- ON-FIRE CHECK (not for lastCup turns) ---
+  const heatKey = `${props.activeTeamIndex}-${props.activePlayerIndex}`;
+  const currentHeat = props.playerHeatMap[heatKey] || 0;
+  if(currentHeat >= 3 && (turnType == 'hit' || turnType == 'bouncer' || turnType == 'onfire')) {
+    // Player is on fire! Convert hit → onfire
+    if(turnType == 'hit') {
+      turnType = 'onfire';
+      turnData = { cupIndex: (turnData as HitTurn).cupIndex } satisfies OnFireTurn;
+    }
     moveTmpTurnHitsToCupsHit();
     hideBalls();
     addTurn(turnType, turnData);
-    props.switchActivePlayer(props.activeTeamIndex, 0); // Balls Back - New Turn
-
+    // Same player throws again
+    props.switchActivePlayer(props.activeTeamIndex, props.activePlayerIndex);
+    props.setInfoText(props.activePlayer.name + " ist ON FIRE! 🔥🔥🔥");
+    props.setModifier(undefined);
     return;
   }
 
-  if(props.cupsHit.length + tmpTurnHits.length == 10 && lastTurn.type != 'lastCup'){
-    console.log("lastCup");
-
-    turnType = 'lastCup';
-    turnData = {
-      cupIndex: (turnData as HitTurn).cupIndex
-    } satisfies LastCupTurn;
+  // Heat announcements
+  if((turnType == 'hit' || turnType == 'bouncer') && currentHeat === 2) {
+    props.setInfoText(props.activePlayer.name + " - Heatin' Up! 🔥 (sag 'Heaten Up!')");
   }
 
-  // End Game after Gentlemans rule
-  let lastCupTurn = props.turns.find(turn => turn.type == 'lastCup');
-  if(lastCupTurn && lastCupTurn.teamIndex != props.activeTeamIndex && props.activePlayerIndex == 1)
-    props.setModalGameOverVisible(true);
-  
-
-  // Moved tmpTurnHits into main cupsHit array. tmpTurnHits needed so users can hit the same cup in one turn
+  // --- COMMIT TURN ---
   moveTmpTurnHitsToCupsHit();
   hideBalls();
   addTurn(turnType, turnData);
   props.switchActivePlayer();
-
   props.setModifier(undefined);
 }
 
-// computed property if the activeteamindex matches with is team1
+// Direct trickshot: one click registers the trickshot and same player throws again
+let performDirectTrickshot = () => {
+  props.saveState();
+  addTurn('trickshot', {} as TrickshotTurn);
+  props.switchActivePlayer(props.activeTeamIndex, props.activePlayerIndex);
+  props.setInfoText(props.activePlayer.name + " bitte Trickshot werfen!");
+  tmpTurnHits = [];
+}
+
+// Deathcup: active team's player threw ball into an already-hit enemy cup
+let performDeathCup = () => {
+  props.saveState();
+  const remainingCups = 10 - props.cupsHitEnemyTeam.length;
+  for(let i = 0; i < 10; i++) {
+    if(!props.cupsHitEnemyTeam.includes(i)) props.cupsHitEnemyTeam.push(i);
+  }
+  addTurn('deathcup', { remainingCups } satisfies DeathcupTurn);
+  props.setModalGameOverVisible(true);
+}
+
 let isActiveTeam = computed(() => {
-  if(props.isTeam1)
-    return props.activeTeamIndex === 0;
+  if(props.isTeam1) return props.activeTeamIndex === 0;
   return props.activeTeamIndex === 1;
 });
 
 let getCupColor = (row:number, cupIndex:number) => {
   let cupIndexValue = getCupIndex(row, cupIndex);
-  if(props.cupsHit.includes(cupIndexValue))
-    return "gray";
+  if(props.cupsHit.includes(cupIndexValue)) return "gray";
   return props.isTeam1 ? 'var(--main-color)' : 'var(--secondary-color)';
 }
 
 let moveBallToCup = (ball:HTMLElement, cupIndex:number) => {
   const cupElement = getCupHTMLElement(cupIndex);
-  ball.style.top = `${cupElement.offsetTop + 25}px`; // TODO: make the ball centered. +25px is just guessed
+  ball.style.top = `${cupElement.offsetTop + 25}px`;
   ball.style.left = `${cupElement.offsetLeft + 25}px`;
 }
 
@@ -230,80 +395,54 @@ let getBallHtmlElement = (teamIndex:number, index:number) => {
   return document.getElementById(`ra-ball-team-${teamIndex}-${index}`)!;
 }
 
-// Check if the team can re-rack
+// Re-Rack availability (reactive since performedReRacks is now a prop)
 let reRackAvailable = computed(() => {
-  // Ignore if last turn was bomb or balls back 
   let lastTurn = props.turns[props.turns.length - 1];
-  if(lastTurn && (lastTurn.type == 'bomb' || lastTurn.type == 'ballsback'))
-    return false;
+  if(lastTurn && (lastTurn.type == 'bomb' || lastTurn.type == 'ballsback')) return false;
+  if(props.performedReRacks >= 2) return false;
+  if(props.activePlayerIndex == 1) return false;
+  // Not in GM rule
+  if(computeIsGMPhase()) return false;
 
-  // Only 2 Re-Racks allowed
-  if(performedReRacks == 2)
-    return false;
-
-  // You can only Re-Rack before the first player did a turn
-  if(props.activePlayerIndex == 1)
-    return false;
-
-  // Dont Allow Re-Racks on already Re-Racked positions
-  if(props.cupsHitEnemyTeam.length == 4 && [6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v)))
-    return false;
-  if(props.cupsHitEnemyTeam.length == 6 && [3,5,6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v)))
-    return false;
-  if(props.cupsHitEnemyTeam.length == 7 && [3,4,5,6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v)))
-    return false;
+  // Don't re-rack already re-racked positions
+  if(props.cupsHitEnemyTeam.length == 4 && [6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v))) return false;
+  if(props.cupsHitEnemyTeam.length == 6 && [3,5,6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v))) return false;
+  if(props.cupsHitEnemyTeam.length == 7 && [3,4,5,6,7,8,9].every(v => props.cupsHitEnemyTeam.includes(v))) return false;
 
   return props.cupsHitEnemyTeam.length == 4 || props.cupsHitEnemyTeam.length == 6 || props.cupsHitEnemyTeam.length == 7;
 });
 
-// Set cups Hit array into a re-rack position
 let performReRack = () => {
+  props.saveState();
   let cupsHit = props.cupsHitEnemyTeam.length;
-  
-  while (props.cupsHitEnemyTeam.length > 0) // Clear Array 
-    props.cupsHitEnemyTeam.pop();
-
-  if(cupsHit == 4)
-    props.cupsHitEnemyTeam.push(6,7,8,9); // Re-Rack to 6 Cups
-  if(cupsHit == 6)
-    props.cupsHitEnemyTeam.push(3,5,6,7,8,9); // Re-Rack to 4 Cups
-  if(cupsHit == 7)
-    props.cupsHitEnemyTeam.push(3,4,5,6,7,8,9); // Re-Rack to 3 Cups
-
-  performedReRacks++;
+  while(props.cupsHitEnemyTeam.length > 0) props.cupsHitEnemyTeam.pop();
+  if(cupsHit == 4) props.cupsHitEnemyTeam.push(6,7,8,9);
+  if(cupsHit == 6) props.cupsHitEnemyTeam.push(3,5,6,7,8,9);
+  if(cupsHit == 7) props.cupsHitEnemyTeam.push(3,4,5,6,7,8,9);
+  props.onIncrementReRacks();
+  addTurn('rerack', {} as ReRackTurn);
 }
 
+// Cup selection for bomb/bouncer — skips already-hit and pending-hit cups
 let performCupSelection: () => Promise<number> = () => {
   return new Promise((resolve) => {
     const teamIndex = props.activeTeamIndex === 0 ? 1 : 0;
-
-    // Alle Cup-Elemente sammeln
     const cups = Array.from({ length: 10 }, (_, i) =>
       document.getElementById(`ra-cup-team-${teamIndex}-${i}`)!
     );
-
-    // Listener-Funktionen hier ablegen, damit wir sie wieder entfernen können
     const handlers: ((e: MouseEvent) => void)[] = [];
-
-    // Diese Funktion wird bei einem Klick aufgerufen
     const handleClick = (cupIndex: number, e: MouseEvent) => {
-      e.stopPropagation(); // Klick nicht weiterleiten
-      e.preventDefault();  // Standardaktion verhindern
-
-      // Alle Listener wieder entfernen
-      cups.forEach((cup, i) => {
-        cup.removeEventListener("click", handlers[i], true);
-      });
-
-      // Promise auflösen
+      e.stopPropagation();
+      e.preventDefault();
+      cups.forEach((cup, i) => cup.removeEventListener("click", handlers[i], true));
       resolve(cupIndex);
     };
-
-    // Listener für jeden Cup anlegen
     cups.forEach((cup, i) => {
+      // Skip cups already hit or pending in this turn
+      if(props.cupsHit.includes(i) || tmpTurnHits.includes(i)) return;
       const listener = (e: MouseEvent) => handleClick(i, e);
       handlers[i] = listener;
-      cup.addEventListener("click", listener, true); // true = Capture-Phase
+      cup.addEventListener("click", listener, true);
     });
   });
 }
@@ -312,19 +451,24 @@ let hideBalls = () => {
   if(props.activePlayerIndex != 0){
     for(let i = 0; i < 2; i++){
       let ball = getBallHtmlElement(props.activeTeamIndex == 0 ? 1 : 0, i);
-      ball.style.opacity = '0';
-      ball.style.top = 'auto';
-      ball.style.bottom = 'auto';
-      ball.style.left = 'auto';
-      ball.style.right = 'auto';
+      ball.style.opacity = '0'; ball.style.top = 'auto'; ball.style.bottom = 'auto';
+      ball.style.left = 'auto'; ball.style.right = 'auto';
     }
+  }
+}
+
+let hideBallsForce = () => {
+  for(let i = 0; i < 2; i++){
+    let ball = getBallHtmlElement(props.activeTeamIndex == 0 ? 1 : 0, i);
+    ball.style.opacity = '0'; ball.style.top = 'auto'; ball.style.bottom = 'auto';
+    ball.style.left = 'auto'; ball.style.right = 'auto';
   }
 }
 
 let moveTmpTurnHitsToCupsHit = () => {
   if(props.activePlayerIndex != 0){
-    tmpTurnHits = [...new Set(tmpTurnHits)]; // Remove duplicates in case of Bomb
-    props.cupsHit.push(...tmpTurnHits);
+    tmpTurnHits = [...new Set(tmpTurnHits)];
+    props.cupsHit.push(...tmpTurnHits.filter(ci => !props.cupsHit.includes(ci)));
     tmpTurnHits = [];
   }
 }
@@ -355,7 +499,39 @@ let addTurn = (turnType:Turn['type'], turnData:Turn['data']) => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  z-index: 10;
+  position: relative;
+}
+
+.ra-infotext{
+  width: 100%;
+  text-align: center;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ra-heat-badge{
+  font-size: 12px;
+  font-weight: bold;
+  color: #ff6600;
+  background: #fff3cd;
+  border-radius: 8px;
+  padding: 2px 8px;
+}
+
+.ra-heat-badge--fire{
+  color: white;
+  background: #cc3300;
+  animation: pulse 0.8s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .ra-cups{
@@ -409,14 +585,28 @@ let addTurn = (turnType:Turn['type'], turnData:Turn['data']) => {
   display: flex;
   width: 100%;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .ra-button{
-  padding: 15px 25px;
+  padding: 10px 20px;
   cursor: pointer;
-  margin: 5px;
-  width: 120px;
+  margin: 3px;
+  min-width: 100px;
   text-align: center;
   color: white;
+  background-color: var(--main-color);
+  font-size: 14px;
+  border-radius: 4px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.ra-button--danger{
+  background-color: #8B0000 !important;
+}
+.ra-button--undo{
+  background-color: #555 !important;
+}
+.ra-button--rerack{
   background-color: var(--main-color);
 }
 </style>

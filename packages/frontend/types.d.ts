@@ -55,8 +55,8 @@ declare global {
     type Turn = {
         playerIndex: number;
         teamIndex: number;
-        type: 'hit' | 'miss' | 'airball' | 'bomb' | 'bouncer' | 'trickshot' | 'onfire' | 'ballsback' | 'lastCup';
-        data: HitTurn | MissTurn | AirballTurn | BombTurn | BouncerTurn | TrickshotTurn | OnFireTurn | BallsBackTurn | LastCupTurn;
+        type: 'hit' | 'miss' | 'airball' | 'bomb' | 'bouncer' | 'trickshot' | 'onfire' | 'ballsback' | 'lastCup' | 'rerack' | 'deathcup' | 'overtimeStart';
+        data: HitTurn | MissTurn | AirballTurn | BombTurn | BouncerTurn | TrickshotTurn | OnFireTurn | BallsBackTurn | LastCupTurn | ReRackTurn | DeathcupTurn | OvertimeStartTurn;
         time: number; 
     };
 
@@ -69,6 +69,24 @@ declare global {
     type OnFireTurn = { cupIndex: number };
     type BallsBackTurn = { cupIndex1: number };
     type LastCupTurn = { cupIndex: number };
+    type ReRackTurn = { };
+    type DeathcupTurn = { remainingCups: number };
+    type OvertimeStartTurn = { };
+
+    type GamePhase = 'normal' | 'gentlemans_rule' | 'overtime';
+    type GameState = {
+        cupsHitTeam1: number[];
+        cupsHitTeam2: number[];
+        activeTeamIndex: number;
+        activePlayerIndex: number;
+        turnsCount: number;
+        performedReRacks1: number;
+        performedReRacks2: number;
+        playerHeatMap: Record<string, number>;
+        gamePhase: GamePhase;
+        modifier: 'bouncer' | 'trickshot' | undefined;
+        infoText: string;
+    };
 
     // Stats
     type GroupWithStats = {  

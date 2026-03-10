@@ -4,9 +4,16 @@
         <ModalStartingPlayer v-if="modalStartingPlayerVisible" :match="match" :startGame="startGame"/>
 
         <div class="bik-game" v-if="!modalStartingPlayerVisible">
-            <Rack v-for="i in 2"
+            <Rack v-for="i in 2" :key="i"
                 :isTeam1="i != 1" :infoText="infoText" :activeTeamIndex="activeTeamIndex" :activeTeam="activeTeam" :activePlayer="activePlayer" :turns="turns" :modifier="modifier" :setModifier="setModifier" :setModalGameOverVisible="setModalGameOverVisible"
                 :activePlayerIndex="activePlayerIndex" :cupsHit="i == 1 ? cupsHitTeam2 : cupsHitTeam1" :cupsHitEnemyTeam="i == 1 ? cupsHitTeam1 : cupsHitTeam2" :switchActivePlayer="switchActivePlayer" :setInfoText="setInfoText"
+                :gamePhase="gamePhase"
+                :playerHeatMap="playerHeatMap" :updatePlayerHeat="updatePlayerHeat"
+                :performedReRacks="i == 1 ? performedReRacks2 : performedReRacks1"
+                :onIncrementReRacks="i == 1 ? incrementReRacks2 : incrementReRacks1"
+                :undoLastTurn="undoLastTurn" :saveState="saveState"
+                :triggerOvertime="triggerOvertime"
+                :hasUndoHistory="stateHistory.length > 0"
             />
         </div>
     </div>
@@ -37,6 +44,13 @@ let modifier = ref<'bouncer' | 'trickshot' | undefined>(undefined);
 let cupsHitTeam1 = ref<number[]>([]); // Array to store hit cups
 let cupsHitTeam2 = ref<number[]>([]); // Array to store hit cups
 
+// Extended state
+let gamePhase = ref<GamePhase>('normal');
+let playerHeatMap = ref<Record<string, number>>({});
+let performedReRacks1 = ref(0);
+let performedReRacks2 = ref(0);
+let stateHistory = ref<GameState[]>([]);
+
 let activeTeam = computed(() => {
     return activeTeamIndex.value === 0 ? match.value.team1 : match.value.team2;
 });
@@ -47,7 +61,7 @@ let activePlayer = computed(() => {
 
 let startGame = (startTeamIndex:number) => {
     modalStartingPlayerVisible.value = false;
-    activeTeamIndex.value = startTeamIndex; // Setze das startende Team
+    activeTeamIndex.value = startTeamIndex;
     infoText.value = activeTeam.value.players[activePlayerIndex.value].name + " ist am Zug!";
     if(process.env.NODE_ENV != 'development')
         document.documentElement.requestFullscreen();
@@ -59,8 +73,6 @@ let switchActivePlayer = (teamIndex?:number, playerIndex?:number) => {
 
     if (nextActivePlayerIndex > activeTeam.value.players.length - 1) {
         nextActivePlayerIndex = 0;
-
-        // Switch to the next team
         let nextActiveTeamIndex = activeTeamIndex.value == 1 ? 0 : 1;
         activeTeamIndex.value = nextActiveTeamIndex;
     }
@@ -69,8 +81,6 @@ let switchActivePlayer = (teamIndex?:number, playerIndex?:number) => {
         activeTeamIndex.value = teamIndex;
 
     activePlayerIndex.value = nextActivePlayerIndex;
-
-    // Aktualisiere den Info-Text
     infoText.value = activeTeam.value.players[activePlayerIndex.value].name + " ist am Zug!";
 }
 
@@ -87,6 +97,68 @@ let setInfoText = (newInfoText:string) => {
 
 let setModalGameOverVisible = (isVisible:boolean) => {
   modalGameOverVisible.value = isVisible;
+}
+
+let setGamePhase = (phase: GamePhase) => {
+  gamePhase.value = phase;
+}
+
+// (gamePhase is set internally by triggerOvertime; kept for consistency)
+
+let updatePlayerHeat = (teamIndex: number, playerIndex: number, hit: boolean) => {
+  const key = `${teamIndex}-${playerIndex}`;
+  if (hit) {
+    playerHeatMap.value[key] = (playerHeatMap.value[key] || 0) + 1;
+  } else {
+    playerHeatMap.value[key] = 0;
+  }
+}
+
+let incrementReRacks1 = () => { performedReRacks1.value++; }
+let incrementReRacks2 = () => { performedReRacks2.value++; }
+
+let saveState = () => {
+  stateHistory.value.push({
+    cupsHitTeam1: [...cupsHitTeam1.value],
+    cupsHitTeam2: [...cupsHitTeam2.value],
+    activeTeamIndex: activeTeamIndex.value,
+    activePlayerIndex: activePlayerIndex.value,
+    turnsCount: turns.value.length,
+    performedReRacks1: performedReRacks1.value,
+    performedReRacks2: performedReRacks2.value,
+    playerHeatMap: { ...playerHeatMap.value },
+    gamePhase: gamePhase.value,
+    modifier: modifier.value,
+    infoText: infoText.value,
+  });
+}
+
+let undoLastTurn = () => {
+  if (stateHistory.value.length === 0) return;
+  const prevState = stateHistory.value.pop()!;
+  cupsHitTeam1.value = prevState.cupsHitTeam1;
+  cupsHitTeam2.value = prevState.cupsHitTeam2;
+  activeTeamIndex.value = prevState.activeTeamIndex;
+  activePlayerIndex.value = prevState.activePlayerIndex;
+  turns.value.splice(prevState.turnsCount);
+  performedReRacks1.value = prevState.performedReRacks1;
+  performedReRacks2.value = prevState.performedReRacks2;
+  playerHeatMap.value = prevState.playerHeatMap;
+  gamePhase.value = prevState.gamePhase;
+  modifier.value = prevState.modifier;
+  infoText.value = prevState.infoText;
+}
+
+let triggerOvertime = (startingTeamIndex: number) => {
+  cupsHitTeam1.value = [3, 4, 5, 6, 7, 8, 9];
+  cupsHitTeam2.value = [3, 4, 5, 6, 7, 8, 9];
+  performedReRacks1.value = 0;
+  performedReRacks2.value = 0;
+  playerHeatMap.value = {};
+  gamePhase.value = 'overtime';
+  activeTeamIndex.value = startingTeamIndex;
+  activePlayerIndex.value = 0;
+  infoText.value = (startingTeamIndex === 0 ? match.value.team1 : match.value.team2).players[0].name + " ist am Zug! (Verlängerung)";
 }
 
 // Watch modalGameOverVisible
@@ -106,14 +178,20 @@ watch(modalGameOverVisible, () => {
         if(turn.type == 'lastCup')
             player.score += 1;
 
+        if(turn.type == 'onfire')
+            player.score += 1;
+
         if(turn.type == 'bomb')
             player.score += 1.5;
 
         if(turn.type == 'ballsback')
             player.score += 1;
 
+        if(turn.type == 'deathcup')
+            player.score += (turn.data as DeathcupTurn).remainingCups;
+
         if(turn.type == 'hit'){
-            if(turn.playerIndex == 0 && match.value.turns![index+1].type == 'bomb') // In case the next throw is a bomb
+            if(turn.playerIndex == 0 && index + 1 < match.value.turns!.length && match.value.turns![index+1].type == 'bomb')
                 player.score += 1.5;
             else
                 player.score += 1;
@@ -126,7 +204,6 @@ watch(modalGameOverVisible, () => {
             if(turn.teamIndex == 0)
                 turn.playerIndex = 0;
         });
-
         match.value.team1.players[0].score += match.value.team1.players[1].score;
         match.value.team1.players = [match.value.team1.players[0]];
     }
@@ -136,7 +213,6 @@ watch(modalGameOverVisible, () => {
             if(turn.teamIndex == 1)
                 turn.playerIndex = 0;
         });
-
         match.value.team2.players[0].score += match.value.team2.players[1].score;
         match.value.team2.players = [match.value.team2.players[0]];
     }
