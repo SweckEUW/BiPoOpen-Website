@@ -5,69 +5,6 @@ import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 import { getLeagueTeamForPlayer } from "./LeaguePlayerMapping";
 
-export type TrendData = {
-    winrateTrend: number | null;
-    averageHitsTrend: number | null;
-};
-
-export type CategoryStats = {
-    name: string;
-    matches: number;
-    wins: number;
-    hits: number;
-    averageHits: number;
-};
-
-export type TurnAnalysis = {
-    hit: number;
-    miss: number;
-    airball: number;
-    bomb: number;
-    bouncer: number;
-    trickshot: number;
-    onfire: number;
-    ballsback: number;
-    lastCup: number;
-    total: number;
-};
-
-export type CupHeatmap = number[]; // index 0-9, count of hits per cup
-
-export type PartnerData = {
-    name: string;
-    matches: number;
-    wins: number;
-};
-
-export type ExtraStats = {
-    fastestWinMinutes: number | null;
-    bestTimeOfDay: string | null;   // e.g. "20-22 Uhr"
-    bestTimeWinrate: number | null;
-    longestLosingStreak: number;
-};
-
-export type PlayerProfileData = {
-    name: string;
-    leagueTeam: string | null;
-    totalMatches: number;
-    totalWins: number;
-    totalLosses: number;
-    winrate: number;
-    totalHits: number;
-    averageHits: number;
-    currentWinStreak: number;
-    bestWinStreak: number;
-    trends: TrendData;
-    categories: CategoryStats[];
-    recentForm: ('W' | 'L')[];
-    matchHistory: { match: Match; source: string; time: number }[];
-    rivals: { name: string; wins: number; losses: number; matches: number }[];
-    partners: PartnerData[];
-    turnAnalysis: TurnAnalysis;
-    cupHeatmap: CupHeatmap;
-    extraStats: ExtraStats;
-};
-
 export const getAllPlayerNames = async (): Promise<string[]> => {
     let allNames: Set<string> = new Set();
 
@@ -245,7 +182,7 @@ const calculateExtraStats = (matchHistory: { match: Match; time: number }[], pla
 
 export const getPlayerProfileData = async (playerName: string): Promise<PlayerProfileData> => {
     let playerNameLower = playerName.toLowerCase();
-    let matchHistory: { match: Match; source: string; time: number }[] = [];
+    let matchHistory: MatchHistoryEntry[] = [];
     let rivals: Map<string, { wins: number; losses: number }> = new Map();
     let partnersMap: Map<string, { matches: number; wins: number }> = new Map();
     let categories: CategoryStats[] = [];

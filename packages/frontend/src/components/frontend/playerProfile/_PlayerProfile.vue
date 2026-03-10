@@ -1,29 +1,26 @@
 <template>
-    <div class="PlayerProfile">
+    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-xs mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)" @hide="router.back()">
 
-        <h1 class="bp-title">Spieler Profil</h1>
-
-        <!-- Loading -->
-        <div v-if="isLoading" class="flex justify-center items-center h-[400px]">
-            <ProgressSpinner strokeWidth="3" />
-        </div>
-
-        <div v-if="!isLoading && profileData">
-
-            <!-- Header -->
-            <div class="flex flex-col items-center mb-[30px]">
-                <Avatar :label="profileData.name.charAt(0)" size="xlarge" shape="circle" class="mb-[10px]" />
-                <div class="text-[32px] font-bold text-[--p-primary-color]">{{ profileData.name }}</div>
-                <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mt-[4px]" />
-                <div class="flex gap-[12px] mt-[8px]">
-                    <Tag severity="success" :value="profileData.totalWins + ' Siege'" rounded />
-                    <Tag severity="danger" :value="profileData.totalLosses + ' Niederlagen'" rounded />
+        <template #header>
+            <!-- Loading -->
+            <div v-if="isLoading" class="w-full flex justify-center">
+                <ProgressSpinner strokeWidth="3" style="width: 40px; height: 40px;" />
+            </div>
+            <!-- Profile header -->
+            <div v-else-if="profileData" class="w-full flex justify-content-center">
+                <div class="flex flex-column align-items-center gap-[6px]">
+                    <Avatar :label="profileData.name.charAt(0)" size="xlarge" shape="circle" class="mb-[4px]" />
+                    <div class="text-[24px] font-bold text-[--p-primary-color]">{{ profileData.name }}</div>
+                    <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded />
+                    <div class="flex gap-[12px] mt-[4px]">
+                        <Tag severity="success" :value="profileData.totalWins + ' Siege'" rounded />
+                        <Tag severity="danger" :value="profileData.totalLosses + ' Niederlagen'" rounded />
+                    </div>
                 </div>
             </div>
+        </template>
 
-            <Divider />
-
-            <!-- KPI Cards -->
+        <div v-if="!isLoading && profileData">
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-[12px] mb-[10px]">
                 <Card class="text-center">
                     <template #content>
@@ -267,18 +264,18 @@
         <Message v-if="!isLoading && !profileData" severity="warn" :closable="false" class="mt-[40px]">
             Spieler "{{ decodeURIComponent((route.params.PlayerName as string) || '').replaceAll('-', ' ') }}" wurde nicht gefunden.
         </Message>
-    </div>
+    </Drawer>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { getPlayerProfileData, type PlayerProfileData } from './PlayerProfileUtilFunctions';
-import { getLeagueTeamForPlayer } from './LeaguePlayerMapping';
+import { getPlayerProfileData } from './PlayerProfileUtilFunctions';
 
 // PrimeVue
 import ProgressSpinner from 'primevue/progressspinner';
+import Drawer from 'primevue/drawer';
 import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
 import Divider from 'primevue/divider';
@@ -300,7 +297,9 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const route = useRoute();
+const router = useRouter();
 
+let drawerVisible = ref(true);
 let isLoading = ref(true);
 let profileData = ref<PlayerProfileData | null>(null);
 let matchLimit = ref(20);
@@ -361,7 +360,7 @@ const cupOpacity = (index: number) => {
     return 0.3 + (profileData.value.cupHeatmap[index] / max) * 0.7;
 };
 
-const isWin = (entry: { match: Match; source: string }) => {
+const isWin = (entry: MatchHistoryEntry) => {
     let lo = profileData.value!.name.toLowerCase();
     // For league matches, the match data contains the team name, not the real player name
     let leagueTeam = profileData.value!.leagueTeam;
@@ -403,6 +402,11 @@ let getGameTime = (dateNumber: number) => {
 .pp-chip-win { background-color: #61C3D9 !important; color: white !important; }
 .pp-chip-loss :deep(.p-chip-label) { color: white; }
 .pp-chip-loss { background-color: #EA5160 !important; color: white !important; }
+
+.mobile-sheet {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
 
 @media (width <= 900px) {
     :deep(.p-timeline-event-opposite) { flex: 0 0 80px; }

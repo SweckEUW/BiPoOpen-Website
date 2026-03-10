@@ -110,4 +110,74 @@ declare global {
     type SortValueMVP = 'averageHits'|'placement'|'hits'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
     type SortValueHallOfFame = 'averageHits'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
     type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageHits'|'averageWins'|'ammountOfDrunkenCups';
+
+    // Player Profile
+    type TrendData = {
+        winrateTrend: number | null;
+        averageHitsTrend: number | null;
+    };
+
+    type CategoryStats = {
+        name: string;
+        matches: number;
+        wins: number;
+        hits: number;
+        averageHits: number;
+    };
+
+    type TurnAnalysis = {
+        hit: number;
+        miss: number;
+        airball: number;
+        bomb: number;
+        bouncer: number;
+        trickshot: number;
+        onfire: number;
+        ballsback: number;
+        lastCup: number;
+        total: number;
+    };
+
+    type CupHeatmap = number[]; // index 0-9, count of hits per cup
+
+    type PartnerData = {
+        name: string;
+        matches: number;
+        wins: number;
+    };
+
+    type ExtraStats = {
+        fastestWinMinutes: number | null;
+        bestTimeOfDay: string | null;   // e.g. "20-22 Uhr"
+        bestTimeWinrate: number | null;
+        longestLosingStreak: number;
+    };
+
+    type MatchHistoryEntry = {
+        match: Match;
+        source: string;
+        time: number;
+    };
+
+    type PlayerProfileData = {
+        name: string;
+        leagueTeam: string | null;
+        totalMatches: number;
+        totalWins: number;
+        totalLosses: number;
+        winrate: number;
+        totalHits: number;
+        averageHits: number;
+        currentWinStreak: number;
+        bestWinStreak: number;
+        trends: TrendData;
+        categories: CategoryStats[];
+        recentForm: ('W' | 'L')[];
+        matchHistory: MatchHistoryEntry[];
+        rivals: { name: string; wins: number; losses: number; matches: number }[];
+        partners: PartnerData[];
+        turnAnalysis: TurnAnalysis;
+        cupHeatmap: CupHeatmap;
+        extraStats: ExtraStats;
+    };
 }
