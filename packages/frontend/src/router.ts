@@ -85,6 +85,16 @@ const routes = [
 	
 
 	{
+		path: '/Spieler/:PlayerName',
+		name: 'Spieler Profil',
+		component: () => import('@/components/frontend/playerProfile/_PlayerProfile.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Spieler Profil',
+			description: 'Spieler Profil'
+		}
+	},
+
+	{
 		path: '/2026/Anmeldung',
 		name: 'Teamanmeldung',
 		component: () => import('@/components/frontend/_Teamanmeldung.vue'),

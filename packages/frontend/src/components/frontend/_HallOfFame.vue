@@ -165,7 +165,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                 <tbody>
                     <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
                         <td>{{ player.placement! + 1}}</td>
-                        <td>{{ player.name.replace(" ","\n") }}</td>
+                        <td><router-link class="hof-player-link" :to="'/Spieler/' + player.name.replaceAll(' ','-')">{{ player.name.replace(" ","\n") }}</router-link></td>
                         <td>{{ player.averageHits }}</td>
                         <td>{{ player.wins }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
@@ -251,6 +251,15 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
     margin-top: 50px;
     margin-bottom: 50px;
     font-size: 18px;
+    color: var(--main-color);
+}
+.hof-player-link{
+    color: inherit;
+    text-decoration: none;
+    white-space: break-spaces;
+}
+.hof-player-link:hover{
+    text-decoration: underline;
     color: var(--main-color);
 }
 

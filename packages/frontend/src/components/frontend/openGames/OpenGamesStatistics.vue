@@ -32,7 +32,7 @@
                     <tbody>
                         <tr v-for="(player, index) in openGamesStatistic.stats" :key="index">
                             <td>{{ player.placement! + 1}}</td>
-                            <td>{{ player.name.replace(" ","\n") }}</td>
+                            <td><router-link class="ogs-player-link" :to="'/Spieler/' + player.name.replaceAll(' ','-')">{{ player.name.replace(" ","\n") }}</router-link></td>
                             <td>{{ player.wins }}</td>
                             <td>{{ player.ammountOfMatches }}</td>
                             <td>{{ player.averageHits.toFixed(2) }}</td>
@@ -271,6 +271,15 @@ onMounted(async () => {
     text-align: center;
     margin-bottom: 50px;
     font-size: 18px;
+    color: var(--main-color);
+}
+.ogs-player-link{
+    color: inherit;
+    text-decoration: none;
+    white-space: break-spaces;
+}
+.ogs-player-link:hover{
+    text-decoration: underline;
     color: var(--main-color);
 }
 .ogs-arrow-down::after, .ogs-arrow-up::after{

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import router from '@/router.js';
 import DropDown from '@/components/shared/DropDown.vue';
+import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
 
 let showBurger = ref(false);
 
@@ -21,6 +22,26 @@ const scrollToTop = () => {
 let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open 2023', 'Weck BiPo Open 2022', 'Weck BiPo Open 2021', 'Weck BiPo Open 2020'];
+
+// Player search
+let playerNames = ref<string[]>([]);
+let playerNamesLoading = ref(false);
+let playerNamesLoaded = ref(false);
+let playerSearch = ref("");
+
+const loadPlayerNames = async () => {
+	if(playerNamesLoaded.value || playerNamesLoading.value) return;
+	playerNamesLoading.value = true;
+	playerNames.value = await getAllPlayerNames();
+	playerNamesLoading.value = false;
+	playerNamesLoaded.value = true;
+}
+
+const filteredPlayerNames = computed(() => {
+	if(!playerSearch.value) return playerNames.value.slice(0, 15);
+	let search = playerSearch.value.toLowerCase();
+	return playerNames.value.filter(name => name.toLowerCase().includes(search)).slice(0, 15);
+});
 </script>
 
 <template>
@@ -48,6 +69,22 @@ let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
 				<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-Knecht'">BiPo Knecht</router-link> -->
 				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/League'">BiPo League</router-link>
+
+				<DropDown :name="'spieler'" :isOpen="false" @click="loadPlayerNames()">
+					<template #header>
+						<div class="ap-menu-title">Spieler</div>
+					</template>
+					<template #content>
+						<div class="ap-spieler-search">
+							<input v-model="playerSearch" placeholder="Spieler suchen..." class="ap-player-input" @click.stop/>
+						</div>
+						<div v-for="name in filteredPlayerNames" :key="name">
+							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu(); playerSearch = '';" :to="'/Spieler/' + name.replaceAll(' ','-')">{{ name }}</router-link>
+						</div>
+						<div v-if="playerNamesLoading" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Laden...</div>
+						<div v-if="!playerNamesLoading && playerNamesLoaded && filteredPlayerNames.length === 0" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Kein Spieler gefunden</div>
+					</template>
+				</DropDown>
 
 				<DropDown :name="'main'" :isOpen="true">
 					<template #header>
@@ -137,6 +174,25 @@ let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open
 a:hover{
 	opacity: 0.5;
 	color: white;
+}
+
+/* Player Search */
+.ap-spieler-search{
+	margin-bottom: 10px;
+}
+.ap-player-input{
+	background: rgba(255,255,255,0.2);
+	border: 2px solid rgba(255,255,255,0.5);
+	border-radius: 8px;
+	padding: 8px 15px;
+	color: white;
+	font-size: 18px;
+	width: 80%;
+	max-width: 300px;
+	outline: none;
+}
+.ap-player-input::placeholder{
+	color: rgba(255,255,255,0.6);
 }
 
 /* BURGER */
