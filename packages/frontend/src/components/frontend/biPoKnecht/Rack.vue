@@ -4,7 +4,7 @@
     <div v-show="isActiveTeam" class="ra-middle">
       <div class="ra-infotext">
         <span>{{ infoText }}</span>
-        <span v-if="currentPlayerHeat == 2" class="ra-heat-badge">🔥 Heatin' Up!</span>
+        <span v-if="currentPlayerHeat == 2" class="ra-heat-badge">🔥 Heaten Up!</span>
         <span v-if="currentPlayerHeat >= 3" class="ra-heat-badge ra-heat-badge--fire">🔥🔥🔥 ON FIRE!</span>
       </div>
       <div class="ra-buttons">
@@ -95,6 +95,9 @@ const props = defineProps({
 });
 
 let isSelectingCup = ref(false);
+// tmpTurnHits accumulates cup hits from player 0 AND player 1 within a single round.
+// It is NOT reset between player 0 and player 1's throws intentionally, to enable bomb detection.
+// It is cleared by moveTmpTurnHitsToCupsHit() at the end of player 1's throw.
 let tmpTurnHits: number[] = [];
 
 let currentPlayerHeat = computed(() => {
@@ -306,8 +309,7 @@ let performTurn = async (turnType:Turn['type'], turnData:Turn['data']) => {
   // --- LAST CUP CHECK ---
   if((turnType == 'hit' || turnType == 'bouncer') &&
      props.cupsHit.length + [...new Set(tmpTurnHits)].filter(ci => !props.cupsHit.includes(ci)).length >= 10 &&
-     !props.turns.some(t => t.type === 'lastCup' && t.teamIndex !== props.activeTeamIndex)) {
-    // Only set lastCup for the first team's last cup (not if opponent already has a lastCup)
+     lastTurn?.type != 'lastCup') {
     const hitCupIndex = turnType == 'bouncer' ? (turnData as BouncerTurn).cupIndex1 : (turnData as HitTurn).cupIndex;
     turnType = 'lastCup';
     turnData = { cupIndex: hitCupIndex } satisfies LastCupTurn;
@@ -334,7 +336,7 @@ let performTurn = async (turnType:Turn['type'], turnData:Turn['data']) => {
 
   // Heat announcements
   if((turnType == 'hit' || turnType == 'bouncer') && currentHeat === 2) {
-    props.setInfoText(props.activePlayer.name + " - Heatin' Up! 🔥 (sag 'Heaten Up!')");
+    props.setInfoText(props.activePlayer.name + " - Heaten Up! 🔥 (sag 'Heaten Up!')");
   }
 
   // --- COMMIT TURN ---

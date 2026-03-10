@@ -99,12 +99,6 @@ let setModalGameOverVisible = (isVisible:boolean) => {
   modalGameOverVisible.value = isVisible;
 }
 
-let setGamePhase = (phase: GamePhase) => {
-  gamePhase.value = phase;
-}
-
-// (gamePhase is set internally by triggerOvertime; kept for consistency)
-
 let updatePlayerHeat = (teamIndex: number, playerIndex: number, hit: boolean) => {
   const key = `${teamIndex}-${playerIndex}`;
   if (hit) {

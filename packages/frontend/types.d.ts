@@ -73,7 +73,7 @@ declare global {
     type DeathcupTurn = { remainingCups: number };
     type OvertimeStartTurn = { };
 
-    type GamePhase = 'normal' | 'gentlemans_rule' | 'overtime';
+    type GamePhase = 'normal' | 'overtime';
     type GameState = {
         cupsHitTeam1: number[];
         cupsHitTeam2: number[];
