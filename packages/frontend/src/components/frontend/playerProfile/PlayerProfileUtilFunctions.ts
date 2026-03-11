@@ -3,69 +3,14 @@ import { getAllLeagueGames, getMatchesFromPlayer as getLeagueMatchesFromPlayer }
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
+import { calculateBadges } from "./BadgeRegistry";
 import { getLeagueTeamForPlayer } from "./LeaguePlayerMapping";
 
-export type TrendData = {
-    winrateTrend: number | null;
-    averageHitsTrend: number | null;
-};
-
-export type CategoryStats = {
-    name: string;
-    matches: number;
-    wins: number;
-    hits: number;
-    averageHits: number;
-};
-
-export type TurnAnalysis = {
-    hit: number;
-    miss: number;
-    airball: number;
-    bomb: number;
-    bouncer: number;
-    trickshot: number;
-    onfire: number;
-    ballsback: number;
-    lastCup: number;
-    total: number;
-};
-
-export type CupHeatmap = number[]; // index 0-9, count of hits per cup
-
-export type PartnerData = {
-    name: string;
-    matches: number;
-    wins: number;
-};
-
-export type ExtraStats = {
-    fastestWinMinutes: number | null;
-    bestTimeOfDay: string | null;   // e.g. "20-22 Uhr"
-    bestTimeWinrate: number | null;
-    longestLosingStreak: number;
-};
-
-export type PlayerProfileData = {
-    name: string;
-    leagueTeam: string | null;
-    totalMatches: number;
-    totalWins: number;
-    totalLosses: number;
-    winrate: number;
-    totalHits: number;
-    averageHits: number;
-    currentWinStreak: number;
-    bestWinStreak: number;
-    trends: TrendData;
-    categories: CategoryStats[];
-    recentForm: ('W' | 'L')[];
-    matchHistory: { match: Match; source: string; time: number }[];
-    rivals: { name: string; wins: number; losses: number; matches: number }[];
-    partners: PartnerData[];
-    turnAnalysis: TurnAnalysis;
-    cupHeatmap: CupHeatmap;
-    extraStats: ExtraStats;
+const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
+    '1m': 30,
+    '3m': 90,
+    '6m': 180,
+    '1y': 365,
 };
 
 export const getAllPlayerNames = async (): Promise<string[]> => {
@@ -159,23 +104,71 @@ const calculateStreaks = (matchHistory: { match: Match; time: number }[], player
     return { current: temp, best, longestLosing: worstLosing };
 };
 
-const calculateTrends = (matchHistory: { match: Match; time: number }[], playerName: string): TrendData => {
+const calculateStreaksFromResults = (matchHistory: { time: number; won: boolean }[]) => {
+    let sorted = [...matchHistory].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
+    let best = 0, temp = 0, worstLosing = 0, tempLosing = 0;
+
+    sorted.forEach(e => {
+        if (e.won) {
+            temp++;
+            if (temp > best) best = temp;
+            tempLosing = 0;
+        } else {
+            temp = 0;
+            tempLosing++;
+            if (tempLosing > worstLosing) worstLosing = tempLosing;
+        }
+    });
+
+    return { current: temp, best, longestLosing: worstLosing };
+};
+
+const calculateTrends = (matchHistory: (MatchHistoryEntry & { won: boolean; hits: number })[], trendPeriod: Exclude<TrendPeriod, 'all'>): TrendData => {
     let now = Date.now();
-    let thirtyDaysAgo = now - 30 * 24 * 60 * 60 * 1000;
-    let recent = matchHistory.filter(m => m.time > thirtyDaysAgo && m.time > 0);
-    let older = matchHistory.filter(m => m.time > 0 && m.time <= thirtyDaysAgo);
+    let periodMs = TREND_PERIOD_DAYS[trendPeriod] * 24 * 60 * 60 * 1000;
+    let cutoff = now - periodMs;
+    let previousCutoff = cutoff - periodMs;
 
-    if (recent.length < 3 || older.length < 3) return { winrateTrend: null, averageHitsTrend: null };
+    let recent = matchHistory.filter(m => m.time > cutoff && m.time > 0);
+    // Historical baseline: all matches before cutoff (stable reference for winrate/avg)
+    let historical = matchHistory.filter(m => m.time <= cutoff && m.time > 0);
+    // Preceding period: same window before recent (for activity comparison)
+    let preceding = matchHistory.filter(m => m.time > previousCutoff && m.time <= cutoff && m.time > 0);
 
-    let rWr = Math.round(recent.filter(m => didPlayerWinMatch(m.match, playerName)).length / recent.length * 100);
-    let oWr = Math.round(older.filter(m => didPlayerWinMatch(m.match, playerName)).length / older.length * 100);
-    let rAvg = recent.reduce((a, m) => a + getPlayerHitsInMatch(m.match, playerName), 0) / recent.length;
-    let oAvg = older.reduce((a, m) => a + getPlayerHitsInMatch(m.match, playerName), 0) / older.length;
+    const nullResult: TrendData = { winrateTrend: null, averageHitsTrend: null, totalMatchesTrend: null, totalHitsTrend: null, avg1v1Trend: null, avg2v2Trend: null };
+    if (recent.length < 3) return nullResult;
 
-    return {
-        winrateTrend: rWr - oWr,
-        averageHitsTrend: Math.round((rAvg - oAvg) * 100) / 100,
-    };
+    // Winrate and avg hits compare recent vs historical baseline (prevents extreme swings)
+    let winrateTrend: number | null = null;
+    let averageHitsTrend: number | null = null;
+    if (historical.length >= 5) {
+        let rWr = recent.filter(m => m.won).length / recent.length * 100;
+        let hWr = historical.filter(m => m.won).length / historical.length * 100;
+        winrateTrend = Math.round((rWr - hWr) * 10) / 10;
+
+        let rAvg = recent.reduce((a, m) => a + m.hits, 0) / recent.length;
+        let hAvg = historical.reduce((a, m) => a + m.hits, 0) / historical.length;
+        averageHitsTrend = Math.round((rAvg - hAvg) * 100) / 100;
+    }
+
+    // Activity trends: compare recent period vs preceding period
+    let totalMatchesTrend = recent.length - preceding.length;
+    let totalHitsTrend = recent.reduce((a, m) => a + m.hits, 0) - preceding.reduce((a, m) => a + m.hits, 0);
+
+    // Per-category average hits trends (recent vs historical baseline)
+    let r1v1 = recent.filter(m => m.source === 'Offene Spiele 1v1');
+    let h1v1 = historical.filter(m => m.source === 'Offene Spiele 1v1');
+    let r2v2 = recent.filter(m => m.source === 'Offene Spiele 2v2');
+    let h2v2 = historical.filter(m => m.source === 'Offene Spiele 2v2');
+
+    let avg1v1Trend = (r1v1.length >= 2 && h1v1.length >= 3)
+        ? Math.round((r1v1.reduce((a, m) => a + m.hits, 0) / r1v1.length - h1v1.reduce((a, m) => a + m.hits, 0) / h1v1.length) * 100) / 100
+        : null;
+    let avg2v2Trend = (r2v2.length >= 3 && h2v2.length >= 5)
+        ? Math.round((r2v2.reduce((a, m) => a + m.hits, 0) / r2v2.length - h2v2.reduce((a, m) => a + m.hits, 0) / h2v2.length) * 100) / 100
+        : null;
+
+    return { winrateTrend, averageHitsTrend, totalMatchesTrend, totalHitsTrend, avg1v1Trend, avg2v2Trend };
 };
 
 const analyzeTurns = (matchHistory: { match: Match }[], playerName: string): { turnAnalysis: TurnAnalysis; cupHeatmap: CupHeatmap } => {
@@ -216,58 +209,141 @@ const calculateExtraStats = (matchHistory: { match: Match; time: number }[], pla
         }
     });
 
-    // Best time of day (2h blocks)
-    let timeBlocks: Map<string, { wins: number; total: number }> = new Map();
+    // Time of day (2h blocks) - build all blocks from 0-24
+    let timeBlocks: Map<number, { wins: number; total: number }> = new Map();
     matchHistory.forEach(({ match, time }) => {
         if (!time || time === 0) return;
         let hour = new Date(time).getHours();
         let blockStart = Math.floor(hour / 2) * 2;
-        let blockKey = `${blockStart}-${blockStart + 2} Uhr`;
-        let block = timeBlocks.get(blockKey) || { wins: 0, total: 0 };
+        let block = timeBlocks.get(blockStart) || { wins: 0, total: 0 };
         block.total++;
         if (didPlayerWinMatch(match, playerName)) block.wins++;
-        timeBlocks.set(blockKey, block);
+        timeBlocks.set(blockStart, block);
     });
 
+    // Build sorted array of all blocks that have games
+    let timeOfDayStats: TimeOfDayBlock[] = [];
+    for (let h = 0; h < 24; h += 2) {
+        let block = timeBlocks.get(h);
+        if (!block || block.total === 0) continue;
+        timeOfDayStats.push({
+            label: `${h}-${h + 2} Uhr`,
+            wins: block.wins,
+            losses: block.total - block.wins,
+            total: block.total,
+            winrate: Math.round(block.wins / block.total * 100),
+        });
+    }
+
+    // Best time of day (min 3 games)
     let bestTimeOfDay: string | null = null;
     let bestTimeWinrate: number | null = null;
-    timeBlocks.forEach((block, key) => {
+    timeOfDayStats.forEach(block => {
         if (block.total < 3) return;
-        let wr = Math.round(block.wins / block.total * 100);
-        if (bestTimeWinrate === null || wr > bestTimeWinrate) {
-            bestTimeWinrate = wr;
-            bestTimeOfDay = key;
+        if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
+            bestTimeWinrate = block.winrate;
+            bestTimeOfDay = block.label;
         }
     });
 
-    return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0 };
+    // Most active time of day
+    let mostActiveTimeOfDay: string | null = null;
+    let mostActiveGames: number | null = null;
+    timeOfDayStats.forEach(block => {
+        if (mostActiveGames === null || block.total > mostActiveGames) {
+            mostActiveGames = block.total;
+            mostActiveTimeOfDay = block.label;
+        }
+    });
+
+    return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0, timeOfDayStats, mostActiveTimeOfDay, mostActiveGames };
 };
 
-export const getPlayerProfileData = async (playerName: string): Promise<PlayerProfileData> => {
+const calculateExtraStatsFromResults = (matchHistory: { match: Match; time: number; won: boolean }[]): ExtraStats => {
+    let fastestWinMinutes: number | null = null;
+
+    matchHistory.forEach(({ match, time, won }) => {
+        if (!match.endTime || !time || time === 0) return;
+        if (!won) return;
+        let duration = (match.endTime - time) / 60000;
+        if (duration > 0 && (fastestWinMinutes === null || duration < fastestWinMinutes)) {
+            fastestWinMinutes = Math.round(duration * 10) / 10;
+        }
+    });
+
+    let timeBlocks: Map<number, { wins: number; total: number }> = new Map();
+    matchHistory.forEach(({ time, won }) => {
+        if (!time || time === 0) return;
+        let hour = new Date(time).getHours();
+        let blockStart = Math.floor(hour / 2) * 2;
+        let block = timeBlocks.get(blockStart) || { wins: 0, total: 0 };
+        block.total++;
+        if (won) block.wins++;
+        timeBlocks.set(blockStart, block);
+    });
+
+    let timeOfDayStats: TimeOfDayBlock[] = [];
+    for (let h = 0; h < 24; h += 2) {
+        let block = timeBlocks.get(h);
+        if (!block || block.total === 0) continue;
+        timeOfDayStats.push({
+            label: `${h}-${h + 2} Uhr`,
+            wins: block.wins,
+            losses: block.total - block.wins,
+            total: block.total,
+            winrate: Math.round(block.wins / block.total * 100),
+        });
+    }
+
+    let bestTimeOfDay: string | null = null;
+    let bestTimeWinrate: number | null = null;
+    timeOfDayStats.forEach(block => {
+        if (block.total < 3) return;
+        if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
+            bestTimeWinrate = block.winrate;
+            bestTimeOfDay = block.label;
+        }
+    });
+
+    let mostActiveTimeOfDay: string | null = null;
+    let mostActiveGames: number | null = null;
+    timeOfDayStats.forEach(block => {
+        if (mostActiveGames === null || block.total > mostActiveGames) {
+            mostActiveGames = block.total;
+            mostActiveTimeOfDay = block.label;
+        }
+    });
+
+    return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0, timeOfDayStats, mostActiveTimeOfDay, mostActiveGames };
+};
+
+export const getPlayerProfileData = async (playerName: string, trendPeriod: TrendPeriod = '1m'): Promise<PlayerProfileData> => {
     let playerNameLower = playerName.toLowerCase();
-    let matchHistory: { match: Match; source: string; time: number }[] = [];
+    let matchHistory: (MatchHistoryEntry & { won: boolean; hits: number })[] = [];
     let rivals: Map<string, { wins: number; losses: number }> = new Map();
-    let partnersMap: Map<string, { matches: number; wins: number }> = new Map();
+    let partnersMap: Map<string, { matches: number; wins: number; losses: number }> = new Map();
     let categories: CategoryStats[] = [];
 
-    const processMatches = (matches: Match[], source: string, categoryName: string) => {
+    const processMatches = (matches: Match[], source: string, categoryName: string, nameForMatch?: string) => {
+        let effectiveName = nameForMatch || playerName;
         let stats = { name: categoryName, matches: matches.length, wins: 0, hits: 0, averageHits: 0 };
         matches.forEach(m => {
-            let won = didPlayerWinMatch(m, playerName);
+            let won = didPlayerWinMatch(m, effectiveName);
+            let hits = getPlayerHitsInMatch(m, effectiveName);
             if (won) stats.wins++;
-            stats.hits += getPlayerHitsInMatch(m, playerName);
-            matchHistory.push({ match: m, source, time: m.time || 0 });
+            stats.hits += hits;
+            matchHistory.push({ match: m, source, time: m.time || 0, won, hits });
 
-            let oppName = getOpponentName(m, playerName);
+            let oppName = getOpponentName(m, effectiveName);
             let rival = rivals.get(oppName) || { wins: 0, losses: 0 };
             if (won) rival.wins++; else rival.losses++;
             rivals.set(oppName, rival);
 
-            let partnerName = getPartnerName(m, playerName);
+            let partnerName = getPartnerName(m, effectiveName);
             if (partnerName) {
-                let p = partnersMap.get(partnerName) || { matches: 0, wins: 0 };
+                let p = partnersMap.get(partnerName) || { matches: 0, wins: 0, losses: 0 };
                 p.matches++;
-                if (won) p.wins++;
+                if (won) p.wins++; else p.losses++;
                 partnersMap.set(partnerName, p);
             }
         });
@@ -286,15 +362,7 @@ export const getPlayerProfileData = async (playerName: string): Promise<PlayerPr
     if (leagueTeam) {
         let leaguePlayerNameLower = leagueTeam.toLowerCase();
         let leagueMatches = getLeagueMatchesFromPlayer(leagueGames, leaguePlayerNameLower);
-        let leagueStats = { name: "BiPo League", matches: leagueMatches.length, wins: 0, hits: 0, averageHits: 0 };
-        leagueMatches.forEach(m => {
-            let won = didPlayerWinMatch(m, leagueTeam!);
-            if (won) leagueStats.wins++;
-            leagueStats.hits += getPlayerHitsInMatch(m, leagueTeam!);
-            matchHistory.push({ match: m, source: "BiPo League", time: m.time || 0 });
-        });
-        leagueStats.averageHits = leagueStats.matches > 0 ? leagueStats.hits / leagueStats.matches : 0;
-        if (leagueStats.matches > 0) categories.push(leagueStats);
+        processMatches(leagueMatches, "BiPo League", "BiPo League", leagueTeam);
     } else {
         // Fallback: try direct name match (for league players not in mapping)
         let directLeagueMatches = getLeagueMatchesFromPlayer(leagueGames, playerNameLower);
@@ -303,22 +371,25 @@ export const getPlayerProfileData = async (playerName: string): Promise<PlayerPr
         }
     }
 
-    // 3. Tournaments
+    // 3. Tournaments - combine all BiPo Open tournaments into one category
     let tournamentYears = ["2020", "2022", "2023", "2024", "2025"];
+    let bipoOpenStats = { name: "BiPo Open Turniere", matches: 0, wins: 0, hits: 0, averageHits: 0 };
     for (let year of tournamentYears) {
         let tournament = await getTournamentByName(year);
         if (!tournament) continue;
         let tMatches = getFinishedMatchesFromPlayer(tournament, playerName, false);
         if (tMatches.length === 0) continue;
 
-        let tStats = { name: tournament.name, matches: tMatches.length, wins: 0, hits: 0, averageHits: 0 };
         tMatches.forEach(m => {
             let isTeam1 = m.team1.players.some(p => p.name === playerName);
-            let won = isTeam1 ? checkIfTeam1WonVsTeam2(m) : !checkIfTeam1WonVsTeam2(m);
-            if (won) tStats.wins++;
+            let t1Won = checkIfTeam1WonVsTeam2(m);
+            let won: boolean = t1Won != null && (isTeam1 ? t1Won : !t1Won);
+            if (won) bipoOpenStats.wins++;
+            bipoOpenStats.matches++;
             let player = [...m.team1.players, ...m.team2.players].find(p => p.name === playerName);
-            if (player) tStats.hits += player.score;
-            matchHistory.push({ match: m, source: tournament.name, time: m.time || 0 });
+            let hits = player ? player.score : 0;
+            bipoOpenStats.hits += hits;
+            matchHistory.push({ match: m, source: "BiPo Open Turniere", time: m.time || 0, won, hits });
 
             let opponents = isTeam1 ? m.team2.players : m.team1.players;
             let oppName = opponents.map(p => p.name).join(" & ");
@@ -328,43 +399,95 @@ export const getPlayerProfileData = async (playerName: string): Promise<PlayerPr
 
             let partnerName = getPartnerName(m, playerName);
             if (partnerName) {
-                let p = partnersMap.get(partnerName) || { matches: 0, wins: 0 };
+                let p = partnersMap.get(partnerName) || { matches: 0, wins: 0, losses: 0 };
                 p.matches++;
-                if (won) p.wins++;
+                if (won) p.wins++; else p.losses++;
                 partnersMap.set(partnerName, p);
             }
         });
-        tStats.averageHits = tStats.matches > 0 ? tStats.hits / tStats.matches : 0;
-        categories.push(tStats);
     }
-
-    // Totals
-    let totalMatches = categories.reduce((a, c) => a + c.matches, 0);
-    let totalWins = categories.reduce((a, c) => a + c.wins, 0);
-    let totalHits = categories.reduce((a, c) => a + c.hits, 0);
+    if (bipoOpenStats.matches > 0) {
+        bipoOpenStats.averageHits = bipoOpenStats.hits / bipoOpenStats.matches;
+        categories.push(bipoOpenStats);
+    }
 
     matchHistory.sort((a, b) => b.time - a.time);
 
-    let streaks = calculateStreaks(matchHistory, playerName);
-    let trends = calculateTrends(matchHistory, playerName);
-    let { turnAnalysis, cupHeatmap } = analyzeTurns(matchHistory, playerName);
-    let extraStats = calculateExtraStats(matchHistory, playerName);
+    // Filter match history by selected time period
+    let filteredHistory = matchHistory;
+    if (trendPeriod !== 'all') {
+        let cutoff = Date.now() - TREND_PERIOD_DAYS[trendPeriod] * 24 * 60 * 60 * 1000;
+        filteredHistory = matchHistory.filter(m => m.time > cutoff && m.time > 0);
+    }
+
+    // Recalculate categories from filtered history
+    let filteredCategories: Map<string, CategoryStats> = new Map();
+    filteredHistory.forEach(m => {
+        let existing = filteredCategories.get(m.source) || { name: m.source, matches: 0, wins: 0, hits: 0, averageHits: 0 };
+        existing.matches++;
+        if (m.won) existing.wins++;
+        existing.hits += m.hits;
+        filteredCategories.set(m.source, existing);
+    });
+    let finalCategories = Array.from(filteredCategories.values()).map(c => {
+        c.averageHits = c.matches > 0 ? c.hits / c.matches : 0;
+        return c;
+    });
+
+    // Totals from filtered history
+    let totalMatches = finalCategories.reduce((a, c) => a + c.matches, 0);
+    let totalWins = finalCategories.reduce((a, c) => a + c.wins, 0);
+    let totalHits = finalCategories.reduce((a, c) => a + c.hits, 0);
+
+    let streaks = calculateStreaksFromResults(filteredHistory);
+    let trends = trendPeriod === 'all'
+        ? calculateTrends(matchHistory, '1m')
+        : { winrateTrend: null, averageHitsTrend: null, totalMatchesTrend: null, totalHitsTrend: null, avg1v1Trend: null, avg2v2Trend: null };
+    let { turnAnalysis, cupHeatmap } = analyzeTurns(filteredHistory, playerName);
+    let extraStats = calculateExtraStatsFromResults(filteredHistory);
     extraStats.longestLosingStreak = streaks.longestLosing;
 
-    let recentForm: ('W' | 'L')[] = matchHistory
+    let recentForm: ('W' | 'L')[] = filteredHistory
         .filter(m => m.time > 0)
         .slice(0, 10)
-        .map(m => didPlayerWinMatch(m.match, playerName) ? 'W' : 'L');
+        .map(m => m.won ? 'W' : 'L');
 
-    let rivalsList = Array.from(rivals.entries())
+    // Recalculate rivals and partners from filtered history
+    let filteredRivals: Map<string, { wins: number; losses: number }> = new Map();
+    let filteredPartners: Map<string, { matches: number; wins: number; losses: number }> = new Map();
+    filteredHistory.forEach(({ match, won }) => {
+        let effectiveName = leagueTeam && match.team1.players.some(p => p.name.toLowerCase() === leagueTeam!.toLowerCase()) || leagueTeam && match.team2.players.some(p => p.name.toLowerCase() === leagueTeam!.toLowerCase()) ? leagueTeam : playerName;
+        let oppName = getOpponentName(match, effectiveName);
+        let rival = filteredRivals.get(oppName) || { wins: 0, losses: 0 };
+        if (won) rival.wins++; else rival.losses++;
+        filteredRivals.set(oppName, rival);
+
+        let partnerName = getPartnerName(match, effectiveName);
+        if (partnerName) {
+            let p = filteredPartners.get(partnerName) || { matches: 0, wins: 0, losses: 0 };
+            p.matches++;
+            if (won) p.wins++; else p.losses++;
+            filteredPartners.set(partnerName, p);
+        }
+    });
+
+    let rivalsList = Array.from(filteredRivals.entries())
         .map(([name, data]) => ({ name, wins: data.wins, losses: data.losses, matches: data.wins + data.losses }))
         .sort((a, b) => b.matches - a.matches)
         .slice(0, 5);
 
-    let partnersList = Array.from(partnersMap.entries())
-        .map(([name, data]) => ({ name, matches: data.matches, wins: data.wins }))
+    let partnersList = Array.from(filteredPartners.entries())
+        .map(([name, data]) => ({ name, matches: data.matches, wins: data.wins, losses: data.losses }))
         .sort((a, b) => b.matches - a.matches)
         .slice(0, 5);
+
+    // Badges are always calculated from the full (unfiltered) match history
+    let allTotalMatches = matchHistory.length;
+    let allTotalWins = matchHistory.filter(m => m.won).length;
+    let allTotalHits = matchHistory.reduce((a, m) => a + m.hits, 0);
+    let allWinrate = allTotalMatches > 0 ? Math.round((allTotalWins / allTotalMatches) * 100) : 0;
+    let allStreaks = calculateStreaksFromResults(matchHistory);
+    let badges = await calculateBadges({ playerName, allMatchHistory: matchHistory, totalMatches: allTotalMatches, totalWins: allTotalWins, bestWinStreak: allStreaks.best, totalHits: allTotalHits, winrate: allWinrate });
 
     return {
         name: playerName,
@@ -378,13 +501,14 @@ export const getPlayerProfileData = async (playerName: string): Promise<PlayerPr
         currentWinStreak: streaks.current,
         bestWinStreak: streaks.best,
         trends,
-        categories,
+        categories: finalCategories,
         recentForm,
-        matchHistory,
+        matchHistory: filteredHistory,
         rivals: rivalsList,
         partners: partnersList,
         turnAnalysis,
         cupHeatmap,
         extraStats,
+        badges,
     };
 };

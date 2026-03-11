@@ -1,10 +1,22 @@
 <script lang="ts" setup>
 import AppHeader from '@/components/shared/AppHeader.vue';
 import AppFooter from '@/components/shared/AppFooter.vue';
+import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
 
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref, provide } from 'vue'
 import router from './router.js';
 import axios from "axios";
+
+// Global player profile drawer
+let playerProfileVisible = ref(false);
+let playerProfileName = ref('');
+
+const openPlayerProfile = (name: string) => {
+	playerProfileName.value = name;
+	playerProfileVisible.value = true;
+};
+
+provide('openPlayerProfile', openPlayerProfile);
 
 onBeforeMount(() => {
 	// Configure Axios
@@ -34,6 +46,12 @@ onBeforeMount(() => {
 
 	<!-- App footer -->
 	<AppFooter/>
+
+	<!-- Global Player Profile Drawer -->
+	<PlayerProfileDrawer
+		v-model:visible="playerProfileVisible"
+		:playerName="playerProfileName"
+	/>
 </template>
 
 <style>

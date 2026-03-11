@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, inject } from "vue"
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
+
+const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 
 let tournaments:Tournament[] = [];
 let sortValue = ref<SortValueHallOfFame>("wins");
@@ -165,7 +167,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                 <tbody>
                     <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
                         <td>{{ player.placement! + 1}}</td>
-                        <td><router-link class="hof-player-link" :to="'/Spieler/' + player.name.replaceAll(' ','-')">{{ player.name.replace(" ","\n") }}</router-link></td>
+                        <td><span class="hof-player-link" @click="openPlayerProfile(player.name)">{{ player.name.replace(" ","\n") }}</span></td>
                         <td>{{ player.averageHits }}</td>
                         <td>{{ player.wins }}</td>
                         <td>{{ player.ammountOfMatches }}</td>
@@ -257,6 +259,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
     color: inherit;
     text-decoration: none;
     white-space: break-spaces;
+    cursor: pointer;
 }
 .hof-player-link:hover{
     text-decoration: underline;

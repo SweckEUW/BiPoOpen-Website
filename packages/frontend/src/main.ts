@@ -6,6 +6,7 @@ import BiPoPreset from '@/theme';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 import "primeicons/primeicons.css"
+import "material-icons/iconfont/material-icons.css"
 
 const app = createApp(App);
 

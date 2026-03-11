@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { ref, computed, inject } from "vue"
 import router from '@/router.js';
 import DropDown from '@/components/shared/DropDown.vue';
 import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
@@ -42,6 +42,8 @@ const filteredPlayerNames = computed(() => {
 	let search = playerSearch.value.toLowerCase();
 	return playerNames.value.filter(name => name.toLowerCase().includes(search)).slice(0, 15);
 });
+
+const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 </script>
 
 <template>
@@ -79,7 +81,7 @@ const filteredPlayerNames = computed(() => {
 							<input v-model="playerSearch" placeholder="Spieler suchen..." class="ap-player-input" @click.stop/>
 						</div>
 						<div v-for="name in filteredPlayerNames" :key="name">
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu(); playerSearch = '';" :to="'/Spieler/' + name.replaceAll(' ','-')">{{ name }}</router-link>
+							<span class="ap-dropdown-link" @click="toggleBurgerMenu(); playerSearch = ''; openPlayerProfile(name);">{{ name }}</span>
 						</div>
 						<div v-if="playerNamesLoading" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Laden...</div>
 						<div v-if="!playerNamesLoading && playerNamesLoaded && filteredPlayerNames.length === 0" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Kein Spieler gefunden</div>

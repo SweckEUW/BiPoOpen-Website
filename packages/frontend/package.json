@@ -11,6 +11,7 @@
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.5.1",
+    "material-icons": "^1.13.14",
     "primeicons": "^7.0.0",
     "primevue": "^4.5.4",
     "sortablejs": "^1.15.2",

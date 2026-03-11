@@ -32,7 +32,7 @@
                     <tbody>
                         <tr v-for="(player, index) in openGamesStatistic.stats" :key="index">
                             <td>{{ player.placement! + 1}}</td>
-                            <td><router-link class="ogs-player-link" :to="'/Spieler/' + player.name.replaceAll(' ','-')">{{ player.name.replace(" ","\n") }}</router-link></td>
+                            <td><span class="ogs-player-link" @click="openPlayerProfile(player.name)">{{ player.name.replace(" ","\n") }}</span></td>
                             <td>{{ player.wins }}</td>
                             <td>{{ player.ammountOfMatches }}</td>
                             <td>{{ player.averageHits.toFixed(2) }}</td>
@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref } from 'vue';
+import { computed, onMounted, PropType, ref, inject } from 'vue';
 import { getAllTimeOpenGamesStatsList, getPlayersWithStats } from './OpenGamesUtilFunctions';
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -84,6 +84,8 @@ import AccordionContent from 'primevue/accordioncontent';
 const props = defineProps({
     openGames: {type: Object as PropType<Match[]>, required: true }
 });
+
+const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 
 let sortValue = ref<SortValueOpenGames>("averageWins");
 let sortUp = ref(false);
@@ -277,6 +279,7 @@ onMounted(async () => {
     color: inherit;
     text-decoration: none;
     white-space: break-spaces;
+    cursor: pointer;
 }
 .ogs-player-link:hover{
     text-decoration: underline;
