@@ -20,6 +20,7 @@
                 <Avatar :label="profileData.name.charAt(0)" size="xlarge" shape="circle" class="mb-[10px]" />
                 <div class="text-[32px] font-bold text-[--p-primary-color]">{{ profileData.name }}</div>
                 <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mt-[4px]" />
+                <div v-if="firstGameDate" class="text-[13px] text-[--p-text-muted-color] mt-[6px]">Erstes Spiel: {{ firstGameDate }}</div>
             </div>
 
             <!-- Zeitraum-Auswahl -->
@@ -64,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, inject } from 'vue';
+import { ref, watch, inject, computed } from 'vue';
 import { getPlayerProfileData } from './PlayerProfileUtilFunctions';
 import PlayerProfileOverview from './PlayerProfileOverview.vue';
 import PlayerProfileAnalysis from './PlayerProfileAnalysis.vue';
@@ -99,6 +100,11 @@ const trendPeriodOptions = [
     { label: 'Letztes Jahr', value: '1y' as TrendPeriod },
 ];
 const trendPeriod = ref<TrendPeriod>('all');
+
+const firstGameDate = computed(() => {
+    if (!profileData.value?.firstGameTime) return null;
+    return new Date(profileData.value.firstGameTime).toLocaleDateString('de-DE');
+});
 
 const openPlayer = (name: string) => {
     drawerVisible.value = false;

@@ -187,6 +187,7 @@ declare global {
     type PlayerProfileData = {
         name: string;
         leagueTeam: string | null;
+        firstGameTime: number | null;
         totalMatches: number;
         totalWins: number;
         totalLosses: number;

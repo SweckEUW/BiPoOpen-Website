@@ -485,6 +485,9 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     let allTotalMatches = matchHistory.length;
     let allTotalWins = matchHistory.filter(m => m.won).length;
     let allTotalHits = matchHistory.reduce((a, m) => a + m.hits, 0);
+    let firstGameTime = matchHistory
+        .filter(m => m.time > 0)
+        .reduce<number | null>((min, m) => (min === null || m.time < min ? m.time : min), null);
     let allWinrate = allTotalMatches > 0 ? Math.round((allTotalWins / allTotalMatches) * 100) : 0;
     let allStreaks = calculateStreaksFromResults(matchHistory);
     let badges = await calculateBadges({ playerName, allMatchHistory: matchHistory, totalMatches: allTotalMatches, totalWins: allTotalWins, bestWinStreak: allStreaks.best, totalHits: allTotalHits, winrate: allWinrate });
@@ -492,6 +495,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     return {
         name: playerName,
         leagueTeam,
+        firstGameTime,
         totalMatches,
         totalWins,
         totalLosses: totalMatches - totalWins,
