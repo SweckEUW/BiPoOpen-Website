@@ -3,6 +3,7 @@ import { ref, inject } from "vue"
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
+import { BIPO_OPEN_TOURNAMENT_YEARS } from "@/util/bipoOpenTournamentMeta";
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 
@@ -13,7 +14,7 @@ let sortedHallOfFameList:PlayerWithStats[] = [];
 let isLoading = ref(true);
 
 // Initial load tournaments
-let tournamentsToEvaluate = ["2020","2022","2023","2024","2025"]; //2021
+let tournamentsToEvaluate = [...BIPO_OPEN_TOURNAMENT_YEARS];
 const getTournament = async () => {
     for (let i = 0; i < tournamentsToEvaluate.length; i++) {
         let tournament = await getTournamentByName(tournamentsToEvaluate[i]);

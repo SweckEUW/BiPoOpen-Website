@@ -3,6 +3,7 @@ import { getAllLeagueGames, getMatchesFromPlayer as getLeagueMatchesFromPlayer }
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
+import { BIPO_OPEN_TOURNAMENT_YEARS, getBiPoOpenTournamentFallbackTime } from "@/util/bipoOpenTournamentMeta";
 import { calculateBadges } from "./BadgeRegistry";
 import { getLeagueTeamForPlayer } from "./LeaguePlayerMapping";
 
@@ -30,8 +31,7 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
         });
     });
 
-    let tournamentYears = ["2020", "2022", "2023", "2024", "2025"];
-    for (let year of tournamentYears) {
+    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
         let tournament = await getTournamentByName(year);
         if (tournament) {
             tournament.teams.forEach(team => {
@@ -372,12 +372,12 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     }
 
     // 3. Tournaments - combine all BiPo Open tournaments into one category
-    let tournamentYears = ["2020", "2022", "2023", "2024", "2025"];
     let bipoOpenStats = { name: "BiPo Open Turniere", matches: 0, wins: 0, hits: 0, averageHits: 0 };
-    for (let year of tournamentYears) {
+    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
         let tournament = await getTournamentByName(year);
         if (!tournament) continue;
         let tMatches = getFinishedMatchesFromPlayer(tournament, playerName, false);
+        let fallbackTime = getBiPoOpenTournamentFallbackTime(year);
         if (tMatches.length === 0) continue;
 
         tMatches.forEach(m => {
@@ -389,7 +389,8 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
             let player = [...m.team1.players, ...m.team2.players].find(p => p.name === playerName);
             let hits = player ? player.score : 0;
             bipoOpenStats.hits += hits;
-            matchHistory.push({ match: m, source: "BiPo Open Turniere", time: m.time || 0, won, hits });
+            let matchTime = m.time && m.time > 0 ? m.time : fallbackTime;
+            matchHistory.push({ match: m, source: "BiPo Open Turniere", time: matchTime, won, hits });
 
             let opponents = isTeam1 ? m.team2.players : m.team1.players;
             let oppName = opponents.map(p => p.name).join(" & ");

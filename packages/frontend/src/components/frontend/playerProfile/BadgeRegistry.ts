@@ -1,5 +1,6 @@
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { checkIfTeam1WonVsTeam2, checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
+import { BIPO_OPEN_TOURNAMENT_YEARS } from "@/util/bipoOpenTournamentMeta";
 
 export interface BadgeContext {
     playerName: string;
@@ -60,8 +61,7 @@ const findHitMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: 
 // Turniersieg
 registerBadge(async ({ playerName }) => {
     let badges: PlayerBadge[] = [];
-    let tournamentYears = ["2020", "2022", "2023", "2024", "2025"];
-    for (let year of tournamentYears) {
+    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
         let tournament = await getTournamentByName(year);
         if (!tournament?.koPhase.matches.length) continue;
         let lastStage = tournament.koPhase.matches[tournament.koPhase.matches.length - 1];
@@ -76,6 +76,8 @@ registerBadge(async ({ playerName }) => {
                 label: `BiPo Open ${year} Sieger`,
                 description: `Gewinner des BiPo Open ${year} Turniers`,
                 date: dateStr(finalMatch.time || 0),
+                priority: 1000,
+                special: 'rainbow',
             });
         }
     }
@@ -85,9 +87,7 @@ registerBadge(async ({ playerName }) => {
 // Spiele-Meilensteine
 registerBadge(({ allMatchHistory, totalMatches }) => {
     let milestones = [
-        { count: 10, icon: 'directions_run', label: 'Einsteiger', desc: '10 Spiele absolviert' },
-        { count: 50, icon: 'fitness_center', label: 'Stammgast', desc: '50 Spiele absolviert' },
-        { count: 100, icon: 'star', label: 'Centurion', desc: '100 Spiele absolviert' },
+        { count: 100, icon: 'star', label: 'Stammgast', desc: '100 Spiele absolviert' },
         { count: 200, icon: 'military_tech', label: 'Veteran', desc: '200 Spiele absolviert' },
         { count: 300, icon: 'workspace_premium', label: 'Legende', desc: '300 Spiele absolviert' },
         { count: 500, icon: 'diamond', label: 'Unstoppable', desc: '500 Spiele absolviert' },
@@ -103,8 +103,6 @@ registerBadge(({ allMatchHistory, totalMatches }) => {
 // Sieg-Meilensteine
 registerBadge(({ allMatchHistory, totalWins }) => {
     let milestones = [
-        { count: 10, icon: 'thumb_up', label: 'Erster Erfolg', desc: '10 Siege errungen' },
-        { count: 50, icon: 'flash_on', label: 'Siegertyp', desc: '50 Siege errungen' },
         { count: 100, icon: 'local_fire_department', label: 'Dominator', desc: '100 Siege errungen' },
         { count: 200, icon: 'whatshot', label: 'Unbesiegbar', desc: '200 Siege errungen' },
     ];
@@ -119,7 +117,6 @@ registerBadge(({ allMatchHistory, totalWins }) => {
 // Treffer-Meilensteine
 registerBadge(({ allMatchHistory, totalHits }) => {
     let milestones = [
-        { count: 100, icon: 'gps_fixed', label: 'Scharfschütze', desc: '100 Treffer erzielt' },
         { count: 500, icon: 'track_changes', label: 'Präzisionsmaschine', desc: '500 Treffer erzielt' },
         { count: 1000, icon: 'crisis_alert', label: 'Tausender', desc: '1.000 Treffer erzielt' },
     ];
@@ -134,8 +131,8 @@ registerBadge(({ allMatchHistory, totalHits }) => {
 // Siegesserien
 registerBadge(({ bestWinStreak }) => {
     let badges: PlayerBadge[] = [];
-    if (bestWinStreak >= 5) badges.push({ id: 'streak-5', icon: 'bolt', label: 'Hot Streak', description: '5 Siege in Folge', date: null });
-    if (bestWinStreak >= 10) badges.push({ id: 'streak-10', icon: 'electric_bolt', label: 'Unaufhaltsam', description: '10 Siege in Folge', date: null });
+    if (bestWinStreak >= 15) badges.push({ id: 'streak-15', icon: 'bolt', label: 'Hot Streak', description: '15 Siege in Folge', date: null });
+    if (bestWinStreak >= 20) badges.push({ id: 'streak-20', icon: 'electric_bolt', label: 'King of the Hill', description: '20 Siege in Folge', date: null });
     return badges;
 });
 
@@ -147,20 +144,13 @@ registerBadge(({ totalMatches, winrate }) => {
     return badges;
 });
 
-// Erstes Spiel
-registerBadge(({ allMatchHistory, totalMatches }) => {
-    if (totalMatches < 1) return [];
-    let first = [...allMatchHistory].filter(m => m.time > 0).sort((a, b) => a.time - b.time)[0];
-    return [{ id: 'first-game', icon: 'celebration', label: 'Erstes Spiel', description: 'Das allererste Spiel absolviert', date: first ? dateStr(first.time) : null }];
-});
-
 // Perfect Game – nur in 2v2, da im 1v1 man sowieso immer 10 Treffer macht
-registerBadge(({ allMatchHistory }) => {
-    let perfectGame = allMatchHistory.find(m => {
-        if (m.hits < 10) return false;
-        let is1v1 = m.match.team1.players.length === 1 && m.match.team2.players.length === 1;
-        return !is1v1;
-    });
-    if (!perfectGame) return [];
-    return [{ id: 'perfect-game', icon: 'auto_awesome', label: 'Perfect Game', description: '10+ Treffer in einem 2v2 Spiel', date: dateStr(perfectGame.time) }];
-});
+// registerBadge(({ allMatchHistory }) => {
+//     let perfectGame = allMatchHistory.find(m => {
+//         if (m.hits < 10) return false;
+//         let is1v1 = m.match.team1.players.length === 1 && m.match.team2.players.length === 1;
+//         return !is1v1;
+//     });
+//     if (!perfectGame) return [];
+//     return [{ id: 'perfect-game', icon: 'auto_awesome', label: 'Perfect Game', description: '10+ Treffer in einem 2v2 Spiel', date: dateStr(perfectGame.time) }];
+// });

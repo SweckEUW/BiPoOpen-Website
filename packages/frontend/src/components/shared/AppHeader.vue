@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, inject } from "vue"
+import { ref } from "vue"
 import router from '@/router.js';
-import DropDown from '@/components/shared/DropDown.vue';
 import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
+import Dropdown from 'primevue/dropdown';
+import AutoComplete from 'primevue/autocomplete';
 
 let showBurger = ref(false);
 
@@ -22,12 +23,18 @@ const scrollToTop = () => {
 let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 
 let tournaments = ['Weck BiPo Open 2025', 'Weck BiPo Open 2024', 'Weck BiPo Open 2023', 'Weck BiPo Open 2022', 'Weck BiPo Open 2021', 'Weck BiPo Open 2020'];
+const tournamentOptions = tournaments.map(tournament => ({
+	label: tournament,
+	value: '/' + tournament.replaceAll('Weck BiPo Open ', '').replaceAll(' ', '-')
+}));
+const selectedTournament = ref<string | null>(null);
 
 // Player search
 let playerNames = ref<string[]>([]);
 let playerNamesLoading = ref(false);
 let playerNamesLoaded = ref(false);
 let playerSearch = ref("");
+let playerSuggestions = ref<string[]>([]);
 
 const loadPlayerNames = async () => {
 	if(playerNamesLoaded.value || playerNamesLoading.value) return;
@@ -37,13 +44,34 @@ const loadPlayerNames = async () => {
 	playerNamesLoaded.value = true;
 }
 
-const filteredPlayerNames = computed(() => {
-	if(!playerSearch.value) return playerNames.value.slice(0, 15);
-	let search = playerSearch.value.toLowerCase();
-	return playerNames.value.filter(name => name.toLowerCase().includes(search)).slice(0, 15);
-});
+const searchPlayers = async (event: { query: string }) => {
+	const query = event.query.trim().toLowerCase();
+	if(!query){
+		playerSuggestions.value = [];
+		return;
+	}
 
-const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
+	if(!playerNamesLoaded.value) await loadPlayerNames();
+	playerSuggestions.value = playerNames.value
+		.filter(name => name.toLowerCase().includes(query))
+		.slice(0, 15);
+};
+
+const onPlayerSelect = (event: { value: string }) => {
+	let name = event.value;
+	toggleBurgerMenu();
+	playerSearch.value = "";
+	playerSuggestions.value = [];
+	router.push(`/Spieler/${encodeURIComponent(name).replaceAll('%20', '-')}`);
+};
+
+const onTournamentSelect = (value: string | null) => {
+	if(!value) return;
+	toggleBurgerMenu();
+	router.push(value);
+	selectedTournament.value = null;
+};
+
 </script>
 
 <template>
@@ -65,39 +93,39 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 		
 		<transition name="fade" mode="out-in">
 			<div class="ap-menu" v-show="showBurger">
+				<div class="ap-menu-content">
+					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
+					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
+					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
+					<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-Knecht'">BiPo Knecht</router-link> -->
+					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/League'">BiPo League</router-link>
 
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
-				<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-Knecht'">BiPo Knecht</router-link> -->
-				<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/League'">BiPo League</router-link>
+					<div class="ap-search-block">
+						<div class="ap-menu-title ap-menu-title-small">Spieler</div>
+						<AutoComplete
+							v-model="playerSearch"
+							:suggestions="playerSuggestions"
+							@complete="searchPlayers"
+							@item-select="onPlayerSelect"
+							placeholder="Spieler suchen..."
+							class="ap-player-autocomplete"
+							:dropdown="false"
+						/>
+					</div>
 
-				<DropDown :name="'spieler'" :isOpen="false" @click="loadPlayerNames()">
-					<template #header>
-						<div class="ap-menu-title">Spieler</div>
-					</template>
-					<template #content>
-						<div class="ap-spieler-search">
-							<input v-model="playerSearch" placeholder="Spieler suchen..." class="ap-player-input" @click.stop/>
-						</div>
-						<div v-for="name in filteredPlayerNames" :key="name">
-							<span class="ap-dropdown-link" @click="toggleBurgerMenu(); playerSearch = ''; openPlayerProfile(name);">{{ name }}</span>
-						</div>
-						<div v-if="playerNamesLoading" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Laden...</div>
-						<div v-if="!playerNamesLoading && playerNamesLoaded && filteredPlayerNames.length === 0" class="ap-dropdown-link" style="cursor: default; opacity: 0.5;">Kein Spieler gefunden</div>
-					</template>
-				</DropDown>
-
-				<DropDown :name="'main'" :isOpen="true">
-					<template #header>
-						<div class="ap-menu-title">Turniere</div>
-					</template>
-					<template #content>
-						<div v-for="tournament in tournaments" :key="tournament">
-							<router-link class="ap-dropdown-link" @click="toggleBurgerMenu()" :to="'/' + tournament.replaceAll('Weck BiPo Open ','').replaceAll(' ','-')">{{ tournament }}</router-link>
-						</div>
-					</template>
-				</DropDown>
+					<div class="ap-search-block">
+						<div class="ap-menu-title ap-menu-title-small">Turniere</div>
+						<Dropdown
+							:modelValue="selectedTournament"
+							:options="tournamentOptions"
+							optionLabel="label"
+							optionValue="value"
+							placeholder="Turnier auswählen"
+							class="ap-tournament-dropdown"
+							@update:modelValue="onTournamentSelect"
+						/>
+					</div>
+				</div>
 			</div>
 		</transition>
 
@@ -145,33 +173,29 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 	flex-direction: column;
 	background-color: var(--main-color);
 	overflow-y: scroll;
+	padding: 70px 16px 30px;
+}
+.ap-menu-content{
+	width: min(520px, 90vw);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
 }
 .ap-menu-title{
 	text-decoration: none;
 	color: white;
-	font-size: 50px;
+	font-size: 40px;
 	font-weight: bolder;
-	margin-top: 0px;
-	margin-bottom: 20px;
+	margin: 0;
 	text-align: center;
 	display: inline-block;
 	transition: .3s opacity ease;
 }
-.ap-menu-title:first-of-type{
-	margin-top: 15vh !important;
-}
-.ap-dropdown-link{
-	display: inline-block;
-	cursor: pointer;
-	transition: .3s opacity ease;
-	text-align: center;
-	color: rgb(240, 240, 240);
-	margin: 10px 0;
-	font-size: 32px;
-	text-decoration: none;
-}
-.ap-dropdown-link:nth-of-type(1){
-	margin-top: 5px;
+.ap-menu-title-small{
+	font-size: 26px;
+	margin-top: 16px;
+	margin-bottom: 8px;
 }
 a:hover{
 	opacity: 0.5;
@@ -179,22 +203,91 @@ a:hover{
 }
 
 /* Player Search */
-.ap-spieler-search{
-	margin-bottom: 10px;
+.ap-search-block{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	margin-top: 2px;
 }
-.ap-player-input{
-	background: rgba(255,255,255,0.2);
-	border: 2px solid rgba(255,255,255,0.5);
-	border-radius: 8px;
-	padding: 8px 15px;
+.ap-player-autocomplete,
+.ap-tournament-dropdown{
+	width: 100%;
+}
+.ap-player-autocomplete :deep(.p-inputtext),
+
+.ap-tournament-dropdown :deep(.p-dropdown),
+.ap-tournament-dropdown :deep(.p-dropdown-label),
+.ap-tournament-dropdown :deep(.p-dropdown-trigger){
+	background: rgba(255,255,255,0.16);
+	border: 1px solid rgba(255,255,255,0.35);
+	border-radius: 10px;
 	color: white;
-	font-size: 18px;
-	width: 80%;
-	max-width: 300px;
+	font-size: 17px;
 	outline: none;
 }
-.ap-player-input::placeholder{
-	color: rgba(255,255,255,0.6);
+.ap-player-autocomplete :deep(.p-inputtext){
+	width: 100%;
+	padding: 10px 14px;
+}
+.ap-tournament-dropdown :deep(.p-dropdown){
+	width: 100%;
+	min-height: 44px;
+	background: linear-gradient(135deg, rgba(234, 81, 96, 0.3), rgba(97, 195, 217, 0.22));
+	border-color: rgba(255, 255, 255, 0.55);
+}
+.ap-player-autocomplete :deep(.p-inputtext:focus),
+.ap-tournament-dropdown :deep(.p-dropdown.p-focus){
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+.ap-tournament-dropdown :deep(.p-dropdown-label){
+	color: #fff;
+	font-weight: 700;
+}
+.ap-tournament-dropdown :deep(.p-dropdown-label.p-placeholder){
+	color: rgba(255, 255, 255, 0.86);
+}
+.ap-tournament-dropdown :deep(.p-dropdown-trigger-icon){
+	color: #ffffff;
+}
+.ap-player-autocomplete :deep(.p-inputtext::placeholder){
+	color: rgba(255,255,255,0.75);
+}
+.ap-player-autocomplete :deep(.p-autocomplete-panel),
+.ap-tournament-dropdown :deep(.p-dropdown-panel){
+	background: #f8fbff;
+	border: 1px solid rgba(18, 40, 76, 0.14);
+	border-radius: 10px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+}
+.ap-player-autocomplete :deep(.p-autocomplete-item),
+.ap-tournament-dropdown :deep(.p-dropdown-item){
+	color: var(--main-color);
+	font-weight: 600;
+}
+.ap-player-autocomplete :deep(.p-autocomplete-item:hover),
+.ap-tournament-dropdown :deep(.p-dropdown-item:hover){
+	background: rgba(97, 195, 217, 0.18);
+}
+.ap-tournament-dropdown :deep(.p-dropdown-panel){
+	background: linear-gradient(180deg, #fff7f8 0%, #f3fbfd 100%);
+	border: 1px solid rgba(234, 81, 96, 0.26);
+}
+.ap-tournament-dropdown :deep(.p-dropdown-item){
+	color: #a72b3b;
+}
+.ap-tournament-dropdown :deep(.p-dropdown-item.p-highlight){
+	background: rgba(234, 81, 96, 0.14);
+	color: #7f1f30;
+}
+.ap-tournament-dropdown :deep(.p-dropdown-item:hover){
+	background: rgba(97, 195, 217, 0.22);
+	color: #7f1f30;
+}
+.ap-search-hint{
+	margin-top: 6px;
+	color: rgba(255, 255, 255, 0.75);
+	font-size: 13px;
 }
 
 /* BURGER */
@@ -243,40 +336,28 @@ a:hover{
 		opacity: 1;
 		color: var(--main-color);;
 	}
-	.ap-menu-title:first-of-type{
-		margin-top: 100px;
+	.ap-menu{
+		padding-top: 78px;
 	}
-	.ap-dropdown-link{
-		font-size: 32px;
-		margin: 5px 0;
+	.ap-menu-content{
+		width: min(420px, 92vw);
 	}
-	.ap-dropdown-link:hover{
+	.ap-menu-title-small{
+		font-size: 24px;
+		margin-top: 12px;
+	}
+	a:hover{
 		opacity: 1;
 	}
 	.ap-menu-title{
-		font-size: 35px;
-	}
-	.ap-dropdown-link{
-		font-size: 24px;
-	}
-	.DropDown{
-		margin-bottom: 20px;
+		font-size: 31px;
 	}
 }
 
 /*MOBILE S*/
 @media (width <= 360px){
     .ap-menu-title{
-		font-size: 35px;
-	}
-	.ap-dropdown-title{
-		font-size: 35px;
-	}
-	.ap-dropdown-link{
-		font-size: 24px;
-	}
-	.DropDown{
-		margin-bottom: 10px;
+		font-size: 28px;
 	}
 }
 </style>

@@ -214,5 +214,7 @@ declare global {
         label: string;
         description: string;
         date: string | null;
+        priority?: number;
+        special?: 'rainbow';
     };
 }
