@@ -92,6 +92,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .AppFooter{
 	width: 100%; 
+	min-height: 80px;
 	background: var(--main-color);
 	text-align: center;
 	color: white;
@@ -146,7 +147,7 @@ img{
 	text-decoration: none;
 	transition: .3s color ease;
 }
-.af-imprint a:hover{
+.af-bottom a:hover{
 	color: rgb(211, 211, 211);
 }
 
