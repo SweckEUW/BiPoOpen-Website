@@ -7,6 +7,9 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
 import "primeicons/primeicons.css"
 import "material-icons/iconfont/material-icons.css"
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({ immediate: true });
 
 const app = createApp(App);
 

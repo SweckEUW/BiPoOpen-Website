@@ -1,3 +1,6 @@
+/// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/client" />
+
 export {}; // wichtig, damit TypeScript es als Modul erkennt
 
 declare global {
