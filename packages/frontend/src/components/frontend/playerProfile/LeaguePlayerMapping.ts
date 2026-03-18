@@ -16,7 +16,7 @@ export const LEAGUE_PLAYER_MAP: Record<string, string> = {
     "BPC Knick": "Nick Brinkrolf",
     "Ostgold": "Giulia Sanio",
     "Schaufautomat": "Jens Schauf",
-    "Anime Dude": "Firtz Falkenreck",
+    "Anime Dude": "Fritz Falkenreck",
     "SallyWin All-in": "Sally Hollenbeck",
 };
 
