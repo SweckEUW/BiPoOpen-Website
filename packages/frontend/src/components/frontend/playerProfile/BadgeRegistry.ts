@@ -62,6 +62,22 @@ const findHitMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: 
 registerBadge(async ({ playerName }) => {
     let badges: PlayerBadge[] = [];
     for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
+        if (String(year) === '2020') {
+            let hardcoded2020Winners = ['Matthias Weck', 'Lennard Kaffitz'];
+            if (hardcoded2020Winners.includes(playerName)) {
+                badges.push({
+                    id: `tournament-win-${year}`,
+                    icon: 'emoji_events',
+                    label: `BiPo Open ${year} Sieger`,
+                    description: `Gewinner des BiPo Open ${year} Turniers`,
+                    date: null,
+                    priority: 1000,
+                    special: 'rainbow',
+                });
+            }
+            continue;
+        }
+
         let tournament = await getTournamentByName(year);
         if (!tournament?.koPhase.matches.length) continue;
         let lastStage = tournament.koPhase.matches[tournament.koPhase.matches.length - 1];
