@@ -127,10 +127,13 @@ const gamesFromSelectedLeaguePlayer = computed(() => {
     // Track match count per opponent
     const matchCounts: Record<string, number> = {};
 
-    const allMatchesPlayed = props.leagueGames.filter((match) => 
-        match.team1.players.some(p => p.name === selectedPlayerName) || 
-        match.team2.players.some(p => p.name === selectedPlayerName)
-    );
+    const allMatchesPlayed = props.leagueGames
+        .filter((match) =>
+            match.team1.players.some(p => p.name === selectedPlayerName) ||
+            match.team2.players.some(p => p.name === selectedPlayerName)
+        )
+        // Ensure the first encounter per opponent is assigned to Hinrunde.
+        .sort((a, b) => (a.time ?? 0) - (b.time ?? 0));
 
     // Distribute played matches
     allMatchesPlayed.forEach(match => {
