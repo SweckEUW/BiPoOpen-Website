@@ -87,7 +87,7 @@ export const getAmmountOfHitsFromPlayer = (tournament:Tournament, playerName:str
         [match.team1, match.team2].forEach((team) => {
             team.players.forEach((player) => {
                 if(player.name == playerName)
-                    score += player.score;
+                    score += (player.score ?? 0);
             });
         });
     });

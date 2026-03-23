@@ -48,17 +48,36 @@ export const checkIfTournamentFinished = (tournament:Tournament) => {
 }
 
 const convertTournament = (tournament:any) => {
-    // Set result to player scores
+    const setPlayerScoresFromResult = (match:any) => {
+        if(!match?.result)
+            return;
+
+        const result = match.result;
+        const hasPlayerBreakdown =
+            typeof result.team1Player1Score === "number" &&
+            typeof result.team1Player2Score === "number" &&
+            typeof result.team2Player1Score === "number" &&
+            typeof result.team2Player2Score === "number";
+
+        if(!hasPlayerBreakdown)
+            return;
+
+        if(match.team1?.players?.[0])
+            match.team1.players[0].score = result.team1Player1Score;
+        if(match.team1?.players?.[1])
+            match.team1.players[1].score = result.team1Player2Score;
+        if(match.team2?.players?.[0])
+            match.team2.players[0].score = result.team2Player1Score;
+        if(match.team2?.players?.[1])
+            match.team2.players[1].score = result.team2Player2Score;
+    }
+
+    // Set result to player scores when a player-level breakdown exists.
     for(let i = 0; i < tournament.groupPhase.matches.length; i++) {
         let group = tournament.groupPhase.matches[i];
         for(let j = 0; j < group.length; j++) {
             let match = group[j];
-            if(match.result){
-                match.team1.players[0].score = match.result.team1Player1Score;
-                match.team1.players[1].score = match.result.team1Player2Score;
-                match.team2.players[0].score = match.result.team2Player1Score;
-                match.team2.players[1].score = match.result.team2Player2Score;
-            }
+            setPlayerScoresFromResult(match);
         }
     }
 
@@ -66,12 +85,7 @@ const convertTournament = (tournament:any) => {
         let group = tournament.koPhase.matches[i];
         for(let j = 0; j < group.length; j++) {
             let match = group[j];
-            if(match.result){
-                match.team1.players[0].score = match.result.team1Player1Score;
-                match.team1.players[1].score = match.result.team1Player2Score;
-                match.team2.players[0].score = match.result.team2Player1Score;
-                match.team2.players[1].score = match.result.team2Player2Score;
-            }
+            setPlayerScoresFromResult(match);
         }
     }
 

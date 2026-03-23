@@ -100,15 +100,17 @@ const formatName = (name: string) =>
 
 const didPlayerWinMatch = (match: Match, playerName: string): boolean => {
     let lo = playerName.toLowerCase();
-    let t1 = match.team1.players.reduce((a, p) => a + p.score, 0);
-    let t2 = match.team2.players.reduce((a, p) => a + p.score, 0);
-    return match.team1.players.some(p => p.name.toLowerCase() === lo) ? t1 > t2 : t2 > t1;
+    let didTeam1Win = checkIfTeam1WonVsTeam2(match);
+    if(didTeam1Win == undefined)
+        return false;
+
+    return match.team1.players.some(p => p.name.toLowerCase() === lo) ? didTeam1Win : !didTeam1Win;
 };
 
 const getPlayerHitsInMatch = (match: Match, playerName: string): number => {
     let lo = playerName.toLowerCase();
     let p = match.team1.players.find(p => p.name.toLowerCase() === lo) || match.team2.players.find(p => p.name.toLowerCase() === lo);
-    return p ? p.score : 0;
+    return p ? (p.score ?? 0) : 0;
 };
 
 const getOpponentName = (match: Match, playerName: string): string => {
@@ -439,7 +441,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
             if (won) bipoOpenStats.wins++;
             bipoOpenStats.matches++;
             let player = [...m.team1.players, ...m.team2.players].find(p => p.name === playerName);
-            let hits = player ? player.score : 0;
+            let hits = player ? (player.score ?? 0) : 0;
             bipoOpenStats.hits += hits;
             let matchTime = m.time && m.time > 0 ? m.time : fallbackTime;
             matchHistory.push({ match: m, source: "BiPo Open Turniere", time: matchTime, won, hits });

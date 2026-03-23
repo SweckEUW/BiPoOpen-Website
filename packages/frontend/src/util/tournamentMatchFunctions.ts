@@ -1,8 +1,19 @@
-export const checkIfMatchFinished = (match:Match) => {
-    if(match.team1 && match.team2)
-        return match.team1.players[0].score != undefined;
+const hasLegacyTeamResult = (match: Match) => {
+    const result = (match as any).result;
+    return typeof result?.team1Score === "number" && typeof result?.team2Score === "number";
+}
 
-    return false;
+export const checkIfMatchFinished = (match:Match) => {
+    if(!match.team1 || !match.team2)
+        return false;
+
+    if(hasLegacyTeamResult(match))
+        return true;
+
+    const team1HasScore = match.team1.players.some((player) => player.score != undefined);
+    const team2HasScore = match.team2.players.some((player) => player.score != undefined);
+    return team1HasScore && team2HasScore;
+
 }
 
 export const checkIfTeam1WonVsTeam2 = (match:Match) => {
@@ -14,9 +25,16 @@ export const checkIfTeam1WonVsTeam2 = (match:Match) => {
 }
 
 export const getMatchScore = (match:Match, isTeam1:boolean) => {
-    if(!checkIfMatchFinished(match)) // If team is not set or the first player has no score, return undefined
+    if(!match.team1 || !match.team2)
+        return undefined;
+
+    const legacyResult = (match as any).result;
+    if(typeof legacyResult?.team1Score === "number" && typeof legacyResult?.team2Score === "number")
+        return isTeam1 ? legacyResult.team1Score : legacyResult.team2Score;
+
+    if(!checkIfMatchFinished(match)) // If team is not set or scores are missing, return undefined
         return undefined;
         
     let team = isTeam1 ? match.team1 : match.team2;
-    return team.players.reduce((acc, player) => acc + (player.score || 0), 0);
+    return team.players.reduce((acc, player) => acc + (player.score ?? 0), 0);
 }
