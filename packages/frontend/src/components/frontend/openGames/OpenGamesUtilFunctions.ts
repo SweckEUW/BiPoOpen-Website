@@ -172,11 +172,11 @@ export const getMatchesFromPlayer = (openGames:Match[], playerName:string, oneVe
     openGames.forEach((openGame) => {
         if(openGame.team1!.players.map(player => player.name.toLowerCase()).includes(playerName) || openGame.team2!.players.map(player => player.name.toLowerCase()).includes(playerName)){
             if(oneVersusOne){
-                if(openGame.team1!.players.length == 1 || openGame.team2!.players.length == 1){
+                if(openGame.team1!.players.length == 1 && openGame.team2!.players.length == 1){
                     matchesFromPlayer.push(openGame);
                 }
             }else{
-                if(openGame.team1!.players.length == 2 || openGame.team2!.players.length == 2){
+                if(openGame.team1!.players.length == 2 && openGame.team2!.players.length == 2){
                     matchesFromPlayer.push(openGame);
                 }
             }

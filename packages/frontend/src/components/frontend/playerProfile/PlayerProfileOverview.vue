@@ -26,22 +26,8 @@
             <div class="flex justify-center items-end gap-[32px] py-[14px] border-b border-[--p-content-border-color]">
                 <div class="text-center">
                     <div class="text-[13px] text-[--p-text-muted-color] mb-[4px]">Treffer / Spiel</div>
-                    <div class="flex gap-[20px] justify-center">
-                        <div v-if="avg1v1 !== null" class="text-center">
-                            <div class="text-[22px] font-bold text-[--p-primary-color]">{{ avg1v1 }}</div>
-                            <div class="text-[11px] text-[--p-text-muted-color]">1v1</div>
-                            <TrendIndicator :value="data.trends.avg1v1Trend" />
-                        </div>
-                        <div v-if="avg2v2 !== null" class="text-center">
-                            <div class="text-[22px] font-bold text-[--p-primary-color]">{{ avg2v2 }}</div>
-                            <div class="text-[11px] text-[--p-text-muted-color]">2v2</div>
-                            <TrendIndicator :value="data.trends.avg2v2Trend" />
-                        </div>
-                        <div v-if="avg1v1 === null && avg2v2 === null" class="text-center">
-                            <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.averageHits }}</div>
-                        </div>
-                    </div>
-                    <TrendIndicator v-if="avg1v1 === null && avg2v2 === null" :value="data.trends.averageHitsTrend" />
+                    <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.averageHits }}</div>
+                    <TrendIndicator :value="data.trends.averageHitsTrend" />
                 </div>
                 <div class="text-center">
                     <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.totalHits }}</div>
@@ -121,16 +107,6 @@ const props = defineProps<{
 }>();
 
 const recentForm = computed(() => props.data.recentForm.slice(0, 5));
-
-const avg1v1 = computed(() => {
-    let cat = props.data.categories.find(c => c.name === 'Offene Spiele 1v1');
-    return cat ? cat.averageHits.toFixed(2) : null;
-});
-
-const avg2v2 = computed(() => {
-    let cat = props.data.categories.find(c => c.name === 'Offene Spiele 2v2');
-    return cat ? cat.averageHits.toFixed(2) : null;
-});
 </script>
 
 <style scoped>

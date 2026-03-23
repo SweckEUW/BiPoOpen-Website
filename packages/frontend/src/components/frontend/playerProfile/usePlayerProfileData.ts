@@ -14,11 +14,6 @@ export const usePlayerProfileData = (playerName: Ref<string>, shouldLoad?: Ref<b
     const profileData = ref<PlayerProfileData | null>(null);
     const trendPeriod = ref<TrendPeriod>('all');
 
-    const firstGameDate = computed(() => {
-        if (!profileData.value?.firstGameTime) return null;
-        return new Date(profileData.value.firstGameTime).toLocaleDateString('de-DE');
-    });
-
     const loadProfile = async () => {
         if (shouldLoad && !shouldLoad.value) {
             isLoading.value = false;
@@ -56,7 +51,6 @@ export const usePlayerProfileData = (playerName: Ref<string>, shouldLoad?: Ref<b
         profileData,
         trendPeriod,
         trendPeriodOptions,
-        firstGameDate,
         loadProfile,
     };
 };

@@ -11,7 +11,6 @@
             :profileData="profileData"
             :trendPeriod="trendPeriod"
             :trendPeriodOptions="trendPeriodOptions"
-            :firstGameDate="firstGameDate"
             layout="page"
             @update:trendPeriod="(value) => trendPeriod = value"
             @openPlayer="openPlayer"
@@ -36,7 +35,7 @@ const route = useRoute();
 const router = useRouter();
 
 const playerName = computed(() => decodeURIComponent(route.params.PlayerName as string).replaceAll('-', ' '));
-const { isLoading, profileData, trendPeriod, trendPeriodOptions, firstGameDate } = usePlayerProfileData(playerName);
+const { isLoading, profileData, trendPeriod, trendPeriodOptions } = usePlayerProfileData(playerName);
 
 const openPlayer = (name: string) => {
     router.push(`/Spieler/${encodeURIComponent(name).replaceAll('%20', '-')}`);

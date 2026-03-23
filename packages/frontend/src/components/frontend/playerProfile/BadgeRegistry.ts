@@ -58,6 +58,24 @@ const findHitMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: 
 
 // ─── Default Badge Registrations ──────────────────────────────────────────────
 
+// Erstes Spiel
+registerBadge(({ allMatchHistory }) => {
+    let firstMatch = [...allMatchHistory]
+        .filter(m => m.time > 0)
+        .sort((a, b) => a.time - b.time)[0];
+
+    if (!firstMatch) return [];
+
+    return [{
+        id: 'first-game',
+        icon: 'event_available',
+        label: 'Erstes Spiel',
+        description: 'Erstes Spiel absolviert',
+        date: dateStr(firstMatch.time),
+        priority: 950,
+    }];
+});
+
 // Turniersieg
 registerBadge(async ({ playerName }) => {
     let badges: PlayerBadge[] = [];

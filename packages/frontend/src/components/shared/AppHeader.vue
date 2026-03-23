@@ -123,6 +123,7 @@ const onTournamentSelect = (value: string | null) => {
 							optionLabel="label"
 							optionValue="value"
 							placeholder="Turnier auswählen"
+							appendTo="self"
 							class="ap-tournament-dropdown"
 							@update:modelValue="onTournamentSelect"
 						/>
@@ -216,15 +217,27 @@ a:hover{
 .ap-tournament-dropdown{
 	width: 100%;
 }
+.ap-tournament-dropdown{
+	--p-select-background: rgba(255,255,255,0.16);
+	--p-select-border-color: rgba(255,255,255,0.35);
+	--p-select-color: #ffffff;
+	--p-select-placeholder-color: rgba(255, 255, 255, 0.55);
+	--p-select-overlay-background: rgba(255, 255, 255, 0.16);
+	--p-select-overlay-border-color: rgba(255,255,255,0.35);
+	--p-select-overlay-color: #ffffff;
+	--p-select-option-color: #ffffff;
+	--p-select-option-focus-color: #ffffff;
+	--p-select-option-selected-color: #ffffff;
+	--p-select-option-focus-background: rgba(255, 255, 255, 0.18);
+	--p-select-option-selected-background: rgba(255, 255, 255, 0.24);
+	--p-select-option-selected-focus-background: rgba(255, 255, 255, 0.24);
+}
 .ap-player-autocomplete :deep(.p-inputtext),
-
-.ap-tournament-dropdown :deep(.p-dropdown),
-.ap-tournament-dropdown :deep(.p-dropdown-label),
-.ap-tournament-dropdown :deep(.p-dropdown-trigger){
-	background: rgba(255,255,255,0.16);
-	border: 1px solid rgba(255,255,255,0.35);
+.ap-tournament-dropdown :deep(.p-select){
+	background: rgba(255,255,255,0.16) !important;
+	border: 1px solid rgba(255,255,255,0.35) !important;
 	border-radius: 10px;
-	color: white;
+	color: white !important;
 	font-size: 17px;
 	outline: none;
 }
@@ -232,59 +245,73 @@ a:hover{
 	width: 100%;
 	padding: 10px 14px;
 }
-.ap-tournament-dropdown :deep(.p-dropdown){
+.ap-tournament-dropdown :deep(.p-select){
 	width: 100%;
-	min-height: 44px;
-	background: linear-gradient(135deg, rgba(234, 81, 96, 0.3), rgba(97, 195, 217, 0.22));
-	border-color: rgba(255, 255, 255, 0.55);
+	min-height: 43px;
+}
+.ap-tournament-dropdown :deep(.p-select-label),
+.ap-tournament-dropdown :deep(.p-select-dropdown){
+	background: transparent !important;
+	color: #ffffff !important;
 }
 .ap-player-autocomplete :deep(.p-inputtext:focus),
-.ap-tournament-dropdown :deep(.p-dropdown.p-focus){
+.ap-tournament-dropdown :deep(.p-select.p-focus){
 	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
 }
-.ap-tournament-dropdown :deep(.p-dropdown-label){
+.ap-tournament-dropdown :deep(.p-select-label){
 	color: #fff;
-	font-weight: 700;
+	font-weight: 400;
 }
-.ap-tournament-dropdown :deep(.p-dropdown-label.p-placeholder){
-	color: rgba(255, 255, 255, 0.86);
+.ap-tournament-dropdown :deep(.p-select-label.p-placeholder){
+	color: rgba(255, 255, 255, 0.55) !important;
+	background: transparent !important;
+	opacity: 1 !important;
 }
-.ap-tournament-dropdown :deep(.p-dropdown-trigger-icon){
+.ap-tournament-dropdown :deep(.p-select-dropdown){
 	color: #ffffff;
 }
 .ap-player-autocomplete :deep(.p-inputtext::placeholder){
 	color: rgba(255,255,255,0.75);
 }
 .ap-player-autocomplete :deep(.p-autocomplete-panel),
-.ap-tournament-dropdown :deep(.p-dropdown-panel){
-	background: #f8fbff;
-	border: 1px solid rgba(18, 40, 76, 0.14);
+.ap-tournament-dropdown :deep(.p-select-overlay){
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255,255,255,0.35);
 	border-radius: 10px;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
+	backdrop-filter: blur(10px);
+}
+.ap-tournament-dropdown :deep(.p-select-list-container){
+	scrollbar-color: rgba(255, 255, 255, 0.95) rgba(255, 255, 255, 0.18);
+}
+.ap-tournament-dropdown :deep(.p-select-list-container::-webkit-scrollbar){
+	width: 10px;
+}
+.ap-tournament-dropdown :deep(.p-select-list-container::-webkit-scrollbar-track){
+	background: rgba(255, 255, 255, 0.18);
+	border-radius: 10px;
+}
+.ap-tournament-dropdown :deep(.p-select-list-container::-webkit-scrollbar-thumb){
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 10px;
+	border: 2px solid rgba(255, 255, 255, 0.18);
+}
+.ap-tournament-dropdown :deep(.p-select-list-container::-webkit-scrollbar-thumb:hover){
+	background: #ffffff;
 }
 .ap-player-autocomplete :deep(.p-autocomplete-item),
-.ap-tournament-dropdown :deep(.p-dropdown-item){
-	color: var(--main-color);
+.ap-tournament-dropdown :deep(.p-select-option){
+	color: white;
 	font-weight: 600;
 }
 .ap-player-autocomplete :deep(.p-autocomplete-item:hover),
-.ap-tournament-dropdown :deep(.p-dropdown-item:hover){
-	background: rgba(97, 195, 217, 0.18);
+.ap-tournament-dropdown :deep(.p-select-option:hover),
+.ap-tournament-dropdown :deep(.p-select-option.p-focus){
+	background: rgba(255, 255, 255, 0.18);
 }
-.ap-tournament-dropdown :deep(.p-dropdown-panel){
-	background: linear-gradient(180deg, #fff7f8 0%, #f3fbfd 100%);
-	border: 1px solid rgba(234, 81, 96, 0.26);
-}
-.ap-tournament-dropdown :deep(.p-dropdown-item){
-	color: #a72b3b;
-}
-.ap-tournament-dropdown :deep(.p-dropdown-item.p-highlight){
-	background: rgba(234, 81, 96, 0.14);
-	color: #7f1f30;
-}
-.ap-tournament-dropdown :deep(.p-dropdown-item:hover){
-	background: rgba(97, 195, 217, 0.22);
-	color: #7f1f30;
+.ap-tournament-dropdown :deep(.p-select-option.p-selected){
+	background: rgba(255, 255, 255, 0.24);
+	color: white;
 }
 .ap-search-hint{
 	margin-top: 6px;

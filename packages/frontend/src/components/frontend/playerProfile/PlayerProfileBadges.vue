@@ -1,21 +1,27 @@
 <template>
-    <div v-if="grouped.length > 0">
-        <div class="pp-section-title">Errungenschaften</div>
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-[10px] mb-[10px]">
-            <Card
-                v-for="badge in grouped"
-                :key="badge.id"
-                class="text-center"
-                :class="{ 'pp-badge-rainbow': badge.special === 'rainbow' }"
-            >
-                <template #content>
-                    <span class="material-icons text-[--p-primary-color]" :class="{ 'pp-badge-rainbow-icon': badge.special === 'rainbow' }" style="font-size: 2rem">{{ badge.icon }}</span>
-                    <div class="text-[14px] font-bold mt-[4px]">{{ badge.label }}</div>
-                    <div class="text-[11px] text-[--p-text-muted-color]">{{ badge.description }}</div>
-                    <div v-if="badge.date" class="text-[10px] text-[--p-text-muted-color] mt-[2px]">{{ badge.date }}</div>
-                </template>
-            </Card>
-        </div>
+    <div class="flex flex-wrap justify-center items-stretch gap-[6px] mb-[6px] w-full">
+        <Card
+            v-for="badge in grouped"
+            :key="badge.id"
+            class="text-center"
+            :class="[
+                'pp-badge-card-compact w-[150px]',
+                { 'pp-badge-rainbow': badge.special === 'rainbow' }
+            ]"
+        >
+            <template #content>
+                <span
+                    class="material-icons text-[--p-primary-color]"
+                    :class="[
+                        { 'pp-badge-rainbow-icon': badge.special === 'rainbow' },
+                        'pp-badge-icon-compact'
+                    ]"
+                >{{ badge.icon }}</span>
+                <div class="text-[12px] font-bold mt-[2px]">{{ badge.label }}</div>
+                <div class="text-[10px] text-[--p-text-muted-color] leading-[1.2]">{{ badge.description }}</div>
+                <div v-if="badge.date" class="text-[9px] text-[--p-text-muted-color] mt-[1px]">{{ badge.date }}</div>
+            </template>
+        </Card>
     </div>
 </template>
 
@@ -23,9 +29,10 @@
 import { computed } from 'vue';
 import Card from 'primevue/card';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     badges: PlayerBadge[];
-}>();
+}>(), {
+});
 
 const getDefaultPriority = (badge: PlayerBadge): number => {
     if (badge.id.startsWith('tournament-win-')) return 900;
@@ -75,11 +82,14 @@ const grouped = computed((): PlayerBadge[] => {
 </script>
 
 <style scoped>
-.pp-section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--p-primary-color);
-    margin-bottom: 12px;
+
+.pp-badge-card-compact :deep(.p-card-body) {
+    padding: 0.45rem;
+}
+
+.pp-badge-icon-compact {
+    font-size: 1.1rem;
+    line-height: 1;
 }
 
 .pp-badge-rainbow {

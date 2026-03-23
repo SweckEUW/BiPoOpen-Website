@@ -18,7 +18,6 @@
             :profileData="profileData"
             :trendPeriod="trendPeriod"
             :trendPeriodOptions="trendPeriodOptions"
-            :firstGameDate="firstGameDate"
             layout="drawer"
             @update:trendPeriod="(value) => trendPeriod = value"
             @openPlayer="openPlayer"
@@ -50,7 +49,7 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 
 const playerName = computed(() => props.playerName);
 const shouldLoad = computed(() => drawerVisible.value);
-const { isLoading, profileData, trendPeriod, trendPeriodOptions, firstGameDate } = usePlayerProfileData(playerName, shouldLoad);
+const { isLoading, profileData, trendPeriod, trendPeriodOptions } = usePlayerProfileData(playerName, shouldLoad);
 
 const openPlayer = (name: string) => {
     drawerVisible.value = false;

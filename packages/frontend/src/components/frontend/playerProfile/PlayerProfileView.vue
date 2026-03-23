@@ -9,7 +9,7 @@
                 {{ profileData.name }}
             </div>
             <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mt-[4px]" />
-            <div v-if="firstGameDate" class="text-[13px] text-[--p-text-muted-color] mt-[6px]">Erstes Spiel: {{ firstGameDate }}</div>
+            <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" class="mt-[10px]" />
         </div>
 
         <div class="flex justify-center mb-[16px]">
@@ -25,51 +25,97 @@
 
         <Divider />
 
-        <PlayerProfileOverview :data="profileData" />
+        <Tabs v-model:value="activeTabValue" class="mb-[10px]">
+            <TabList class="w-full">
+                <Tab value="1v1" class="flex-1 justify-center">1v1 Spiele</Tab>
+                <Tab value="2v2" class="flex-1 justify-center">2v2 Spiele</Tab>
+            </TabList>
+            <TabPanels>
+                <TabPanel value="1v1">
+                    <div v-if="filteredData1v1.totalMatches === 0" class="text-center py-[30px] text-[--p-text-muted-color]">
+                        Keine 1v1 Spiele vorhanden
+                    </div>
+                    <template v-else>
+                        <PlayerProfileOverview :data="filteredData1v1" />
 
-        <Divider />
+                        <Divider />
 
-        <PlayerProfileAnalysis :data="profileData" />
+                        <PlayerProfileAnalysis :data="filteredData1v1" />
 
-        <Divider />
+                        <Divider />
 
-        <PlayerProfileBadges :badges="profileData.badges" />
+                        <PlayerProfilePeers
+                            :partners="filteredData1v1.partners"
+                            :rivals="filteredData1v1.rivals"
+                            @openPlayer="(name) => $emit('openPlayer', name)"
+                        />
 
-        <Divider />
+                        <Divider />
 
-        <PlayerProfilePeers
-            :partners="profileData.partners"
-            :rivals="profileData.rivals"
-            @openPlayer="(name) => $emit('openPlayer', name)"
-        />
+                        <PlayerProfileHistory
+                            :matchHistory="filteredData1v1.matchHistory"
+                            :playerName="profileData.name"
+                            :leagueTeam="profileData.leagueTeam"
+                        />
+                    </template>
+                </TabPanel>
 
-        <Divider />
+                <TabPanel value="2v2">
+                    <div v-if="filteredData2v2.totalMatches === 0" class="text-center py-[30px] text-[--p-text-muted-color]">
+                        Keine 2v2 Spiele vorhanden
+                    </div>
+                    <template v-else>
+                        <PlayerProfileOverview :data="filteredData2v2" />
 
-        <PlayerProfileHistory
-            :matchHistory="profileData.matchHistory"
-            :playerName="profileData.name"
-            :leagueTeam="profileData.leagueTeam"
-        />
+                        <Divider />
+
+                        <PlayerProfileAnalysis :data="filteredData2v2" />
+
+                        <Divider />
+
+                        <PlayerProfilePeers
+                            :partners="filteredData2v2.partners"
+                            :rivals="filteredData2v2.rivals"
+                            @openPlayer="(name) => $emit('openPlayer', name)"
+                        />
+
+                        <Divider />
+
+                        <PlayerProfileHistory
+                            :matchHistory="filteredData2v2.matchHistory"
+                            :playerName="profileData.name"
+                            :leagueTeam="profileData.leagueTeam"
+                        />
+                    </template>
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
     </div>
 </template>
 
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
 import Divider from 'primevue/divider';
 import Select from 'primevue/select';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 import PlayerProfileOverview from './PlayerProfileOverview.vue';
 import PlayerProfileAnalysis from './PlayerProfileAnalysis.vue';
 import PlayerProfileBadges from './PlayerProfileBadges.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
+import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
 
-defineProps<{
+const props = defineProps<{
     profileData: PlayerProfileData;
     trendPeriod: TrendPeriod;
     trendPeriodOptions: { label: string; value: TrendPeriod }[];
-    firstGameDate: string | null;
     layout: 'drawer' | 'page';
 }>();
 
@@ -77,4 +123,21 @@ defineEmits<{
     (e: 'update:trendPeriod', value: TrendPeriod): void;
     (e: 'openPlayer', name: string): void;
 }>();
+
+const activeTabValue = ref('1v1');
+
+const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
+const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));
 </script>
+
+<style scoped>
+:deep(.p-tablist-tab-list) {
+    width: 100%;
+}
+
+:deep(.p-tab) {
+    flex: 1 1 0;
+    justify-content: center;
+}
+</style>
+

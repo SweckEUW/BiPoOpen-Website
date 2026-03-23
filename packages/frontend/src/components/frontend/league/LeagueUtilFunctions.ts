@@ -66,7 +66,7 @@ export const getMatchesFromPlayer = (leagueGames:Match[], playerName:string) => 
 
     leagueGames.forEach((leagueGame) => {
         if(leagueGame.team1!.players.map(player => player.name.toLowerCase()).includes(playerName) || leagueGame.team2!.players.map(player => player.name.toLowerCase()).includes(playerName)){
-            if(leagueGame.team1!.players.length == 1 || leagueGame.team2!.players.length == 1){
+            if(leagueGame.team1!.players.length == 1 && leagueGame.team2!.players.length == 1){
                 matchesFromPlayer.push(leagueGame);
             }
         }
