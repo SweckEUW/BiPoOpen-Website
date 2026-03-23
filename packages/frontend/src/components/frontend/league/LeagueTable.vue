@@ -27,7 +27,15 @@
                     Absolvierte Spiele {{ round.data.matchesPlayed.length }}/{{ round.data.matchesPlayed.length + round.data.matchesToPlay.length }}
                 </div>
                 <div v-for="match in round.data.matchesPlayed" style="margin-top: 10px;">
-                    <div v-if="match.time">{{ getGameTime(match.time) }}</div>
+                    <div class="lg-match-meta" v-if="match.time || getMatchResult(match)">
+                        <Tag
+                            v-if="getMatchResult(match)"
+                            :severity="getMatchResult(match) === 'Sieg' ? 'success' : 'danger'"
+                            :value="getMatchResult(match)"
+                            rounded
+                        />
+                        <div v-if="match.time">{{ getGameTime(match.time) }}</div>
+                    </div>
                     <MatchElement :match="match"/> 
                 </div>
 
@@ -83,6 +91,8 @@ import { getLeagueList } from "./LeagueUtilFunctions";
 import Image from "primevue/image";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import Drawer from 'primevue/drawer';
+import Tag from 'primevue/tag';
+import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 
 const props = defineProps({
     leaguePlayers: {type: Array as () => LeaguePlayer[], required: true },
@@ -211,6 +221,25 @@ let getGameTime = (dateNumber:number) => {
     let time = date.getHours() + ":" + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
     return date.toLocaleDateString("de-DE") + "  -  " + time + " Uhr";
 }
+
+let getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
+    if(!selectedLeaguePlayer.value || !checkIfMatchFinished(match))
+        return undefined;
+
+    const selectedPlayerName = selectedLeaguePlayer.value.name;
+    const isTeam1 = match.team1.players.some(p => p.name === selectedPlayerName);
+    const isTeam2 = match.team2.players.some(p => p.name === selectedPlayerName);
+    const team1Won = checkIfTeam1WonVsTeam2(match);
+
+    if(team1Won == undefined)
+        return undefined;
+    if(isTeam1)
+        return team1Won ? 'Sieg' : 'Niederlage';
+    if(isTeam2)
+        return team1Won ? 'Niederlage' : 'Sieg';
+
+    return undefined;
+}
 </script>
 
 <style scoped>
@@ -275,6 +304,12 @@ table td{
 }
 .lg-team div{
     text-align: left;
+}
+.lg-match-meta{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 .mvp-arrow-down::after, .mvp-arrow-up::after{
     content: ' ';
