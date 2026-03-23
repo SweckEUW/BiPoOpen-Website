@@ -111,6 +111,7 @@ const onTournamentSelect = (value: string | null) => {
 							@focus="loadPlayerNames"
 							placeholder="Spieler suchen..."
 							class="ap-player-autocomplete"
+							appendTo="self"
 							:dropdown="false"
 						/>
 					</div>
@@ -217,6 +218,9 @@ a:hover{
 .ap-tournament-dropdown{
 	width: 100%;
 }
+.ap-player-autocomplete{
+	position: relative;
+}
 .ap-tournament-dropdown{
 	--p-select-background: rgba(255,255,255,0.16);
 	--p-select-border-color: rgba(255,255,255,0.35);
@@ -274,12 +278,22 @@ a:hover{
 	color: rgba(255,255,255,0.75);
 }
 .ap-player-autocomplete :deep(.p-autocomplete-panel),
+.ap-player-autocomplete :deep(.p-autocomplete-overlay),
 .ap-tournament-dropdown :deep(.p-select-overlay){
 	background: rgba(255, 255, 255, 0.16);
 	border: 1px solid rgba(255,255,255,0.35);
 	border-radius: 10px;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.14);
 	backdrop-filter: blur(10px);
+}
+.ap-player-autocomplete :deep(.p-autocomplete-panel),
+.ap-player-autocomplete :deep(.p-autocomplete-overlay){
+	top: auto !important;
+	bottom: calc(100% + 8px) !important;
+	left: 0 !important;
+	right: 0 !important;
+	inset: auto 0 calc(100% + 8px) 0 !important;
+	max-height: min(40vh, 280px);
 }
 .ap-tournament-dropdown :deep(.p-select-list-container){
 	scrollbar-color: rgba(255, 255, 255, 0.95) rgba(255, 255, 255, 0.18);
@@ -300,14 +314,22 @@ a:hover{
 	background: #ffffff;
 }
 .ap-player-autocomplete :deep(.p-autocomplete-item),
+.ap-player-autocomplete :deep(.p-autocomplete-option),
 .ap-tournament-dropdown :deep(.p-select-option){
 	color: white;
 	font-weight: 600;
 }
 .ap-player-autocomplete :deep(.p-autocomplete-item:hover),
+.ap-player-autocomplete :deep(.p-autocomplete-option:hover),
+.ap-player-autocomplete :deep(.p-autocomplete-option.p-focus),
+.ap-player-autocomplete :deep(.p-autocomplete-option.p-selected),
 .ap-tournament-dropdown :deep(.p-select-option:hover),
 .ap-tournament-dropdown :deep(.p-select-option.p-focus){
+	color: white;
 	background: rgba(255, 255, 255, 0.18);
+}
+.ap-player-autocomplete :deep(.p-autocomplete-option-label){
+	color: inherit;
 }
 .ap-tournament-dropdown :deep(.p-select-option.p-selected){
 	background: rgba(255, 255, 255, 0.24);
