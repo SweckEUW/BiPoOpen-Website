@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import router from '@/router.js';
 import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
-import Dropdown from 'primevue/dropdown';
+import Select from 'primevue/select';
 import AutoComplete from 'primevue/autocomplete';
 
 let showBurger = ref(false);
@@ -10,6 +10,7 @@ let showBurger = ref(false);
 const toggleBurgerMenu = () =>{
 	showBurger.value = !showBurger.value;
 	document.getElementsByClassName("ap-burger")[0].classList.toggle("change");
+	if(showBurger.value && !playerNamesLoaded.value) loadPlayerNames();
 }
 
 const scrollToTop = () => {
@@ -107,6 +108,7 @@ const onTournamentSelect = (value: string | null) => {
 							:suggestions="playerSuggestions"
 							@complete="searchPlayers"
 							@item-select="onPlayerSelect"
+							@focus="loadPlayerNames"
 							placeholder="Spieler suchen..."
 							class="ap-player-autocomplete"
 							:dropdown="false"
@@ -115,7 +117,7 @@ const onTournamentSelect = (value: string | null) => {
 
 					<div class="ap-search-block">
 						<div class="ap-menu-title ap-menu-title-small">Turniere</div>
-						<Dropdown
+						<Select
 							:modelValue="selectedTournament"
 							:options="tournamentOptions"
 							optionLabel="label"

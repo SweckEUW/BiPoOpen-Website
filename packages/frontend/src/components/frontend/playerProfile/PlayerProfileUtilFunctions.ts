@@ -14,33 +14,85 @@ const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
     '1y': 365,
 };
 
+const PLAYER_NAMES_CACHE_KEY = 'bipo-player-names-cache-v1';
+const PLAYER_NAMES_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+let cachedPlayerNames: string[] | null = null;
+let playerNamesRequest: Promise<string[]> | null = null;
+
 export const getAllPlayerNames = async (): Promise<string[]> => {
-    let allNames: Set<string> = new Set();
+    if (cachedPlayerNames) return cachedPlayerNames;
+    if (playerNamesRequest) return playerNamesRequest;
 
-    let openGames = await getAllOpenGames();
-    openGames.forEach(game => {
-        [...game.team1.players, ...game.team2.players].forEach(p => {
-            allNames.add(formatName(p.name));
-        });
-    });
-
-    let leagueGames = await getAllLeagueGames();
-    leagueGames.forEach(game => {
-        [...game.team1.players, ...game.team2.players].forEach(p => {
-            allNames.add(formatName(p.name));
-        });
-    });
-
-    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
-        let tournament = await getTournamentByName(year);
-        if (tournament) {
-            tournament.teams.forEach(team => {
-                team.players.forEach(p => allNames.add(p.name));
-            });
+    if (typeof window !== 'undefined') {
+        try {
+            const rawCache = window.localStorage.getItem(PLAYER_NAMES_CACHE_KEY);
+            if (rawCache) {
+                const parsed = JSON.parse(rawCache) as { timestamp: number; names: string[] };
+                if (
+                    parsed &&
+                    Array.isArray(parsed.names) &&
+                    typeof parsed.timestamp === 'number' &&
+                    Date.now() - parsed.timestamp < PLAYER_NAMES_CACHE_TTL_MS
+                ) {
+                    cachedPlayerNames = parsed.names;
+                    return cachedPlayerNames;
+                }
+            }
+        } catch {
+            // Ignore cache parse/storage errors and continue with network fetch.
         }
     }
 
-    return Array.from(allNames).sort();
+    playerNamesRequest = (async () => {
+        const allNames: Set<string> = new Set();
+
+        const [openGames, leagueGames, tournaments] = await Promise.all([
+            getAllOpenGames(),
+            getAllLeagueGames(),
+            Promise.all(BIPO_OPEN_TOURNAMENT_YEARS.map((year) => getTournamentByName(year))),
+        ]);
+
+        openGames.forEach(game => {
+            [...game.team1.players, ...game.team2.players].forEach(p => {
+                allNames.add(formatName(p.name));
+            });
+        });
+
+        leagueGames.forEach(game => {
+            [...game.team1.players, ...game.team2.players].forEach(p => {
+                allNames.add(formatName(p.name));
+            });
+        });
+
+        tournaments.forEach(tournament => {
+            if (!tournament) return;
+            tournament.teams.forEach(team => {
+                team.players.forEach(p => allNames.add(formatName(p.name)));
+            });
+        });
+
+        const names = Array.from(allNames).sort();
+        cachedPlayerNames = names;
+
+        if (typeof window !== 'undefined') {
+            try {
+                window.localStorage.setItem(
+                    PLAYER_NAMES_CACHE_KEY,
+                    JSON.stringify({ timestamp: Date.now(), names })
+                );
+            } catch {
+                // Ignore storage quota/private mode errors.
+            }
+        }
+
+        return names;
+    })();
+
+    try {
+        return await playerNamesRequest;
+    } finally {
+        playerNamesRequest = null;
+    }
 };
 
 const formatName = (name: string) =>
