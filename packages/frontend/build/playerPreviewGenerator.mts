@@ -63,10 +63,48 @@ const getMimeTypeForExtension = (ext: string): string => {
   return 'application/octet-stream';
 };
 
+const detectMimeTypeFromContent = (content: Buffer, filePath: string): string => {
+  if (
+    content.length >= 8 &&
+    content[0] === 0x89 &&
+    content[1] === 0x50 &&
+    content[2] === 0x4e &&
+    content[3] === 0x47 &&
+    content[4] === 0x0d &&
+    content[5] === 0x0a &&
+    content[6] === 0x1a &&
+    content[7] === 0x0a
+  ) {
+    return 'image/png';
+  }
+
+  if (content.length >= 3 && content[0] === 0xff && content[1] === 0xd8 && content[2] === 0xff) {
+    return 'image/jpeg';
+  }
+
+  if (
+    content.length >= 12 &&
+    content.subarray(0, 4).toString('ascii') === 'RIFF' &&
+    content.subarray(8, 12).toString('ascii') === 'WEBP'
+  ) {
+    return 'image/webp';
+  }
+
+  if (content.length >= 4 && content.subarray(0, 4).toString('ascii') === 'GIF8') {
+    return 'image/gif';
+  }
+
+  const headText = content.subarray(0, 512).toString('utf-8').trimStart().toLowerCase();
+  if (headText.startsWith('<svg') || headText.startsWith('<?xml')) {
+    return 'image/svg+xml';
+  }
+
+  return getMimeTypeForExtension(path.extname(filePath));
+};
+
 const toDataUri = (filePath: string): string => {
-  const ext = path.extname(filePath);
-  const mimeType = getMimeTypeForExtension(ext);
   const content = fs.readFileSync(filePath);
+  const mimeType = detectMimeTypeFromContent(content, filePath);
   return `data:${mimeType};base64,${content.toString('base64')}`;
 };
 

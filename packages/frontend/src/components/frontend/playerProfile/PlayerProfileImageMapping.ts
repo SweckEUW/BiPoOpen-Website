@@ -2,7 +2,7 @@ import { LEAGUE_PLAYER_DATA } from '@/components/frontend/league/LeaguePlayersDa
 
 export const PLAYER_PROFILE_IMAGE_MAP: Record<string, string> = {
     'Simon Weck': new URL('/src/assets/playerProfiles/simon-weck.jpg', import.meta.url).href,
-    'Jonas Weck': new URL('/src/assets/playerProfiles/jonas-weck.jpeg', import.meta.url).href,
+    'Jonas Weck': new URL('/src/assets/playerProfiles/jonas-weck.png', import.meta.url).href,
 };
 
 export const getPlayerProfileImage = (playerOrTeamName: string): string | null => {
