@@ -1,6 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import axios from 'axios';
+import { getAllOpenGames } from '../src/components/frontend/openGames/OpenGamesUtilFunctions';
+import { getAllLeagueGames } from '../src/components/frontend/league/LeagueUtilFunctions';
+import { getTournamentByName } from '../src/util/tournamentFunctions';
+import { BIPO_OPEN_TOURNAMENT_YEARS } from '../src/util/bipoOpenTournamentMeta';
+import { getPlayerForLeagueTeam } from '../src/components/frontend/league/LeaguePlayersData';
 
 const MAIN_COLOR = '#EA5160';
 const OG_WIDTH = 1200;
@@ -13,6 +19,7 @@ const GENERATED_ROOT_RELATIVE = 'Spieler';
 const LEAGUE_PLAYER_DATA_RELATIVE = path.join('src', 'components', 'frontend', 'league', 'LeaguePlayersData.ts');
 const PROFILE_IMAGES_SOURCE_RELATIVE = path.join('src', 'assets', 'playerProfiles');
 const GENERATED_OG_IMAGES_RELATIVE = path.join('.generated', 'playerProfiles', 'generated');
+const BACKEND_BASE_URL = 'https://bipoopen-backend.vercel.app/';
 
 const routeSlugFromName = (name: string): string => encodeURIComponent(name).replaceAll('%20', '-');
 
@@ -55,6 +62,22 @@ const splitNameForOg = (name: string): [string, string | null] => {
   const firstLine = parts.slice(0, 2).join(' ');
   const secondLine = parts.slice(2).join(' ');
   return [firstLine, secondLine];
+};
+
+const formatName = (name: string): string =>
+  name
+    .split(' ')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ');
+
+const normalizePlayerNameForList = (name: string): string => {
+  const formattedName = formatName(name);
+  return getPlayerForLeagueTeam(formattedName) ?? formattedName;
+};
+
+const isValidPlayerName = (name: string): boolean => {
+  const normalized = name.trim();
+  return normalized.length > 0;
 };
 
 const createAvatarOgSvg = (playerName: string): string => {
@@ -193,6 +216,47 @@ const extractPlayerNames = (leaguePlayerDataPath: string): string[] => {
   return [...playerNames].sort((a, b) => a.localeCompare(b));
 };
 
+const getAllPlayerNamesForBuild = async (leaguePlayerDataPath: string): Promise<string[]> => {
+  try {
+    axios.defaults.baseURL = BACKEND_BASE_URL;
+
+    const allNames: Set<string> = new Set();
+    const [openGames, leagueGames, tournaments] = await Promise.all([
+      getAllOpenGames(),
+      getAllLeagueGames(),
+      Promise.all(BIPO_OPEN_TOURNAMENT_YEARS.map((year) => getTournamentByName(year))),
+    ]);
+
+    openGames.forEach((game) => {
+      [...game.team1.players, ...game.team2.players].forEach((p) => {
+        const normalized = normalizePlayerNameForList(p.name);
+        if (isValidPlayerName(normalized)) allNames.add(normalized);
+      });
+    });
+
+    leagueGames.forEach((game) => {
+      [...game.team1.players, ...game.team2.players].forEach((p) => {
+        const normalized = normalizePlayerNameForList(p.name);
+        if (isValidPlayerName(normalized)) allNames.add(normalized);
+      });
+    });
+
+    tournaments.forEach((tournament) => {
+      if (!tournament) return;
+      tournament.teams.forEach((team) => {
+        team.players.forEach((p) => {
+          const normalized = normalizePlayerNameForList(p.name);
+          if (isValidPlayerName(normalized)) allNames.add(normalized);
+        });
+      });
+    });
+
+    return Array.from(allNames).sort((a, b) => a.localeCompare(b));
+  } catch {
+    return extractPlayerNames(leaguePlayerDataPath);
+  }
+};
+
 const buildSourceImageMap = (sourceDir: string): Map<string, string> => {
   const imageMap = new Map<string, string>();
   if (!fs.existsSync(sourceDir)) return imageMap;
@@ -222,7 +286,7 @@ export const generatePlayerPreviewBuildArtifacts = async (frontendRoot: string):
   const profileImagesSourceDir = path.resolve(frontendRoot, PROFILE_IMAGES_SOURCE_RELATIVE);
   const generatedOgImagesDir = path.resolve(frontendRoot, GENERATED_OG_IMAGES_RELATIVE);
 
-  const playerNames = extractPlayerNames(leaguePlayerDataPath);
+  const playerNames = await getAllPlayerNamesForBuild(leaguePlayerDataPath);
   const sourceImageMap = buildSourceImageMap(profileImagesSourceDir);
 
   fs.rmSync(generatedRoot, { recursive: true, force: true });
@@ -232,7 +296,11 @@ export const generatePlayerPreviewBuildArtifacts = async (frontendRoot: string):
   const inputEntries: Record<string, string> = {};
 
   for (const playerName of playerNames) {
+    if (!isValidPlayerName(playerName)) continue;
+
     const routeSlug = routeSlugFromName(playerName);
+    if (!routeSlug.trim()) continue;
+
     const imageSlug = imageSlugFromName(playerName);
     const sourceImagePath = sourceImageMap.get(imageSlug) ?? null;
 
