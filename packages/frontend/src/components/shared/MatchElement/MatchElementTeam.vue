@@ -12,7 +12,9 @@
                     :key="`${player.name}-${index}`"
                     :name="player.name"
                     shape="circle"
-                    class="mt-team-header-avatar"
+                    size="normal"
+                    :grayscale="teamScore < opponentTeamScore"
+                    class="!text-[12px]"
                 />
             </div>
             <div class="mt-team-name">{{ teamName }}</div>
@@ -20,7 +22,7 @@
         </div>
         <div v-if="team && playersVisible && team.players.length > 1">
             <div class="mt-team-player" v-for="player in team.players">
-                <PlayerProfileAvatar :name="player.name" shape="circle" class="mt-team-player-avatar" />
+                <PlayerProfileAvatar :name="player.name" shape="circle" size="normal" class="!text-[12px]" :grayscale="teamScore < opponentTeamScore" />
                 <div class="mt-team-player-name">{{ player.name }}</div>
                 <div class="mt-team-player-score">{{ player.score }}</div>
             </div>
@@ -120,13 +122,6 @@ let opponentTeamScore = computed(() => {
 .mt-team-player{
     display: flex;
     align-items: center;
-}
-.mt-team-player-avatar{
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    font-size: 12px;
-    margin-right: 8px;
 }
 .mt-team-player-name{
     width: 100%;

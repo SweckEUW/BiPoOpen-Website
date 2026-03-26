@@ -20,8 +20,7 @@
                 <table class="table table-hover caption-top">
                     <thead>
                         <tr style="height: auto;">
-                            <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                            <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
+                            <th colspan="2" @click="setSortValue('placement')" :class="giveArrowClass('placement')" class="text-left!">Spieler</th>
                             <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
                             <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spi.'}}</th>
                             <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
@@ -32,7 +31,12 @@
                     <tbody>
                         <tr v-for="(player, index) in openGamesStatistic.stats" :key="index">
                             <td>{{ player.placement! + 1}}</td>
-                            <td><span class="ogs-player-link" @click="openPlayerProfile(player.name)">{{ player.name.replace(" ","\n") }}</span></td>
+                            <td>
+                                <div class="ogs-player-row" @click="openPlayerProfile(player.name)">
+                                    <PlayerProfileAvatar class="ogs-player-avatar" :name="player.name" :size="'large'"/>
+                                    <span class="ogs-player-link">{{ player.name.replace(" ","\n") }}</span>
+                                </div>
+                            </td>
                             <td>{{ player.wins }}</td>
                             <td>{{ player.ammountOfMatches }}</td>
                             <td>{{ player.averageHits.toFixed(2) }}</td>
@@ -80,6 +84,7 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
+import PlayerProfileAvatar from '../playerProfile/PlayerProfileAvatar.vue';
 
 const props = defineProps({
     openGames: {type: Object as PropType<Match[]>, required: true }
@@ -224,12 +229,15 @@ onMounted(async () => {
     table *{
         vertical-align: middle;
     }
+    .table>:not(caption)>*>* {
+        padding: 10px 4px;
+    }
     tbody tr{
-        font-size: 18px;
+        font-size: 16px;
     }
     tbody tr:nth-of-type(1){
         background: var(--secondary-color-weak);
-        font-size: 22px;
+        font-size: 18px;
     }
     tbody tr:nth-of-type(2){
         background: #e6faff;
@@ -242,31 +250,14 @@ onMounted(async () => {
         top: 350px;
         background-color: #FFF;
         color: var(--main-color);
-        font-size: 20px;
+        font-size: 17px;
         cursor: pointer;
         z-index: 2;
-        border: 1px solid rgba(0, 0, 0, 0.3); 
-        border-top: 0;
     }
     table td{
         background: inherit;
-        border: 1px solid rgba(0, 0, 0, 0.3); 
     }
-    table th:first-child{
-        border-left: 0;
-    }
-    table th:last-child{
-        border-right: 0;
-    }
-    table tr td:first-child {
-        border-left: 0;
-    }
-    table tr:last-child td {
-        border-bottom: 0;
-    }
-    table tr td:last-child {
-        border-right: 0;
-    }
+    
 }
 
 .ogs-text{
@@ -284,6 +275,21 @@ onMounted(async () => {
 .ogs-player-link:hover{
     text-decoration: underline;
     color: var(--main-color);
+}
+.ogs-player-row{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+.ogs-player-avatar{
+    flex: 0 0 auto;
+}
+
+.ogs-player-avatar:deep(.p-avatar){
+    width: 44px;
+    height: 44px;
 }
 .ogs-arrow-down::after, .ogs-arrow-up::after{
     content: ' ';
@@ -308,14 +314,14 @@ onMounted(async () => {
             margin-top: 0px;
         }
         table *{
-            font-size: 15px;
+            font-size: 14px;
         }
         tr{
             height: 80px;
         }
         table th{ 
             top: 295px;
-            font-size: 15px;
+            font-size: 14px;
         }
         table th:nth-of-type(1), table td:nth-of-type(1){
             max-width: 30px;
@@ -323,9 +329,10 @@ onMounted(async () => {
             padding-left: 4px;
             padding-right: 10px;
         }
-        table th:nth-of-type(2), table td:nth-of-type(2){
+        table td:nth-of-type(2){
             min-width: 100px;
-            white-space: break-spaces;
+            white-space: normal;
+            text-align: left;
         }
     }
     .ogs-text{
@@ -353,9 +360,9 @@ onMounted(async () => {
 @media (width <= 360px){
     .OpenGames{
         table *{
-            font-size: 14px !important;
+            font-size: 13px !important;
         }
-        th:nth-of-type(2), td:nth-of-type(2){
+        td:nth-of-type(2){
             max-width: 100px;
         }
     }
@@ -365,5 +372,14 @@ onMounted(async () => {
     .ogs-text{
         font-size: 15px;
     }
+}
+
+:deep(.OpenGames table td:nth-of-type(2)){
+    text-align: left;
+    min-width: 220px;
+}
+
+:deep(.OpenGames table th:first-child){
+    text-align: left;
 }
 </style>
