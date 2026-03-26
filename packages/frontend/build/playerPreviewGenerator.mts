@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 
 const MAIN_COLOR = '#EA5160';
+const OG_WIDTH = 1200;
+const OG_HEIGHT = 630;
 const GENERATED_ROOT_RELATIVE = 'Spieler';
 const LEAGUE_PLAYER_DATA_RELATIVE = path.join('src', 'components', 'frontend', 'league', 'LeaguePlayersData.ts');
 const PROFILE_IMAGES_SOURCE_RELATIVE = path.join('src', 'assets', 'playerProfiles');
@@ -36,6 +39,20 @@ const escapeHtml = (value: string): string =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
+const splitNameForOg = (name: string): [string, string | null] => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const fullName = parts.join(' ');
+
+  if (parts.length === 0) return ['', null];
+  if (parts.length === 1) return [fullName, null];
+  if (parts.length === 2 && fullName.length >= 16) return [parts[0], parts[1]];
+  if (parts.length <= 2) return [name, null];
+
+  const firstLine = parts.slice(0, 2).join(' ');
+  const secondLine = parts.slice(2).join(' ');
+  return [firstLine, secondLine];
+};
+
 const getMimeTypeForExtension = (ext: string): string => {
   const normalized = ext.toLowerCase();
   if (normalized === '.jpg' || normalized === '.jpeg') return 'image/jpeg';
@@ -56,31 +73,57 @@ const toDataUri = (filePath: string): string => {
 const createAvatarOgSvg = (playerName: string, imageDataUri: string | null): string => {
   const safePlayerName = escapeHtml(playerName);
   const initials = escapeHtml(getPlayerInitials(playerName));
+  const [nameLineOne, nameLineTwo] = splitNameForOg(playerName);
+  const safeLineOne = escapeHtml(nameLineOne);
+  const safeLineTwo = nameLineTwo ? escapeHtml(nameLineTwo) : null;
+
+  const imageCenterX = 930;
+  const imageCenterY = 315;
+  const outerRadius = 210;
+  const innerRadius = 194;
+  const headlineY = 140;
+  const nameLineOneY = 255;
+  const nameLineTwoY = 338;
+  const ctaX = 90;
+  const ctaY = 470;
+  const ctaWidth = 430;
+  const ctaHeight = 96;
 
   const imageMarkup = imageDataUri
-    ? `<circle cx="300" cy="300" r="222" fill="#ffffff" />
+    ? `<circle cx="${imageCenterX}" cy="${imageCenterY}" r="${outerRadius}" fill="#ffffff" />
     <clipPath id="avatarClip">
-      <circle cx="300" cy="300" r="210" />
+      <circle cx="${imageCenterX}" cy="${imageCenterY}" r="${innerRadius}" />
     </clipPath>
-    <image href="${imageDataUri}" x="90" y="90" width="420" height="420" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)" />`
-    : `<circle cx="300" cy="300" r="222" fill="#ffffff" />
-    <circle cx="300" cy="300" r="210" fill="#ffffff" />
-    <text x="300" y="300" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="140" font-weight="700" fill="${MAIN_COLOR}">${initials}</text>`;
+    <image href="${imageDataUri}" x="${imageCenterX - innerRadius}" y="${imageCenterY - innerRadius}" width="${innerRadius * 2}" height="${innerRadius * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)" />`
+    : `<circle cx="${imageCenterX}" cy="${imageCenterY}" r="${outerRadius}" fill="#ffffff" />
+    <circle cx="${imageCenterX}" cy="${imageCenterY}" r="${innerRadius}" fill="#ffffff" />
+    <text x="${imageCenterX}" y="${imageCenterY}" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="142" font-weight="700" fill="${MAIN_COLOR}">${initials}</text>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600" role="img" aria-label="${safePlayerName}">
-  <rect width="600" height="600" fill="${MAIN_COLOR}" />
+<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}" role="img" aria-label="${safePlayerName}">
+  <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${MAIN_COLOR}" />
+  <text x="90" y="${headlineY}" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#FFE7EA">Spielerprofil</text>
+  <text x="90" y="${nameLineOneY}" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#FFFFFF">${safeLineOne}</text>
+  ${safeLineTwo ? `<text x="90" y="${nameLineTwoY}" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">${safeLineTwo}</text>` : ''}
+  <rect x="${ctaX}" y="${ctaY}" width="${ctaWidth}" height="${ctaHeight}" rx="48" fill="#FFFFFF" />
+  <text x="${ctaX + ctaWidth / 2}" y="${ctaY + 62}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" fill="${MAIN_COLOR}">Zum Spielerprofil</text>
   ${imageMarkup}
 </svg>
 `;
+};
+
+const renderOgPngFromSvg = async (svg: string, outputPath: string): Promise<void> => {
+  await sharp(Buffer.from(svg, 'utf-8'))
+    .png({ compressionLevel: 9 })
+    .toFile(outputPath);
 };
 
 const createPlayerPreviewHtml = (playerName: string, ogImagePath: string): string => {
   const safeName = escapeHtml(playerName);
   const playerSlug = routeSlugFromName(playerName);
   const safeSlug = escapeHtml(playerSlug);
-  const title = `${safeName} | Spielerprofil | Weck BiPo Open`;
-  const description = `Zum Spielerprofil von ${safeName} beim Weck BiPo Open.`;
+  const title = `Spielerprofil von ${safeName} | Weck BiPo Open Turnierserie`;
+  const description = `Entdecke das offizielle Spielerprofil von ${safeName} bei den Weck BiPo Open mit Teamhistorie, Turnierstationen, Bildern und direkten Einblicken in aktuelle Ergebnisse.`;
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -95,7 +138,9 @@ const createPlayerPreviewHtml = (playerName: string, ogImagePath: string): strin
     <meta property="og:title" content="${title}" />
     <meta property="og:description" content="${description}" />
     <meta property="og:image" content="https://bipoopen.de${ogImagePath}" />
-    <meta property="og:image:alt" content="Profilbild von ${safeName}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Spielerprofil von ${safeName} mit Hinweis zum Spielerprofil" />
 
     <meta name="description" content="${description}" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -153,7 +198,7 @@ export interface PlayerPreviewBuildArtifacts {
   generatedPlayersDir: string;
 }
 
-export const generatePlayerPreviewBuildArtifacts = (frontendRoot: string): PlayerPreviewBuildArtifacts => {
+export const generatePlayerPreviewBuildArtifacts = async (frontendRoot: string): Promise<PlayerPreviewBuildArtifacts> => {
   const generatedRoot = path.resolve(frontendRoot, GENERATED_ROOT_RELATIVE);
   const leaguePlayerDataPath = path.resolve(frontendRoot, LEAGUE_PLAYER_DATA_RELATIVE);
   const profileImagesSourceDir = path.resolve(frontendRoot, PROFILE_IMAGES_SOURCE_RELATIVE);
@@ -174,10 +219,11 @@ export const generatePlayerPreviewBuildArtifacts = (frontendRoot: string): Playe
     const sourceImagePath = sourceImageMap.get(imageSlug) ?? null;
     const imageDataUri = sourceImagePath ? toDataUri(sourceImagePath) : null;
 
-    const ogFileName = `${routeSlug}.svg`;
+    const ogFileName = `${routeSlug}.png`;
     const ogImagePath = `/playerProfiles/generated/${ogFileName}`;
-    const ogSvgPath = path.join(generatedOgImagesDir, ogFileName);
-    fs.writeFileSync(ogSvgPath, createAvatarOgSvg(playerName, imageDataUri), 'utf-8');
+    const ogPngPath = path.join(generatedOgImagesDir, ogFileName);
+    const ogSvg = createAvatarOgSvg(playerName, imageDataUri);
+    await renderOgPngFromSvg(ogSvg, ogPngPath);
 
     const htmlSourcePath = path.resolve(generatedRoot, routeSlug, 'index.html');
     fs.mkdirSync(path.dirname(htmlSourcePath), { recursive: true });
