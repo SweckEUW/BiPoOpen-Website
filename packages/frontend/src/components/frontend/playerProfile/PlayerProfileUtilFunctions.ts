@@ -5,7 +5,7 @@ import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 import { BIPO_OPEN_TOURNAMENT_YEARS, getBiPoOpenTournamentFallbackTime } from "@/util/bipoOpenTournamentMeta";
 import { calculateBadges } from "./BadgeRegistry";
-import { getLeagueTeamForPlayer } from "./LeaguePlayerMapping";
+import { getLeagueTeamForPlayer, getPlayerForLeagueTeam } from "./LeaguePlayerMapping";
 
 const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
     '1m': 30,
@@ -14,10 +14,15 @@ const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
     '1y': 365,
 };
 
-const PLAYER_NAMES_CACHE_KEY = 'bipo-player-names-cache-v1';
+const PLAYER_NAMES_CACHE_KEY = 'bipo-player-names-cache-v2';
 const PLAYER_NAMES_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 let cachedPlayerNames: string[] | null = null;
 let playerNamesRequest: Promise<string[]> | null = null;
+
+const normalizePlayerNameForList = (name: string): string => {
+    const formattedName = formatName(name);
+    return getPlayerForLeagueTeam(formattedName) ?? formattedName;
+};
 
 export const getAllPlayerNames = async (): Promise<string[]> => {
     if (cachedPlayerNames) return cachedPlayerNames;
@@ -54,20 +59,20 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
 
         openGames.forEach(game => {
             [...game.team1.players, ...game.team2.players].forEach(p => {
-                allNames.add(formatName(p.name));
+                allNames.add(normalizePlayerNameForList(p.name));
             });
         });
 
         leagueGames.forEach(game => {
             [...game.team1.players, ...game.team2.players].forEach(p => {
-                allNames.add(formatName(p.name));
+                allNames.add(normalizePlayerNameForList(p.name));
             });
         });
 
         tournaments.forEach(tournament => {
             if (!tournament) return;
             tournament.teams.forEach(team => {
-                team.players.forEach(p => allNames.add(formatName(p.name)));
+                team.players.forEach(p => allNames.add(normalizePlayerNameForList(p.name)));
             });
         });
 

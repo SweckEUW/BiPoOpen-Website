@@ -27,6 +27,7 @@ import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PlayerProfileView from './PlayerProfileView.vue';
 import { usePlayerProfileData } from './usePlayerProfileData';
+import { getPlayerForLeagueTeam } from './LeaguePlayerMapping';
 
 import ProgressSpinner from 'primevue/progressspinner';
 import Message from 'primevue/message';
@@ -35,15 +36,26 @@ const route = useRoute();
 const router = useRouter();
 
 const playerName = computed(() => decodeURIComponent(route.params.PlayerName as string).replaceAll('-', ' '));
-const { isLoading, profileData, trendPeriod, trendPeriodOptions } = usePlayerProfileData(playerName);
+const normalizedPlayerName = computed(() => getPlayerForLeagueTeam(playerName.value) ?? playerName.value);
+const { isLoading, profileData, trendPeriod, trendPeriodOptions } = usePlayerProfileData(normalizedPlayerName);
 
 const openPlayer = (name: string) => {
     router.push(`/Spieler/${encodeURIComponent(name).replaceAll('%20', '-')}`);
 };
 
-watch(playerName, () => {
+watch(playerName, (name) => {
+    const mappedName = getPlayerForLeagueTeam(name);
+    if (mappedName) {
+        const mappedSlug = encodeURIComponent(mappedName).replaceAll('%20', '-');
+        const currentSlug = route.params.PlayerName as string;
+        if (currentSlug !== mappedSlug) {
+            router.replace(`/Spieler/${mappedSlug}`);
+            return;
+        }
+    }
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
-});
+}, { immediate: true });
 </script>
 
 <style scoped>
