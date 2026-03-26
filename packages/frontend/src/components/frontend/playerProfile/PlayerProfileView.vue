@@ -1,12 +1,11 @@
 <template>
     <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
         <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
-            <Avatar
-                :label="playerProfileImage ? undefined : playerInitials"
-                :image="playerProfileImage || undefined"
+            <PlayerProfileAvatar
+                :name="profileData.name"
                 size="xlarge"
                 shape="circle"
-                class="mb-[10px]"
+                class="mb-[10px] pp-profile-avatar"
             />
             <div
                 class="font-bold text-[--p-primary-color]"
@@ -101,7 +100,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
 import Divider from 'primevue/divider';
 import Select from 'primevue/select';
@@ -116,8 +114,8 @@ import PlayerProfileAnalysis from './PlayerProfileAnalysis.vue';
 import PlayerProfileBadges from './PlayerProfileBadges.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
+import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
 import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
-import { getPlayerInitials, getPlayerProfileImage } from './PlayerProfileImageMapping';
 
 const props = defineProps<{
     profileData: PlayerProfileData;
@@ -135,13 +133,13 @@ const activeTabValue = ref('1v1');
 
 const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
 const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));
-const playerProfileImage = computed(() => getPlayerProfileImage(props.profileData.name));
-const playerInitials = computed(() => getPlayerInitials(props.profileData.name));
 </script>
 
 <style scoped>
-:deep(.p-avatar img) {
-    object-fit: contain;
+.pp-profile-avatar {
+    width: 96px;
+    height: 96px;
+    font-size: 32px;
 }
 
 :deep(.p-tablist-tab-list) {
