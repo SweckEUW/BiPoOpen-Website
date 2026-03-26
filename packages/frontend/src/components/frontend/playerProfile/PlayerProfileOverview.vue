@@ -3,10 +3,10 @@
     <div class="pp-section-title">Spiele & Treffer</div>
 
     <div class="mb-[10px]">
-        <Panel>
+        <Panel :pt="{ header: { class: 'p-2' } }">
             <!-- Siegquote & Spiele -->
             <div class="grid grid-cols-2 gap-[12px] pb-[14px] border-b border-[--p-content-border-color]">
-                <div class="text-center">
+                <div class="flex flex-col items-center justify-center">
                     <Knob :modelValue="data.winrate" :size="90" readonly :strokeWidth="8" valueTemplate="{value}%" />
                     <div class="text-[13px] text-[--p-text-muted-color] mt-[2px]">Siegquote</div>
                     <TrendIndicator :value="data.trends.winrateTrend" suffix="%" />

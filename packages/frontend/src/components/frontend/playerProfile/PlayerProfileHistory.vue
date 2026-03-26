@@ -2,7 +2,7 @@
     <div class="pp-section-title">Spielverlauf</div>
 
     <div class="mb-[40px]">
-        <Panel>
+        <Panel :pt="{ header: { class: 'p-2' } }">
             <div class="flex flex-col gap-[12px]">
                 <div v-for="(item, i) in displayed" :key="i" class="match-entry">
                     <div class="flex items-center gap-[8px] mb-[6px]">

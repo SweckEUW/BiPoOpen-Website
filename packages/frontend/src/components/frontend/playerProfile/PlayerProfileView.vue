@@ -38,7 +38,7 @@
             <TabPanels
                 :pt="{
                     root: {
-                    style: { '--p-tabs-tabpanel-padding': '0.5rem 0' }
+                        style: { '--p-tabs-tabpanel-padding': '0.5rem 0' }
                     }
                 }"
             >

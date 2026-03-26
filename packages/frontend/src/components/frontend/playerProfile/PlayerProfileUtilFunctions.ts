@@ -103,10 +103,16 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
 const formatName = (name: string) =>
     name.split(" ").map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(" ");
 
+const getNormalizedPlayerCombination = (players: Match['team1']['players']): string =>
+    players
+        .map(p => formatName(p.name))
+        .sort((a, b) => a.localeCompare(b, 'de', { sensitivity: 'base' }))
+        .join(" & ");
+
 export const getOpponentNameExport = (match: Match, playerName: string): string => {
     let lo = playerName.toLowerCase();
     let isTeam1 = match.team1.players.some(p => p.name.toLowerCase() === lo);
-    return (isTeam1 ? match.team2.players : match.team1.players).map(p => formatName(p.name)).join(" & ");
+    return getNormalizedPlayerCombination(isTeam1 ? match.team2.players : match.team1.players);
 };
 
 export const getPartnerNameExport = (match: Match, playerName: string): string | null => {
@@ -201,7 +207,7 @@ export const calculateExtraStatsFromResultsExport = (matchHistory: { match: Matc
     let bestTimeOfDay: string | null = null;
     let bestTimeWinrate: number | null = null;
     timeOfDayStats.forEach(block => {
-        if (block.total < 3) return;
+        if (block.total <= 4) return;
         if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
             bestTimeWinrate = block.winrate;
             bestTimeOfDay = block.label;
@@ -211,6 +217,7 @@ export const calculateExtraStatsFromResultsExport = (matchHistory: { match: Matc
     let mostActiveTimeOfDay: string | null = null;
     let mostActiveGames: number | null = null;
     timeOfDayStats.forEach(block => {
+        if (block.total <= 4) return;
         if (mostActiveGames === null || block.total > mostActiveGames) {
             mostActiveGames = block.total;
             mostActiveTimeOfDay = block.label;
@@ -238,7 +245,7 @@ const getPlayerHitsInMatch = (match: Match, playerName: string): number => {
 const getOpponentName = (match: Match, playerName: string): string => {
     let lo = playerName.toLowerCase();
     let isTeam1 = match.team1.players.some(p => p.name.toLowerCase() === lo);
-    return (isTeam1 ? match.team2.players : match.team1.players).map(p => formatName(p.name)).join(" & ");
+    return getNormalizedPlayerCombination(isTeam1 ? match.team2.players : match.team1.players);
 };
 
 const getPartnerName = (match: Match, playerName: string): string | null => {
@@ -411,21 +418,22 @@ const calculateExtraStats = (matchHistory: { match: Match; time: number }[], pla
         });
     }
 
-    // Best time of day (min 3 games)
+    // Best time of day (more than 4 games)
     let bestTimeOfDay: string | null = null;
     let bestTimeWinrate: number | null = null;
     timeOfDayStats.forEach(block => {
-        if (block.total < 3) return;
+        if (block.total <= 4) return;
         if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
             bestTimeWinrate = block.winrate;
             bestTimeOfDay = block.label;
         }
     });
 
-    // Most active time of day
+    // Most active time of day (more than 4 games)
     let mostActiveTimeOfDay: string | null = null;
     let mostActiveGames: number | null = null;
     timeOfDayStats.forEach(block => {
+        if (block.total <= 4) return;
         if (mostActiveGames === null || block.total > mostActiveGames) {
             mostActiveGames = block.total;
             mostActiveTimeOfDay = block.label;
@@ -474,7 +482,7 @@ const calculateExtraStatsFromResults = (matchHistory: { match: Match; time: numb
     let bestTimeOfDay: string | null = null;
     let bestTimeWinrate: number | null = null;
     timeOfDayStats.forEach(block => {
-        if (block.total < 3) return;
+        if (block.total <= 4) return;
         if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
             bestTimeWinrate = block.winrate;
             bestTimeOfDay = block.label;
@@ -484,6 +492,7 @@ const calculateExtraStatsFromResults = (matchHistory: { match: Match; time: numb
     let mostActiveTimeOfDay: string | null = null;
     let mostActiveGames: number | null = null;
     timeOfDayStats.forEach(block => {
+        if (block.total <= 4) return;
         if (mostActiveGames === null || block.total > mostActiveGames) {
             mostActiveGames = block.total;
             mostActiveTimeOfDay = block.label;
@@ -569,7 +578,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
             matchHistory.push({ match: m, source: "BiPo Open Turniere", time: matchTime, won, hits });
 
             let opponents = isTeam1 ? m.team2.players : m.team1.players;
-            let oppName = opponents.map(p => p.name).join(" & ");
+            let oppName = getNormalizedPlayerCombination(opponents);
             let rival = rivals.get(oppName) || { wins: 0, losses: 0 };
             if (won) rival.wins++; else rival.losses++;
             rivals.set(oppName, rival);
