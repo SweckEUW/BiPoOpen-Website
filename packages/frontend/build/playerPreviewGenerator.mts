@@ -5,6 +5,10 @@ import sharp from 'sharp';
 const MAIN_COLOR = '#EA5160';
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
+const AVATAR_CENTER_X = 930;
+const AVATAR_CENTER_Y = 315;
+const AVATAR_OUTER_RADIUS = 210;
+const AVATAR_INNER_RADIUS = 194;
 const GENERATED_ROOT_RELATIVE = 'Spieler';
 const LEAGUE_PLAYER_DATA_RELATIVE = path.join('src', 'components', 'frontend', 'league', 'LeaguePlayersData.ts');
 const PROFILE_IMAGES_SOURCE_RELATIVE = path.join('src', 'assets', 'playerProfiles');
@@ -53,103 +57,81 @@ const splitNameForOg = (name: string): [string, string | null] => {
   return [firstLine, secondLine];
 };
 
-const getMimeTypeForExtension = (ext: string): string => {
-  const normalized = ext.toLowerCase();
-  if (normalized === '.jpg' || normalized === '.jpeg') return 'image/jpeg';
-  if (normalized === '.png') return 'image/png';
-  if (normalized === '.webp') return 'image/webp';
-  if (normalized === '.gif') return 'image/gif';
-  if (normalized === '.svg') return 'image/svg+xml';
-  return 'application/octet-stream';
-};
-
-const detectMimeTypeFromContent = (content: Buffer, filePath: string): string => {
-  if (
-    content.length >= 8 &&
-    content[0] === 0x89 &&
-    content[1] === 0x50 &&
-    content[2] === 0x4e &&
-    content[3] === 0x47 &&
-    content[4] === 0x0d &&
-    content[5] === 0x0a &&
-    content[6] === 0x1a &&
-    content[7] === 0x0a
-  ) {
-    return 'image/png';
-  }
-
-  if (content.length >= 3 && content[0] === 0xff && content[1] === 0xd8 && content[2] === 0xff) {
-    return 'image/jpeg';
-  }
-
-  if (
-    content.length >= 12 &&
-    content.subarray(0, 4).toString('ascii') === 'RIFF' &&
-    content.subarray(8, 12).toString('ascii') === 'WEBP'
-  ) {
-    return 'image/webp';
-  }
-
-  if (content.length >= 4 && content.subarray(0, 4).toString('ascii') === 'GIF8') {
-    return 'image/gif';
-  }
-
-  const headText = content.subarray(0, 512).toString('utf-8').trimStart().toLowerCase();
-  if (headText.startsWith('<svg') || headText.startsWith('<?xml')) {
-    return 'image/svg+xml';
-  }
-
-  return getMimeTypeForExtension(path.extname(filePath));
-};
-
-const toDataUri = (filePath: string): string => {
-  const content = fs.readFileSync(filePath);
-  const mimeType = detectMimeTypeFromContent(content, filePath);
-  return `data:${mimeType};base64,${content.toString('base64')}`;
-};
-
-const createAvatarOgSvg = (playerName: string, imageDataUri: string | null): string => {
+const createAvatarOgSvg = (playerName: string): string => {
   const safePlayerName = escapeHtml(playerName);
-  const initials = escapeHtml(getPlayerInitials(playerName));
   const [nameLineOne, nameLineTwo] = splitNameForOg(playerName);
   const safeLineOne = escapeHtml(nameLineOne);
   const safeLineTwo = nameLineTwo ? escapeHtml(nameLineTwo) : null;
 
-  const imageCenterX = 930;
-  const imageCenterY = 315;
-  const outerRadius = 210;
-  const innerRadius = 194;
   const headlineY = 140;
   const nameLineOneY = 255;
   const nameLineTwoY = 338;
-  const ctaX = 90;
-  const ctaY = 470;
-  const ctaWidth = 430;
-  const ctaHeight = 96;
-
-  const imageMarkup = imageDataUri
-    ? `<circle cx="${imageCenterX}" cy="${imageCenterY}" r="${outerRadius}" fill="#ffffff" />
-    <clipPath id="avatarClip">
-      <circle cx="${imageCenterX}" cy="${imageCenterY}" r="${innerRadius}" />
-    </clipPath>
-    <image href="${imageDataUri}" x="${imageCenterX - innerRadius}" y="${imageCenterY - innerRadius}" width="${innerRadius * 2}" height="${innerRadius * 2}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatarClip)" />`
-    : `<circle cx="${imageCenterX}" cy="${imageCenterY}" r="${outerRadius}" fill="#ffffff" />
-    <circle cx="${imageCenterX}" cy="${imageCenterY}" r="${innerRadius}" fill="#ffffff" />
-    <text x="${imageCenterX}" y="${imageCenterY}" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="142" font-weight="700" fill="${MAIN_COLOR}">${initials}</text>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}" role="img" aria-label="${safePlayerName}">
-  <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${MAIN_COLOR}" />
-  <text x="90" y="${headlineY}" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#FFE7EA">Spielerprofil</text>
-  <text x="90" y="${nameLineOneY}" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#FFFFFF">${safeLineOne}</text>
-  ${safeLineTwo ? `<text x="90" y="${nameLineTwoY}" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">${safeLineTwo}</text>` : ''}
-  ${imageMarkup}
-</svg>
-`;
+    <svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}" role="img" aria-label="${safePlayerName}">
+      <rect width="${OG_WIDTH}" height="${OG_HEIGHT}" fill="${MAIN_COLOR}" />
+      <text x="90" y="${headlineY}" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#FFE7EA">Spielerprofil</text>
+      <text x="90" y="${nameLineOneY}" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#FFFFFF">${safeLineOne}</text>
+      ${safeLineTwo ? `<text x="90" y="${nameLineTwoY}" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">${safeLineTwo}</text>` : ''}
+      <circle cx="${AVATAR_CENTER_X}" cy="${AVATAR_CENTER_Y}" r="${AVATAR_OUTER_RADIUS}" fill="#ffffff" />
+      <circle cx="${AVATAR_CENTER_X}" cy="${AVATAR_CENTER_Y}" r="${AVATAR_INNER_RADIUS}" fill="#ffffff" />
+    </svg>
+  `;
 };
 
-const renderOgPngFromSvg = async (svg: string, outputPath: string): Promise<void> => {
-  await sharp(Buffer.from(svg, 'utf-8'))
+const createInitialsOverlaySvg = (initials: string): string => `<?xml version="1.0" encoding="UTF-8"?>
+  <svg xmlns="http://www.w3.org/2000/svg" width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}">
+    <text x="${AVATAR_CENTER_X}" y="${AVATAR_CENTER_Y}" text-anchor="middle" dominant-baseline="central" font-family="Arial, Helvetica, sans-serif" font-size="142" font-weight="700" fill="${MAIN_COLOR}">${escapeHtml(initials)}</text>
+  </svg>
+`;
+
+const renderOgPngFromSvg = async (svg: string, outputPath: string, sourceImagePath: string | null, playerName: string): Promise<void> => {
+  const baseImage = await sharp(Buffer.from(svg, 'utf-8'))
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+
+  if (sourceImagePath) {
+    try {
+      const avatarSize = AVATAR_INNER_RADIUS * 2;
+      const avatar = await sharp(sourceImagePath)
+        .resize(avatarSize, avatarSize, { fit: 'cover', position: 'centre' })
+        .png()
+        .toBuffer();
+
+      const circleMask = Buffer.from(
+        `<?xml version="1.0" encoding="UTF-8"?>
+          <svg xmlns="http://www.w3.org/2000/svg" width="${avatarSize}" height="${avatarSize}" viewBox="0 0 ${avatarSize} ${avatarSize}">
+            <circle cx="${AVATAR_INNER_RADIUS}" cy="${AVATAR_INNER_RADIUS}" r="${AVATAR_INNER_RADIUS}" fill="#ffffff" />
+          </svg>
+        `,
+        'utf-8'
+      );
+
+      const circularAvatar = await sharp(avatar)
+        .composite([{ input: circleMask, blend: 'dest-in' }])
+        .png()
+        .toBuffer();
+
+      await sharp(baseImage)
+        .composite([
+          {
+            input: circularAvatar,
+            left: AVATAR_CENTER_X - AVATAR_INNER_RADIUS,
+            top: AVATAR_CENTER_Y - AVATAR_INNER_RADIUS,
+          },
+        ])
+        .png({ compressionLevel: 9 })
+        .toFile(outputPath);
+
+      return;
+    } catch {
+      // Fall through to initials rendering when profile image processing fails.
+    }
+  }
+
+  const initialsOverlay = Buffer.from(createInitialsOverlaySvg(getPlayerInitials(playerName)), 'utf-8');
+  await sharp(baseImage)
+    .composite([{ input: initialsOverlay, top: 0, left: 0 }])
     .png({ compressionLevel: 9 })
     .toFile(outputPath);
 };
@@ -253,13 +235,12 @@ export const generatePlayerPreviewBuildArtifacts = async (frontendRoot: string):
     const routeSlug = routeSlugFromName(playerName);
     const imageSlug = imageSlugFromName(playerName);
     const sourceImagePath = sourceImageMap.get(imageSlug) ?? null;
-    const imageDataUri = sourceImagePath ? toDataUri(sourceImagePath) : null;
 
     const ogFileName = `${routeSlug}.png`;
     const ogImagePath = `/playerProfiles/generated/${ogFileName}`;
     const ogPngPath = path.join(generatedOgImagesDir, ogFileName);
-    const ogSvg = createAvatarOgSvg(playerName, imageDataUri);
-    await renderOgPngFromSvg(ogSvg, ogPngPath);
+    const ogSvg = createAvatarOgSvg(playerName);
+    await renderOgPngFromSvg(ogSvg, ogPngPath, sourceImagePath, playerName);
 
     const htmlSourcePath = path.resolve(generatedRoot, routeSlug, 'index.html');
     fs.mkdirSync(path.dirname(htmlSourcePath), { recursive: true });
