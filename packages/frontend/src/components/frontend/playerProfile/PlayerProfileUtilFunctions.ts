@@ -5,7 +5,7 @@ import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 import { BIPO_OPEN_TOURNAMENT_YEARS, getBiPoOpenTournamentFallbackTime } from "@/util/bipoOpenTournamentMeta";
 import { calculateBadges } from "./BadgeRegistry";
-import { getLeagueTeamForPlayer, getPlayerForLeagueTeam } from "./LeaguePlayerMapping";
+import { getLeagueTeamForPlayer, getPlayerForLeagueTeam } from "@/components/frontend/league/LeaguePlayersData";
 
 const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
     '1m': 30,

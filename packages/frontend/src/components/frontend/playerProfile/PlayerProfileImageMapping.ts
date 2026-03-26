@@ -1,11 +1,14 @@
-import { getPlayerForLeagueTeam } from './LeaguePlayerMapping';
+import { LEAGUE_PLAYER_DATA } from '@/components/frontend/league/LeaguePlayersData';
 
-// Zuordnung: Echter Spielername -> Profilbild-URL
-// Tipp: Lege Bilder unter frontend/public/playerProfiles/ ab und nutze z.B. '/playerProfiles/simon-weck.jpg'
 export const PLAYER_PROFILE_IMAGE_MAP: Record<string, string> = {
-    'Simon Weck': "/src/assets/playerProfiles/simon-weck.jpg"
-    // 'David Jones': '/playerProfiles/david-jones.jpg',
+    'Simon Weck': new URL('/src/assets/playerProfiles/simon-weck.jpg', import.meta.url).href,
 };
+
+const normalizeName = (value: string): string =>
+    value
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
 
 const toTitleCase = (value: string): string =>
     value
@@ -17,13 +20,17 @@ const toTitleCase = (value: string): string =>
 
 const resolveCanonicalPlayerName = (name: string): string => {
     const formattedName = toTitleCase(name);
-    return getPlayerForLeagueTeam(formattedName) ?? formattedName;
+    return formattedName;
 };
 
 export const getPlayerProfileImage = (playerOrTeamName: string): string | null => {
+    const normalizedInput = normalizeName(playerOrTeamName);
+    const leagueTeam = LEAGUE_PLAYER_DATA.find(entry => normalizeName(entry.teamName) === normalizedInput);
+    if (leagueTeam?.logo) return leagueTeam.logo;
+
     const canonicalName = resolveCanonicalPlayerName(playerOrTeamName);
     if (PLAYER_PROFILE_IMAGE_MAP[canonicalName]) 
-        return PLAYER_PROFILE_IMAGE_MAP[canonicalName];
+        return new URL(PLAYER_PROFILE_IMAGE_MAP[canonicalName], import.meta.url).href;
     return null;
 };
 

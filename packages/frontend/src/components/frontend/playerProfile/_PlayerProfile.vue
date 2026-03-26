@@ -27,7 +27,7 @@ import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PlayerProfileView from './PlayerProfileView.vue';
 import { usePlayerProfileData } from './usePlayerProfileData';
-import { getPlayerForLeagueTeam } from './LeaguePlayerMapping';
+import { getPlayerForLeagueTeam } from '@/components/frontend/league/LeaguePlayersData';
 
 import ProgressSpinner from 'primevue/progressspinner';
 import Message from 'primevue/message';

@@ -3,7 +3,7 @@ import { PropType, computed } from 'vue';
 import { getMatchScore } from "@/util/tournamentMatchFunctions";
 import Avatar from 'primevue/avatar';
 import { getPlayerInitials, getPlayerProfileImage } from '@/components/frontend/playerProfile/PlayerProfileImageMapping';
-import { getLeagueTeamForPlayer } from '@/components/frontend/playerProfile/LeaguePlayerMapping';
+import { getLeagueTeamForPlayer } from '@/components/frontend/league/LeaguePlayersData';
 
 const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
