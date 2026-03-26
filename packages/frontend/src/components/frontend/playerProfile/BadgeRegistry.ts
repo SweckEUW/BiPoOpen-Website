@@ -80,9 +80,9 @@ registerBadge(({ allMatchHistory }) => {
 registerBadge(async ({ playerName }) => {
     let badges: PlayerBadge[] = [];
     for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
-        if (String(year) === '2020') {
-            let hardcoded2020Winners = ['Matthias Weck', 'Lennard Kaffitz'];
-            if (hardcoded2020Winners.includes(playerName)) {
+        if (String(year) === '2021') {
+            let hardcoded2021Winners = ['Matthias Weck', 'Lennard Kaffitz'];
+            if (hardcoded2021Winners.includes(playerName)) {
                 badges.push({
                     id: `tournament-win-${year}`,
                     icon: 'emoji_events',
