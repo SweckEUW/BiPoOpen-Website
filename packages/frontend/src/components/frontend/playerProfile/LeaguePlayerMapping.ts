@@ -20,13 +20,27 @@ export const LEAGUE_PLAYER_MAP: Record<string, string> = {
     "SallyWin All-in": "Sally Hollenbeck",
 };
 
+const normalizeName = (value: string): string =>
+    value
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+
 export const getLeagueTeamForPlayer = (playerName: string): string | null => {
     for (let [team, name] of Object.entries(LEAGUE_PLAYER_MAP)) {
-        if (name && name.toLowerCase() === playerName.toLowerCase()) return team;
+        if (name && normalizeName(name) === normalizeName(playerName)) return team;
     }
     return null;
 };
 
 export const getPlayerForLeagueTeam = (teamName: string): string | null => {
-    return LEAGUE_PLAYER_MAP[teamName] || null;
+    const exact = LEAGUE_PLAYER_MAP[teamName];
+    if (exact) return exact;
+
+    const normalizedTeamName = normalizeName(teamName);
+    for (const [team, player] of Object.entries(LEAGUE_PLAYER_MAP)) {
+        if (normalizeName(team) === normalizedTeamName) return player;
+    }
+
+    return null;
 };

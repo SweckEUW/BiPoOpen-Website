@@ -2,7 +2,11 @@
     <Card>
         <template #content>
             <div class="flex items-center gap-[10px]">
-                <Avatar :label="name.charAt(0)" shape="circle" />
+                <Avatar
+                    :label="playerProfileImage ? undefined : playerInitials"
+                    :image="playerProfileImage || undefined"
+                    shape="circle"
+                />
                 <div class="flex-1">
                     <span v-if="clickable" class="font-bold text-[14px] text-[--p-primary-color] cursor-pointer hover:underline" @click="$emit('open', name)">{{ name }}</span>
                     <div v-else class="font-bold text-[14px] break-words">{{ name }}</div>
@@ -18,11 +22,13 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import Avatar from 'primevue/avatar';
 import Tag from 'primevue/tag';
 import Card from 'primevue/card';
+import { getPlayerInitials, getPlayerProfileImage } from './PlayerProfileImageMapping';
 
-defineProps<{
+const props = defineProps<{
     name: string;
     matches: number;
     wins: number;
@@ -31,7 +37,16 @@ defineProps<{
     subtitle?: string;
 }>();
 
+const playerProfileImage = computed(() => getPlayerProfileImage(props.name));
+const playerInitials = computed(() => getPlayerInitials(props.name));
+
 defineEmits<{
     open: [name: string];
 }>();
 </script>
+
+<style scoped>
+:deep(.p-avatar img) {
+    object-fit: contain;
+}
+</style>

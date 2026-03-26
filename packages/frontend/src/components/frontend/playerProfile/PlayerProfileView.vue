@@ -1,7 +1,13 @@
 <template>
     <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
         <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
-            <Avatar :label="profileData.name.charAt(0)" size="xlarge" shape="circle" class="mb-[10px]" />
+            <Avatar
+                :label="playerProfileImage ? undefined : playerInitials"
+                :image="playerProfileImage || undefined"
+                size="xlarge"
+                shape="circle"
+                class="mb-[10px]"
+            />
             <div
                 class="font-bold text-[--p-primary-color]"
                 :class="layout === 'page' ? 'text-[30px] md:text-[36px] text-center' : 'text-[32px]'"
@@ -111,6 +117,7 @@ import PlayerProfileBadges from './PlayerProfileBadges.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
 import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
+import { getPlayerInitials, getPlayerProfileImage } from './PlayerProfileImageMapping';
 
 const props = defineProps<{
     profileData: PlayerProfileData;
@@ -128,9 +135,15 @@ const activeTabValue = ref('1v1');
 
 const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
 const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));
+const playerProfileImage = computed(() => getPlayerProfileImage(props.profileData.name));
+const playerInitials = computed(() => getPlayerInitials(props.profileData.name));
 </script>
 
 <style scoped>
+:deep(.p-avatar img) {
+    object-fit: contain;
+}
+
 :deep(.p-tablist-tab-list) {
     width: 100%;
 }
