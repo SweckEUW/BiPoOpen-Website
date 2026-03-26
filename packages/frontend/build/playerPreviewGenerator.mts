@@ -105,8 +105,6 @@ const createAvatarOgSvg = (playerName: string, imageDataUri: string | null): str
   <text x="90" y="${headlineY}" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="700" fill="#FFE7EA">Spielerprofil</text>
   <text x="90" y="${nameLineOneY}" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#FFFFFF">${safeLineOne}</text>
   ${safeLineTwo ? `<text x="90" y="${nameLineTwoY}" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#FFFFFF">${safeLineTwo}</text>` : ''}
-  <rect x="${ctaX}" y="${ctaY}" width="${ctaWidth}" height="${ctaHeight}" rx="48" fill="#FFFFFF" />
-  <text x="${ctaX + ctaWidth / 2}" y="${ctaY + 62}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" fill="${MAIN_COLOR}">Zum Spielerprofil</text>
   ${imageMarkup}
 </svg>
 `;
