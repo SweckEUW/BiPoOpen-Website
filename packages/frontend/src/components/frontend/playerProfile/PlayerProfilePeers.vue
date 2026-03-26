@@ -1,6 +1,6 @@
 <template>
     <div v-if="hasVisiblePeers">
-        <div class="pp-section-title">Mitspieler & Gegner</div>
+        <div class="text-[20px] font-bold text-[--p-primary-color] mb-[12px]">Mitspieler & Gegner</div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-[20px] mb-[10px]">
             <Panel v-if="visiblePartners.length > 0" header="Häufigste Partner (2v2)">
@@ -29,7 +29,7 @@
                                         v-for="player in rival.players"
                                         :key="player"
                                         :name="player"
-                                        class="pp-rival-avatar"
+                                        class="border-[2px] border-[--p-surface-0]"
                                     />
                                 </div>
 
@@ -100,15 +100,3 @@ const visibleRivalsWithPlayers = computed(() =>
 const hasVisiblePeers = computed(() => visiblePartners.value.length > 0 || visibleRivals.value.length > 0);
 </script>
 
-<style scoped>
-.pp-section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--p-primary-color);
-    margin-bottom: 12px;
-}
-
-.pp-rival-avatar {
-    border: 2px solid var(--p-surface-0);
-}
-</style>

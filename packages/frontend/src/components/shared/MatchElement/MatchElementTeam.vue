@@ -6,7 +6,7 @@
         }"
     >
         <div class="mt-team">
-            <div class="mt-team-player-icons">
+            <div class="flex items-center -space-x-2 mr-[8px] shrink-0">
                 <PlayerProfileAvatar
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
@@ -14,7 +14,7 @@
                     shape="circle"
                     size="normal"
                     :grayscale="teamScore < opponentTeamScore"
-                    class="!text-[12px]"
+                    class="!text-[12px] border-[2px] border-[--p-surface-0]"
                 />
             </div>
             <div class="mt-team-name">{{ teamName }}</div>
@@ -22,7 +22,13 @@
         </div>
         <div v-if="team && playersVisible && team.players.length > 1">
             <div class="mt-team-player" v-for="player in team.players">
-                <PlayerProfileAvatar :name="player.name" shape="circle" size="normal" class="!text-[12px]" :grayscale="teamScore < opponentTeamScore" />
+                <PlayerProfileAvatar
+                    :name="player.name"
+                    shape="circle"
+                    size="normal"
+                    class="!text-[12px] !w-[32px] !h-[32px] !min-w-[32px] shrink-0"
+                    :grayscale="teamScore < opponentTeamScore"
+                />
                 <div class="mt-team-player-name">{{ player.name }}</div>
                 <div class="mt-team-player-score">{{ player.score }}</div>
             </div>
@@ -86,13 +92,6 @@ let opponentTeamScore = computed(() => {
     align-items: center;
     min-height: 34px;
 }
-.mt-team-player-icons{
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-right: 8px;
-    flex-shrink: 0;
-}
 .mt-team-header-avatar{
     width: 24px;
     height: 24px;
@@ -122,10 +121,11 @@ let opponentTeamScore = computed(() => {
 .mt-team-player{
     display: flex;
     align-items: center;
+    gap: 4px;
 }
 .mt-team-player-name{
     width: 100%;
-    padding-left: 2px;
+    padding-left: 6px;
 }
 .mt-team-player-score{
     padding: 0px 5px;
