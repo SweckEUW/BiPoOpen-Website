@@ -1,14 +1,14 @@
 
 <template>
 
-    <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[80%] rounded-xs mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <Drawer v-model:visible="leaguePlayerOverviewVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-content-center" v-if="selectedLeaguePlayer">
                 <!-- <div class="drag-handle"></div> -->
 
                 <div class="flex flex-column align-items-center">
                     <div class="font-bold text-[20px]">{{ selectedLeaguePlayer.name }}</div>
-                    <Image class="h-[150px]" :src="selectedLeaguePlayer.logo" preview
+                    <Image class="h-[120px]" :src="selectedLeaguePlayer.logo" preview
                         :pt="{ 
                             toolbar: { style: 'display: none' },
                             previewMask: { style: 'background: transparent; opacity: 0' },
@@ -21,10 +21,14 @@
 
         <div v-if="selectedLeaguePlayer">
             <div v-for="round in orderedRounds" :key="round.name" class="mb-[40px]">
-                <div class="font-bold text-[24px] capitalize">{{ round.name }}</div>
+                <div class="lg-sticky-round-block">
+                    <div class="font-bold text-[24px] capitalize lg-sticky-round">{{ round.name }}</div>
+                </div>
 
-                <div class="mt-[10px] font-bold text-[20px]">
-                    Absolvierte Spiele {{ round.data.matchesPlayed.length }}/{{ round.data.matchesPlayed.length + round.data.matchesToPlay.length }}
+                <div class="lg-sticky-subblock lg-sticky-subblock--played">
+                    <div class="font-bold text-[20px] lg-sticky-subheadline">
+                        Absolvierte Spiele {{ round.data.matchesPlayed.length }}/{{ round.data.matchesPlayed.length + round.data.matchesToPlay.length }}
+                    </div>
                 </div>
                 <div v-for="match in round.data.matchesPlayed" style="margin-top: 10px;">
                     <div class="lg-match-meta" v-if="match.time || getMatchResult(match)">
@@ -40,7 +44,9 @@
                 </div>
 
                 <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
-                    <div class="font-bold text-[20px]">Offene Spiele</div>
+                    <div class="lg-sticky-subblock lg-sticky-subblock--open">
+                        <div class="font-bold text-[20px] lg-sticky-subheadline">Offene Spiele</div>
+                    </div>
                     <div v-for="match in round.data.matchesToPlay" style="margin-top: 10px;">
                         <MatchElement :match="match"/> 
                     </div>
@@ -311,6 +317,39 @@ table td{
     gap: 8px;
     margin-bottom: 4px;
 }
+.lg-sticky-round-block{
+    position: sticky;
+    top: 0;
+    z-index: 7;
+    background: #fff;
+    min-height: 52px;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px 0;
+}
+.lg-sticky-round-block::before{
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+    background: #fff;
+}
+.lg-sticky-subblock{
+    position: sticky;
+    top: 52px;
+    z-index: 6;
+    background: #fff;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+}
+.lg-sticky-subheadline{
+    margin-top: 0;
+    line-height: 1.2;
+}
 .mvp-arrow-down::after, .mvp-arrow-up::after{
     content: ' ';
     position: relative;
@@ -350,6 +389,15 @@ table td{
 
 /*MOBILE*/
 @media (width <= 900px){
+    .lg-sticky-round-block{
+        min-height: 44px;
+        padding: 6px 0;
+    }
+    .lg-sticky-subblock{
+        top: 44px;
+        min-height: 36px;
+        padding: 4px 0;
+    }
     .lg-explain{
         font-size: 14px;
         color: var(--main-color);

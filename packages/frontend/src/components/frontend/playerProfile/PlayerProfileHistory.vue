@@ -1,6 +1,8 @@
 <template>
+    <div class="pp-section-title">Spielverlauf</div>
+
     <div class="mb-[40px]">
-        <Panel header="Spielverlauf">
+        <Panel>
             <div class="flex flex-col gap-[12px]">
                 <div v-for="(item, i) in displayed" :key="i" class="match-entry">
                     <div class="flex items-center gap-[8px] mb-[6px]">
@@ -71,6 +73,12 @@ const formatTime = (ts: number) => {
 </script>
 
 <style scoped>
+.pp-section-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--p-primary-color);
+    margin-bottom: 12px;
+}
 .match-entry {
     border-bottom: 1px solid var(--p-content-border-color);
     padding-bottom: 12px;

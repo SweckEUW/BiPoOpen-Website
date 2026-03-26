@@ -35,7 +35,13 @@
                 <Tab value="1v1" class="flex-1 justify-center">1v1 Spiele</Tab>
                 <Tab value="2v2" class="flex-1 justify-center">2v2 Spiele</Tab>
             </TabList>
-            <TabPanels>
+            <TabPanels
+                :pt="{
+                    root: {
+                    style: { '--p-tabs-tabpanel-padding': '0.5rem 0' }
+                    }
+                }"
+            >
                 <TabPanel value="1v1">
                     <div v-if="filteredData1v1.totalMatches === 0" class="text-center py-[30px] text-[--p-text-muted-color]">
                         Keine 1v1 Spiele vorhanden

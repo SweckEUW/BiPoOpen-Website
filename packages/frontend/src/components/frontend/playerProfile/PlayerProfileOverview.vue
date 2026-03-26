@@ -23,21 +23,21 @@
             </div>
 
             <!-- Treffer -->
-            <div class="flex justify-center items-end gap-[32px] py-[14px] border-b border-[--p-content-border-color]">
+            <div class="flex justify-center items-end gap-[32px] pb-[14px] pt-[14px] border-b border-[--p-content-border-color]">
                 <div class="text-center">
                     <div class="text-[13px] text-[--p-text-muted-color] mb-[4px]">Treffer / Spiel</div>
                     <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.averageHits }}</div>
                     <TrendIndicator :value="data.trends.averageHitsTrend" />
                 </div>
                 <div class="text-center">
+                    <div class="text-[13px] text-[--p-text-muted-color] mb-[4px]">Treffer gesamt</div>
                     <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.totalHits }}</div>
-                    <div class="text-[13px] text-[--p-text-muted-color]">Treffer gesamt</div>
                     <TrendIndicator :value="data.trends.totalHitsTrend" />
                 </div>
             </div>
 
             <!-- Letzte 5 Spiele -->
-            <div v-if="recentForm.length > 0" class="pt-[14px] text-center">
+            <div v-if="recentForm.length > 0" class="pb-[14px] pt-[14px] text-centerborder-b border-[--p-content-border-color]">
                 <div class="pp-subsection-title">Letzte 5 Spiele</div>
                 <div class="flex justify-center gap-[6px]">
                     <Chip
@@ -49,12 +49,9 @@
                     />
                 </div>
             </div>
-        </Panel>
-    </div>
 
-    <div class="mb-[10px]">
-        <Panel header="Serien & Rekorde">
-            <div class="grid grid-cols-3 gap-[12px]">
+            <!-- Serien & Rekorde -->
+            <div class="grid grid-cols-3 gap-[12px] pb-[14px] border-b border-[--p-content-border-color]">
                 <div class="text-center">
                     <div class="text-[24px] font-bold text-[--p-primary-color]">{{ data.currentWinStreak }}</div>
                     <div class="text-[12px] text-[--p-text-muted-color]">Aktuelle Serie</div>
@@ -68,11 +65,8 @@
                     <div class="text-[12px] text-[--p-text-muted-color]">Längste Niederlagenserie</div>
                 </div>
             </div>
-        </Panel>
-    </div>
 
-    <div class="mb-[10px]">
-        <Panel header="Statistiken nach Kategorie">
+            <!-- Kategorien -->
             <DataTable :value="data.categories" stripedRows size="small">
                 <Column field="name" header="Kategorie" />
                 <Column field="matches" header="Spiele" />
