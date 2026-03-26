@@ -79,23 +79,21 @@ registerBadge(({ allMatchHistory }) => {
 // Turniersieg
 registerBadge(async ({ playerName }) => {
     let badges: PlayerBadge[] = [];
-    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
-        if (String(year) === '2021') {
-            let hardcoded2021Winners = ['Matthias Weck', 'Lennard Kaffitz'];
-            if (hardcoded2021Winners.includes(playerName)) {
-                badges.push({
-                    id: `tournament-win-${year}`,
-                    icon: 'emoji_events',
-                    label: `BiPo Open ${year} Sieger`,
-                    description: `Gewinner des BiPo Open ${year} Turniers`,
-                    date: null,
-                    priority: 1000,
-                    special: 'rainbow',
-                });
-            }
-            continue;
-        }
 
+    let hardcoded2021Winners = ['Matthias Weck', 'Lennard Kaffitz'];
+    if (hardcoded2021Winners.includes(playerName)) {
+        badges.push({
+            id: `tournament-win-${2021}`,
+            icon: 'emoji_events',
+            label: `BiPo Open ${2021} Sieger`,
+            description: `Gewinner des BiPo Open ${2021} Turniers`,
+            date: null,
+            priority: 1000,
+            special: 'rainbow',
+        });
+    }
+
+    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
         let tournament = await getTournamentByName(year);
         if (!tournament?.koPhase.matches.length) continue;
         let lastStage = tournament.koPhase.matches[tournament.koPhase.matches.length - 1];
