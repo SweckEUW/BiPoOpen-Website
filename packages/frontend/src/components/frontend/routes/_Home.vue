@@ -389,12 +389,14 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
     overflow: hidden;
     min-height: 280px;
     transition: background-image 0.5s ease;
+    margin-top: 20px;
 }
 .ho-hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(234, 81, 96, 0.85) 0%, rgba(97, 195, 217, 0.75) 100%);
     z-index: 0;
+    /* opacity: 0.8; */
 }
 .ho-hero > *:not(.ho-hero-overlay) {
     position: relative;

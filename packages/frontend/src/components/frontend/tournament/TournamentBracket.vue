@@ -179,6 +179,9 @@ const bracketRounds = computed(() => {
 .tb-match :deep(.mt-vs) {
     font-size: 11px;
 }
+.tb-match :deep(.mt-team-player-name) {
+    font-size: 8px;
+}
 
 /* ═══════ MOBILE ═══════ */
 @media (width <= 900px) {
