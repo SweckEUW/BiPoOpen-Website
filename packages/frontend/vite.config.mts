@@ -49,13 +49,29 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'metaImage.jpg'],
       workbox: {
-        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024 * 1024, // 50 MB
+        // Delete old caches on update
+        cleanupOutdatedCaches: true, 
+        // Take control immediately
+        clientsClaim: true,
+        // Force immediate activation
+        skipWaiting: true,
+        
+        maximumFileSizeToCacheInBytes: 50 * 1024 * 1024 * 1024,
         globPatterns: [
-          '**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff2}'
+          '**/*.{js,css,ico,png,svg,jpg,jpeg,webp,woff2}'
         ],
         runtimeCaching: [
           {
-            // GET-Anfragen an das Backend cachen (Turniere, League, OpenGames)
+            // Network-First for HTML navigations
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 3
+            }
+          },
+          {
+            // GET requests to backend
             urlPattern: /^https:\/\/bipoopen-backend\.vercel\.app\/.*/,
             handler: 'NetworkFirst',
             method: 'GET',
@@ -64,7 +80,7 @@ export default defineConfig({
               networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 Tage
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
               },
               cacheableResponse: {
                 statuses: [0, 200]
