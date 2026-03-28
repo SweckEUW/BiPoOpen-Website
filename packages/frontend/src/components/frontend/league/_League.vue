@@ -1,7 +1,9 @@
 <template>
     <div class="League">
         
-        <h1 class="bp-title">BiPo League</h1>
+        <h1 class="bp-title !pb-[7px] !mb-[0px]">BiPo League</h1>
+        <h2 class="!text-[var(--main-color)] !text-[20px] !pt-[0px] !mt-[0px] !pb-[20px] opacity-80">Saison 2025/26</h2>
+
         <div class="lg-logo">
             <Image :src="BipoLeagueLogo" preview 
                 :pt="{ 
@@ -55,7 +57,7 @@
 
                 <div class="tab-pane fade" :id="'LeagueInfo'">
                     <h1 class="bp-title">Info zur BiPo League</h1>
-
+1
                     <h2>Wettbewerbsmodus & Dauer</h2>
                     <ul>
                         <li><strong>System:</strong> 1 gegen 1 (Jeder gegen Jeden) mit Hin- und Rückspiel.</li>
