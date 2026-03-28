@@ -57,7 +57,6 @@
 
                 <div class="tab-pane fade" :id="'LeagueInfo'">
                     <h1 class="bp-title">Info zur BiPo League</h1>
-1
                     <h2>Wettbewerbsmodus & Dauer</h2>
                     <ul>
                         <li><strong>System:</strong> 1 gegen 1 (Jeder gegen Jeden) mit Hin- und Rückspiel.</li>
