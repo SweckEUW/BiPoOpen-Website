@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ScheduleGroups from '@/components/frontend/tournament/schedule/ScheduleGroups.vue';
-import ScheduleKO from '@/components/frontend/tournament/schedule/ScheduleKO.vue';
+import TournamentBracket from '@/components/frontend/tournament/TournamentBracket.vue';
 import { PropType } from 'vue';
 
 defineProps({
@@ -34,7 +34,7 @@ defineProps({
                <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
             </div>
             <div class="tab-pane fade" :id="'GameScheduleKO' + tournament._id">
-               <ScheduleKO :getTournament="getTournament" :tournament="tournament" :isBackend="isBackend"/>
+               <TournamentBracket :tournament="tournament"/>
             </div>
          </div>
       </div>

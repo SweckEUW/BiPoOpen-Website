@@ -2,6 +2,7 @@
 import { ref, onUnmounted, Ref } from "vue"
 import { getTournamentByName } from "@/util/tournamentFunctions"
 
+import Overview from '@/components/frontend/tournament/_Overview.vue';
 import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
 import Teams from '@/components/frontend/tournament/_Teams.vue';
 import MVP from '@/components/frontend/tournament/_MVP.vue';
@@ -12,14 +13,28 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
+let overviewPhotoIds = ref<{img_id: string, name: string}[]>([]);
+
 const getTournament = async () => {
    tournament.value = await getTournamentByName(route.params.TournamentName as string);
 }
-getTournament();
 
-let place:Ref<"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Spielplan");
+const loadOverviewPhotos = async () => {
+   const photos = getTournamentPhotos();
+   if (!photos) return;
+   try {
+      const response = await fetch(photos.driveImageIDs);
+      overviewPhotoIds.value = await response.json();
+   } catch { /* photos not available */ }
+};
+
+getTournament().then(loadOverviewPhotos);
+
+let place:Ref<"Übersicht"|"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Übersicht");
 let name = route.path.split("/").pop();
-if(name == "Spielplan")
+if(name == "Übersicht")
+   place.value = "Übersicht";
+else if(name == "Spielplan")
    place.value = "Spielplan";
 else if(name == "Teams")
    place.value = "Teams";
@@ -36,7 +51,7 @@ onUnmounted(() => {
    clearInterval(updateInterval);
 });
 
-const changeRouter = (path:"Spielplan"|"Teams"|"MVP"|"Fotos") => {
+const changeRouter = (path:"Übersicht"|"Spielplan"|"Teams"|"MVP"|"Fotos") => {
    let newURL = window.location.origin + "/" + route.params.TournamentName + '/' + path;
    window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
    window.scrollTo({top: 0, behavior: 'instant' });
@@ -116,6 +131,9 @@ const getTournamentPhotos = () => {
 
             <!-- Tabs -->
             <ul class="nav nav-tabs justify-content-center">
+               <li class="nav-item">
+                  <button class="nav-link" :class="{active: place == 'Übersicht'}" data-bs-toggle="tab" :data-bs-target="'#Overview' + tournament._id" @click="changeRouter('Übersicht')">Übersicht</button>
+               </li>
                <!-- <li class="nav-item">
                   <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
                </li> -->
@@ -132,6 +150,9 @@ const getTournamentPhotos = () => {
 
             <!-- Content -->
             <div class="tab-content" id="GameScheduleContainer">
+               <div class="tab-pane fade show" :class="{active: place == 'Übersicht'}" :id="'Overview' + tournament._id">
+                  <Overview :tournament="tournament" :photoIds="overviewPhotoIds" :basePath="'/' + route.params.TournamentName"/>
+               </div>
                <!-- <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
                   <Teams :tournament="tournament"/>
                </div> -->
