@@ -85,7 +85,7 @@ const toggleModalAddGame = () => {
 
 <style scoped>
 .og-time{
-    font-size: 20px;
+    font-size: 14px;
     margin-bottom: 5px;
     color: var(--main-color);
 }

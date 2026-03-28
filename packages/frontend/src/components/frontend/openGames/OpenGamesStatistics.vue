@@ -33,7 +33,7 @@
                             <td>{{ player.placement! + 1}}</td>
                             <td>
                                 <div class="ogs-player-row" @click="openPlayerProfile(player.name)">
-                                    <PlayerProfileAvatar class="ogs-player-avatar" :name="player.name" :size="'large'"/>
+                                    <PlayerProfileAvatar class="ogs-player-avatar" :name="player.name" :size="'xlarge'"/>
                                     <span class="ogs-player-link">{{ player.name.replace(" ","\n") }}</span>
                                 </div>
                             </td>

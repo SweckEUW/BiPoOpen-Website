@@ -2,6 +2,7 @@
 import { PropType, ref } from "vue"
 import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
 import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
+import MatchTimeline from '@/components/shared/MatchElement/MatchTimeline.vue';
 import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 
 const props = defineProps({
@@ -10,6 +11,7 @@ const props = defineProps({
    deleteMatch: {type: Function as PropType<(match:Match) => void> },
    isBackend: {type: Boolean, default: false},
    editName: {type: Boolean, default: false},
+   hideAvatars: {type: Boolean, default: false},
 });
 
 let showModal = ref(false);
@@ -20,34 +22,6 @@ const toggleModal = () => {
 let playersVisible = ref(false);
 let togglePlayersVisible = () => {
    playersVisible.value = !playersVisible.value;
-}
-
-let getPlayerName = (teamIndex: number, playerIndex: number) => {
-   const team = teamIndex == 0 ? props.match.team1 : props.match.team2;
-   const player = team.players[playerIndex];
-   return player.name;
-}
-
-let getCorrectTurnName = (turnType:Turn['type']) => {
-   switch(turnType) {
-      case 'hit': return 'Treffer';
-      case 'miss': return 'Nullwurf';
-      case 'airball': return 'Airball';
-      case 'bomb': return 'Bombe';
-      case 'bouncer': return 'Bouncer';
-      case 'trickshot': return 'Trickshot';
-      case 'onfire': return 'On Fire';
-      case 'ballsback': return 'Treffer - Balls Back';
-      case 'lastCup': return 'Letzter Becher';
-      default: return turnType;
-   }
-}
-
-function formatGameDuration(startTime:number, endTime:number) {
-  const diff = endTime - startTime;
-  const minutes = Math.floor(diff / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-  return `${minutes}:${String(seconds).padStart(2, '0')} Minuten`;
 }
 </script>
 
@@ -72,17 +46,11 @@ function formatGameDuration(startTime:number, endTime:number) {
 
          <!-- Team Name & Score -->
          <div class="mt-teams" @click="togglePlayersVisible()">
-            <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible"/> <!-- Team 1 -->
-            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible"/> <!-- Team 2 -->
+            <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars"/> <!-- Team 1 -->
+            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars"/> <!-- Team 2 -->
 
-            <!-- Spielverlauf -->
-            <div v-if="match.turns && match.turns.length > 0  && playersVisible" class="mt-history">
-               <div>{{ 'Dauer: ' + formatGameDuration(match.time!, match.endTime!) }}</div>
-               <div>Spiel Verlauf</div>
-                <div class="mt-turn" v-for="(turn, index) in match.turns" :style="{ 'background-color': turn.teamIndex == 0 ? 'var(--main-color)' : 'var(--secondary-color)' }">
-                  {{ index + 1 + '. ' + getPlayerName(turn.teamIndex, turn.playerIndex) + ' - ' + getCorrectTurnName(turn.type) }}
-                </div>
-            </div>
+            <!-- Spielverlauf Timeline -->
+            <MatchTimeline v-if="match.turns && match.turns.length > 0 && playersVisible" :match="match" />
          </div>
 
          <!-- VS. -->
@@ -98,9 +66,9 @@ function formatGameDuration(startTime:number, endTime:number) {
    display: flex;
    align-items: center;
    width: 100%;
-   padding: 10px;
+   padding: 6px 10px;
    border: 1px solid black;
-   margin-bottom: 10px;
+   margin-bottom: 6px;
    border-radius: 4px;
 }
 
@@ -136,16 +104,6 @@ function formatGameDuration(startTime:number, endTime:number) {
 .mt-vs, .mt-button{
    text-align: center;
    padding: 10px;
-}
-
-.mt-history{
-   margin-top: 20px;
-}
-.mt-turn{
-   width: 100%;
-   padding: 10px;
-   margin-bottom: 5px;
-   color: white;
 }
 
 /*MOBILE*/

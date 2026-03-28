@@ -6,7 +6,7 @@
         }"
     >
         <div class="mt-team">
-            <div class="flex items-center -space-x-2 mr-[8px] shrink-0">
+            <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
                 <PlayerProfileAvatar
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
@@ -23,6 +23,7 @@
         <div v-if="team && playersVisible && team.players.length > 1">
             <div class="mt-team-player" v-for="player in team.players">
                 <PlayerProfileAvatar
+                    v-if="!hideAvatars"
                     :name="player.name"
                     shape="circle"
                     size="normal"
@@ -47,6 +48,7 @@ const props = defineProps({
     playersVisible: {type: Boolean, required: true },
     isTeam2: {type: Boolean, required: true },
     leaguePlayers: {type: Array as PropType<LeaguePlayer[]>, required: false },
+    hideAvatars: {type: Boolean, default: false},
 });
 
 let team = props.isTeam2 ? props.match.team2 : props.match.team1;
@@ -86,11 +88,10 @@ let opponentTeamScore = computed(() => {
     color: var(--loose-gray);
 }
 .mt-team{
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: normal;
     display: flex;
     align-items: center;
-    min-height: 34px;
 }
 .mt-team-header-avatar{
     width: 24px;
@@ -100,16 +101,13 @@ let opponentTeamScore = computed(() => {
 }
 .mt-team-name{
     width: 100%;
-    align-self: flex-end;
-}
-.mt-team-second .mt-team-name{
-    align-self: flex-start;
 }
 .mt-team-score, .mt-team-player-score{
     background-color: var(--main-color);
-    padding: 5px;
+    padding: 2px 5px;
     color: white;
     width: 35px;
+    min-width: 35px;
     text-align: center;
 }
 .mt-team-second .mt-team-score, .mt-team-second .mt-team-player-score{
@@ -134,20 +132,20 @@ let opponentTeamScore = computed(() => {
 /*MOBILE*/
 @media (width <= 900px){
     .mt-team{
-        font-size: 16px;
+        font-size: 14px;
     }
     .mt-team-player{
-        font-size: 16px;
+        font-size: 14px;
     }
 }
 
 /*MOBILE S*/
 @media (width <= 360px){
     .mt-team-name{
-        font-size: 14px;
+        font-size: 13px;
     }
     .mt-team-player{
-        font-size: 14px;
+        font-size: 13px;
     }
 }
 </style>
