@@ -3,13 +3,16 @@
     <div class="Home">
 
         <!-- ═══════ HERO SECTION ═══════ -->
-        <section class="ho-hero" :style="heroLoaded ? { backgroundImage: `url(${heroImage})` } : {}">
+        <section class="ho-hero" :class="{ 'ho-hero--skeleton': !heroLoaded }" :style="heroLoaded ? { backgroundImage: `url(${heroImage})` } : {}">
             <!-- Skeleton while image loads -->
             <div v-if="!heroLoaded" class="ho-hero-skeleton">
-                <Skeleton width="60%" height="3rem" class="ho-hero-skeleton-title" />
-                <Skeleton width="40%" height="1.2rem" class="ho-hero-skeleton-subtitle" />
+                <Skeleton width="340px" height="4.5rem" class="ho-hero-skeleton-title" />
+                <Skeleton width="260px" height="1.3rem" class="ho-hero-skeleton-subtitle" />
                 <div class="ho-hero-skeleton-timer">
-                    <Skeleton v-for="i in 4" :key="i" width="80px" height="70px" borderRadius="12px" />
+                    <div v-for="i in 4" :key="i" class="ho-hero-skeleton-box">
+                        <Skeleton width="48px" height="2rem" />
+                        <Skeleton width="56px" height="0.75rem" />
+                    </div>
                 </div>
             </div>
 
@@ -36,6 +39,38 @@
 
         <!-- ═══════ DASHBOARD GRID ═══════ -->
         <div class="ho-grid">
+
+            <!-- ─── Recent Games ─── -->
+            <section class="ho-card ho-card-wide">
+                <div class="ho-card-header">
+                    <span class="material-icons ho-card-icon">history</span>
+                    <h3>Letzte Spiele</h3>
+                </div>
+                <div v-if="recentGamesLoading" class="ho-games-skeleton">
+                    <div v-for="i in 5" :key="i" class="ho-games-skeleton-row">
+                        <div class="flex items-center gap-[8px] mb-[6px]">
+                            <Skeleton width="80px" height="22px" borderRadius="12px" />
+                            <Skeleton width="140px" height="14px" />
+                        </div>
+                        <Skeleton width="100%" height="42px" borderRadius="4px" />
+                    </div>
+                </div>
+                <div v-else>
+                    <div class="ho-fade-wrapper">
+                        <div v-for="item in recentGames" :key="item.match._id" class="ho-open-game">
+                            <div class="flex items-center gap-[8px] mb-[6px]">
+                                <Tag :value="item.source" severity="secondary" rounded />
+                                <span class="text-[12px] text-[--p-text-muted-color]" v-if="item.time">
+                                    {{ getGameTime(item.time) }}
+                                </span>
+                            </div>
+                            <MatchElement :match="item.match" />
+                        </div>
+                        <div class="ho-fade-overlay"></div>
+                    </div>
+                    <router-link to="/Offene-Spiele" class="ho-cta-btn">Alle Offenen Spiele ansehen</router-link>
+                </div>
+            </section>
 
             <!-- ─── League Standings ─── -->
             <section class="ho-card">
@@ -91,7 +126,27 @@
                     <span class="material-icons ho-card-icon">military_tech</span>
                     <h3>Letztes Turnier</h3>
                 </div>
-                <Loadingscreen v-if="lastTournamentLoading" />
+                <div v-if="lastTournamentLoading" class="ho-tournament-skeleton">
+                    <Skeleton width="200px" height="1.4rem" class="mb-[10px]" />
+                    <!-- Podium skeleton -->
+                    <div class="ho-tournament-skeleton-podium">
+                        <div v-for="i in 3" :key="i" class="ho-tournament-skeleton-podium-entry">
+                            <Skeleton shape="circle" size="32px" />
+                            <div class="flex flex-col gap-[4px]">
+                                <Skeleton width="60px" height="12px" />
+                                <Skeleton width="100px" height="14px" />
+                                <Skeleton width="130px" height="12px" />
+                            </div>
+                        </div>
+                    </div>
+                    <Skeleton width="160px" height="36px" borderRadius="8px" class="mt-[12px]" />
+                    <!-- MVP skeleton -->
+                    <Skeleton width="50px" height="1rem" class="mt-[20px] mb-[8px]" />
+                    <div class="flex flex-col gap-[8px]">
+                        <Skeleton v-for="i in 4" :key="i" width="100%" height="28px" />
+                    </div>
+                    <Skeleton width="160px" height="36px" borderRadius="8px" class="mt-[12px]" />
+                </div>
                 <div v-else-if="lastTournament">
                     <div class="font-bold text-[var(--main-color)] text-[20px] pb-[10px]">{{ lastTournament.name }}</div>
                     <TournamentOverview
@@ -99,25 +154,6 @@
                         :photoIds="lastTournamentPhotoIds"
                         :basePath="'/' + BIPO_OPEN_TOURNAMENT_YEARS[BIPO_OPEN_TOURNAMENT_YEARS.length - 1]"
                     />
-                </div>
-            </section>
-
-            <!-- ─── Recent Open Games ─── -->
-            <section class="ho-card ho-card-wide">
-                <div class="ho-card-header">
-                    <span class="material-icons ho-card-icon">sports</span>
-                    <h3>Letzte Offene Spiele</h3>
-                </div>
-                <Loadingscreen v-if="openGamesLoading" />
-                <div v-else>
-                    <div class="ho-fade-wrapper">
-                        <div v-for="match in recentOpenGames" :key="match._id" class="ho-open-game">
-                            <div class="ho-open-game-time" v-if="match.time">{{ getGameTime(match.time) }}</div>
-                            <MatchElement :match="match" />
-                        </div>
-                        <div class="ho-fade-overlay"></div>
-                    </div>
-                    <router-link to="/Offene-Spiele" class="ho-cta-btn">Alle Offenen Spiele ansehen</router-link>
                 </div>
             </section>
 
@@ -194,10 +230,10 @@ import { BIPO_OPEN_TOURNAMENT_YEARS } from '@/util/bipoOpenTournamentMeta';
 import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import TournamentOverview from '@/components/frontend/tournament/_Overview.vue';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Skeleton from 'primevue/skeleton';
 import AutoComplete from 'primevue/autocomplete';
 import Select from 'primevue/select';
+import Tag from 'primevue/tag';
 import router from '@/router.js';
 import { LEAGUE_PLAYERS } from '../league/LeaguePlayersData';
 
@@ -261,8 +297,8 @@ let leaguePlayers: LeaguePlayer[] = LEAGUE_PLAYERS;
 const leagueTop5 = ref<PlayerWithStats[]>([]);
 const leagueLoading = ref(true);
 
-const recentOpenGames = ref<Match[]>([]);
-const openGamesLoading = ref(true);
+const recentGames = ref<MatchHistoryEntry[]>([]);
+const recentGamesLoading = ref(true);
 
 const lastTournament = ref<Tournament | null>(null);
 const lastTournamentLoading = ref(true);
@@ -321,12 +357,20 @@ const loadLeague = async () => {
     leagueLoading.value = false;
 };
 
-const loadOpenGames = async () => {
+const loadRecentGames = async () => {
     try {
-        const games = await getAllOpenGames();
-        recentOpenGames.value = games.reverse().slice(0, 5);
+        const [openGames, leagueGames] = await Promise.all([
+            getAllOpenGames(),
+            getAllLeagueGames(),
+        ]);
+        const entries: MatchHistoryEntry[] = [
+            ...openGames.map(m => ({ match: m, source: 'Offenes Spiel', time: m.time ?? 0 })),
+            ...leagueGames.map(m => ({ match: m, source: 'Liga', time: m.time ?? 0 })),
+        ];
+        entries.sort((a, b) => b.time - a.time);
+        recentGames.value = entries.slice(0, 5);
     } catch { /* silent */ }
-    openGamesLoading.value = false;
+    recentGamesLoading.value = false;
 };
 
 const loadLastTournament = async () => {
@@ -345,7 +389,7 @@ const loadLastTournament = async () => {
 };
 
 loadLeague();
-loadOpenGames();
+loadRecentGames();
 loadLastTournament();
 
 // ─── Helpers ───
@@ -390,6 +434,9 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
     min-height: 280px;
     transition: background-image 0.5s ease;
     margin-top: 20px;
+}
+.ho-hero--skeleton {
+    background: linear-gradient(135deg, rgba(234, 81, 96, 0.85) 0%, rgba(97, 195, 217, 0.75) 100%);
 }
 .ho-hero-overlay {
     position: absolute;
@@ -713,25 +760,64 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
     margin-top: 5px;
 }
 
+/* ─── Recent Games Skeleton ─── */
+.ho-games-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.ho-games-skeleton-row {
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f5f5f5;
+}
+.ho-games-skeleton-row:last-child {
+    border-bottom: none;
+}
+
+/* ─── Tournament Skeleton ─── */
+.ho-tournament-skeleton-podium {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.ho-tournament-skeleton-podium-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 /* ─── Hero Skeleton ─── */
 .ho-hero-skeleton {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
+    gap: 10px;
     z-index: 1;
+    position: relative;
 }
 .ho-hero-skeleton-title {
     max-width: 400px;
 }
 .ho-hero-skeleton-subtitle {
-    max-width: 280px;
+    max-width: 300px;
+    margin-top: 0;
 }
 .ho-hero-skeleton-timer {
     display: flex;
     gap: 12px;
-    margin-top: 8px;
+    margin-top: 14px;
+}
+.ho-hero-skeleton-box {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 16px 12px;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
 }
 
 /* ═══════ MOBILE ═══════ */
