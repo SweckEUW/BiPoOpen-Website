@@ -197,3 +197,46 @@ export const getLeagueList = (leagueMatches:Match[], leaguePlayers:LeaguePlayer[
 
     return playersWithStats;
 }
+
+const getLeagueMatchupKey = (match: Match) => {
+    const team1Name = match.team1.players[0]?.name?.toLocaleLowerCase() ?? '';
+    const team2Name = match.team2.players[0]?.name?.toLocaleLowerCase() ?? '';
+
+    return [team1Name, team2Name].sort().join('::');
+}
+
+export const splitLeagueGamesByRound = (leagueMatches: Match[]) => {
+    const sorted1v1Matches = leagueMatches
+        .filter((match) => match.team1.players.length === 1 && match.team2.players.length === 1)
+        .map((match, index) => ({ match, index }))
+        .sort((a, b) => {
+            const aTime = a.match.time ?? Number.MAX_SAFE_INTEGER;
+            const bTime = b.match.time ?? Number.MAX_SAFE_INTEGER;
+
+            if (aTime !== bTime)
+                return aTime - bTime;
+
+            return a.index - b.index;
+        })
+        .map(entry => entry.match);
+
+    const matchCountsByMatchup: Record<string, number> = {};
+    const hinrunde: Match[] = [];
+    const rueckrunde: Match[] = [];
+
+    sorted1v1Matches.forEach((match) => {
+        const matchupKey = getLeagueMatchupKey(match);
+        const playedCount = (matchCountsByMatchup[matchupKey] || 0) + 1;
+        matchCountsByMatchup[matchupKey] = playedCount;
+
+        if (playedCount === 1)
+            hinrunde.push(match);
+        if (playedCount === 2)
+            rueckrunde.push(match);
+    });
+
+    return {
+        hinrunde,
+        rueckrunde
+    };
+}
