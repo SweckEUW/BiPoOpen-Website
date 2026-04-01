@@ -19,7 +19,7 @@ export const addLeagueGame = async (leagueGame:Match) => {
 
 export const updateLeagueGame = async (leagueGame:Match) => {
     let response = await axios.patch("/leagueGames/update/" + leagueGame._id, leagueGame);
-    return response.status == 200;
+    return response.status == 201;
 }
 
 export const deleteLeagueGame = async (leagueGame: Match) => {

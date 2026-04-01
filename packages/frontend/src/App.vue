@@ -2,6 +2,7 @@
 import AppHeader from '@/components/shared/AppHeader.vue';
 import AppFooter from '@/components/shared/AppFooter.vue';
 import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
+import Toast from 'primevue/toast';
 
 import { onBeforeMount, ref, provide } from 'vue'
 import router from './router.js';
@@ -33,6 +34,8 @@ onBeforeMount(() => {
 </script>
 
 <template>
+	<Toast position="bottom-right" />
+
 	<!-- App header -->
 	<AppHeader/>
 
@@ -162,6 +165,31 @@ body{
 @media (width <= 360px){
     .bp-title{
 		font-size: 22px !important;
+	}
+}
+
+.p-toast .p-toast-message-enter-active, .p-toast .p-toast-message-leave-active {
+	transition: transform 0.3s ease, opacity 0.3s ease !important;
+	animation: none !important;
+}
+.p-toast .p-toast-message-enter-from , .p-toast .p-toast-message-leave-to {
+  	opacity: 0;
+	transform: translateX(80%)
+}
+
+/* Toast close button hidden */
+.p-toast .p-toast-close-button {
+	display: none !important;
+}
+
+/* Toast mobile */
+@media (width <= 900px){
+	.p-toast.p-toast-bottom-right {
+		right: 0;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 10px;
 	}
 }
 </style>

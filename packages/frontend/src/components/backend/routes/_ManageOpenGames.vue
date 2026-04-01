@@ -32,13 +32,15 @@ getOpenGames();
 
 
 const setGameResult = async (match:Match) => {
-    await updateOpenGame(match);
+    let success = await updateOpenGame(match);
     await getOpenGames();
+    return success;
 }
 
 const deleteMatch = async (match:Match) => {
-    await deleteOpenGame(match);
+    let success = await deleteOpenGame(match);
     await getOpenGames();
+    return success;
 }
 
 let getGameTime = (dateNumber:number) => {

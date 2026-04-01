@@ -16,6 +16,8 @@
                     <slot name="confirm">Confirm</slot>
                 </div>   
             </div>
+
+            <slot name="loading"></slot>
         </div>
     </div>
 </template>

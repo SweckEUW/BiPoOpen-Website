@@ -2,9 +2,14 @@
 import { addOpenGame, getAllOpenGameNames } from "./OpenGamesUtilFunctions";
 import { onMounted, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
+import ProgressSpinner from 'primevue/progressspinner';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
 
 let ammountOfPlayersTeam1 = ref(1);
 let ammountOfPlayersTeam2 = ref(1);
+let loading = ref(false);
 
 let openGameNames = ref<string[]>([]);
 onMounted(async () => {
@@ -17,6 +22,8 @@ const props = defineProps({
 });
 
 const addGame = async () => {
+    if (loading.value) return;
+
     let openGame:Match = {
         _id: "placeholder",
         team1: {
@@ -50,10 +57,20 @@ const addGame = async () => {
         }
     }
 
-    let success = await addOpenGame(openGame);
-    if(success){
-        await props.getOpenGames();
-        props.toggleModalAddGame();
+    loading.value = true;
+    try {
+        let success = await addOpenGame(openGame);
+        if(success){
+            await props.getOpenGames();
+            props.toggleModalAddGame();
+            setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Spiel wurde erstellt', life: 3000 }), 400);
+        } else {
+            setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht erstellt werden', life: 3000 }), 400);
+        }
+    } catch {
+        setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht erstellt werden', life: 3000 }), 400);
+    } finally {
+        loading.value = false;
     }
 }
 </script>
@@ -95,10 +112,28 @@ const addGame = async () => {
         <template #confirm>
             <div @click="addGame()">Eintragen</div>
         </template>
+
+        <template #loading v-if="loading">
+            <div class="loading-overlay">
+                <ProgressSpinner strokeWidth="4" />
+            </div>
+        </template>
     </Modal>
 </template>
 
 <style scoped>
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
 .rt-modal{
     overflow: hidden;
 }

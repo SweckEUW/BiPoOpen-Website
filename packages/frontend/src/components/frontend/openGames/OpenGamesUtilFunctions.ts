@@ -18,7 +18,7 @@ export const addOpenGame = async (openGame:Match) => {
 
 export const updateOpenGame = async (openGame:Match) => {
     let response = await axios.patch("/openGames/update/" + openGame._id, openGame);
-    return response.status == 200;
+    return response.status == 201;
 }
 
 export const deleteOpenGame = async (openGame: Match) => {

@@ -28,13 +28,15 @@ const getLeagueGames = async () => {
 getLeagueGames();
 
 const setGameResult = async (match:Match) => {
-    await updateLeagueGame(match);
+    let success = await updateLeagueGame(match);
     await getLeagueGames();
+    return success;
 }
 
 const deleteMatch = async (match:Match) => {
-    await deleteLeagueGame(match);
+    let success = await deleteLeagueGame(match);
     await getLeagueGames();
+    return success;
 }
 </script>
 

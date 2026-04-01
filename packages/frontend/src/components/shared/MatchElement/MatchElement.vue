@@ -7,8 +7,8 @@ import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 
 const props = defineProps({
    match: {type: Object as PropType<Match>, required: true },
-   setGameResult: {type: Function as PropType<(match:Match) => void> },
-   deleteMatch: {type: Function as PropType<(match:Match) => void> },
+   setGameResult: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
+   deleteMatch: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
    isBackend: {type: Boolean, default: false},
    editName: {type: Boolean, default: false},
    hideAvatars: {type: Boolean, default: false},

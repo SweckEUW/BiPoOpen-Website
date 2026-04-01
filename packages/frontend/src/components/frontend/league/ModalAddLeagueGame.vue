@@ -73,14 +73,24 @@
         <template #confirm>
             <div @click="addGame();" :style="{ opacity: players[0] && players[1] ? 1 : 0.3, pointerEvents: players[0] && players[1] ? 'auto' : 'none' }">Eintragen</div>
         </template>
+
+        <template #loading v-if="loading">
+            <div class="loading-overlay">
+                <ProgressSpinner strokeWidth="4" />
+            </div>
+        </template>
     </Modal>
 </template>
 
 <script setup lang="ts">
 import Modal from '@/components/shared/Modal.vue';
 import Select from 'primevue/select';
+import ProgressSpinner from 'primevue/progressspinner';
+import { useToast } from 'primevue/usetoast';
 import { PropType, ref } from 'vue';
 import { addLeagueGame } from './LeagueUtilFunctions';
+
+const toast = useToast();
 
 const props = defineProps({
     leaguePlayers: {type: Array as () => LeaguePlayer[], required: true },
@@ -91,8 +101,11 @@ const props = defineProps({
 
 const players = ref<(LeaguePlayer | null)[]>([null, null]);
 const scores = ref<[number, number]>([0, 0]);
+const loading = ref(false);
 
 const addGame = async () => {
+    if (loading.value) return;
+
     let match:Match = {
         _id: "placeholder",
         time: new Date().getTime(),
@@ -118,10 +131,20 @@ const addGame = async () => {
         }
     }
 
-    let success = await addLeagueGame(match);
-    if(success){
-        await props.getLeagueGames();
-        props.toggleModalAddGame();
+    loading.value = true;
+    try {
+        let success = await addLeagueGame(match);
+        if(success){
+            await props.getLeagueGames();
+            props.toggleModalAddGame();
+            setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Spiel wurde erstellt', life: 3000 }), 400);
+        } else {
+            setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht erstellt werden', life: 3000 }), 400);
+        }
+    } catch {
+        setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht erstellt werden', life: 3000 }), 400);
+    } finally {
+        loading.value = false;
     }
 }
 
@@ -165,6 +188,19 @@ const startBiPoKnecht = async () => {
 </script>
 
 <style scoped>
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
 :deep(.mo-container){
     margin-bottom: 50px;
 }

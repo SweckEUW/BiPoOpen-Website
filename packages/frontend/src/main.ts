@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router.js';
 import PrimeVue from 'primevue/config';
+import ToastService from 'primevue/toastservice';
 import BiPoPreset from '@/theme';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
@@ -22,5 +23,6 @@ app.use(PrimeVue, {
     }
 });
 
+app.use(ToastService);
 app.use(router);
 app.mount('#app');

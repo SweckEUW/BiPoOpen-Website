@@ -59,33 +59,70 @@
         <template #confirm>
             <div @click="setResult()">{{ checkIfMatchFinished(copiedMatch) ? 'Bearbeiten' : 'Eintragen' }}</div>
         </template>
+
+        <template #loading v-if="loading">
+            <div class="loading-overlay">
+                <ProgressSpinner strokeWidth="4" />
+            </div>
+        </template>
     </Modal>
 </template>
 
 <script setup lang="ts">
 import { PropType, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
+import ProgressSpinner from 'primevue/progressspinner';
+import { useToast } from 'primevue/usetoast';
 import { checkIfMatchFinished, getMatchScore } from "@/util/tournamentMatchFunctions";
+
+const toast = useToast();
 
 const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
-    setGameResult: {type: Function as PropType<(match:Match) => void> },
-    deleteMatch: {type: Function as PropType<(match:Match) => void> },
+    setGameResult: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
+    deleteMatch: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
     toggleModal: {type: Function, required: true },
     editName: {type: Boolean, default: false},
 });
 
 // Create a copy of the match to avoid modifying the original match object directly
 let copiedMatch = ref(JSON.parse(JSON.stringify(props.match)) as Match);
+let loading = ref(false);
 
-const setResult = () => {
-    props.setGameResult!(copiedMatch.value);
-    props.toggleModal();
+const setResult = async () => {
+    if (loading.value) return;
+    loading.value = true;
+    try {
+        const success = await props.setGameResult!(copiedMatch.value);
+        if (success !== false) {
+            props.toggleModal();
+            setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Ergebnis wurde gespeichert', life: 3000 }), 400);
+        } else {
+            setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Ergebnis konnte nicht gespeichert werden', life: 3000 }), 400);
+        }
+    } catch {
+        setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Ergebnis konnte nicht gespeichert werden', life: 3000 }), 400);
+    } finally {
+        loading.value = false;
+    }
 }
 
-const deleteGame = () => {
-    props.deleteMatch!(copiedMatch.value);
-    props.toggleModal();
+const deleteGame = async () => {
+    if (loading.value) return;
+    loading.value = true;
+    try {
+        const success = await props.deleteMatch!(copiedMatch.value);
+        if (success !== false) {
+            props.toggleModal();
+            setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Spiel wurde gelöscht', life: 3000 }), 400);
+        } else {
+            setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht gelöscht werden', life: 3000 }), 400);
+        }
+    } catch {
+        setTimeout(() => toast.add({ severity: 'error', summary: 'Fehler', detail: 'Spiel konnte nicht gelöscht werden', life: 3000 }), 400);
+    } finally {
+        loading.value = false;
+    }
 }
 
 let getTeamName = (team:Team) => {
@@ -98,6 +135,19 @@ let getTeamName = (team:Team) => {
 </script>
 
 <style scoped>
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
 /* Remove arrows from input field */
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   -webkit-appearance: none;
