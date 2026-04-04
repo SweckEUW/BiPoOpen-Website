@@ -1,14 +1,4 @@
-import type { IncomingMessage, ServerResponse } from 'http';
-
-interface VercelRequest extends IncomingMessage {
-  query: Record<string, string | string[]>;
-}
-
-interface VercelResponse extends ServerResponse {
-  status(code: number): VercelResponse;
-  send(body: string): VercelResponse;
-  setHeader(name: string, value: string): this;
-}
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const MAIN_COLOR = '#EA5160';
 const SITE_URL = 'https://bipoopen.de';
