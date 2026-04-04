@@ -3,6 +3,8 @@ import AppHeader from '@/components/shared/AppHeader.vue';
 import AppFooter from '@/components/shared/AppFooter.vue';
 import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
 import Toast from 'primevue/toast';
+import { Analytics } from '@vercel/analytics/vue';
+import { SpeedInsights } from '@vercel/speed-insights/vue';
 
 import { onBeforeMount, ref, provide } from 'vue'
 import router from './router.js';
@@ -35,6 +37,8 @@ onBeforeMount(() => {
 
 <template>
 	<Toast position="bottom-right" />
+	<Analytics/>
+	<SpeedInsights/>
 
 	<!-- App header -->
 	<AppHeader/>
