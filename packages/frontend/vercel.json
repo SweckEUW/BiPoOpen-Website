@@ -12,7 +12,7 @@
       "destination": "/api/spieler-meta?name=:name"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/:path((?!api/).*)",
       "has": [
         {
           "type": "header",
@@ -20,7 +20,7 @@
           "value": "(?i).*(facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|slackbot|discordbot|googlebot|bingbot|pinterestbot|redditbot).*"
         }
       ],
-      "destination": "/api/default-meta"
+      "destination": "/api/default-meta?path=:path"
     },
     {
       "source": "/((?!api/).*)",

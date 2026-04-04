@@ -9,7 +9,10 @@ export const config = {
   runtime: 'edge',
 };
 
-export default async function handler() {
+export default async function handler(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const title = searchParams.get('title') || '';
+
   return new ImageResponse(
     {
       type: 'div',
@@ -57,7 +60,7 @@ export default async function handler() {
                 fontWeight: 600,
                 color: '#FFE7EA',
               },
-              children: 'Professionelles Bierpong Turnier seit 2020',
+              children: title || 'Professionelles Bierpong Turnier seit 2020',
             },
           },
         ],
