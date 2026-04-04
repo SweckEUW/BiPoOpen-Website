@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/Spieler/:name",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|facebot|twitterbot|linkedinbot|whatsapp|telegrambot|slackbot|discordbot|googlebot|bingbot|pinterestbot|redditbot).*"
+        }
+      ],
+      "destination": "/api/spieler-meta?name=:name"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

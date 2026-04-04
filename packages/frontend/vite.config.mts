@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig, type UserConfig } from 'vite'
@@ -6,53 +5,13 @@ import vue from '@vitejs/plugin-vue'
 import mkcert from 'vite-plugin-mkcert';
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
-import { generatePlayerPreviewBuildArtifacts } from './build/playerPreviewGenerator.mjs';
 
-const frontendRoot = fileURLToPath(new URL('.', import.meta.url));
-
-export default defineConfig(async ({ command }) => {
-  let playerPreviewInputs: Record<string, string> = {};
-  let generatedOgImagesDir = '';
-  let generatedPlayersDir = '';
-
-  if (command === 'build') {
-    const result = await generatePlayerPreviewBuildArtifacts(frontendRoot);
-    playerPreviewInputs = result.inputEntries;
-    generatedOgImagesDir = result.generatedOgImagesDir;
-    generatedPlayersDir = result.generatedPlayersDir;
-  }
-
+export default defineConfig(({ command }) => {
   return {
     plugins: [
       vue(),
       mkcert(),
       tailwindcss(),
-
-      // Custom plugin to include generated OG images in the build and clean up after the build
-      {
-        name: 'emit-player-preview-og-images',
-        apply: 'build',
-        generateBundle() {
-          if (!fs.existsSync(generatedOgImagesDir)) return;
-
-          const files = fs.readdirSync(generatedOgImagesDir, { withFileTypes: true });
-          for (const file of files) {
-            if (!file.isFile() || !file.name.endsWith('.png')) continue;
-
-            const source = fs.readFileSync(path.join(generatedOgImagesDir, file.name));
-            this.emitFile({
-              type: 'asset',
-              fileName: `playerProfiles/generated/${file.name}`,
-              source,
-            });
-          }
-        },
-        closeBundle() {
-          fs.rmSync(generatedOgImagesDir, { recursive: true, force: true });
-          fs.rmSync(path.resolve(frontendRoot, '.generated'), { recursive: true, force: true });
-          fs.rmSync(generatedPlayersDir, { recursive: true, force: true });
-        },
-      },
 
       // PWA plugin configuration
       VitePWA({
@@ -69,9 +28,6 @@ export default defineConfig(async ({ command }) => {
           // Only precache the app shell (HTML, JS, CSS) - NOT images
           globPatterns: [
             '**/*.{html,js,css,woff2}'
-          ],
-          globIgnores: [
-            'playerProfiles/generated/**'
           ],
           runtimeCaching: [
             {
@@ -160,7 +116,6 @@ export default defineConfig(async ({ command }) => {
       rollupOptions: {
         input: {
           main: fileURLToPath(new URL('./index.html', import.meta.url)),
-          ...playerPreviewInputs,
         },
       },
     }
