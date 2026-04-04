@@ -27,21 +27,12 @@ const readTournament = (req: Request, res: Response, next: NextFunction) => {
         const tournament = tournaments.find((tournament) => tournament.name === tournamentName);
         if (tournament) {
             res.status(200).json({ tournament });
+        } else {
+            res.status(404).json({ message: "Tournament not found" });
         }
+    }).catch((error) => {
+        res.status(500).json({ error });
     });
-    
-    // Tournament.findOne({ name: tournamentName })
-        
-    //     .then((tournament) => {
-    //         if (tournament) {
-    //             res.status(200).json({ tournament });
-    //         } else {
-    //             res.status(404).json({ message: "Tournament not found" });
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         res.status(500).json({ error });
-    //     });
 };
 
 const readAll = (req: Request, res: Response, next: NextFunction) => {

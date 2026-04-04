@@ -8,11 +8,23 @@ import playerImageRoutes from './routes/PlayerImage';
 
 const router = express();
 
-// Connect to Mongo
-mongoose.connect(config.mongo.url, { retryWrites: true, w: 'majority', dbName: "bipoopen"}).then(() => {
+// Cache the MongoDB connection for serverless (Vercel) warm invocations
+let cached = (globalThis as any).__mongoose;
+if (!cached) {
+    cached = (globalThis as any).__mongoose = { conn: null, promise: null };
+}
+
+// Connect to Mongo (reuse cached connection if available)
+if (!cached.promise) {
+    cached.promise = mongoose.connect(config.mongo.url, { retryWrites: true, w: 'majority', dbName: "bipoopen" });
+}
+
+cached.promise.then((conn: typeof mongoose) => {
+    cached.conn = conn;
     console.log('MongoDB connected');
     StartServer();
-}).catch((err) => { 
+}).catch((err: unknown) => { 
+    cached.promise = null; // Reset so next invocation retries
     console.log('MongoDB connection error:', err);
 });
 
