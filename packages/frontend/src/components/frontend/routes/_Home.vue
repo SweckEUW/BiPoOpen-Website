@@ -168,16 +168,11 @@
                     <span class="material-icons ho-feature-icon">search</span>
                     <h4>Spieler Suche</h4>
                     <p>Finde Spieler und sieh dir ihre Statistiken an</p>
-                    <AutoComplete
+                    <PlayerSearchAutoComplete
                         v-model="playerSearch"
-                        :suggestions="playerSuggestions"
-                        @complete="searchPlayers"
                         @item-select="onPlayerSelect"
-                        @focus="loadPlayerNames"
                         placeholder="Spieler suchen..."
-                        class="ho-player-autocomplete"
-                        appendTo="self"
-                        :dropdown="false"
+                        className="ho-player-autocomplete"
                         overlayClass="ho-autocomplete-panel-top"
                     />
                 </div>
@@ -227,11 +222,10 @@ import { getAllOpenGames } from '@/components/frontend/openGames/OpenGamesUtilFu
 import { getAllLeagueGames, getLeagueList } from '@/components/frontend/league/LeagueUtilFunctions';
 import { getTournamentByName } from '@/util/tournamentFunctions';
 import { BIPO_OPEN_TOURNAMENT_YEARS } from '@/util/bipoOpenTournamentMeta';
-import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
+import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import TournamentOverview from '@/components/frontend/tournament/_Overview.vue';
 import Skeleton from 'primevue/skeleton';
-import AutoComplete from 'primevue/autocomplete';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import router from '@/router.js';
@@ -306,27 +300,10 @@ const lastTournamentPhotoIds = ref<{img_id: string, name: string}[]>([]);
 
 // ─── Player Search ───
 const playerSearch = ref('');
-const playerSuggestions = ref<string[]>([]);
-let playerNames: string[] = [];
-let playerNamesLoaded = false;
-
-const loadPlayerNames = async () => {
-    if (playerNamesLoaded) return;
-    playerNames = await getAllPlayerNames();
-    playerNamesLoaded = true;
-};
-
-const searchPlayers = async (event: { query: string }) => {
-    const query = event.query.trim().toLowerCase();
-    if (!query) { playerSuggestions.value = []; return; }
-    if (!playerNamesLoaded) await loadPlayerNames();
-    playerSuggestions.value = playerNames.filter(n => n.toLowerCase().includes(query)).slice(0, 10);
-};
 
 const onPlayerSelect = (event: { value: string }) => {
     const name = event.value;
     playerSearch.value = '';
-    playerSuggestions.value = [];
     if (openPlayerProfile) {
         openPlayerProfile(name);
     } else {

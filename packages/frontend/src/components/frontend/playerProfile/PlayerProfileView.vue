@@ -1,11 +1,22 @@
 <template>
     <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
         <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
-            <PlayerProfileAvatar
-                :name="profileData.name"
-                size="xlarge"
-                shape="circle"
-                class="mb-[10px] pp-profile-avatar"
+            <div class="relative cursor-pointer group mb-[10px]" @click="showImageUpload = true">
+                <PlayerProfileAvatar
+                    :key="avatarKey"
+                    :name="profileData.name"
+                    size="xlarge"
+                    shape="circle"
+                    class="pp-profile-avatar"
+                />
+                <div class="absolute bottom-[2px] right-[2px] w-[26px] h-[26px] rounded-full bg-[var(--main-color)] flex items-center justify-center shadow-md border-2 border-white">
+                    <span class="material-icons text-white !text-[16px]">edit</span>
+                </div>
+            </div>
+            <PlayerProfileImageUpload
+                :playerName="profileData.name"
+                v-model:visible="showImageUpload"
+                @uploaded="onImageUploaded"
             />
             <div
                 class="font-bold text-[--p-primary-color]"
@@ -121,7 +132,9 @@ import PlayerProfileBadges from './PlayerProfileBadges.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
 import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import PlayerProfileImageUpload from './PlayerProfileImageUpload.vue';
 import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
+import { fetchPlayerProfileImage } from './PlayerProfileImageMapping';
 
 const props = defineProps<{
     profileData: PlayerProfileData;
@@ -136,6 +149,15 @@ defineEmits<{
 }>();
 
 const activeTabValue = ref('1v1');
+const showImageUpload = ref(false);
+const avatarKey = ref(0);
+
+const onImageUploaded = () => {
+    // Re-fetch backend image and force avatar re-render
+    fetchPlayerProfileImage(props.profileData.name).then(() => {
+        avatarKey.value++;
+    });
+};
 
 const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
 const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));

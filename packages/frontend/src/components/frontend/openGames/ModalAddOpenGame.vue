@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { addOpenGame, getAllOpenGameNames } from "./OpenGamesUtilFunctions";
-import { onMounted, ref } from "vue"
+import { addOpenGame } from "./OpenGamesUtilFunctions";
+import { ref, reactive } from "vue"
 import Modal from '@/components/shared/Modal.vue';
+import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
 
@@ -11,10 +12,23 @@ let ammountOfPlayersTeam1 = ref(1);
 let ammountOfPlayersTeam2 = ref(1);
 let loading = ref(false);
 
-let openGameNames = ref<string[]>([]);
-onMounted(async () => {
-    openGameNames.value = await getAllOpenGameNames();
-});
+// Reactive player name/score models
+const playerNames = reactive<{ team1: string[]; team2: string[] }>({ team1: [''], team2: [''] });
+const playerScores = reactive<{ team1: string[]; team2: string[] }>({ team1: [''], team2: [''] });
+
+
+
+const addPlayerSlot = (team: 1 | 2) => {
+    if (team === 1) {
+        ammountOfPlayersTeam1.value++;
+        playerNames.team1.push('');
+        playerScores.team1.push('');
+    } else {
+        ammountOfPlayersTeam2.value++;
+        playerNames.team2.push('');
+        playerScores.team2.push('');
+    }
+};
 
 const props = defineProps({
     toggleModalAddGame: {type: Function, required: true },
@@ -37,24 +51,19 @@ const addGame = async () => {
         time: new Date().getTime()
     }
 
-    for (let i = 1; i < 3; i++) {
-        let root = document.getElementById("addOpenGameModal-team-"+i)!;
-        let fields = root.getElementsByClassName("rt-modal-team");
-        for(let j = 0; j < fields.length; j++){
-            let player = (fields[j].getElementsByClassName("rt-modal-input-player")[0] as HTMLInputElement).value.trim();
-            let score = parseFloat((fields[j].getElementsByClassName("rt-modal-input-number")[0] as HTMLInputElement).value.trim());
-
-            let openGamePlayer = {
-                _id: "placeholder",
-                name: player,
-                score: score
-            }
-
-            if(i == 1)
-                openGame.team1.players.push(openGamePlayer);
-            else
-                openGame.team2.players.push(openGamePlayer);
-        }
+    for (let i = 0; i < ammountOfPlayersTeam1.value; i++) {
+        openGame.team1.players.push({
+            _id: "placeholder",
+            name: (playerNames.team1[i] || '').trim(),
+            score: parseFloat(playerScores.team1[i] || '0')
+        });
+    }
+    for (let i = 0; i < ammountOfPlayersTeam2.value; i++) {
+        openGame.team2.players.push({
+            _id: "placeholder",
+            name: (playerNames.team2[i] || '').trim(),
+            score: parseFloat(playerScores.team2[i] || '0')
+        });
     }
 
     loading.value = true;
@@ -86,17 +95,23 @@ const addGame = async () => {
                     <!-- TODO: Fix Added Score if more than 1 Player is in each Team -->
                     <!-- <div class="rt-modal-score" :style="{textAlign: i == 1 ? 'right' : 'left'}">{{ 0 }}</div> -->
 
-                    <div class="rt-modal-team" v-for="index in i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2">
-                        <input list="openGameNames" class="rt-modal-input-player" type="string" :placeholder="'Spielername'" :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}">
-                        <datalist id="openGameNames">
-                            <option v-for="name in openGameNames" :value="name"/>
-                        </datalist>
+                    <div class="rt-modal-team" v-for="(_, index) in (i == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2)">
+                        <PlayerSearchAutoComplete
+                            :modelValue="(i == 1 ? playerNames.team1 : playerNames.team2)[index]"
+                            @update:modelValue="val => (i == 1 ? playerNames.team1 : playerNames.team2)[index] = val"
+                            placeholder="Spielername"
+                            className="rt-modal-autocomplete"
+                            :maxResults="10"
+                            :style="{textAlign: i == 1 ? 'right' : 'left', order: i == 1 ? 1 : 3}"
+                        />
 
-                        <input class="rt-modal-input-number" type="number" placeholder="0">
+                        <input class="rt-modal-input-number" type="number" placeholder="0"
+                            :value="(i == 1 ? playerScores.team1 : playerScores.team2)[index]"
+                            @input="e => (i == 1 ? playerScores.team1 : playerScores.team2)[index] = (e.target as HTMLInputElement).value">
                     </div>
 
                     <div class="rt-modal-buttons">
-                        <div @click="i == 1 ? ammountOfPlayersTeam1++ : ammountOfPlayersTeam2++">+</div>
+                        <div @click="addPlayerSlot(i as 1 | 2)">+</div>
                     </div>
 
                 </div>
@@ -153,12 +168,15 @@ const addGame = async () => {
 .rt-modal-team{
     display: flex; 
 }
-.rt-modal-input-player{
-    text-align: left;   
+.rt-modal-autocomplete{
     width: 250px;
+    position: relative;
+}
+.rt-modal-autocomplete :deep(.p-inputtext){
+    width: 100%;
     height: 50px;
     padding: 0px 20px;
-    margin-bottom: 10px;
+    font-size: 14px;
 }
 .rt-modal-input-number{
     text-align: center;
@@ -202,8 +220,10 @@ input[type=number] {
         white-space: break-spaces;
     }
 
-    .rt-modal-input-player{
+    .rt-modal-autocomplete{
         width: 100%;
+    }
+    .rt-modal-autocomplete :deep(.p-inputtext){
         padding: 0px 4px;
     }
     .rt-modal-input-number{

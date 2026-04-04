@@ -4,6 +4,7 @@ import { config } from './config/config';
 import tournamentRoutes from './routes/Tournament';
 import openGameRoutes from './routes/OpenGame';
 import leagueGameRoutes from './routes/LeagueGame';
+import playerImageRoutes from './routes/PlayerImage';
 
 const router = express();
 
@@ -29,7 +30,7 @@ const StartServer = () => {
     });
 
     router.use(express.urlencoded({ extended: true }));
-    router.use(express.json());
+    router.use(express.json({ limit: '5mb' }));
 
     /** Rules of our API */
     router.use((req, res, next) => {
@@ -49,6 +50,7 @@ const StartServer = () => {
     router.use('/tournaments', tournamentRoutes);
     router.use('/openGames', openGameRoutes);
     router.use('/leagueGames', leagueGameRoutes);
+    router.use('/playerImages', playerImageRoutes);
 
     // Error handling
     router.use((req, res, next) => {

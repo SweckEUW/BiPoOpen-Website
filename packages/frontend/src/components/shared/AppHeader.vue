@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import router from '@/router.js';
-import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
+import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
 import Select from 'primevue/select';
-import AutoComplete from 'primevue/autocomplete';
 
 let showBurger = ref(false);
 
 const toggleBurgerMenu = () =>{
 	showBurger.value = !showBurger.value;
 	document.getElementsByClassName("ap-burger")[0].classList.toggle("change");
-	if(showBurger.value && !playerNamesLoaded.value) loadPlayerNames();
 }
 
 const scrollToTop = () => {
@@ -31,38 +29,12 @@ const tournamentOptions = tournaments.map(tournament => ({
 const selectedTournament = ref<string | null>(null);
 
 // Player search
-let playerNames = ref<string[]>([]);
-let playerNamesLoading = ref(false);
-let playerNamesLoaded = ref(false);
 let playerSearch = ref("");
-let playerSuggestions = ref<string[]>([]);
-
-const loadPlayerNames = async () => {
-	if(playerNamesLoaded.value || playerNamesLoading.value) return;
-	playerNamesLoading.value = true;
-	playerNames.value = await getAllPlayerNames();
-	playerNamesLoading.value = false;
-	playerNamesLoaded.value = true;
-}
-
-const searchPlayers = async (event: { query: string }) => {
-	const query = event.query.trim().toLowerCase();
-	if(!query){
-		playerSuggestions.value = [];
-		return;
-	}
-
-	if(!playerNamesLoaded.value) await loadPlayerNames();
-	playerSuggestions.value = playerNames.value
-		.filter(name => name.toLowerCase().includes(query))
-		.slice(0, 15);
-};
 
 const onPlayerSelect = (event: { value: string }) => {
 	let name = event.value;
 	toggleBurgerMenu();
 	playerSearch.value = "";
-	playerSuggestions.value = [];
 	router.push(`/Spieler/${encodeURIComponent(name).replaceAll('%20', '-')}`);
 };
 
@@ -103,16 +75,11 @@ const onTournamentSelect = (value: string | null) => {
 
 					<div class="ap-search-block">
 						<div class="ap-menu-title ap-menu-title-small">Spieler</div>
-						<AutoComplete
+						<PlayerSearchAutoComplete
 							v-model="playerSearch"
-							:suggestions="playerSuggestions"
-							@complete="searchPlayers"
 							@item-select="onPlayerSelect"
-							@focus="loadPlayerNames"
 							placeholder="Spieler suchen..."
-							class="ap-player-autocomplete"
-							appendTo="self"
-							:dropdown="false"
+							className="ap-player-autocomplete"
 						/>
 					</div>
 

@@ -1,18 +1,58 @@
 import { LEAGUE_PLAYER_DATA } from '@/components/frontend/league/LeaguePlayersData';
+import axios from 'axios';
+import { reactive } from 'vue';
 
-export const PLAYER_PROFILE_IMAGE_MAP: Record<string, string> = {
-    'Simon Weck': new URL('/src/assets/playerProfiles/simon-weck.jpg', import.meta.url).href,
-    'Jonas Weck': new URL('/src/assets/playerProfiles/jonas-weck.png', import.meta.url).href,
+// Reactive cache for backend-fetched profile images
+export const backendImageCache = reactive<Record<string, string | null>>({});
+const pendingFetches = new Map<string, Promise<string | null>>();
+
+export const fetchPlayerProfileImage = async (playerName: string): Promise<string | null> => {
+    const key = normalizeName(playerName);
+    if (key in backendImageCache) return backendImageCache[key];
+
+    if (pendingFetches.has(key)) return pendingFetches.get(key)!;
+
+    const promise = axios
+        .get(`/playerImages/get/${encodeURIComponent(playerName)}`, {
+            validateStatus: (status) => status === 200 || status === 404,
+        })
+        .then((res) => {
+            const imageData = res.status === 200 ? (res.data?.imageData || null) : null;
+            backendImageCache[key] = imageData;
+            pendingFetches.delete(key);
+            return imageData;
+        })
+        .catch(() => {
+            backendImageCache[key] = null;
+            pendingFetches.delete(key);
+            return null;
+        });
+
+    pendingFetches.set(key, promise);
+    return promise;
+};
+
+export const getPlayerProfileImageFromBackend = async (playerName: string): Promise<string | null> => {
+    return fetchPlayerProfileImage(playerName);
+};
+
+export const invalidatePlayerProfileImageCache = (playerName: string) => {
+    const key = normalizeName(playerName);
+    delete backendImageCache[key];
+    pendingFetches.delete(key);
 };
 
 export const getPlayerProfileImage = (playerOrTeamName: string): string | null => {
+    // Check backend cache first (reactive — will update when fetched)
+    const backendKey = normalizeName(playerOrTeamName);
+    if (backendKey in backendImageCache && backendImageCache[backendKey]) {
+        return backendImageCache[backendKey];
+    }
+
     const normalizedInput = normalizeName(playerOrTeamName);
     const leagueTeam = LEAGUE_PLAYER_DATA.find(entry => normalizeName(entry.teamName) === normalizedInput);
     if (leagueTeam?.logo) return leagueTeam.logo;
 
-    const canonicalName = toTitleCase(playerOrTeamName);
-    if (PLAYER_PROFILE_IMAGE_MAP[canonicalName]) 
-        return new URL(PLAYER_PROFILE_IMAGE_MAP[canonicalName], import.meta.url).href;
     return null;
 };
 
