@@ -7,7 +7,7 @@
                     :name="profileData.name"
                     size="xlarge"
                     shape="circle"
-                    class="pp-profile-avatar"
+                    class="!w-[120px] !h-[120px] !text-[40px]"
                 />
                 <div class="absolute bottom-[2px] right-[2px] w-[26px] h-[26px] rounded-full bg-[var(--main-color)] flex items-center justify-center shadow-md border-2 border-white">
                     <span class="material-icons text-white !text-[16px]">edit</span>
@@ -164,12 +164,6 @@ const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profile
 </script>
 
 <style scoped>
-.pp-profile-avatar {
-    width: 96px;
-    height: 96px;
-    font-size: 32px;
-}
-
 :deep(.p-tablist-tab-list) {
     width: 100%;
 }

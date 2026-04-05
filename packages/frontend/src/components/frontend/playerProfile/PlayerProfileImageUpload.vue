@@ -10,7 +10,7 @@
     >
         <!-- Step 1: File Selection -->
         <div v-if="step === 'select'" class="flex flex-col items-center gap-4 py-4">
-            <PlayerProfileAvatar :name="playerName" size="xlarge" shape="circle" class="w-[120px] h-[120px] text-[40px]" />
+            <PlayerProfileAvatar :name="playerName" size="xlarge" shape="circle" class="!w-[250px] !h-[250px] !text-[40px]" />
             <p class="text-[--p-text-muted-color] text-center text-sm">
                 Wähle ein Bild aus, um dein Profilbild zu ändern.
             </p>
