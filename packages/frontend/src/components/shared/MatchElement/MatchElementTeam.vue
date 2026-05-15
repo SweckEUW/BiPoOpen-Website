@@ -7,21 +7,30 @@
     >
         <div class="mt-team">
             <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
-                <PlayerProfileAvatar
+                <div
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
-                    :name="player.name"
-                    shape="circle"
-                    size="normal"
-                    :grayscale="teamScore < opponentTeamScore"
-                    class="!text-[12px] border-[2px] border-[--p-surface-0]"
-                />
+                    class="cursor-pointer"
+                    @click.stop="openPlayerProfile?.(player.name)"
+                >
+                    <PlayerProfileAvatar
+                        :name="player.name"
+                        shape="circle"
+                        size="normal"
+                        :grayscale="teamScore < opponentTeamScore"
+                        class="!text-[12px] border-[2px] border-[--p-surface-0]"
+                    />
+                </div>
             </div>
-            <div class="mt-team-name">{{ teamName }}</div>
+            <div
+                class="mt-team-name"
+                :class="{ 'cursor-pointer': team && team.players.length === 1 }"
+                @click.stop="team && team.players.length === 1 && openPlayerProfile?.(team.players[0].name)"
+            >{{ teamName }}</div>
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
         <div v-if="team && playersVisible && team.players.length > 1">
-            <div class="mt-team-player" v-for="player in team.players">
+            <div class="mt-team-player cursor-pointer" v-for="player in team.players" @click.stop="openPlayerProfile?.(player.name)">
                 <PlayerProfileAvatar
                     v-if="!hideAvatars"
                     :name="player.name"
@@ -39,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType, computed } from 'vue';
+import { PropType, computed, inject } from 'vue';
 import { getMatchScore } from "@/util/tournamentMatchFunctions";
 import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
 
@@ -72,6 +81,8 @@ let teamScore = computed(() => {
 let opponentTeamScore = computed(() => {
     return getMatchScore(props.match, props.isTeam2)!;
 });
+
+const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 </script>
 
 <style scoped>
