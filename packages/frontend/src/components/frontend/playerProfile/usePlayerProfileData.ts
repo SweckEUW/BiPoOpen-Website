@@ -16,7 +16,6 @@ export const usePlayerProfileData = (playerName: Ref<string>, shouldLoad?: Ref<b
 
     const loadProfile = async () => {
         if (shouldLoad && !shouldLoad.value) {
-            isLoading.value = false;
             return;
         }
 

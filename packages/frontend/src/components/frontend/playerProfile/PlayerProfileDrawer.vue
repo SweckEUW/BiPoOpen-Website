@@ -3,7 +3,7 @@
         <template #header>
             <div class="w-full flex justify-center">
                 <div class="flex flex-col items-center">
-                    <div class="font-bold text-[24px] text-[--p-primary-color]">{{ profileData ? profileData.name : 'Spieler Profil' }}</div>
+                    <div class="font-bold text-[24px] text-[--p-primary-color]">{{ playerName || 'Spieler Profil' }}</div>
                 </div>
             </div>
         </template>

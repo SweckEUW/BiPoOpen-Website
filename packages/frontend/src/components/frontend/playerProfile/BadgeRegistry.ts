@@ -8,6 +8,9 @@ export interface BadgeContext {
     totalMatches: number;
     totalWins: number;
     bestWinStreak: number;
+    bestLossStreak: number;
+    globalMaxWinStreak: number;
+    globalMaxLossStreak: number;
     totalHits: number;
     winrate: number;
 }
@@ -160,12 +163,30 @@ registerBadge(({ allMatchHistory, totalHits }) => {
         });
 });
 
-// Siegesserien
-registerBadge(({ bestWinStreak }) => {
-    let badges: PlayerBadge[] = [];
-    if (bestWinStreak >= 15) badges.push({ id: 'streak-15', icon: 'bolt', label: 'Hot Streak', description: '15 Siege in Folge', date: null });
-    if (bestWinStreak >= 20) badges.push({ id: 'streak-20', icon: 'electric_bolt', label: 'King of the Hill', description: '20 Siege in Folge', date: null });
-    return badges;
+// Rekord-Siegesserie (nur der Spieler mit der längsten Siegesserie aller Spieler)
+registerBadge(({ bestWinStreak, globalMaxWinStreak }) => {
+    if (globalMaxWinStreak <= 0 || bestWinStreak < globalMaxWinStreak) return [];
+    return [{
+        id: 'streak-record',
+        icon: 'local_fire_department',
+        label: 'Serien-König',
+        description: `Längste Siegesserie aller Spieler: ${bestWinStreak} Siege in Folge`,
+        date: null,
+        priority: 750,
+    }];
+});
+
+// Rekord-Niederlagenserie (nur der Spieler mit der längsten Niederlagenserie aller Spieler)
+registerBadge(({ bestLossStreak, globalMaxLossStreak }) => {
+    if (globalMaxLossStreak <= 0 || bestLossStreak < globalMaxLossStreak) return [];
+    return [{
+        id: 'loss-streak-record',
+        icon: 'mood_bad',
+        label: 'Pechvogel',
+        description: `Längste Niederlagenserie aller Spieler: ${bestLossStreak} Niederlagen in Folge`,
+        date: null,
+        priority: 200,
+    }];
 });
 
 // Siegquote

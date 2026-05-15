@@ -19,6 +19,9 @@ const PLAYER_NAMES_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 let cachedPlayerNames: string[] | null = null;
 let playerNamesRequest: Promise<string[]> | null = null;
 
+let globalMaxStreaksCache: { maxWinStreak: number; maxLossStreak: number } | null = null;
+let globalMaxStreaksRequest: Promise<{ maxWinStreak: number; maxLossStreak: number }> | null = null;
+
 const normalizePlayerNameForList = (name: string): string => {
     const formattedName = formatName(name);
     return getPlayerForLeagueTeam(formattedName) ?? formattedName;
@@ -502,6 +505,55 @@ const calculateExtraStatsFromResults = (matchHistory: { match: Match; time: numb
     return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0, timeOfDayStats, mostActiveTimeOfDay, mostActiveGames };
 };
 
+export const getGlobalMaxStreaks = async (): Promise<{ maxWinStreak: number; maxLossStreak: number }> => {
+    if (globalMaxStreaksCache) return globalMaxStreaksCache;
+    if (globalMaxStreaksRequest) return globalMaxStreaksRequest;
+
+    globalMaxStreaksRequest = (async () => {
+        let playerNames = await getAllPlayerNames();
+        let openGames = await getAllOpenGames();
+        let leagueGames = await getAllLeagueGames();
+        let tournaments = await Promise.all(BIPO_OPEN_TOURNAMENT_YEARS.map(y => getTournamentByName(y)));
+
+        let maxWinStreak = 0;
+        let maxLossStreak = 0;
+
+        for (let playerName of playerNames) {
+            let playerNameLower = playerName.toLowerCase();
+            let timeline: { time: number; won: boolean }[] = [];
+
+            let og1v1 = getOpenGameMatchesFromPlayer(openGames, playerNameLower, true);
+            let og2v2 = getOpenGameMatchesFromPlayer(openGames, playerNameLower, false);
+            [...og1v1, ...og2v2].forEach(m => timeline.push({ time: m.time || 0, won: didPlayerWinMatch(m, playerName) }));
+
+            let leagueTeam = getLeagueTeamForPlayer(playerName);
+            let leagueMatches = getLeagueMatchesFromPlayer(leagueGames, (leagueTeam ?? playerName).toLowerCase());
+            leagueMatches.forEach(m => timeline.push({ time: m.time || 0, won: didPlayerWinMatch(m, leagueTeam ?? playerName) }));
+
+            tournaments.forEach((tournament, i) => {
+                if (!tournament) return;
+                let year = BIPO_OPEN_TOURNAMENT_YEARS[i];
+                let fallbackTime = getBiPoOpenTournamentFallbackTime(year);
+                getFinishedMatchesFromPlayer(tournament, playerName, false).forEach(m => {
+                    let isTeam1 = m.team1.players.some(p => p.name === playerName);
+                    let t1Won = checkIfTeam1WonVsTeam2(m);
+                    let won = t1Won != null && (isTeam1 ? t1Won : !t1Won);
+                    timeline.push({ time: m.time && m.time > 0 ? m.time : fallbackTime, won });
+                });
+            });
+
+            let { best, longestLosing } = calculateStreaksFromResults(timeline);
+            if (best > maxWinStreak) maxWinStreak = best;
+            if (longestLosing > maxLossStreak) maxLossStreak = longestLosing;
+        }
+
+        globalMaxStreaksCache = { maxWinStreak, maxLossStreak };
+        return globalMaxStreaksCache;
+    })();
+
+    return globalMaxStreaksRequest;
+};
+
 export const getPlayerProfileData = async (playerName: string, trendPeriod: TrendPeriod = '1m'): Promise<PlayerProfileData> => {
     let playerNameLower = playerName.toLowerCase();
     let matchHistory: (MatchHistoryEntry & { won: boolean; hits: number })[] = [];
@@ -676,7 +728,8 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
         .reduce<number | null>((min, m) => (min === null || m.time < min ? m.time : min), null);
     let allWinrate = allTotalMatches > 0 ? Math.round((allTotalWins / allTotalMatches) * 100) : 0;
     let allStreaks = calculateStreaksFromResults(matchHistory);
-    let badges = await calculateBadges({ playerName, allMatchHistory: matchHistory, totalMatches: allTotalMatches, totalWins: allTotalWins, bestWinStreak: allStreaks.best, totalHits: allTotalHits, winrate: allWinrate });
+    let globalMaxStreaks = await getGlobalMaxStreaks();
+    let badges = await calculateBadges({ playerName, allMatchHistory: matchHistory, totalMatches: allTotalMatches, totalWins: allTotalWins, bestWinStreak: allStreaks.best, bestLossStreak: allStreaks.longestLosing, globalMaxWinStreak: globalMaxStreaks.maxWinStreak, globalMaxLossStreak: globalMaxStreaks.maxLossStreak, totalHits: allTotalHits, winrate: allWinrate });
 
     return {
         name: playerName,
@@ -832,4 +885,16 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
         extraStats,
         recentForm,
     };
+};
+
+export const getBadgeHolders = async (badgeId: string): Promise<string[]> => {
+    let names = await getAllPlayerNames();
+    let holders: string[] = [];
+    await Promise.all(names.map(async name => {
+        try {
+            let data = await getPlayerProfileData(name);
+            if (data.badges.some(b => b.id === badgeId)) holders.push(name);
+        } catch {}
+    }));
+    return holders.sort();
 };

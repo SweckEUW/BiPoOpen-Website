@@ -25,7 +25,7 @@
                 {{ profileData.name }}
             </div>
             <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mt-[4px]" />
-            <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" class="mt-[10px]" />
+            <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" :playerName="profileData.name" class="mt-[10px]" />
         </div>
 
         <div class="flex justify-center mb-[16px]">
