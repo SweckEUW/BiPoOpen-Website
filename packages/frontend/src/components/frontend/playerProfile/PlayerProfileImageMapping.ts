@@ -2,6 +2,40 @@ import { LEAGUE_PLAYER_DATA } from '@/components/frontend/league/LeaguePlayersDa
 import axios from 'axios';
 import { reactive } from 'vue';
 
+const CACHE_PREFIX = 'playerImg_';
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function readFromLocalStorage(key: string): string | null | undefined {
+    try {
+        const raw = localStorage.getItem(CACHE_PREFIX + key);
+        if (!raw) return undefined;
+        const entry = JSON.parse(raw) as { data: string | null; ts: number };
+        if (Date.now() - entry.ts > CACHE_TTL_MS) {
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return undefined;
+        }
+        return entry.data;
+    } catch {
+        return undefined;
+    }
+}
+
+function writeToLocalStorage(key: string, data: string | null): void {
+    try {
+        localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() }));
+    } catch {
+        // QuotaExceededError or similar — silently ignore
+    }
+}
+
+function removeFromLocalStorage(key: string): void {
+    try {
+        localStorage.removeItem(CACHE_PREFIX + key);
+    } catch {
+        // ignore
+    }
+}
+
 // Reactive cache for backend-fetched profile images
 export const backendImageCache = reactive<Record<string, string | null>>({});
 const pendingFetches = new Map<string, Promise<string | null>>();
@@ -9,6 +43,12 @@ const pendingFetches = new Map<string, Promise<string | null>>();
 export const fetchPlayerProfileImage = async (playerName: string): Promise<string | null> => {
     const key = normalizeName(playerName);
     if (key in backendImageCache) return backendImageCache[key];
+
+    const stored = readFromLocalStorage(key);
+    if (stored !== undefined) {
+        backendImageCache[key] = stored;
+        return stored;
+    }
 
     if (pendingFetches.has(key)) return pendingFetches.get(key)!;
 
@@ -19,6 +59,7 @@ export const fetchPlayerProfileImage = async (playerName: string): Promise<strin
         .then((res) => {
             const imageData = res.status === 200 ? (res.data?.imageData || null) : null;
             backendImageCache[key] = imageData;
+            writeToLocalStorage(key, imageData);
             pendingFetches.delete(key);
             return imageData;
         })
@@ -40,6 +81,7 @@ export const invalidatePlayerProfileImageCache = (playerName: string) => {
     const key = normalizeName(playerName);
     delete backendImageCache[key];
     pendingFetches.delete(key);
+    removeFromLocalStorage(key);
 };
 
 export const getPlayerProfileImage = (playerOrTeamName: string): string | null => {

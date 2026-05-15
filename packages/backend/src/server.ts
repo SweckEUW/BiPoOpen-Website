@@ -12,7 +12,7 @@ let mongoPromise: Promise<void> | null = null;
 
 function connectToMongo() {
     if (!mongoPromise) {
-        mongoPromise = mongoose.connect(config.mongo.url, { retryWrites: true, w: 'majority', dbName: "bipoopen" })
+        mongoPromise = mongoose.connect(config.mongo.url, { retryWrites: true, w: 'majority', dbName: "bipoopen", maxPoolSize: 1, serverSelectionTimeoutMS: 5000, socketTimeoutMS: 10000 })
             .then(() => {
                 console.log('MongoDB connected');
             })
