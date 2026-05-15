@@ -2,7 +2,7 @@
     <!-- Analyse -->
     <div class="pp-section-title">Analyse</div>
 
-    <div v-if="data.turnAnalysis.total > 0" class="mb-[10px]">
+    <!-- <div v-if="data.turnAnalysis.total > 0" class="mb-[10px]">
         <Panel header="Wurfanalyse">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-[20px]">
                 <div>
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </Panel>
-    </div>
+    </div> -->
 
     <div v-if="data.extraStats.timeOfDayStats.length > 0" class="mb-[10px]">
         <Panel header="Siege / Niederlagen nach Tageszeit">
