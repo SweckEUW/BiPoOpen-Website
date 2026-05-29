@@ -11,6 +11,8 @@
         appendTo="self"
         :dropdown="false"
         v-bind="$attrs"
+        class="p-0"
+        inputClass="!p-[5px]"
     >
         <template #option="{ option }">
             <div class="flex items-center gap-[8px]">
