@@ -5,13 +5,13 @@
             'mt-team-second': isTeam2
         }"
     >
+        <!-- Team Header -->
         <div class="mt-team">
             <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
                 <div
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
                     class="cursor-pointer"
-                    @click.stop="openPlayerProfile?.(player.name)"
                 >
                     <PlayerProfileAvatar
                         :name="player.name"
@@ -25,10 +25,12 @@
             <div
                 class="mt-team-name"
                 :class="{ 'cursor-pointer': team && team.players.length === 1 }"
-                @click.stop="team && team.players.length === 1 && openPlayerProfile?.(team.players[0].name)"
+                @click="team && team.players.length === 1 && openPlayerProfile?.(team.players[0].name)"
             >{{ teamName }}</div>
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
+
+        <!-- Team Players when expanded -->
         <div v-if="team && playersVisible && team.players.length > 1">
             <div class="mt-team-player cursor-pointer" v-for="player in team.players" @click.stop="openPlayerProfile?.(player.name)">
                 <PlayerProfileAvatar
