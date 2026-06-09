@@ -3,6 +3,8 @@
 
 export {}; // wichtig, damit TypeScript es als Modul erkennt
 
+declare module 'primeicons/primeicons.css';
+
 declare global {
     type Tournament = {
         _id: string;

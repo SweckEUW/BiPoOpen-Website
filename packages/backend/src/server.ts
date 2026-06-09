@@ -5,6 +5,7 @@ import tournamentRoutes from './routes/Tournament';
 import openGameRoutes from './routes/OpenGame';
 import leagueGameRoutes from './routes/LeagueGame';
 import playerImageRoutes from './routes/PlayerImage';
+import registrationRoutes from './routes/TournamentRegistration';
 
 const router = express();
 
@@ -67,6 +68,7 @@ router.use('/tournaments', tournamentRoutes);
 router.use('/openGames', openGameRoutes);
 router.use('/leagueGames', leagueGameRoutes);
 router.use('/playerImages', playerImageRoutes);
+router.use('/registrations', registrationRoutes);
 
 // Error handling
 router.use((req, res, next) => {

@@ -4,6 +4,7 @@
         <router-link class="ma-tournament" :to="'/Manage/OpenGames'">Open Games</router-link>
         <router-link class="ma-tournament" :to="'/Manage/LeagueGames'">League Games</router-link>
         <router-link class="ma-tournament" :to="'/Manage/Tournaments'">Tournaments</router-link>
+        <router-link class="ma-tournament" :to="'/Manage/Anmeldungen'">Anmeldungen 2026</router-link>
     </div>
 </template>
 

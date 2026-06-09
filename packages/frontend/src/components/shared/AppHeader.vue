@@ -70,7 +70,7 @@ const onTournamentSelect = (value: string | null) => {
 					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Regeln'">Regeln</router-link>
 					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Hall-Of-Fame'">Hall Of Fame</router-link>
 					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Offene-Spiele'">Offene Spiele</router-link>
-					<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/BiPo-Knecht'">BiPo Knecht</router-link> -->
+					<!-- <router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/Knecht'">BiPo Knecht</router-link> -->
 					<router-link @click="toggleBurgerMenu()" class="ap-menu-title" :to="'/League'">BiPo League</router-link>
 
 					<div class="ap-search-block">

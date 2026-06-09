@@ -41,16 +41,6 @@ const routes = [
 		}
 	},
 
-	{
-		path: '/BiPo-Knecht',
-		name: 'BiPo-Knecht',
-		component: () => import('@/components/frontend/biPoKnecht/_BiPoKnecht.vue'),
-		meta: {
-			title: 'Weck BiPo Knecht',
-			description: 'BiPo Knecht'
-		}
-	},
-
 		{
 		path: '/Knecht',
 		name: 'BiPo-Knecht',
@@ -101,6 +91,16 @@ const routes = [
 		meta: {
 			title: 'Weck BiPo Open 2026 - Anmeldung',
 			description: 'Anmeldung'
+		},
+	},
+
+	{
+		path: '/2026/Teams',
+		name: 'Teams 2026',
+		component: () => import('@/components/frontend/_Teams2026.vue'),
+		meta: {
+			title: 'Weck BiPo Open 2026 - Angemeldete Teams',
+			description: 'Angemeldete Teams'
 		},
 	},
 
@@ -200,6 +200,15 @@ const routes = [
 		component: () => import('@/components/backend/routes/_ManageLeagueGames.vue'),
 		meta: {
 			title: 'Weck BiPo Open - Manage League Games',
+			description: ''
+		}
+	},
+	{
+		path: '/Manage/Anmeldungen',
+		name: 'Manage Anmeldungen',
+		component: () => import('@/components/backend/routes/_ManageRegistrations.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Anmeldungen Backend',
 			description: ''
 		}
 	},
