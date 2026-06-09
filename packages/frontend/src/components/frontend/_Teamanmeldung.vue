@@ -132,6 +132,16 @@
         </div>
 
     </div>
+
+    <ImageCropDialog
+        v-model:visible="cropDialogVisible"
+        :src="cropSrc"
+        stencil="rectangle"
+        :output-size="600"
+        output-format="png"
+        header="Logo zuschneiden"
+        @cropped="onLogoCropped"
+    />
 </template>
 
 <script setup lang="ts">
@@ -141,6 +151,7 @@ import { useRouter } from 'vue-router';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
+import ImageCropDialog from '@/components/shared/ImageCropDialog.vue';
 
 const toast = useToast();
 const router = useRouter();
@@ -154,25 +165,34 @@ const logoFileName = ref('');
 const logoError = ref('');
 const submitted = ref(false);
 const loading = ref(false);
+const cropDialogVisible = ref(false);
+const cropSrc = ref('');
 
 const onLogoChange = (event: Event) => {
     logoError.value = '';
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
         logoError.value = 'Die Datei ist zu groß. Bitte wähle eine Datei unter 2 MB.';
+        input.value = '';
         return;
     }
 
     logoFileName.value = file.name;
     const reader = new FileReader();
     reader.onload = (e) => {
-        const result = e.target?.result as string;
-        logoBase64.value = result;
-        logoPreview.value = result;
+        cropSrc.value = e.target?.result as string;
+        cropDialogVisible.value = true;
     };
     reader.readAsDataURL(file);
+    input.value = '';
+};
+
+const onLogoCropped = (dataUrl: string) => {
+    logoBase64.value = dataUrl;
+    logoPreview.value = dataUrl;
 };
 
 const clearLogo = () => {
@@ -180,6 +200,7 @@ const clearLogo = () => {
     logoPreview.value = undefined;
     logoFileName.value = '';
     logoError.value = '';
+    cropSrc.value = '';
 };
 
 const submit = async () => {

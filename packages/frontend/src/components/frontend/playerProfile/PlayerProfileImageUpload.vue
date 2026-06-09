@@ -2,14 +2,13 @@
     <Dialog
         v-model:visible="dialogVisible"
         modal
-        :header="step === 'select' ? 'Profilbild ändern' : 'Bild zuschneiden'"
+        header="Profilbild ändern"
         :style="{ width: '95vw', maxWidth: '500px' }"
         :closable="!uploading"
         :draggable="false"
         @hide="onDialogHide"
     >
-        <!-- Step 1: File Selection -->
-        <div v-if="step === 'select'" class="flex flex-col items-center gap-4 py-4">
+        <div class="flex flex-col items-center gap-4 py-4">
             <PlayerProfileAvatar :name="playerName" size="xlarge" shape="circle" class="!w-[250px] !h-[250px] !text-[40px]" />
             <p class="text-[--p-text-muted-color] text-center text-sm">
                 Wähle ein Bild aus, um dein Profilbild zu ändern.
@@ -38,48 +37,27 @@
                 @change="onFileSelected"
             />
         </div>
-
-        <!-- Step 2: Crop -->
-        <div v-else-if="step === 'crop'" class="flex flex-col items-center gap-4">
-            <div class="w-full overflow-hidden rounded-lg" style="max-height: 60vh;">
-                <Cropper
-                    ref="cropperRef"
-                    :src="imageSrc"
-                    :stencil-component="CircleStencil"
-                    :stencil-props="{ aspectRatio: 1 }"
-                    :resize-image="{ adjustStencil: false }"
-                    image-restriction="stencil"
-                    class="cropper"
-                />
-            </div>
-            <div class="flex gap-3 w-full justify-end">
-                <Button
-                    label="Abbrechen"
-                    severity="secondary"
-                    text
-                    @click="resetToSelect"
-                    :disabled="uploading"
-                />
-                <Button
-                    label="Speichern"
-                    icon="pi pi-check"
-                    @click="cropAndUpload"
-                    :loading="uploading"
-                />
-            </div>
-        </div>
     </Dialog>
+
+    <ImageCropDialog
+        v-model:visible="cropDialogVisible"
+        :src="cropSrc"
+        stencil="circle"
+        :output-size="400"
+        output-format="jpeg"
+        header="Profilbild zuschneiden"
+        @cropped="onCropped"
+    />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { Cropper, CircleStencil } from 'vue-advanced-cropper';
-import 'vue-advanced-cropper/dist/style.css';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
 import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import ImageCropDialog from '@/components/shared/ImageCropDialog.vue';
 import { getPlayerProfileImageFromBackend, invalidatePlayerProfileImageCache } from './PlayerProfileImageMapping';
 
 const props = defineProps<{
@@ -99,14 +77,12 @@ const dialogVisible = computed({
     set: (val) => emit('update:visible', val),
 });
 
-const step = ref<'select' | 'crop'>('select');
-const imageSrc = ref<string>('');
+const cropDialogVisible = ref(false);
+const cropSrc = ref('');
 const uploading = ref(false);
 const hasExistingImage = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const cropperRef = ref<InstanceType<typeof Cropper> | null>(null);
 
-// Check if player already has an uploaded image
 watch(() => props.visible, async (visible) => {
     if (visible) {
         try {
@@ -118,9 +94,7 @@ watch(() => props.visible, async (visible) => {
     }
 });
 
-const triggerFileInput = () => {
-    fileInputRef.value?.click();
-};
+const triggerFileInput = () => fileInputRef.value?.click();
 
 const onFileSelected = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -139,38 +113,21 @@ const onFileSelected = (event: Event) => {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        imageSrc.value = e.target?.result as string;
-        step.value = 'crop';
+        cropSrc.value = e.target?.result as string;
+        cropDialogVisible.value = true;
     };
     reader.readAsDataURL(file);
-
-    // Reset file input so the same file can be selected again
     target.value = '';
 };
 
-const cropAndUpload = async () => {
-    if (!cropperRef.value) return;
-
+const onCropped = async (dataUrl: string) => {
     uploading.value = true;
     try {
-        const { canvas } = cropperRef.value.getResult();
-        if (!canvas) {
-            toast.add({ severity: 'error', summary: 'Fehler', detail: 'Bild konnte nicht zugeschnitten werden', life: 3000 });
-            uploading.value = false;
-            return;
-        }
-
-        // Resize to max 400x400 for optimal size
-        const resizedCanvas = resizeCanvas(canvas, 400, 400);
-        const imageData = resizedCanvas.toDataURL('image/jpeg', 0.85);
-
         await axios.post('/playerImages/upload', {
             playerName: props.playerName,
-            imageData,
+            imageData: dataUrl,
         });
-
         invalidatePlayerProfileImageCache(props.playerName);
-
         toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Profilbild wurde gespeichert', life: 3000 });
         emit('uploaded');
         dialogVisible.value = false;
@@ -187,7 +144,6 @@ const deleteImage = async () => {
         await axios.delete(`/playerImages/delete/${encodeURIComponent(props.playerName)}`);
         invalidatePlayerProfileImageCache(props.playerName);
         hasExistingImage.value = false;
-
         toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Profilbild wurde entfernt', life: 3000 });
         emit('uploaded');
         dialogVisible.value = false;
@@ -198,42 +154,8 @@ const deleteImage = async () => {
     }
 };
 
-const resetToSelect = () => {
-    imageSrc.value = '';
-    step.value = 'select';
-};
-
 const onDialogHide = () => {
-    // Reset state when the dialog is closed
-    step.value = 'select';
-    imageSrc.value = '';
+    cropSrc.value = '';
     uploading.value = false;
 };
-
-const resizeCanvas = (source: HTMLCanvasElement, maxWidth: number, maxHeight: number): HTMLCanvasElement => {
-    const { width, height } = source;
-    if (width <= maxWidth && height <= maxHeight) return source;
-
-    const ratio = Math.min(maxWidth / width, maxHeight / height);
-    const newWidth = Math.round(width * ratio);
-    const newHeight = Math.round(height * ratio);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-
-    const ctx = canvas.getContext('2d')!;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, newWidth, newHeight);
-
-    return canvas;
-};
 </script>
-
-<style scoped>
-.cropper {
-    min-height: 300px;
-    max-height: 55vh;
-}
-</style>
