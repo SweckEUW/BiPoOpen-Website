@@ -48,7 +48,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <span style="color: var(--main-color); font-weight: bold; min-width: 130px;">Gebühr</span>
-                    <span>25 € pro Teilnehmer (50 € pro Team) – Hotdogs &amp; Getränke inklusive</span>
+                    <span>30 € pro Teilnehmer (60 € pro Team) – Hotdogs &amp; Getränke inklusive</span>
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <span style="color: var(--main-color); font-weight: bold; min-width: 130px;">WhatsApp</span>
