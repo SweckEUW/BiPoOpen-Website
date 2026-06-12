@@ -100,7 +100,7 @@
 
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <label style="font-weight: bold; font-size: 14px;">Teamlogo (optional)</label>
-                    <p style="font-size: 13px; color: #666; margin: 0 0 8px;">Möglichst freigestellt als PNG. (Am einfachsten per ChatGPT generiert)</p>
+                    <p style="font-size: 13px; color: #666; margin: 0 0 8px;">Logo als freigestelltes PNG hochladen. Es sollte auch klein gut wirken (Tipp: einfach per ChatGPT generieren).</p>
                     <label
                         style="display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px 14px; width: fit-content; transition: border-color 0.2s;"
                         @mouseenter="(e) => (e.currentTarget as HTMLElement).style.borderColor = 'var(--main-color)'"
