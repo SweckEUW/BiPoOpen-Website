@@ -13,11 +13,13 @@
                         v-for="(reg, index) in registrations"
                         :key="String(reg._id)"
                         style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 20px; display: flex; align-items: center; gap: 16px;"
+                        :style="isBackend ? 'cursor: pointer;' : ''"
+                        @click="isBackend && emit('edit', reg)"
                     >
                         <div
                             style="flex-shrink: 0; width: 56px; height: 56px; border-radius: 10px; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; background: #f9f9f9; overflow: hidden;"
-                            :style="reg.teamLogo ? 'cursor: pointer;' : ''"
-                            @click="reg.teamLogo && openLightbox(reg.teamLogo, reg.teamName)"
+                            :style="reg.teamLogo && !isBackend ? 'cursor: pointer;' : ''"
+                            @click="reg.teamLogo && !isBackend && openLightbox(reg.teamLogo, reg.teamName)"
                         >
                             <img v-if="reg.teamLogo" :src="reg.teamLogo" :alt="reg.teamName" style="width: 100%; height: 100%; object-fit: contain;" />
                             <span v-else class="material-icons" style="color: #ccc; font-size: 28px;">groups</span>
@@ -77,7 +79,9 @@ interface Registration {
     createdAt: string;
 }
 
-defineProps<{ showDates?: boolean }>();
+defineProps<{ showDates?: boolean; isBackend?: boolean }>();
+
+const emit = defineEmits<{ (e: 'edit', reg: Registration): void }>();
 
 const registrations = ref<Registration[] | undefined>(undefined);
 const lightbox = ref<{ src: string; name: string } | null>(null);
@@ -100,6 +104,9 @@ const formatDate = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString('de-DE') + ' ' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
 };
+
+// Allow the parent to refresh the list (e.g. after editing a team).
+defineExpose({ reload: load });
 </script>
 
 <style scoped>

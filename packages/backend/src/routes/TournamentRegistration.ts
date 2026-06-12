@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.post('/register', controller.createRegistration);
 router.get('/get', controller.getAllRegistrations);
+router.patch('/update/:id', controller.updateRegistration);
 
 export = router;
