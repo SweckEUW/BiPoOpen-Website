@@ -82,7 +82,7 @@
             </section>
 
             <!-- ─── League Standings ─── -->
-            <section class="ho-card">
+            <section class="ho-card ho-card-wide">
                 <div class="ho-card-header">
                     <span class="material-icons ho-card-icon">emoji_events</span>
                     <h3>BiPo League Saison 2025/26</h3>
