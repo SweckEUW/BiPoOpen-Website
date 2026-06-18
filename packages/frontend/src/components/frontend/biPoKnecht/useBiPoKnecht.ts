@@ -330,7 +330,7 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     const enemy = state.racks[1 - teamIndex].hit;
     const last = lastTurn();
     if (last && (last.type === 'bomb' || last.type === 'ballsback')) return false;
-    if (state.reRacks.length === 2) return false;
+    if (state.reRacks.filter(r => r.teamIndex === teamIndex).length === 2) return false;
     if (state.activePlayerIndex === 1) return false;
     if (enemy.length === 4 && [6, 7, 8, 9].every(v => enemy.includes(v))) return false;
     if (enemy.length === 6 && [3, 5, 6, 7, 8, 9].every(v => enemy.includes(v))) return false;
