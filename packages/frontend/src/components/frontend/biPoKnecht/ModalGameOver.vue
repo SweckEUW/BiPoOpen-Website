@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import Modal from '@/components/shared/Modal.vue';
-import { PropType } from 'vue';
+import { onMounted, PropType } from 'vue';
 import router from '@/router.js';
 import { addLeagueGame } from '../league/LeagueUtilFunctions';
 import { addOpenGame } from '../openGames/OpenGamesUtilFunctions';
@@ -42,6 +42,14 @@ import { addOpenGame } from '../openGames/OpenGamesUtilFunctions';
 const props = defineProps({
     match: { type: Object as PropType<Match>, required: true },
     isLeagueGame: {type: Boolean, required: false, default: false }
+});
+
+onMounted(async () => {
+    if(props.isLeagueGame){
+        let success = await addLeagueGame(props.match);
+    }else{
+        let success = await addOpenGame(props.match);
+    }
 });
 
 let getPlayerName = (teamIndex: number, playerIndex: number) => {
@@ -74,21 +82,17 @@ let getCorrectTurnName = (turnType:Turn['type']) => {
 
 let endGame = async () => {
     if(props.isLeagueGame){
-        let success = await addLeagueGame(props.match);
-        if(success){
-            router.push({path: '/League'});
-        } 
-    }
-    else{
-        let success = await addOpenGame(props.match);
-        if(success){
-            router.push({path: '/Offene-Spiele'});
-        }
+        router.push({path: '/League'});
+    }else{
+        router.push({path: '/Offene-Spiele'});
     }
 }   
 </script>
 
 <style>
+.ModalGameOver{
+    z-index: 9999999;
+}
 .ModalGameOver .mo-container{
     height: 90%;
     overflow: auto;
