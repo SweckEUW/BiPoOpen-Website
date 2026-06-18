@@ -2,7 +2,9 @@
   <div
     class="flex flex-col items-center justify-end w-full"
     :style="{
-      transform: isTeam1 ? 'rotate(0deg)' : 'rotate(180deg)',
+      position: 'relative',
+      zIndex: isActiveTeam ? 1001 : 1,
+      transform: isTeam1 ? 'rotate(180deg)' : 'rotate(0deg)',
       height: isActiveTeam ? '30%' : '70%'
     }"
   >
@@ -59,12 +61,12 @@
           </span>
         </Button>
 
-        <Button
+        <!-- <Button
           outlined
           class="!rounded-full !bg-white !border-gray-300 !text-gray-700 !px-4 !py-[6px] !text-sm"
         >
           ...
-        </Button>
+        </Button> -->
       </div>
     </div>
 

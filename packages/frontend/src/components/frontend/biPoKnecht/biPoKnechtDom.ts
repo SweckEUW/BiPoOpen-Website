@@ -41,12 +41,9 @@ export const createEffects = () => {
     const enemy = enemyOf(activeTeamIndex);
     const ball = getBall(enemy, playerIndex);
     const areaEl = document.getElementById(`ra-${area}-team-${enemy}`)!;
-    // The two racks are rotated 180° against each other, so the active team
-    // drops the ball from the top or the bottom depending on which side it is.
-    if (activeTeamIndex === 1)
-      ball.style.top = `${areaEl.offsetTop}px`;
-    else
-      ball.style.bottom = `${areaEl.getBoundingClientRect().top}px`;
+    // Ball and area live in the same (rotated) rack, so the layout offset already
+    // resolves correctly for both teams — same approach as ballToCup.
+    ball.style.top = `${areaEl.offsetTop}px`;
     ball.style.left = `calc(50% - 15px)`;
   };
 
@@ -61,6 +58,33 @@ export const createEffects = () => {
       ball.style.left = 'auto';
       ball.style.right = 'auto';
     }
+  };
+
+  // The inline style of one ball, captured so undo can restore it exactly.
+  type BallStyle = { opacity: string; top: string; bottom: string; left: string; right: string };
+
+  // Capture the inline position/visibility of all four balls (both teams).
+  const snapshotBalls = (): BallStyle[][] =>
+    [0, 1].map((team) =>
+      [0, 1].map((ballIndex) => {
+        const { style } = getBall(team, ballIndex);
+        return { opacity: style.opacity, top: style.top, bottom: style.bottom, left: style.left, right: style.right };
+      }),
+    );
+
+  // Re-apply a snapshot taken by snapshotBalls. Assigning '' clears the inline
+  // value and falls back to the CSS default (opacity: 0 → hidden).
+  const restoreBalls = (snap: BallStyle[][]) => {
+    snap.forEach((team, teamIndex) =>
+      team.forEach((s, ballIndex) => {
+        const { style } = getBall(teamIndex, ballIndex);
+        style.opacity = s.opacity;
+        style.top = s.top;
+        style.bottom = s.bottom;
+        style.left = s.left;
+        style.right = s.right;
+      }),
+    );
   };
 
   // Let the user click one more enemy cup (used by bouncer & bomb).
@@ -95,5 +119,5 @@ export const createEffects = () => {
       document.exitFullscreen();
   };
 
-  return { ballStart, ballToCup, ballToArea, hideBalls, askCup, enterFullscreen, exitFullscreen };
+  return { ballStart, ballToCup, ballToArea, hideBalls, snapshotBalls, restoreBalls, askCup, enterFullscreen, exitFullscreen };
 };

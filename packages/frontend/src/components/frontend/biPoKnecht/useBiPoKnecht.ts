@@ -15,16 +15,27 @@ type Rack = { hit: number[]; pending: number[] };
 
 type Modifier = 'bouncer' | 'trickshot' | undefined;
 
+// A re-rack event. Re-racks are not turns (they score nothing), so they are
+// tracked separately. `afterTurnIndex` is the number of turns that existed when
+// the re-rack happened, so the marker sits between turn afterTurnIndex-1 and
+// afterTurnIndex in the history.
+type ReRack = { afterTurnIndex: number; teamIndex: number; time: number };
+
+// The lifecycle phase of the match. The UI derives which modal to show from it:
+//   starting = before the game (pick the starting team)
+//   playing  = the game is running
+//   over      = the game is finished
+type GameStatus = 'starting' | 'playing' | 'over';
+
 type GameState = {
   racks: [Rack, Rack];        // racks[teamIndex] = that team's cups
   turns: Turn[];
   activeTeamIndex: number;    // 0 | 1 — team that is currently throwing
   activePlayerIndex: number;  // 0 | 1 — player within the active team
   modifier: Modifier;         // a special shot the active player armed
-  performedReRacks: number;
+  reRacks: ReRack[];          // re-rack events, in chronological order
   infoText: string;
-  modalGameOverVisible: boolean;
-  modalStartingPlayerVisible: boolean;
+  status: GameStatus;
 };
 
 type GameSnapshot = {
@@ -32,8 +43,11 @@ type GameSnapshot = {
   activePlayerIndex: number;
   team1Hits: number[];
   team2Hits: number[];
+  team1Pending: number[];
+  team2Pending: number[];
+  balls: ReturnType<Effects['snapshotBalls']>;
   modifier: Modifier;
-  performedReRacks: number;
+  reRacks: ReRack[];
 };
 
 // The base action that a button click produces, before the rules decide what
@@ -90,10 +104,9 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     activeTeamIndex: 0,
     activePlayerIndex: 0,
     modifier: undefined,
-    performedReRacks: 0,
-    infoText: 'Bob ist am Zug!',
-    modalGameOverVisible: false,
-    modalStartingPlayerVisible: false,
+    reRacks: [],
+    infoText: '',
+    status: 'starting',
   });
 
   const activeTeam = computed(() => state.activeTeamIndex === 0 ? match.value.team1 : match.value.team2);
@@ -111,7 +124,6 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     state.modifier = state.modifier === newModifier ? undefined : newModifier;
   };
   const setInfoText = (text: string) => { state.infoText = text; };
-  const setModalGameOverVisible = (visible: boolean) => { state.modalGameOverVisible = visible; };
 
   // --- player / team progression ----------------------------------------
 
@@ -131,7 +143,7 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
   };
 
   const startGame = (startTeamIndex: number) => {
-    state.modalStartingPlayerVisible = false;
+    state.status = 'playing';
     state.activeTeamIndex = startTeamIndex;
     state.infoText = `${activeTeam.value.players[state.activePlayerIndex].name} ist am Zug!`;
     effects.enterFullscreen();
@@ -146,23 +158,32 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
       activePlayerIndex: state.activePlayerIndex,
       team1Hits: [...state.racks[0].hit],
       team2Hits: [...state.racks[1].hit],
+      team1Pending: [...state.racks[0].pending],
+      team2Pending: [...state.racks[1].pending],
+      balls: effects.snapshotBalls(),
       modifier: state.modifier,
-      performedReRacks: state.performedReRacks,
+      reRacks: state.reRacks.map(r => ({ ...r })),
     });
   };
 
   const undoLastTurn = () => {
-    if (state.turns.length === 0 || history.length === 0) return;
-    state.turns.pop();
+    if (history.length === 0) return;
+    // A re-rack pushes a snapshot but no turn. If the most recent action was a
+    // re-rack (its afterTurnIndex still equals the current turn count, i.e. no
+    // turn followed it), undo only that re-rack — don't pop a real turn.
+    const lastReRack = state.reRacks.at(-1);
+    const isReRack = lastReRack?.afterTurnIndex === state.turns.length;
+    if (!isReRack) state.turns.pop();
     const snap = history.pop()!;
     state.activeTeamIndex = snap.activeTeamIndex;
     state.activePlayerIndex = snap.activePlayerIndex;
     state.racks[0].hit.splice(0, state.racks[0].hit.length, ...snap.team1Hits);
     state.racks[1].hit.splice(0, state.racks[1].hit.length, ...snap.team2Hits);
-    state.racks[0].pending.length = 0;
-    state.racks[1].pending.length = 0;
+    state.racks[0].pending.splice(0, state.racks[0].pending.length, ...snap.team1Pending);
+    state.racks[1].pending.splice(0, state.racks[1].pending.length, ...snap.team2Pending);
     state.modifier = snap.modifier;
-    state.performedReRacks = snap.performedReRacks;
+    state.reRacks.splice(0, state.reRacks.length, ...snap.reRacks);
+    effects.restoreBalls(snap.balls);
     state.infoText = `${activeTeam.value.players[state.activePlayerIndex].name} ist am Zug!`;
   };
 
@@ -270,7 +291,7 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     if (def.progress.kind === 'next') {
       const lastCupTurn = state.turns.find(t => t.type === 'lastCup');
       if (lastCupTurn && lastCupTurn.teamIndex !== state.activeTeamIndex && state.activePlayerIndex === 1)
-        state.modalGameOverVisible = true;
+        state.status = 'over';
     }
 
     // Commit this round's hits once the second player has thrown (a trickshot
@@ -281,7 +302,6 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
       effects.hideBalls(state.activeTeamIndex);
     }
 
-    pushSnapshot();
     addTurn(resolved.type, resolved.data);
     applyProgress(def.progress);
     state.modifier = undefined;
@@ -291,6 +311,7 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
 
   // Entry point called by the UI when a cup / Nullwurf / Airball is clicked.
   const performTurn = async (base: Base, cup?: number) => {
+    pushSnapshot();
     effects.ballStart(state.activeTeamIndex, state.activePlayerIndex);
     if (base === 'hit')
       effects.ballToCup(state.activeTeamIndex, state.activePlayerIndex, cup!);
@@ -309,7 +330,7 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     const enemy = state.racks[1 - teamIndex].hit;
     const last = lastTurn();
     if (last && (last.type === 'bomb' || last.type === 'ballsback')) return false;
-    if (state.performedReRacks === 2) return false;
+    if (state.reRacks.length === 2) return false;
     if (state.activePlayerIndex === 1) return false;
     if (enemy.length === 4 && [6, 7, 8, 9].every(v => enemy.includes(v))) return false;
     if (enemy.length === 6 && [3, 5, 6, 7, 8, 9].every(v => enemy.includes(v))) return false;
@@ -325,7 +346,11 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     if (count === 4) enemy.push(6, 7, 8, 9);
     if (count === 6) enemy.push(3, 5, 6, 7, 8, 9);
     if (count === 7) enemy.push(3, 4, 5, 6, 7, 8, 9);
-    state.performedReRacks += 1;
+    state.reRacks.push({
+      afterTurnIndex: state.turns.length,
+      teamIndex,
+      time: new Date().getTime(),
+    });
   };
 
   // --- scoring (used when the game is over) ------------------------------
@@ -371,7 +396,6 @@ export const useBiPoKnecht = (match: Ref<Match>, effects: Effects) => {
     switchActivePlayer,
     setModifier,
     setInfoText,
-    setModalGameOverVisible,
     scoreTurn,
     finalizeScores,
   });
