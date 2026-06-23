@@ -23,7 +23,7 @@
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <span style="color: var(--main-color); font-weight: bold; min-width: 130px;">Vsl. Ende</span>
-                    <span>21:00 Uhr</span>
+                    <span>23:00 Uhr</span>
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <span style="color: var(--main-color); font-weight: bold; min-width: 130px;">Modus</span>
@@ -33,9 +33,9 @@
                     <span style="color: var(--main-color); font-weight: bold; min-width: 130px;">Preise</span>
                     <div style="display: flex; flex-direction: column; gap: 4px;">
                         <span>🥇 1. Platz – BiPo-Open-folierter Bierpong-Tisch + Wanderpokal</span>
-                        <span>🥈 2. Platz – 50 €</span>
+                        <span>🥈 2. Platz – 60 €</span>
                         <span>🥉 3. Platz – 30 €</span>
-                        <span>🏆 MVP – 25 € + Wanderpokal</span>
+                        <span>🏆 MVP – 30 € + Wanderpokal</span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -70,7 +70,7 @@
                     Pünktliches Erscheinen um 14:00 Uhr, sonst droht Disqualifikation.
                     Die Anmeldung garantiert keinen Startplatz.
                     Die teilnehmenden Teams werden Anfang Juni bekannt gegeben.
-                    Die Anmeldung ist bis zum 01.07.2026 offen!
+                    Die Anmeldung ist bis zum 01.076.2026 offen!
                 </p>
             </div>
         </div>
