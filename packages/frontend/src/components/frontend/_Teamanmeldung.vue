@@ -70,7 +70,7 @@
                     Pünktliches Erscheinen um 14:00 Uhr, sonst droht Disqualifikation.
                     Die Anmeldung garantiert keinen Startplatz.
                     Die teilnehmenden Teams werden Anfang Juni bekannt gegeben.
-                    Die Anmeldung ist bis zum 01.06.2026 offen!
+                    Die Anmeldung ist bis zum 01.07.2026 offen!
                 </p>
             </div>
         </div>
