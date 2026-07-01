@@ -29,7 +29,8 @@
                     </div>
                 </div>
 
-                <div v-if="registrationOpen && !countdownOver" style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <!-- Registrierung -->
+                <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                         <router-link to="/2026/Anmeldung" class="ho-register-hero-btn">🎯 Jetzt anmelden</router-link>
                         <router-link to="/2026/Teams" class="ho-hero-btn">👥 Angemeldete Teams</router-link>
@@ -37,12 +38,12 @@
                     <span style="color: rgba(255,255,255,0.8); font-size: 13px;">Anmeldung bis 01.07.2026</span>
                 </div>
 
-                <div v-else class="ho-hero-links">
-                    <router-link class="ho-hero-btn" to="/2026/Teams">👥 Angemeldete Teams</router-link>
+                <!-- Turnier Links -->
+                <!-- <div class="ho-hero-links">
                     <router-link class="ho-hero-btn" to="/2026/Spielplan">Spielplan</router-link>
                     <router-link class="ho-hero-btn" to="/2026/MVP">MVP</router-link>
                     <router-link class="ho-hero-btn" to="/Regeln">Regeln</router-link>
-                </div>
+                </div> -->
             </template>
         </section>
 
@@ -241,9 +242,6 @@ import router from '@/router.js';
 import { LEAGUE_PLAYERS } from '../league/LeaguePlayersData';
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
-
-// ─── Registration ───
-const registrationOpen = new Date() < new Date(2026, 6, 1); // closes 01.07.2026
 
 // ─── Countdown ───
 const countdownOver = ref(false);
