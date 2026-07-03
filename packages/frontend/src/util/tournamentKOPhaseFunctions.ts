@@ -24,9 +24,9 @@ export const getTeamsKOPhase = (tournament:Tournament) => {
 
 
 export const setMatchesKOPhase = async (tournamentID:string, matches:Match[][]) => {
-    let response = await axios.post("/setMatchesKOPhase", {tournamentID: tournamentID, matches: matches})
+    let response = await axios.post("/tournaments/setMatchesKOPhase", {tournamentID: tournamentID, matches: matches})
     console.log(response.data.message);
-    return response.data.success as boolean;
+    return response.status == 201;
 }
 
 export const initMatchesKOPhase = async (tournament:Tournament) => {

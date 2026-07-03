@@ -21,12 +21,12 @@ const openPlayerProfile = (name: string) => {
 
 provide('openPlayerProfile', openPlayerProfile);
 
-onBeforeMount(() => {
+onBeforeMount(async() => {
 	// Configure Axios
 	axios.defaults.baseURL = "https://bipoopen-backend.vercel.app/";
 	// axios.defaults.baseURL = "http://localhost:8080";
 
-	// Redirect
+	// Redirect		
 	let path = localStorage.getItem('path');
 	if(path){
 		localStorage.removeItem('path');

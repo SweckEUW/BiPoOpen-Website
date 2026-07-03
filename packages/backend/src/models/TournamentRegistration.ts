@@ -1,11 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { InferSchemaType, Schema } from 'mongoose';
 
-export interface ITournamentRegistration extends Document {
-    teamName: string;
-    player1: string;
-    player2: string;
-    teamLogo?: string;
-}
+export type ITournamentRegistration = InferSchemaType<typeof TournamentRegistrationSchema>;
 
 const TournamentRegistrationSchema: Schema = new Schema(
     {

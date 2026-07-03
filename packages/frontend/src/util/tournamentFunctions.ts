@@ -1,12 +1,13 @@
 import axios from "axios";
 import { checkIfMatchFinished } from "./tournamentMatchFunctions";
+import { resolveTeamLogo } from "./supabaseStorage";
 
 ////////////////
 // TOURNAMENT //
 ////////////////
 export const addTournament = async (tournament:Tournament) => {
     let response = await axios.post("/tournaments/create", tournament);
-    return response.data.success as boolean;
+    return response.status == 201;
 }
 
 export const getAllTournaments = async () => {
@@ -28,9 +29,9 @@ export const getTournamentByName = async (tournamentName:string) => {
 }
 
 export const setSettings = async (tournamentID:string, settings:TournamentSettings) => {
-    let response = await axios.post("/setSettings", {tournamentID: tournamentID, settings: settings})
+    let response = await axios.post("/tournaments/setSettings", {tournamentID: tournamentID, settings: settings})
     console.log(response.data.message);
-    return response.data.success as boolean;
+    return response.status == 201;
 }
 
 export const checkIfTournamentFinished = (tournament:Tournament) => {
@@ -48,6 +49,22 @@ export const checkIfTournamentFinished = (tournament:Tournament) => {
 }
 
 const convertTournament = (tournament:any) => {
+    // Resolve a team's stored logo reference to a displayable URL, in place.
+    const applyTeamLogo = (team:any) => {
+        if(!team)
+            return;
+
+        team.logoId = team.logo;                 // keep raw stored reference
+        team.logo = resolveTeamLogo(team.logo);  // resolve to displayable URL
+    };
+
+    // Roster teams
+    (tournament.teams ?? []).forEach(applyTeamLogo);
+
+    // Group-standings teams
+    for(const group of (tournament.groupPhase?.groups ?? []))
+        (group.teams ?? []).forEach(applyTeamLogo);
+
     const setPlayerScoresFromResult = (match:any) => {
         if(!match?.result)
             return;
@@ -72,12 +89,15 @@ const convertTournament = (tournament:any) => {
             match.team2.players[1].score = result.team2Player2Score;
     }
 
-    // Set result to player scores when a player-level breakdown exists.
+    // Set result to player scores when a player-level breakdown exists,
+    // and resolve the logo for each match's teams.
     for(let i = 0; i < tournament.groupPhase.matches.length; i++) {
         let group = tournament.groupPhase.matches[i];
         for(let j = 0; j < group.length; j++) {
             let match = group[j];
             setPlayerScoresFromResult(match);
+            applyTeamLogo(match.team1);
+            applyTeamLogo(match.team2);
         }
     }
 
@@ -86,6 +106,8 @@ const convertTournament = (tournament:any) => {
         for(let j = 0; j < group.length; j++) {
             let match = group[j];
             setPlayerScoresFromResult(match);
+            applyTeamLogo(match.team1);
+            applyTeamLogo(match.team2);
         }
     }
 

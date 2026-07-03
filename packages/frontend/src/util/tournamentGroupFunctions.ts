@@ -6,9 +6,9 @@ import { shuffleArray } from "@/util/util";
 import axios from "axios";
 
 export const setGroups = async (tournamentID:string, groups:Group[]) => {
-    let response = await axios.post("/setGroups", {tournamentID: tournamentID, groups: groups})
+    let response = await axios.post("/tournaments/setGroups", {tournamentID: tournamentID, groups: groups})
     console.log(response.data.message);
-    return response.data.success as boolean;
+    return response.status == 201;
 }
 
 export const generateRandomGroups = async (tournament:Tournament) => {
@@ -27,7 +27,7 @@ export const generateRandomGroups = async (tournament:Tournament) => {
 
 export const getGroupsWithStats = (tournament:Tournament|undefined) => {
     let groupsWithStats:GroupWithStats[] = [];
-
+    
     let tournamentGroups = tournament?.groupPhase.groups!;
     
     for (let i = 0; i < tournamentGroups.length; i++) {
@@ -39,7 +39,8 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
             let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamName, true);
 
             let team = {
-                name: tournamentGroups[i].teams[x].name,
+                name: teamName,
+                logo: tournamentGroups[i].teams[x].logo,
                 players: tournamentGroups[i].teams[x].players,
                 wins: getAmmountOfWinsFromTeam(tournament, teamName, true),
                 ammountOfMatches: getAmmountOfMatchesFromPlayer(tournament, tournamentGroups[i].teams[x].players[0].name, true),
@@ -68,9 +69,9 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
 }
 
 export const setMatchesGroupPhase = async (tournamentID:string, matches:Match[][]) => {
-    let response = await axios.post("/setMatchesGroupPhase", {tournamentID: tournamentID, matches: matches})
+    let response = await axios.post("/tournaments/setMatchesGroupPhase", {tournamentID: tournamentID, matches: matches})
     console.log(response.data.message);
-    return response.data.success as boolean;
+    return response.status == 201;
 }
 
 export const generateRandomMatchesGroupPhase = async (tournament:Tournament) => {

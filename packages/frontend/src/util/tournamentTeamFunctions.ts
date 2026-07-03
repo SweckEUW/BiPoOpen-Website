@@ -1,22 +1,22 @@
 import axios from "axios";
 import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 
-export const addTeam = async (tournamentID:string, team:{name: string; players: string[];}) => {
-    let response = await axios.post("/addTeam", {tournamentID: tournamentID, team: team})
+export const addTeam = async (tournamentID:string, team:{name: string; players: string[]}) => {
+    let response = await axios.post(`/tournaments/addTeam/${tournamentID}`, { team: team });
     console.log(response.data.message);
-    return response.data.success  as boolean;
+    return response.status == 201;
 }
 
 export const editTeam = async (tournamentID:string, team:Team) => {
-    let response = await axios.post("/editTeam", {tournamentID: tournamentID, team: team})
+    let response = await axios.post(`/tournaments/editTeam/${tournamentID}`, {team: team})
     console.log(response.data.message);
-    return response.data.success  as boolean;
+    return response.status == 201;
 }
 
 export const removeTeam = async (tournamentID:string, teamID:string) => {
-    let response = await axios.post("/removeTeam", {tournamentID: tournamentID, teamID: teamID});
+    let response = await axios.post(`/tournaments/removeTeam/${tournamentID}`, {teamID: teamID});
     console.log(response.data.message);
-    return response.data.success  as boolean;
+    return response.status == 201;
 }
 
 export const getTeamFromID = (tournament: Tournament, teamID:string) => {

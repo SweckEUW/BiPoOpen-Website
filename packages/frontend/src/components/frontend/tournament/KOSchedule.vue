@@ -1,28 +1,35 @@
 <template>
-    <div v-if="bracketRounds.length" class="tb-bracket">
-        <template v-for="(round, rIndex) in bracketRounds" :key="rIndex">
-            <div class="tb-round" :class="{'tb-round--connected': rIndex > 0}">
-                <div class="tb-round-title">{{ round.name }}</div>
-                <div class="tb-matches">
-                    <!-- Non-final rounds: group into pairs for connector lines -->
-                    <template v-if="rIndex < bracketRounds.length - 1">
-                        <div v-for="(pair, pIndex) in getMatchPairs(round.matches)" :key="pIndex" class="tb-pair">
-                            <div v-for="(match, mIndex) in pair" :key="mIndex" class="tb-slot">
-                                <div class="tb-match">
-                                    <MatchElement :match="match" :hideAvatars="true" />
+
+    <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
+        K.o.Phase noch nicht verfügbar
+    </div>
+
+    <div v-else>
+        <div v-if="bracketRounds.length" class="tb-bracket">
+            <template v-for="(round, rIndex) in bracketRounds" :key="rIndex">
+                <div class="tb-round" :class="{'tb-round--connected': rIndex > 0}">
+                    <div class="tb-round-title">{{ round.name }}</div>
+                    <div class="tb-matches">
+                        <!-- Non-final rounds: group into pairs for connector lines -->
+                        <template v-if="rIndex < bracketRounds.length - 1">
+                            <div v-for="(pair, pIndex) in getMatchPairs(round.matches)" :key="pIndex" class="tb-pair">
+                                <div v-for="(match, mIndex) in pair" :key="mIndex" class="tb-slot">
+                                    <div class="tb-match">
+                                        <MatchElement :match="match" :hideAvatars="true" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </template>
-                    <!-- Final round: standalone -->
-                    <template v-else>
-                        <div v-for="(match, mIndex) in round.matches" :key="mIndex" class="tb-match">
-                            <MatchElement :match="match" :hideAvatars="true" />
-                        </div>
-                    </template>
+                        </template>
+                        <!-- Final round: standalone -->
+                        <template v-else>
+                            <div v-for="(match, mIndex) in round.matches" :key="mIndex" class="tb-match">
+                                <MatchElement :match="match" :hideAvatars="true" />
+                            </div>
+                        </template>
+                    </div>
                 </div>
-            </div>
-        </template>
+            </template>
+        </div>
     </div>
 </template>
 

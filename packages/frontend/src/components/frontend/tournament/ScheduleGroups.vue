@@ -1,9 +1,45 @@
+<template>
+      <div style="text-align: center; font-size: 18px; color: var(--main-color);" v-if="tournament.groupPhase.groups.length == 0">
+         Gruppenphase noch nicht verfügbar
+      </div>
+
+      <div v-else>
+         <div class="swiper-pagination" id="GameScheduleGroupsSwiper-Pagination"/>
+
+         <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
+            <div class="swiper-wrapper">
+
+               <div class="rt-table swiper-slide" v-for="(group, groupIndex) in getGroupsWithStats(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
+
+                  <!-- Caption -->
+                  <div class="rt-caption">{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
+
+                  <StandingsGroups :tournament="tournament" :group="group"/>
+
+                  <div class="rt-caption">Spiele</div>
+
+                  <!-- Matches -->
+                  <div class="rt-matches">
+                     <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" 
+                        :match="match" 
+                        :isBackend="isBackend" 
+                        :setGameResult="setGameResult"
+                        :displayTeamLogo="true"
+                     />
+                  </div>
+
+               </div>
+            </div>
+         </div>
+      </div>
+</template>
+
 <script setup lang="ts">
 import Sortable from "sortablejs";
 import { onMounted, PropType, watch, ref } from "vue"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import StandingsGroups from '@/components/frontend/tournament/schedule/StandingsGroups.vue';
+import StandingsGroups from '@/components/frontend/tournament/StandingsGroups.vue';
 import { setMatchesGroupPhase, getGroupsWithStats} from "@/util/tournamentGroupFunctions";
 
 import Swiper from 'swiper';
@@ -100,31 +136,6 @@ const setGameResult = () => {
 }
 </script>
 
-<template>
-   <div class="swiper-pagination" id="GameScheduleGroupsSwiper-Pagination"/>
-
-   <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
-      <div class="swiper-wrapper">
-
-         <div class="rt-table swiper-slide" v-for="(group, groupIndex) in getGroupsWithStats(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
-
-            <!-- Caption -->
-            <div class="rt-caption">{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
-
-            <StandingsGroups :tournament="tournament" :group="group"/>
-
-            <div class="rt-caption">Spiele</div>
-
-            <!-- Matches -->
-            <div class="rt-matches">
-               <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" :match="match" :isBackend="isBackend" :setGameResult="setGameResult"/>
-            </div>
-
-         </div>
-      </div>
-   </div>
-</template>
-
 <style>
 .GameScheduleGroups{
    overflow: hidden;
@@ -137,15 +148,14 @@ const setGameResult = () => {
 }
 
 /* Top Swiper Pagination */
-.Schedule .swiper-pagination, .Standings .swiper-pagination{
+#GameScheduleGroupsSwiper-Pagination{
    position: sticky;
-   padding-top: 10px;
    padding-bottom: 20px;
    display: flex;
    background-color: white;
-   top: 270px;
+   top: 200px;
 }
-.Schedule .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
+#GameScheduleGroupsSwiper-Pagination .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
 	padding: 5px 10px; 
 	border-radius: 0;
 	width: auto;
@@ -158,15 +168,15 @@ const setGameResult = () => {
    flex: 1 1 0;
    text-align: center;
 }
-.Schedule .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
+#GameScheduleGroupsSwiper-Pagination .swiper-pagination-bullet-active, .Standings .swiper-pagination-bullet-active{
 	color:white;
 	background: var(--main-color);
 }
 
 /* MOBILE */
 @media (width <= 900px){
-   .Schedule .swiper-pagination{
-      top: 230px;
+   #GameScheduleGroupsSwiper-Pagination .swiper-pagination{
+      top: 200px;
    }
    .rt-caption{
       font-size: 22px;

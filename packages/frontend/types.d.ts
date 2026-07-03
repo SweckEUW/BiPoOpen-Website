@@ -48,6 +48,8 @@ declare global {
         _id: string;
         name?: string;
         players: Player[];
+        logo?: string;
+        logoId?: string;
     };
 
     type Player = {
@@ -83,6 +85,7 @@ declare global {
     type TeamWithStats = {  
         placement?: number;
         name: string;
+        logo?: string;
         players: Player[];
         wins: number;
         hitDifference: string;

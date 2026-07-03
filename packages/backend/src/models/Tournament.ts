@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { InferSchemaType, Schema } from 'mongoose';
 
-export interface ITournamentModel extends Document {}
+export type ITournamentModel = InferSchemaType<typeof TournamentSchema>;
 
 const TournamentSchema = new Schema(
     {
@@ -26,8 +26,8 @@ const TournamentSchema = new Schema(
                                 team1ID: { type: Schema.Types.ObjectId, ref: 'Team' },
                                 team2ID: { type: Schema.Types.ObjectId, ref: 'Team' },
                                 result: {
-                                    team1Score: { type: Number, required: true },
-                                    team2Score: { type: Number, required: true },
+                                    team1Score: { type: Number, required: false },
+                                    team2Score: { type: Number, required: false },
                                     team1Player1Score: { type: Number, required: false },
                                     team1Player2Score: { type: Number, required: false },
                                     team2Player1Score: { type: Number, required: false },
@@ -41,7 +41,7 @@ const TournamentSchema = new Schema(
             },
             required: true
         },
-        knockoutPhase: {
+        koPhase: {
             type: {
                 matches: [
                     [
@@ -49,8 +49,8 @@ const TournamentSchema = new Schema(
                             team1ID: { type: Schema.Types.ObjectId, ref: 'Team' },
                             team2ID: { type: Schema.Types.ObjectId, ref: 'Team' },
                             result: {
-                                team1Score: { type: Number, required: true },
-                                team2Score: { type: Number, required: true },
+                                team1Score: { type: Number, required: false },
+                                team2Score: { type: Number, required: false },
                                 team1Player1Score: { type: Number, required: false },
                                 team1Player2Score: { type: Number, required: false },
                                 team2Player1Score: { type: Number, required: false },
@@ -66,7 +66,8 @@ const TournamentSchema = new Schema(
         teams: [
             {
                 name: { type: String, required: true },
-                players: { type: [String], required: true }
+                players: { type: [String], required: true },
+                logo: { type: String, required: false }
             }
         ],
         settings: {

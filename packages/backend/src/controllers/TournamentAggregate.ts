@@ -9,6 +9,7 @@ export const tournamentAggregation = () => [
             in: {
               _id: "$$team._id",
               name: "$$team.name",
+              logo: "$$team.logo",
               players: {
                 $map: {
                   input: "$$team.players",

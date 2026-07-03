@@ -1,15 +1,14 @@
 <template>
     <Avatar
-        :label="avatarImage ? undefined : playerInitials"
-        :image="avatarImage || undefined"
-        :size="size"
+        :label="avatarImageComputed ? undefined : playerInitials"
+        :image="avatarImageComputed || undefined"
         :shape="shape"
         :pt="{
             root: {
-                class: `border-2 border-black/10 ${avatarImage ? '' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[#d8f2f8] !text-[black]')}`
+                class: `${avatarImageComputed ? '!bg-transparent' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[var(--main-color)] opacity-70 !text-[white]')}`
             },
             image: {
-                class: `object-cover bg-white ${grayscale ? 'grayscale' : ''}`
+                class: `${shape === 'square' ? 'object-contain' : 'object-cover'} bg-transparent ${grayscale ? 'grayscale' : ''}`
             }
         }"
     />
@@ -20,15 +19,11 @@ import { computed, onMounted } from 'vue';
 import Avatar from 'primevue/avatar';
 import { getPlayerInitials, getPlayerProfileImage, fetchPlayerProfileImage, backendImageCache } from './PlayerProfileImageMapping';
 
-const props = withDefaults(defineProps<{
-    name: string;
-    size?: 'normal' | 'large' | 'xlarge';
-    shape?: 'circle' | 'square';
-    grayscale?: boolean;
-}>(), {
-    size: 'normal',
-    shape: 'circle',
-    grayscale: false,
+const props = defineProps({
+    name: {type: String, required: true},
+    avatarImage: {type: String, required: false},
+    shape: {type: String as () => 'circle' | 'square', default: 'circle'},
+    grayscale: {type: Boolean, default: false},
 });
 
 // Trigger backend fetch on mount (result lands in reactive cache)
@@ -36,7 +31,10 @@ onMounted(() => {
     fetchPlayerProfileImage(props.name);
 });
 
-const avatarImage = computed(() => {
+const avatarImageComputed = computed(() => {
+    if(props.avatarImage) 
+        return props.avatarImage;
+    
     // Access backendImageCache reactively to re-render when image is fetched
     const _trigger = backendImageCache[props.name?.trim().replace(/\s+/g, ' ').toLowerCase()];
     return getPlayerProfileImage(props.name);

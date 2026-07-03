@@ -30,20 +30,20 @@
                 </div>
 
                 <!-- Registrierung -->
-                <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                <!-- <div style="margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
                         <router-link to="/2026/Anmeldung" class="ho-register-hero-btn">🎯 Jetzt anmelden</router-link>
                         <router-link to="/2026/Teams" class="ho-hero-btn">👥 Angemeldete Teams</router-link>
                     </div>
                     <span style="color: rgba(255,255,255,0.8); font-size: 13px;">Anmeldung bis 01.07.2026</span>
-                </div>
+                </div> -->
 
                 <!-- Turnier Links -->
-                <!-- <div class="ho-hero-links">
-                    <router-link class="ho-hero-btn" to="/2026/Spielplan">Spielplan</router-link>
+                <div class="ho-hero-links">
+                    <router-link class="ho-hero-btn" to="/2026/Gruppenphase">Spielplan</router-link>
                     <router-link class="ho-hero-btn" to="/2026/MVP">MVP</router-link>
                     <router-link class="ho-hero-btn" to="/Regeln">Regeln</router-link>
-                </div> -->
+                </div>
             </template>
         </section>
 
@@ -234,7 +234,7 @@ import { getTournamentByName } from '@/util/tournamentFunctions';
 import { BIPO_OPEN_TOURNAMENT_YEARS } from '@/util/bipoOpenTournamentMeta';
 import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import TournamentOverview from '@/components/frontend/tournament/_Overview.vue';
+import TournamentOverview from '@/components/frontend/tournament/Overview.vue';
 import Skeleton from 'primevue/skeleton';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';

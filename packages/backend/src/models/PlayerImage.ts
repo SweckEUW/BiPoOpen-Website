@@ -1,9 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { InferSchemaType, Schema } from 'mongoose';
 
-export interface IPlayerImage extends Document {
-    playerName: string;
-    imageData: string;
-}
+export type IPlayerImage = InferSchemaType<typeof PlayerImageSchema>;
 
 const PlayerImageSchema: Schema = new Schema(
     {

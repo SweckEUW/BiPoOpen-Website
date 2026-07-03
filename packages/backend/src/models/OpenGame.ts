@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { InferSchemaType, Schema } from 'mongoose';
 
-export interface IOpenGameModel extends Document {}
+export type IOpenGameModel = InferSchemaType<typeof MatchSchema>;
 
 const PlayerSchema = new Schema(
   {

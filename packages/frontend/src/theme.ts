@@ -87,7 +87,9 @@ const BiPoPreset = definePreset(Aura, {
                     headerCell: {
                         background: '#EA5160',
                         color: '#ffffff',
-                        borderColor: '#EA5160'
+                        borderColor: '#EA5160',
+                        selectedBackground: '#EA5160',
+                        selectedColor: '#ffffff'
                     },
                     header: {
                         background: '#EA5160',
@@ -97,9 +99,6 @@ const BiPoPreset = definePreset(Aura, {
                 }
             },
             css: `
-                .p-datatable *{
-                    font-size: 14px;
-                }
                 .p-datatable-column-title {
                     font-size: 16px;
                     font-weight: bold;

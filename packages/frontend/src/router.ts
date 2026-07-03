@@ -84,15 +84,15 @@ const routes = [
 		}
 	},
 
-	{
-		path: '/2026/Anmeldung',
-		name: 'Teamanmeldung',
-		component: () => import('@/components/frontend/_Teamanmeldung.vue'),
-		meta: {
-			title: 'Weck BiPo Open 2026 - Anmeldung',
-			description: 'Anmeldung'
-		},
-	},
+	// {
+	// 	path: '/2026/Anmeldung',
+	// 	name: 'Teamanmeldung',
+	// 	component: () => import('@/components/frontend/_Teamanmeldung.vue'),
+	// 	meta: {
+	// 		title: 'Weck BiPo Open 2026 - Anmeldung',
+	// 		description: 'Anmeldung'
+	// 	},
+	// },
 
 	{
 		path: '/2026/Teams',
@@ -127,10 +127,18 @@ const routes = [
 				}
 			},
 			{
-				path: 'Spielplan',
+				path: 'Gruppenphase',
 				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
 				meta: {
-					title: 'Weck BiPo Open - REPLACE - Spielplan',
+					title: 'Weck BiPo Open - REPLACE - Gruppenphase',
+					description: 'Tournament'
+				}
+			},
+			{
+				path: 'K.o.Phase',
+				component: () => import('@/components/frontend/tournament/_Tournament.vue'),
+				meta: {
+					title: 'Weck BiPo Open - REPLACE - K.o.Phase',
 					description: 'Tournament'
 				}
 			},

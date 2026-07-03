@@ -1,12 +1,44 @@
+<template>
+    <div class="Manage">
+        <h1 class="bp-title" style="padding-bottom: 50px; position: inherit;">Tournament Backend</h1>
+
+        <div class="bp-button" @click="toggleModal()">Neues Turnier erstellen</div>
+        
+        <router-link class="ma-tournament" :to="'/Manage/Tournaments/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
+
+        <Transition name="fade">
+            <Modal v-if="showModal">        
+                <template #title>Neues Turnier erstellen</template>
+                <template #template>
+                    <div>Turniername</div>
+                    <input type="text" v-model="tournamentName">
+                </template>
+                <template #cancle>
+                    <div @click="toggleModal()">Abbrechen</div>
+                </template>
+                <template #confirm>
+                    <div @click="createTournament();">Erstellen</div>
+                </template>
+            </Modal>
+        </Transition>
+    </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
 import { addTournament, getAllTournaments } from "@/util/tournamentFunctions";
+import { useToast } from 'primevue/usetoast';
+import { useRouter } from "vue-router";
+
+const toast = useToast();
+const router = useRouter();
 
 let tournaments = ref<Tournament[]|undefined>();
 
 const getTournaments = async () => {
     tournaments.value = await getAllTournaments();
+    tournaments.value?.reverse();
 }
 getTournaments();
 
@@ -35,7 +67,8 @@ const createTournament = async () => {
         await getTournaments();
         tournamentName = ref();
         toggleModal();
-        window.location.href = "/Manage/Tournaments/" + tournament.name.replaceAll(' ','-');
+        setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Turnier wurde erstellt', life: 3000 }), 400);
+        router.push("/Manage/Tournaments/" + tournament.name.replaceAll(' ','-'));
     }
 }
 
@@ -46,32 +79,6 @@ const toggleModal = () => {
 
 let tournamentName = ref();
 </script>
-
-<template>
-    <div class="Manage">
-        <h1 class="bp-title" style="padding-bottom: 50px; position: inherit;">Tournament Backend</h1>
-
-        <div class="bp-button" @click="toggleModal()">Neues Turnier erstellen</div>
-        
-        <router-link class="ma-tournament" :to="'/Manage/Tournaments/' + tournament.name.replaceAll(' ','-')" v-for="tournament in tournaments" :key="tournament.name">{{ tournament.name }}</router-link>
-
-        <Transition name="fade">
-            <Modal v-if="showModal">        
-                <template #title>Neues Turnier erstellen</template>
-                <template #template>
-                    <div>Turniername</div>
-                    <input type="text" v-model="tournamentName">
-                </template>
-                <template #cancle>
-                    <div @click="toggleModal()">Abbrechen</div>
-                </template>
-                <template #confirm>
-                    <div @click="createTournament();">Erstellen</div>
-                </template>
-            </Modal>
-        </Transition>
-    </div>
-</template>
 
 <style scoped>
 .Manage{

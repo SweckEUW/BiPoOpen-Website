@@ -8,11 +8,23 @@
         <!-- Team Header -->
         <div class="mt-team">
             <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
+
+                <!-- Team Logo -->
+                <PlayerProfileAvatar
+                    v-if="displayTeamLogo"
+                    :name="teamName"
+                    :avatarImage="teamLogo"
+                    shape="square"
+                    :grayscale="teamScore < opponentTeamScore"
+                    class="min-w-[80px] min-h-[80px]"
+                />
+
                 <div
+                    v-else
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
                     class="cursor-pointer"
-                >
+                >   
                     <PlayerProfileAvatar
                         :name="player.name"
                         shape="circle"
@@ -58,8 +70,8 @@ const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
     playersVisible: {type: Boolean, required: true },
     isTeam2: {type: Boolean, required: true },
-    leaguePlayers: {type: Array as PropType<LeaguePlayer[]>, required: false },
     hideAvatars: {type: Boolean, default: false},
+    displayTeamLogo: {type: Boolean, default: false},
 });
 
 let team = props.isTeam2 ? props.match.team2 : props.match.team1;
@@ -82,6 +94,12 @@ let teamScore = computed(() => {
 
 let opponentTeamScore = computed(() => {
     return getMatchScore(props.match, props.isTeam2)!;
+});
+
+let teamLogo = computed(() => {
+    if(team && team.logo)
+        return team.logo;
+    return undefined;
 });
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');

@@ -1,22 +1,23 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import Tournament from "../models/Tournament";
 import { tournamentAggregation } from "./TournamentAggregate";
 
 const createTournament = (req: Request, res: Response, next: NextFunction) => {
-    // const { name } = req.body;
-
-    let name = "Test AAAA";
 
     const tournament = new Tournament({
         _id: new mongoose.Types.ObjectId(),
-        name: name,
+        name: req.body.name,
+        groupPhase: req.body.groupPhase,
+        koPhase: req.body.koPhase,
+        teams: req.body.teams,
+        settings: req.body.settings
     });
 
     tournament
         .save()
-        .then((tournament) => { res.status(201).json({ tournament })})
-        .catch((error) => { res.status(500).json({ error });});
+        .then((tournament) => res.status(201).json({ tournament }))
+        .catch((error) => res.status(500).json({ error }));
 };
 
 const readTournament = (req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +32,8 @@ const readTournament = (req: Request, res: Response, next: NextFunction) => {
             res.status(404).json({ message: "Tournament not found" });
         }
     }).catch((error) => {
-        res.status(500).json({ error });
+        console.log(error);
+        res.status(500).json({ message: error });
     });
 };
 
@@ -41,7 +43,8 @@ const readAll = (req: Request, res: Response, next: NextFunction) => {
             res.status(200).json({ tournaments });
         })
         .catch((error) => {
-            res.status(500).json({ error });
+            console.log(error);
+            res.status(500).json({ message: error });
         });
 };
 
@@ -61,7 +64,10 @@ const updateTournament = (req: Request, res: Response, next: NextFunction) => {
                 res.status(404).json({ message: 'not found' });
             }
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
 };
 
 const deleteTournament = (req: Request, res: Response, next: NextFunction) => {
@@ -76,8 +82,196 @@ const deleteTournament = (req: Request, res: Response, next: NextFunction) => {
             }
         })
         .catch((error) => {
-            return res.status(500).json({ error });
+            console.log(error);
+            res.status(500).json({ message: error });
         });
 };
 
-export default { createTournament, readTournament, readAll, updateTournament, deleteTournament };
+const addTeam = (req: Request, res: Response, next: NextFunction) => {
+    const tournamentId = req.params.tournamentId;
+    const team = req.body.team; 
+
+    Tournament.findById(tournamentId)
+        .then((tournament) => {
+            if (tournament) {
+                tournament.teams.push(team);
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+};
+
+const editTeam = (req: Request, res: Response, next: NextFunction) => {
+    let tournamentID = req.params.tournamentId;
+    let team = req.body.team;
+
+    Tournament.findById(tournamentID)
+        .then((tournament) => {
+            if (tournament) {
+                // Find team index
+                const teamIndex = tournament.teams.findIndex((t) => t._id.toString() === team._id.toString());
+
+                // Abort if missing
+                if (teamIndex === -1) return res.status(404).json({ message: "Team not found" });
+
+                // Update team
+                tournament.teams[teamIndex] = { ...tournament.teams[teamIndex], ...team };
+
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+}
+
+
+const removeTeam = (req: Request, res: Response, next: NextFunction) => {
+    let tournamentID = req.params.tournamentId;
+    let teamID = req.body.teamID;
+
+    Tournament.findById(tournamentID)
+        .then((tournament) => {
+            if (tournament) {
+                // Find team index
+                const teamIndex = tournament.teams.findIndex((t) => t._id.toString() === teamID.toString());
+
+                // Abort if missing
+                if (teamIndex === -1) return res.status(404).json({ message: "Team not found" });
+
+                // Remove team
+                tournament.teams.splice(teamIndex, 1);
+
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+}
+
+const setGroups = (req: Request, res: Response, next: NextFunction) => {
+    let tournamentID = req.body.tournamentID;
+    let groups = req.body.groups;
+
+    Tournament.findById(tournamentID)
+        .then((tournament) => {
+            if (tournament) {
+
+                // Update group 
+                tournament.groupPhase.groups = groups;
+
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+}
+
+const setMatchesGroupPhase = (req: Request, res: Response, next: NextFunction) => {
+    let tournamentID = req.body.tournamentID;
+    let matches  = req.body.matches;
+
+    Tournament.findById(tournamentID)
+        .then((tournament) => {
+            if (tournament) {
+
+                matches.forEach((matchesForGroup:any) => {
+                    matchesForGroup.forEach((match:any) => {
+                        match._id = new Types.ObjectId().toString();
+                    });
+                });
+
+                tournament.groupPhase.matches = matches;
+
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+}
+
+const setMatchesKOPhase = (req: Request, res: Response, next: NextFunction) => {
+    let tournamentID = req.body.tournamentID;
+    let matches  = req.body.matches;
+
+    Tournament.findById(tournamentID)
+        .then((tournament) => {
+            if (tournament) {
+
+                matches.forEach((matchesForGroup:any) => {
+                    matchesForGroup.forEach((match:any) => {
+                        match._id = new Types.ObjectId().toString();
+                    });
+                });
+
+                // Update group matches
+                tournament.koPhase.matches = matches;
+
+                tournament
+                    .save()
+                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .catch((error) => {
+                        console.log(error);
+                        res.status(500).json({ message: error });
+                    });
+            } else {
+                res.status(404).json({ message: "Tournament not found" });
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            res.status(500).json({ message: error });
+        });
+}
+
+export default { createTournament, readTournament, readAll, updateTournament, deleteTournament, addTeam, editTeam, removeTeam, setGroups, setMatchesGroupPhase, setMatchesKOPhase};

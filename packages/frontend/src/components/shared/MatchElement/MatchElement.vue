@@ -12,6 +12,7 @@ const props = defineProps({
    isBackend: {type: Boolean, default: false},
    editName: {type: Boolean, default: false},
    hideAvatars: {type: Boolean, default: false},
+   displayTeamLogo: {type: Boolean, default: false}
 });
 
 let showModal = ref(false);
@@ -46,8 +47,8 @@ let togglePlayersVisible = () => {
 
          <!-- Team Name & Score -->
          <div class="mt-teams" @click="togglePlayersVisible()">
-            <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars"/> <!-- Team 1 -->
-            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars"/> <!-- Team 2 -->
+            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" /> <!-- Team 1 -->
+            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo"/> <!-- Team 2 -->
 
             <!-- Spielverlauf Timeline -->
             <MatchTimeline v-if="match.turns && match.turns.length > 0 && playersVisible" :match="match" />

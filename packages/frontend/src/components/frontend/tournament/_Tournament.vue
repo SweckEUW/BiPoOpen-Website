@@ -1,47 +1,74 @@
+
+<template>
+    <div class="Tournament">
+
+        <Loadingscreen v-if="!tournament"/>
+
+        <div v-if="tournament && tournament.groupPhase.groups">
+
+            <h1 class="bp-title">{{ tournament.name }}</h1>
+
+            <!-- Tabs -->
+            <Tabs v-model:value="place" @update:value="changeRouter">
+               <TabList class="pb-[20px]">
+                  <Tab value="Gruppenphase">Gruppenphase</Tab>
+                  <Tab value="K.o.Phase">K.o.Phase</Tab>
+                  <Tab v-if="tournament.settings.trackPlayerShots" value="MVP">MVP</Tab>
+                  <Tab v-if="getTournamentPhotos()" value="Fotos">Fotos</Tab>
+               </TabList>
+               <TabPanels class="!p-[0px]">
+                  <TabPanel value="Gruppenphase">
+                     <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="false"/>
+                  </TabPanel>
+                  <TabPanel value="K.o.Phase">
+                     <KOSchedule :tournament="tournament"/>
+                  </TabPanel>
+                  <TabPanel v-if="tournament.settings.trackPlayerShots" value="MVP">
+                     <MVP :tournament="tournament"/>
+                  </TabPanel>
+                  <TabPanel v-if="getTournamentPhotos()" value="Fotos">
+                     <Photos :tournamentPhotos="getTournamentPhotos()"/>
+                  </TabPanel>
+               </TabPanels>
+            </Tabs>
+        </div>
+    </div>
+</template>
+
 <script setup lang="ts">
 import { ref, onUnmounted, Ref } from "vue"
 import { getTournamentByName } from "@/util/tournamentFunctions"
-
-import Overview from '@/components/frontend/tournament/_Overview.vue';
-import Schedule from '@/components/frontend/tournament/schedule/Schedule.vue';
-import Teams from '@/components/frontend/tournament/_Teams.vue';
-import MVP from '@/components/frontend/tournament/_MVP.vue';
+import ScheduleGroups from '@/components/frontend/tournament/ScheduleGroups.vue';
+import KOSchedule from '@/components/frontend/tournament/KOSchedule.vue';
+import MVP from '@/components/frontend/tournament/MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
 
 import { useRoute } from "vue-router";
 const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
-let overviewPhotoIds = ref<{img_id: string, name: string}[]>([]);
 
-const getTournament = async () => {
-   tournament.value = await getTournamentByName(route.params.TournamentName as string);
-}
-
-const loadOverviewPhotos = async () => {
-   const photos = getTournamentPhotos();
-   if (!photos) return;
-   try {
-      const response = await fetch(photos.driveImageIDs);
-      overviewPhotoIds.value = await response.json();
-   } catch { /* photos not available */ }
-};
-
-getTournament().then(loadOverviewPhotos);
-
-let place:Ref<"Übersicht"|"Spielplan"|"Teams"|"MVP"|"Fotos"> = ref("Übersicht");
+let place:Ref<"Gruppenphase"|"K.o.Phase"|"Teams"|"MVP"|"Fotos"> = ref("Gruppenphase");
 let name = route.path.split("/").pop();
-if(name == "Übersicht")
-   place.value = "Übersicht";
-else if(name == "Spielplan")
-   place.value = "Spielplan";
-else if(name == "Teams")
-   place.value = "Teams";
+if(name == "Gruppenphase")
+   place.value = "Gruppenphase";
+else if(name == "K.o.Phase")
+   place.value = "K.o.Phase";
 else if(name == "MVP")
    place.value = "MVP";
 else if(name == "Fotos")
    place.value = "Fotos";
+
+const getTournament = async () => {
+   tournament.value = await getTournamentByName(route.params.TournamentName as string);
+}
+getTournament()
 
 let updateInterval = setInterval(() => {
    getTournament();
@@ -51,7 +78,7 @@ onUnmounted(() => {
    clearInterval(updateInterval);
 });
 
-const changeRouter = (path:"Übersicht"|"Spielplan"|"Teams"|"MVP"|"Fotos") => {
+const changeRouter = (path:string|number) => {
    let newURL = window.location.origin + "/" + route.params.TournamentName + '/' + path;
    window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
    window.scrollTo({top: 0, behavior: 'instant' });
@@ -120,90 +147,26 @@ const getTournamentPhotos = () => {
 }
 </script>
 
-<template>
-    <div class="Tournament">
-
-        <Loadingscreen v-if="!tournament"/>
-
-        <div v-if="tournament && tournament.groupPhase.groups">
-
-            <h1 class="bp-title">{{ tournament.name }}</h1>
-
-            <!-- Tabs -->
-            <ul class="nav nav-tabs justify-content-center">
-               <li class="nav-item">
-                  <button class="nav-link" :class="{active: place == 'Übersicht'}" data-bs-toggle="tab" :data-bs-target="'#Overview' + tournament._id" @click="changeRouter('Übersicht')">Übersicht</button>
-               </li>
-               <!-- <li class="nav-item">
-                  <button class="nav-link" :class="{active: place == 'Teams'}" data-bs-toggle="tab" :data-bs-target="'#Teams' + tournament._id" @click="changeRouter('Teams')">Teams</button>
-               </li> -->
-               <li class="nav-item">
-                  <button class="nav-link" :class="{active: place == 'Spielplan'}" data-bs-toggle="tab" :data-bs-target="'#GameSchedule' + tournament._id" @click="changeRouter('Spielplan')">Spielplan</button>
-               </li>
-               <li class="nav-item" v-if="tournament.settings.trackPlayerShots">
-                  <button class="nav-link" :class="{active: place == 'MVP'}" data-bs-toggle="tab" :data-bs-target="'#GameMVP' + tournament._id" @click="changeRouter('MVP')">MVP</button>
-               </li>
-               <li class="nav-item" v-if="getTournamentPhotos()">
-                  <button class="nav-link" :class="{active: place == 'Fotos'}" data-bs-toggle="tab" :data-bs-target="'#GameFotos' + tournament._id" @click="changeRouter('Fotos')">Fotos</button>
-               </li>
-            </ul>
-
-            <!-- Content -->
-            <div class="tab-content" id="GameScheduleContainer">
-               <div class="tab-pane fade show" :class="{active: place == 'Übersicht'}" :id="'Overview' + tournament._id">
-                  <Overview :tournament="tournament" :photoIds="overviewPhotoIds" :basePath="'/' + route.params.TournamentName"/>
-               </div>
-               <!-- <div class="tab-pane fade show" :class="{active: place == 'Teams'}" :id="'Teams' + tournament._id">
-                  <Teams :tournament="tournament"/>
-               </div> -->
-               <div class="tab-pane fade show" :class="{active: place == 'Spielplan'}" :id="'GameSchedule' + tournament._id">
-                  <Schedule :tournament="tournament" :getTournament="getTournament" :isBackend="false"/>
-               </div>
-               <div class="tab-pane fade show" :class="{active: place == 'MVP'}" :id="'GameMVP' + tournament._id" v-if="tournament.settings.trackPlayerShots">
-                  <MVP :tournament="tournament"/>
-               </div>
-               <div class="tab-pane fade show" :class="{active: place == 'Fotos'}" :id="'GameFotos' + tournament._id" v-if="getTournamentPhotos()">
-                  <Photos :tournamentPhotos="getTournamentPhotos()"/>
-               </div>
-         </div>
-        </div>
-    </div>
-</template>
-
 <style scoped>
-.nav-tabs{
+:deep(.p-tablist){
    position: sticky;
    top: 160px;
    background: white;
    z-index: 2;
 }
-.nav{
-   border: none;
+:deep(.p-tabs){
    padding-bottom: 30px;
 }
-.nav-link{
-   border-radius: 0px;
-   width: 40vw;
+:deep(.p-tab){
    padding: 15px 10px;
-   color: var(--secondary-color);
    font-weight: bold;
-}
-.nav-item{
-   flex: 1;
-}
-.nav-item .active{
-   background-color: var(--main-color) !important;
-   color: white !important;
-}
-.nav-item button{
-   width: 100%;
 }
 /* MOBILE */
 @media (width <= 900px){
-   .nav-tabs{
+   :deep(.p-tablist){
       top: 140px;
    }
-   .nav-link{
+   :deep(.p-tab){
       font-size: 14px;
       padding: 10px 10px;
    }
