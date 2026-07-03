@@ -16,7 +16,7 @@
                     :avatarImage="teamLogo"
                     shape="square"
                     :grayscale="teamScore < opponentTeamScore"
-                    class="min-w-[80px] min-h-[80px]"
+                    class="min-w-[50px] min-h-[50px]"
                 />
 
                 <div
