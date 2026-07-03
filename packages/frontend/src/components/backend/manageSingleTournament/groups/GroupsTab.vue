@@ -138,16 +138,16 @@ const initGroupAndKOMatches = async () => {
    toggleModal();
 
    // DEBUG!
-   props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
-      groupMatches.forEach(async (match) => {
-         let team1Won = Math.random() > 0.5;
-         match.team1.players[0].score = team1Won ? 10 : Math.floor(Math.random() * 9);
-         match.team1.players[1].score = Math.floor(Math.random() * 9);
-         match.team2.players[0].score = team1Won ? Math.floor(Math.random() * 9) : 10;
-         match.team2.players[1].score = Math.floor(Math.random() * 9);
-         await setGameResultGroupPhase(props.tournament, match);
-      });
-   });
+   // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
+   //    groupMatches.forEach(async (match) => {
+   //       let team1Won = Math.random() > 0.5;
+   //       match.team1.players[0].score = team1Won ? 10 : Math.floor(Math.random() * 9);
+   //       match.team1.players[1].score = Math.floor(Math.random() * 9);
+   //       match.team2.players[0].score = team1Won ? Math.floor(Math.random() * 9) : 10;
+   //       match.team2.players[1].score = Math.floor(Math.random() * 9);
+   //       await setGameResultGroupPhase(props.tournament, match);
+   //    });
+   // });
 }
 
 let generateRandom = ref(false);
