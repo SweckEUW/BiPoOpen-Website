@@ -15,16 +15,29 @@
                             <div v-for="(pair, pIndex) in getMatchPairs(round.matches)" :key="pIndex" class="tb-pair">
                                 <div v-for="(match, mIndex) in pair" :key="mIndex" class="tb-slot">
                                     <div class="tb-match">
-                                        <MatchElement :match="match" :hideAvatars="true" />
+                                        <MatchElement :match="match" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                            :team1Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, false)"
+                                            :team2Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, true)"/>
                                     </div>
                                 </div>
                             </div>
                         </template>
-                        <!-- Final round: standalone -->
+                        <!-- Final round: Finale + Spiel um Platz 3 -->
                         <template v-else>
-                            <div v-for="(match, mIndex) in round.matches" :key="mIndex" class="tb-match">
-                                <MatchElement :match="match" :hideAvatars="true" />
+                            <div class="tb-round-title">Finale</div>
+                            <div class="tb-match">
+                                <MatchElement :match="round.matches[0]" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                    :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 0, false)"
+                                    :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 0, true)"/>
                             </div>
+                            <template v-if="round.matches[1]">
+                                <div class="tb-round-title tb-third-place-title">Spiel um Platz 3</div>
+                                <div class="tb-match">
+                                    <MatchElement :match="round.matches[1]" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                        :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 1, false)"
+                                        :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 1, true)"/>
+                                </div>
+                            </template>
                         </template>
                     </div>
                 </div>
@@ -36,9 +49,13 @@
 <script setup lang="ts">
 import { computed, PropType } from 'vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { setGameResultKOPhase, getFirstStageSeeding } from '../../../util/tournamentKOPhaseFunctions';
+import { convertNumberToCharacter } from '../../../util/util';
 
 const props = defineProps({
+    getTournament: {type: Function, required: true },
     tournament: { type: Object as PropType<Tournament>, required: true },
+    isBackend: {type: Boolean, required: true },
 });
 
 const getStageText = (stageIndex: number) => {
@@ -55,6 +72,7 @@ const getMatchPairs = (matches: Match[]) => {
     for (let i = 0; i < matches.length; i += 2) {
         pairs.push(matches.slice(i, i + 2));
     }
+
     return pairs;
 };
 
@@ -63,9 +81,29 @@ const bracketRounds = computed(() => {
     if (!ko.matches.length) return [];
     return ko.matches.map((round, i) => ({
         name: getStageText(i),
-        matches: i === ko.matches.length - 1 ? [round[0]] : round
+        matches: round
     }));
 });
+
+const setGameResult = async (match:Match) => {
+    await setGameResultKOPhase(props.tournament, match);
+    await props.getTournament();
+
+    return true;
+}
+
+const getKOPlaceholderName = (tournament:Tournament, stageIndex:number, matchIndex:number, isTeam2:boolean) => {
+    if(stageIndex !== 0 || !tournament.koPhase.matches[0])
+        return "TBD";
+
+    const stageLength = tournament.koPhase.matches[0].length;
+    const { group1Number, group2Number, placeGroup1, placeGroup2 } = getFirstStageSeeding(tournament, matchIndex, stageLength);
+
+    const groupNumber = isTeam2 ? group2Number : group1Number;
+    const place = isTeam2 ? placeGroup2 : placeGroup1;
+
+    return `${place+1}. Gruppe ${convertNumberToCharacter(groupNumber + 1)}`;
+}
 </script>
 
 <style scoped>
@@ -99,6 +137,11 @@ const bracketRounds = computed(() => {
     flex-direction: column;
     justify-content: center;
     flex: 1;
+}
+
+/* Sub-heading for the third-place match below the final */
+.tb-third-place-title {
+    margin-top: 20px;
 }
 
 /* ── Match card ── */

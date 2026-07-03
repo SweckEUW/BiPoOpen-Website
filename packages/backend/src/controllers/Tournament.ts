@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import Tournament from "../models/Tournament";
 import { tournamentAggregation } from "./TournamentAggregate";
 
@@ -16,7 +16,7 @@ const createTournament = (req: Request, res: Response, next: NextFunction) => {
 
     tournament
         .save()
-        .then((tournament) => res.status(201).json({ tournament }))
+        .then((tournament) => res.status(201).json({ message: "Tournament created successfully", tournament }))
         .catch((error) => res.status(500).json({ error }));
 };
 
@@ -58,7 +58,7 @@ const updateTournament = (req: Request, res: Response, next: NextFunction) => {
 
                 tournament
                     .save()
-                    .then((tournament) => res.status(201).json({ tournament }))
+                    .then((tournament) => res.status(201).json({ message: "Tournament updated successfully", tournament }))
                     .catch((error) => res.status(500).json({ error }));
             } else {
                 res.status(404).json({ message: 'not found' });
@@ -97,7 +97,7 @@ const addTeam = (req: Request, res: Response, next: NextFunction) => {
                 tournament.teams.push(team);
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Team added successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });
@@ -130,7 +130,7 @@ const editTeam = (req: Request, res: Response, next: NextFunction) => {
 
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Team updated successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });
@@ -164,7 +164,7 @@ const removeTeam = (req: Request, res: Response, next: NextFunction) => {
 
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Team removed successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });
@@ -192,7 +192,7 @@ const setGroups = (req: Request, res: Response, next: NextFunction) => {
 
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Set Groups successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });
@@ -217,15 +217,14 @@ const setMatchesGroupPhase = (req: Request, res: Response, next: NextFunction) =
 
                 matches.forEach((matchesForGroup:any) => {
                     matchesForGroup.forEach((match:any) => {
-                        match._id = new Types.ObjectId().toString();
+                        match._id = new mongoose.Types.ObjectId();
                     });
                 });
 
                 tournament.groupPhase.matches = matches;
-
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Matches Groupphase updated successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });
@@ -250,7 +249,7 @@ const setMatchesKOPhase = (req: Request, res: Response, next: NextFunction) => {
 
                 matches.forEach((matchesForGroup:any) => {
                     matchesForGroup.forEach((match:any) => {
-                        match._id = new Types.ObjectId().toString();
+                        match._id = new mongoose.Types.ObjectId();
                     });
                 });
 
@@ -259,7 +258,7 @@ const setMatchesKOPhase = (req: Request, res: Response, next: NextFunction) => {
 
                 tournament
                     .save()
-                    .then((updatedTournament) => res.status(201).json({ tournament: updatedTournament }))
+                    .then((updatedTournament) => res.status(201).json({ message: "Matches KOPhase updated successfully", tournament: updatedTournament }))
                     .catch((error) => {
                         console.log(error);
                         res.status(500).json({ message: error });

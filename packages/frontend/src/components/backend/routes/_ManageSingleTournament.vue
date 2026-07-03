@@ -7,7 +7,7 @@
          <TabList>
             <Tab value="Teams">Teams</Tab>
             <Tab value="Gruppen">Gruppen</Tab>
-            <Tab value="GruppenPhase">GruppenPhase</Tab>
+            <Tab value="GruppenPhase">Gruppenphase</Tab>
             <Tab value="KOPhase">K.o.Phase</Tab>
          </TabList>
          <TabPanels class="!p-[0px]">
@@ -22,7 +22,7 @@
                <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="true"/>
             </TabPanel>
             <TabPanel value="KOPhase">
-               <KOSchedule :tournament="tournament"/>
+               <KOSchedule :getTournament="getTournament" :tournament="tournament" :isBackend="true"/>
             </TabPanel>
          </TabPanels>
       </Tabs>

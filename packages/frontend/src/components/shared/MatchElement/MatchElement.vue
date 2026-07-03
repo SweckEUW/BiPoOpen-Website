@@ -1,30 +1,3 @@
-<script setup lang="ts">
-import { PropType, ref } from "vue"
-import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
-import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
-import MatchTimeline from '@/components/shared/MatchElement/MatchTimeline.vue';
-import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
-
-const props = defineProps({
-   match: {type: Object as PropType<Match>, required: true },
-   setGameResult: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
-   deleteMatch: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
-   isBackend: {type: Boolean, default: false},
-   editName: {type: Boolean, default: false},
-   hideAvatars: {type: Boolean, default: false},
-   displayTeamLogo: {type: Boolean, default: false}
-});
-
-let showModal = ref(false);
-const toggleModal = () => {
-   showModal.value = !showModal.value;
-}
-
-let playersVisible = ref(false);
-let togglePlayersVisible = () => {
-   playersVisible.value = !playersVisible.value;
-}
-</script>
 
 <template>
     <div class="Match" ref="matchHTMLElement">
@@ -47,8 +20,8 @@ let togglePlayersVisible = () => {
 
          <!-- Team Name & Score -->
          <div class="mt-teams" @click="togglePlayersVisible()">
-            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" /> <!-- Team 1 -->
-            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo"/> <!-- Team 2 -->
+            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" :placeholder="team1Placeholder" /> <!-- Team 1 -->
+            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" :placeholder="team2Placeholder"/> <!-- Team 2 -->
 
             <!-- Spielverlauf Timeline -->
             <MatchTimeline v-if="match.turns && match.turns.length > 0 && playersVisible" :match="match" />
@@ -61,6 +34,36 @@ let togglePlayersVisible = () => {
          <div v-if="isBackend && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">{{ checkIfMatchFinished(match) ? 'Bearbeiten' : 'Eintragen'}}</div>
     </div>
 </template>
+
+<script setup lang="ts">
+import { PropType, ref } from "vue"
+import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
+import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
+import MatchTimeline from '@/components/shared/MatchElement/MatchTimeline.vue';
+import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
+
+const props = defineProps({
+   match: {type: Object as PropType<Match>, required: true },
+   setGameResult: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
+   deleteMatch: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
+   isBackend: {type: Boolean, default: false},
+   editName: {type: Boolean, default: false},
+   hideAvatars: {type: Boolean, default: false},
+   displayTeamLogo: {type: Boolean, default: false},
+   team1Placeholder: {type: String, default: undefined},
+   team2Placeholder: {type: String, default: undefined}
+});
+
+let showModal = ref(false);
+const toggleModal = () => {
+   showModal.value = !showModal.value;
+}
+
+let playersVisible = ref(false);
+let togglePlayersVisible = () => {
+   playersVisible.value = !playersVisible.value;
+}
+</script>
 
 <style scoped>
 .Match{

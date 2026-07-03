@@ -68,7 +68,7 @@ import { convertNumberToCharacter } from "@/util/util";
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
 import { getTeamFromName } from "@/util/tournamentTeamFunctions";
-import { generateRandomGroups, generateRandomMatchesGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
+import { generateRandomGroups, generateRandomMatchesGroupPhase, setGameResultGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
 import { initMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { useToast } from "primevue";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -138,21 +138,16 @@ const initGroupAndKOMatches = async () => {
    toggleModal();
 
    // DEBUG!
-   // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
-   //    await groupMatches.forEach(async (match) => {
-   //       let team1Won = Math.random() > 0.5;
-   //       let result = {
-   //          team1Score: team1Won ? 10 : Math.floor(Math.random() * 9),
-   //          team1Player1Score: Math.floor(Math.random() * 9), 
-   //          team1Player2Score: Math.floor(Math.random() * 9), 
-         
-   //          team2Score: team1Won ? Math.floor(Math.random() * 9) : 10,
-   //          team2Player1Score: Math.floor(Math.random() * 9), 
-   //          team2Player2Score: Math.floor(Math.random() * 9)
-   //       }
-   //       await setGameResultGroupPhase(props.tournament, match._id, result);
-   //    });
-   // });
+   props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
+      groupMatches.forEach(async (match) => {
+         let team1Won = Math.random() > 0.5;
+         match.team1.players[0].score = team1Won ? 10 : Math.floor(Math.random() * 9);
+         match.team1.players[1].score = Math.floor(Math.random() * 9);
+         match.team2.players[0].score = team1Won ? Math.floor(Math.random() * 9) : 10;
+         match.team2.players[1].score = Math.floor(Math.random() * 9);
+         await setGameResultGroupPhase(props.tournament, match);
+      });
+   });
 }
 
 let generateRandom = ref(false);

@@ -21,7 +21,7 @@
                      <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="false"/>
                   </TabPanel>
                   <TabPanel value="K.o.Phase">
-                     <KOSchedule :tournament="tournament"/>
+                     <KOSchedule :getTournament="getTournament" :tournament="tournament" :isBackend="false"/>
                   </TabPanel>
                   <TabPanel v-if="tournament.settings.trackPlayerShots" value="MVP">
                      <MVP :tournament="tournament"/>

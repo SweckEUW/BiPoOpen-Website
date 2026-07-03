@@ -67,6 +67,9 @@ export const tournamentAggregation = () => [
                 input: "$$matchList",
                 as: "match",
                 in: {
+                  _id: "$$match._id",
+                  team1ID: "$$match.team1ID",
+                  team2ID: "$$match.team2ID",
                   team1: {
                     $arrayElemAt: [
                       {
@@ -112,6 +115,9 @@ export const tournamentAggregation = () => [
                 input: "$$matchList",
                 as: "match",
                 in: {
+                  _id: "$$match._id",
+                  team1ID: "$$match.team1ID",
+                  team2ID: "$$match.team2ID",
                   team1: {
                     $arrayElemAt: [
                       {
@@ -148,11 +154,7 @@ export const tournamentAggregation = () => [
     // Unnötige teamID-Felder entfernen
     {
       $project: {
-        "groupPhase.groups.teams.teamID": 0,
-        "groupPhase.matches.team1ID": 0,
-        "groupPhase.matches.team2ID": 0,
-        "koPhase.matches.team1ID": 0,
-        "koPhase.matches.team2ID": 0
+        "groupPhase.groups.teams.teamID": 0
       }
     }
   ];

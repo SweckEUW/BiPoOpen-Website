@@ -2,6 +2,8 @@
 
 import { getAmmountOfEnemyHitsFromTeam, getAmmountOfHitsFromTeam, getAmmountOfMatchesFromPlayer, getAmmountOfWinsFromTeam } from "@/util/tournamentStatsFunctions";
 import { updateMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
+import { getFinishedMatchesFromTeam } from "@/util/tournamentTeamFunctions";
+import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 import { shuffleArray } from "@/util/util";
 import axios from "axios";
 
@@ -56,8 +58,25 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
     // Sort after wins, hit difference and direct win against component
     groupsWithStats.forEach((group) => {
         group.teams = group.teams.sort((team1, team2) => {
-            if (team2.hitDifferenceNumber == team1.hitDifferenceNumber && team1.wins == team2.wins)
+            if (team1.wins == team2.wins && team1.hitDifferenceNumber == team2.hitDifferenceNumber) {
+                // Direkter Vergleich: abgeschlossene Spiele zwischen den beiden Teams zählen
+                let directMatches = getFinishedMatchesFromTeam(tournament, team1.name, true).filter((m) => m.team1.name == team2.name || m.team2.name == team2.name);
+
+                let team1DirectWins = 0;
+                let team2DirectWins = 0;
+                directMatches.forEach((match) => {
+                    let team1Won = checkIfTeam1WonVsTeam2(match);
+                    if (team1Won === undefined) return;
+                    let winnerName = team1Won ? match.team1.name : match.team2.name;
+                    if (winnerName == team1.name) team1DirectWins++;
+                    else if (winnerName == team2.name) team2DirectWins++;
+                });
+
+                if (team1DirectWins != team2DirectWins)
+                    return team2DirectWins - team1DirectWins; // Sieger im direkten Duell steht vorne
+
                 return team2.hits - team1.hits;
+            }
             else if(team1.wins == team2.wins)
                 return team2.hitDifferenceNumber - team1.hitDifferenceNumber;
 
@@ -131,13 +150,24 @@ export const generateRandomMatchesGroupPhase = async (tournament:Tournament) => 
     await setMatchesGroupPhase(tournament._id,matches);
 }
 
-export const setGameResultGroupPhase = async (tournament:Tournament, matchID:string, result:MatchResult) => {
+export const setGameResultGroupPhase = async (tournament:Tournament, match:Match) => {
     // Find match in matches and add result 
     let matches = tournament.groupPhase.matches;
     for (let i = 0; i < matches.length; i++) {
         for (let x = 0; x < matches[i].length; x++) {
-            if(matchID == matches[i][x]._id)
+            if(match._id == matches[i][x]._id){
+                let result = {
+                    team1Score:  match.team1.players[0].score + match.team1.players[1].score,
+                    team1Player1Score: match.team1.players[0].score, 
+                    team1Player2Score: match.team1.players[1].score, 
+                
+                    team2Score:  match.team2.players[0].score + match.team2.players[1].score,
+                    team2Player1Score: match.team2.players[0].score, 
+                    team2Player2Score: match.team2.players[1].score
+                }
+                
                 matches[i][x].result = result;   
+            }
         }
     }
 

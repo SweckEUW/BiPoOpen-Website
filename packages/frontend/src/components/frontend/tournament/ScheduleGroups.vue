@@ -20,7 +20,7 @@
 
                   <!-- Matches -->
                   <div class="rt-matches">
-                     <MatchElement v-for="(match, matchIndex) in tournament.groupPhase.matches[groupIndex]" :key="match._id" 
+                     <MatchElement v-for="(match) in tournament.groupPhase.matches[groupIndex]" :key="match._id" 
                         :match="match" 
                         :isBackend="isBackend" 
                         :setGameResult="setGameResult"
@@ -40,7 +40,7 @@ import { onMounted, PropType, watch, ref } from "vue"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import StandingsGroups from '@/components/frontend/tournament/StandingsGroups.vue';
-import { setMatchesGroupPhase, getGroupsWithStats} from "@/util/tournamentGroupFunctions";
+import { setMatchesGroupPhase, getGroupsWithStats, setGameResultGroupPhase } from "@/util/tournamentGroupFunctions";
 
 import Swiper from 'swiper';
 import { Pagination } from 'swiper/modules';
@@ -113,26 +113,11 @@ onMounted(() => {
    });
 });
 
-const setGameResult = () => {
-   // let result:MatchResult = {
-   //    team1Score: (team1Player1Score.value ? team1Player1Score.value : 0) + (team1Player2Score.value ? team1Player2Score.value : 0),
-   //    team1Player1Score: team1Player1Score.value!, 
-   //    team1Player2Score: team1Player2Score.value!, 
-   
-   //    team2Score: (team2Player1Score.value ? team2Player1Score.value : 0) + (team2Player2Score.value ? team2Player2Score.value : 0),
-   //    team2Player1Score: team2Player1Score.value!, 
-   //    team2Player2Score: team2Player2Score.value!
-   // }
+const setGameResult = async (match:Match) => {
+   await setGameResultGroupPhase(props.tournament, match);
+   await props.getTournament();
 
-   // if(!props.tournament.settings.trackPlayerShots){
-   //    result = {
-   //       team1Score: team1Score.value!,
-   //       team2Score: team2Score.value!
-   //    }
-   // }
-
-   // await setGameResultGroupPhase(props.tournament, props.match._id, result);
-   // await props.getTournament();
+   return true;
 }
 </script>
 

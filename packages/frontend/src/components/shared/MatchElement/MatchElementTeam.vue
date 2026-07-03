@@ -44,7 +44,7 @@
 
         <!-- Team Players when expanded -->
         <div v-if="team && playersVisible && team.players.length > 1">
-            <div class="mt-team-player cursor-pointer" v-for="player in team.players" @click.stop="openPlayerProfile?.(player.name)">
+            <div class="mt-team-player cursor-pointer" v-for="(player, index) in team.players" :key="`${player.name}-${index}`" @click.stop="openPlayerProfile?.(player.name)">
                 <PlayerProfileAvatar
                     v-if="!hideAvatars"
                     :name="player.name"
@@ -72,20 +72,21 @@ const props = defineProps({
     isTeam2: {type: Boolean, required: true },
     hideAvatars: {type: Boolean, default: false},
     displayTeamLogo: {type: Boolean, default: false},
+    placeholder: {type: String, default: undefined},
 });
 
-let team = props.isTeam2 ? props.match.team2 : props.match.team1;
+const team = computed(() => props.isTeam2 ? props.match.team2 : props.match.team1);
 
 let teamName = computed(() => {
-    if(team){
-        if(team.name){
-            return team.name;
+    if(team.value){
+        if(team.value.name){
+            return team.value.name;
         }else{
-            return team.players.map(p => p.name.trim()).filter(name => name.length > 0).join(' & ');
+            return team.value.players.map(p => p.name.trim()).filter(name => name.length > 0).join(' & ');
         }
     }
 
-    return "TBD" // TODO: Set correct Team Name in Tournament e.g. Group A Team 1
+    return props.placeholder || "TBD";
 });
 
 let teamScore = computed(() => {
@@ -97,8 +98,8 @@ let opponentTeamScore = computed(() => {
 });
 
 let teamLogo = computed(() => {
-    if(team && team.logo)
-        return team.logo;
+    if(team.value && team.value.logo)
+        return team.value.logo;
     return undefined;
 });
 

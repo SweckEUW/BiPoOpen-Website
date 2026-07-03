@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { getGroupsWithStats } from "@/util/tournamentGroupFunctions";
+import { convertNumberToCharacter } from "@/util/util";
 import axios from "axios";
 
 export const getTeamsKOPhase = (tournament:Tournament) => {
@@ -60,6 +61,60 @@ export const initMatchesKOPhase = async (tournament:Tournament) => {
     await setMatchesKOPhase(tournament._id, matches);
 }
 
+// Computes which group + placement feeds each slot of the first KO stage.
+// Match groups that are far away from each other so that teams that played together in groupstage wont play again in KO-Stage.
+// Returns { group1Number, group2Number, placeGroup1, placeGroup2 } (place 0 = winner, 1 = runner-up).
+export const getFirstStageSeeding = (tournament:Tournament, x:number, stageLength:number) => {
+    let group1Number, group2Number;
+    let placeGroup1 = 0;
+    let placeGroup2 = 1;
+    if(x % 2 == 0){
+        group1Number = x;
+        group2Number = x + 1;
+    }else{
+        group1Number = stageLength - x;
+        group2Number = stageLength - x - 1;
+    }
+
+    // 3 Groups and the best 2. advanced
+    // TODO: This is hardcoded for 3 Groups. Make it dynamic
+    if(tournament.name == "SCW 3 Karneval 2025"){
+        if(x == 0){
+            group1Number = 2;
+            group2Number = 1;
+        }
+        if(x == 1){
+            placeGroup1 = 1;
+            placeGroup2 = 0;
+            group1Number = 1;
+            group2Number = 0;
+        }
+    }
+
+    // Change first K.o-Stage for 2022 tournament
+    if(tournament.name == "Weck BiPo Open 2022"){
+        if(x == 0){
+            group1Number = 2;
+            group2Number = 0;
+        }
+        if(x == 1){
+            group1Number = 3;
+            group2Number = 1;
+        }
+        if(x == 2){
+            group1Number = 0;
+            group2Number = 3;
+        }
+        if(x == 3){
+            group1Number = 1;
+            group2Number = 2;
+        }
+    }
+
+    return { group1Number, group2Number, placeGroup1, placeGroup2 };
+}
+
+
 // Gets called when Group or KO Phase sets Game Result
 // Loops over all Matches in the KO Phase and sets the TeamIDs for the next Stage
 export const updateMatchesKOPhase = async (tournament:Tournament) => {
@@ -75,55 +130,9 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
         if(i == 0) { // First Stage 
             for (let x = 0; x < stage.length; x++) { 
                 let matchTMP = stage[x];
-                
-                // groupNumber are the groups that are picked for the K.O-Stage. 
-                // Match groups that are far away from each other so that teams that played together in groupstage wont play again in KO-Stage
-                let group1Number, group2Number;
-                let placeGroup1 = 0;
-                let placeGroup2 = 1;
-                if(x % 2 == 0){
-                    group1Number = x;
-                    group2Number = x + 1;
-                }else{
-                    group1Number = stage.length - x;
-                    group2Number = stage.length - x - 1;
-                }
 
-                // 3 Groups and the best 2. advanced 
-                // TODO: This is hardcoded for 3 Groups. Make it dynamic 
-                if(tournament.name == "SCW 3 Karneval 2025"){
-                    if(x == 0){
-                        group1Number = 2;
-                        group2Number = 1;
-                    }
-                    if(x == 1){
-                        placeGroup1 = 1;
-                        placeGroup2 = 0;
-                        group1Number = 1;
-                        group2Number = 0;
-                    }
-                }
-
-
-                // Change first K.o-Stage for 2022 tournament
-                if(tournament.name == "Weck BiPo Open 2022"){
-                    if(x == 0){
-                        group1Number = 2;
-                        group2Number = 0;
-                    }
-                    if(x == 1){
-                        group1Number = 3;
-                        group2Number = 1;
-                    }
-                    if(x == 2){
-                        group1Number = 0;
-                        group2Number = 3;
-                    }
-                    if(x == 3){
-                        group1Number = 1;
-                        group2Number = 2;
-                    }
-                }
+                // groupNumber are the groups that are picked for the K.O-Stage.
+                let { group1Number, group2Number, placeGroup1, placeGroup2 } = getFirstStageSeeding(tournament, x, stage.length);
 
                 // Check if all games of group are played. Get first place of picked group1 and set as team1
                 if(!tournament.groupPhase.matches[group1Number].find((match) => !match.result)) 
@@ -176,13 +185,24 @@ export const updateMatchesKOPhase = async (tournament:Tournament) => {
 }
 
 // KO-PHASE
-export const setGameResultKOPhase = async (tournament:Tournament, matchID:string, result:MatchResult) => {
+export const setGameResultKOPhase = async (tournament:Tournament, match:Match) => {
     // Find match in matches and add result 
     let matches = tournament.koPhase.matches;
     for (let i = 0; i < matches.length; i++) {
         for (let x = 0; x < matches[i].length; x++) {
-            if(matchID == matches[i][x]._id)
+            if(match._id == matches[i][x]._id){
+                let result = {
+                    team1Score:  match.team1.players[0].score + match.team1.players[1].score,
+                    team1Player1Score: match.team1.players[0].score, 
+                    team1Player2Score: match.team1.players[1].score, 
+                
+                    team2Score:  match.team2.players[0].score + match.team2.players[1].score,
+                    team2Player1Score: match.team2.players[0].score, 
+                    team2Player2Score: match.team2.players[1].score
+                }
+                
                 matches[i][x].result = result;
+            }
         }
     }
 

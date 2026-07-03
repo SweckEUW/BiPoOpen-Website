@@ -32,8 +32,7 @@ const TournamentSchema = new Schema(
                                     team1Player2Score: { type: Number, required: false },
                                     team2Player1Score: { type: Number, required: false },
                                     team2Player2Score: { type: Number, required: false }
-                                },
-                                _id: false
+                                }
                             }
                         ]
                     ]
@@ -55,8 +54,7 @@ const TournamentSchema = new Schema(
                                 team1Player2Score: { type: Number, required: false },
                                 team2Player1Score: { type: Number, required: false },
                                 team2Player2Score: { type: Number, required: false }
-                            },
-                            _id: false
+                            }
                         }
                     ]
                 ]
