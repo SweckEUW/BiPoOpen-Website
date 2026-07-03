@@ -133,6 +133,7 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 }
 .mt-team-name{
     width: 100%;
+    margin-right: 10px;
 }
 .mt-team-score, .mt-team-player-score{
     background-color: var(--main-color);

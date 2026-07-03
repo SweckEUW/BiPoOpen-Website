@@ -23,7 +23,7 @@
             <template #body="slotProps">
                 <div class="flex items-center justify-start">
                     <PlayerProfileAvatar class="min-w-[65px] min-h-[65px] mr-[10px]" :name="slotProps.data.name" :avatarImage="slotProps.data.logo" :shape="'square'"/>
-                    <div class="!text-left whitespace-pre-line">{{ slotProps.data.name }}</div>
+                    <div class="!text-left whitespace-pre-line leading-tight" :class="getNameSizeClass(slotProps.data.name)">{{ slotProps.data.name }}</div>
                 </div>
             </template>
         </Column>
@@ -70,6 +70,16 @@ const getRowClass = (row: TeamWithStats) => {
 
     if (index === 0) return '!bg-[var(--secondary-color-weak)]';
     if (index === 1) return '!bg-[#e6faff]';
+
+    return '';
+};
+
+const getNameSizeClass = (name: string) => {
+    const length = name?.length ?? 0;
+
+    if (length > 40) return 'text-[11px] max-[900px]:text-[10px]';
+    if (length > 28) return 'text-[13px] max-[900px]:text-[12px]';
+    if (length > 20) return 'text-[15px] max-[900px]:text-[13px]';
 
     return '';
 };
