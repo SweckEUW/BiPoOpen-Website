@@ -11,12 +11,16 @@
             <!-- Tabs -->
             <Tabs v-model:value="place" @update:value="changeRouter">
                <TabList class="pb-[20px]">
+                  <Tab value="Teams">Teams</Tab>
                   <Tab value="Gruppenphase">Gruppenphase</Tab>
                   <Tab value="K.o.Phase">K.o.Phase</Tab>
                   <Tab v-if="tournament.settings.trackPlayerShots" value="MVP">MVP</Tab>
                   <Tab v-if="getTournamentPhotos()" value="Fotos">Fotos</Tab>
                </TabList>
                <TabPanels class="!p-[0px]">
+                  <TabPanel value="Teams">
+                     <Teams :tournament="tournament"/>
+                  </TabPanel>
                   <TabPanel value="Gruppenphase">
                      <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="false"/>
                   </TabPanel>
@@ -38,6 +42,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted, Ref } from "vue"
 import { getTournamentByName } from "@/util/tournamentFunctions"
+import Teams from '@/components/frontend/tournament/Teams.vue';
 import ScheduleGroups from '@/components/frontend/tournament/ScheduleGroups.vue';
 import KOSchedule from '@/components/frontend/tournament/KOSchedule.vue';
 import MVP from '@/components/frontend/tournament/MVP.vue';
@@ -54,9 +59,11 @@ const route = useRoute()
 
 let tournament = ref<Tournament|undefined>();
 
-let place:Ref<"Gruppenphase"|"K.o.Phase"|"Teams"|"MVP"|"Fotos"> = ref("Gruppenphase");
+let place:Ref<"Teams"|"Gruppenphase"|"K.o.Phase"|"MVP"|"Fotos"> = ref("Teams");
 let name = route.path.split("/").pop();
-if(name == "Gruppenphase")
+if(name == "Teams")
+   place.value = "Teams";
+else if(name == "Gruppenphase")
    place.value = "Gruppenphase";
 else if(name == "K.o.Phase")
    place.value = "K.o.Phase";

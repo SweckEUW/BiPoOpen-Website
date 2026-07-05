@@ -13,7 +13,7 @@
     >
 
         <!-- Platzierung -->
-        <Column :header="windowWidth > 900 ? 'Platz' : 'Pl.'" :pt="{ headerCell: { class: '!px-1 !w-[35px] !max-w-[35px]' }, bodyCell: { class: '!p-1 !w-[35px] !max-w-[35px]' } }">
+        <Column :header="windowWidth > 900 ? 'Platz' : 'Pl.'" :pt="{ headerCell: { class: '!px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
             <template #body="slotProps">
                 {{ slotProps.index + 1 }}
             </template>
