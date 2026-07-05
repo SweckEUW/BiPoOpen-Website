@@ -9,7 +9,7 @@
             }
         }"
         stripedRows
-        class="w-full league-standings-table"
+        class="w-full league-standings-table text-[14px]"
     >
 
         <!-- Platzierung -->
@@ -20,7 +20,7 @@
         </Column>
 
         <!-- Team -->
-        <Column header="Team" :pt="{ headerCell: { class: 'league-standings-sticky-header !text-left' }, columnTitle: { class: '!text-left' } }">
+        <Column header="Team" :pt="{ headerCell: { class: 'league-standings-sticky-header' }, columnTitle: { class: '!text-left' } }">
             <template #body="slotProps">
                 <div class="flex items-center justify-start">
                     <img class="w-[80px] h-[80px] object-contain mr-[20px] max-[900px]:mr-[10px] max-[450px]:w-[60px] max-[450px]:h-[60px] max-[375px]:w-[40px] max-[375px]:h-[40px]" :src="getPlayerLogo(slotProps.data.name)">
@@ -90,11 +90,11 @@ const getRowClass = (row: PlayerWithStats) => {
     const index = playerOrderByName.value[row.name];
     const total = sortedLeaguePlayers.value.length;
 
-    if (index === 0) return '!bg-[#8fe4f7] !text-[22px]';
+    if (index === 0) return '!bg-[#8fe4f7]';
     if (index === 1) return '!bg-[#aaeafa]';
     if (index === 2) return '!bg-[#b5ecfa]';
     if (index === 3) return '!bg-[#c6f2fd]';
-    if (index === total - 3) return '!bg-[#f3d4d7] !text-[22px]';
+    if (index === total - 3) return '!bg-[#f3d4d7]';
     if (index === total - 2) return '!bg-[#eeaab1]';
     if (index === total - 1) return '!bg-[#e97f89]';
 
