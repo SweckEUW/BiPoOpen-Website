@@ -2,6 +2,7 @@
     <DataTable
         :value="group.teams"
         :rowClass="getRowClass"
+        @row-click="onRowClick"
         :pt="{
             tableContainer: {
                 class: '!overflow-visible'
@@ -52,6 +53,8 @@
         </Column>
 
     </DataTable>
+
+    <StandingsGroupTeamDrawer v-model:visible="drawerVisible" :selected-team="selectedTeam" :tournament="tournament"/>
 </template>
 
 <script setup lang="ts">
@@ -59,19 +62,28 @@ import { onMounted, onUnmounted, PropType, ref } from "vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import StandingsGroupTeamDrawer from '@/components/frontend/tournament/StandingsGroupTeamDrawer.vue';
 
 const props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },
    group: {type: Object as PropType<GroupWithStats>, required: true },
 })
 
+const drawerVisible = ref(false);
+const selectedTeam = ref<TeamWithStats>();
+
+const onRowClick = (event: { data: TeamWithStats }) => {
+    selectedTeam.value = event.data;
+    drawerVisible.value = true;
+};
+
 const getRowClass = (row: TeamWithStats) => {
     const index = props.group.teams.indexOf(row);
 
-    if (index === 0) return '!bg-[var(--secondary-color-weak)]';
-    if (index === 1) return '!bg-[#e6faff]';
+    if (index === 0) return '!bg-[var(--secondary-color-weak)] cursor-pointer';
+    if (index === 1) return '!bg-[#e6faff] cursor-pointer';
 
-    return '';
+    return 'cursor-pointer';
 };
 
 const getNameSizeClass = (name: string) => {
