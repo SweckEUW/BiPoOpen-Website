@@ -20,7 +20,7 @@
             <template v-else>
                 <div class="ho-hero-overlay"></div>
                 <h1 class="ho-title-1">BiPo Open 2026</h1>
-                <p class="ho-subtitle">Samstag 11.07.2026 - 14:00 Uhr</p>
+                <p class="ho-subtitle" v-if="!countdownOver">Samstag 11.07.2026 - 14:00 Uhr</p>
 
                 <div v-if="!countdownOver" class="ho-timer">
                     <div v-for="unit in countdown" :key="unit.label" class="ho-time">
@@ -247,8 +247,10 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 const countdownOver = ref(false);
 const countdown = ref<{ value: number; label: string }[]>([]);
 
+let timer: ReturnType<typeof setInterval> | undefined = undefined;
+
 const updateCountdown = () => {
-    const diff = new Date(2026, 6, 11, 14).getTime() - Date.now();
+    const diff = new Date(2026, 6, 11, 13).getTime() - Date.now();
     if (diff <= 0) { countdownOver.value = true; clearInterval(timer); return; }
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
@@ -262,7 +264,7 @@ const updateCountdown = () => {
     ];
 };
 updateCountdown();
-const timer = setInterval(updateCountdown, 1000);
+timer = setInterval(updateCountdown, 1000);
 onBeforeUnmount(() => clearInterval(timer));
 
 // ─── Hero Image ───
@@ -418,7 +420,7 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
     background-position: center;
     border-radius: 16px;
     overflow: hidden;
-    min-height: 280px;
+    min-height: 440px;
     transition: background-image 0.5s ease;
     margin-top: 20px;
 }
@@ -428,9 +430,10 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
 .ho-hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(234, 81, 96, 0.85) 0%, rgba(97, 195, 217, 0.75) 100%);
+    background: linear-gradient(135deg, rgba(234, 81, 96, 0.6) 0%, rgba(97, 195, 217, 0.5) 100%);
+    /* Leichter Blur nur auf das dahinterliegende Bild — Text bleibt scharf (z-index 1) */
+    backdrop-filter: blur(1px);
     z-index: 0;
-    /* opacity: 0.8; */
 }
 .ho-hero > *:not(.ho-hero-overlay) {
     position: relative;
@@ -828,7 +831,7 @@ const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
     }
     .ho-hero {
         padding: 40px 15px;
-        min-height: 220px;
+        min-height: 400px;
         width: calc(100% + 30px);
         margin-left: -15px;
     }
