@@ -108,7 +108,15 @@ export const getPlayerInitials = (playerOrTeamName: string): string => {
     if (parts.length === 0) return '?';
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
 
-    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+    const initials = `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+
+    // "SS" (historisch belastet) vermeiden -> erste zwei Buchstaben des Vornamens
+    if (initials === 'SS') {
+        const firstName = parts[0];
+        return (firstName.length >= 2 ? firstName.slice(0, 2) : firstName.charAt(0)).toUpperCase();
+    }
+
+    return initials;
 };
 
 const normalizeName = (value: string): string =>
