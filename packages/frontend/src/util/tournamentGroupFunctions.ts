@@ -36,6 +36,7 @@ export const getGroupsWithStats = (tournament:Tournament|undefined) => {
         groupsWithStats.push({teams: []});
         
         for (let x = 0; x < tournamentGroups[i].teams.length; x++) {
+            if(!tournamentGroups[i].teams[x]) continue;
             let teamName = tournamentGroups[i].teams[x].name!;
             let ammountOfHitsFromTeam = getAmmountOfHitsFromTeam(tournament, teamName, true);
             let ammountOfEnemyHitsFromTeam = getAmmountOfEnemyHitsFromTeam(tournament, teamName, true);

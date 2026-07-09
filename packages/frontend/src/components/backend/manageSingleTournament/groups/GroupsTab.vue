@@ -41,14 +41,14 @@
             </tr>
          </thead>
          <tbody>
-            <tr v-for="(team,id) in group.teams" :key="team._id" class="text-left">
+            <tr v-for="(team,id) in group.teams" :key="team ? team._id : ''" class="text-left">
                <td class="lt-handle">
                   <div style="margin-bottom: 5px; margin-top: 5px;"/>
                   <div/>
                </td>
                <td>{{id+1}}</td>
                <td class="flex">
-                  <PlayerProfileAvatar class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
+                  <PlayerProfileAvatar v-if="team" class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
                   <div>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</div>
                </td>
                <td v-if="team">
