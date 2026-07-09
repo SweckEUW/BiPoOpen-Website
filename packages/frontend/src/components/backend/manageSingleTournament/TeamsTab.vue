@@ -121,7 +121,7 @@
             <tr class="text-left" v-for="(team, id) in tournament.teams" @click="toggleModalEditTeam(team)" :key="team.name">
                <td>{{ id + 1 }}</td>
                <td>
-                  <PlayerProfileAvatar class="min-w-[65px] min-h-[65px] mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'" :shape="'square'"/>
+                  <Avatar class="min-w-[65px] min-h-[65px] mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'" :shape="'square'"/>
                </td>
                <td>{{ team.name }}</td>
                <td>
@@ -138,7 +138,7 @@
 import { PropType, ref } from "vue"
 import Modal from '@/components/shared/Modal.vue';
 import { addTeam, editTeam, removeTeam } from "@/util/tournamentTeamFunctions";
-import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 import ImageCropDialog from '@/components/shared/ImageCropDialog.vue';
 import { uploadTeamLogo } from '@/util/supabaseStorage';
 

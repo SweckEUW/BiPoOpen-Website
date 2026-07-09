@@ -2,7 +2,7 @@
     <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
         <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
             <div class="relative cursor-pointer group mb-[10px]" @click="showImageUpload = true">
-                <PlayerProfileAvatar
+                <Avatar
                     :key="avatarKey"
                     :name="profileData.name"
                     size="xlarge"
@@ -131,7 +131,7 @@ import PlayerProfileAnalysis from './PlayerProfileAnalysis.vue';
 import PlayerProfileBadges from './PlayerProfileBadges.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
-import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 import PlayerProfileImageUpload from './PlayerProfileImageUpload.vue';
 import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
 import { fetchPlayerProfileImage } from './PlayerProfileImageMapping';

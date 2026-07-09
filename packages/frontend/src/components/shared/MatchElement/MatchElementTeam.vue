@@ -10,7 +10,7 @@
             <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
 
                 <!-- Team Logo -->
-                <PlayerProfileAvatar
+                <Avatar
                     v-if="displayTeamLogo"
                     :name="teamName"
                     :avatarImage="teamLogo"
@@ -25,7 +25,7 @@
                     :key="`${player.name}-${index}`"
                     class="cursor-pointer"
                 >   
-                    <PlayerProfileAvatar
+                    <Avatar
                         :name="player.name"
                         shape="circle"
                         size="normal"
@@ -45,7 +45,7 @@
         <!-- Team Players when expanded -->
         <div v-if="team && playersVisible && team.players.length > 1">
             <div class="mt-team-player cursor-pointer" v-for="(player, index) in team.players" :key="`${player.name}-${index}`" @click.stop="openPlayerProfile?.(player.name)">
-                <PlayerProfileAvatar
+                <Avatar
                     v-if="!hideAvatars"
                     :name="player.name"
                     shape="circle"
@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import { PropType, computed, inject } from 'vue';
 import { getMatchScore } from "@/util/tournamentMatchFunctions";
-import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },

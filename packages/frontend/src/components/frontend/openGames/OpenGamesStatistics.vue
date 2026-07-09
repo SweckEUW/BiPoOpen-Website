@@ -33,7 +33,7 @@
                             <td>{{ player.placement! + 1}}</td>
                             <td>
                                 <div class="ogs-player-row" @click="openPlayerProfile(player.name)">
-                                    <PlayerProfileAvatar class="ogs-player-avatar" :name="player.name" :size="'xlarge'"/>
+                                    <Avatar class="ogs-player-avatar" :name="player.name" :size="'xlarge'"/>
                                     <span class="ogs-player-link">{{ player.name.replace(" ","\n") }}</span>
                                 </div>
                             </td>
@@ -84,7 +84,7 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-import PlayerProfileAvatar from '../playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps({
     openGames: {type: Object as PropType<Match[]>, required: true }

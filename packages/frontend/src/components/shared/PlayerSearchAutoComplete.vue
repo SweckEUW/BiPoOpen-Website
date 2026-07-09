@@ -16,7 +16,7 @@
     >
         <template #option="{ option }">
             <div class="flex items-center gap-[8px]">
-                <PlayerProfileAvatar :name="option" size="normal" shape="circle" />
+                <Avatar :name="option" size="normal" shape="circle" />
                 <span>{{ option }}</span>
             </div>
         </template>
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import AutoComplete from 'primevue/autocomplete';
-import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 import { getAllPlayerNames } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
 
 defineOptions({ inheritAttrs: false });

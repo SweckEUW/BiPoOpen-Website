@@ -1,5 +1,5 @@
 <template>
-    <Avatar
+    <PrimeAvatar
         :label="avatarImageComputed ? undefined : playerInitials"
         :image="avatarImageComputed || undefined"
         :shape="shape"
@@ -16,8 +16,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import Avatar from 'primevue/avatar';
-import { getPlayerInitials, getPlayerProfileImage, fetchPlayerProfileImage, backendImageCache } from './PlayerProfileImageMapping';
+import PrimeAvatar from 'primevue/avatar';
+import { getPlayerInitials, getPlayerProfileImage, fetchPlayerProfileImage, backendImageCache } from '@/components/frontend/playerProfile/PlayerProfileImageMapping';
 
 const props = defineProps({
     name: {type: String, required: true},
@@ -32,9 +32,9 @@ onMounted(() => {
 });
 
 const avatarImageComputed = computed(() => {
-    if(props.avatarImage) 
+    if(props.avatarImage)
         return props.avatarImage;
-    
+
     // Access backendImageCache reactively to re-render when image is fetched
     const _trigger = backendImageCache[props.name?.trim().replace(/\s+/g, ' ').toLowerCase()];
     return getPlayerProfileImage(props.name);

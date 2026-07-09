@@ -2,7 +2,7 @@
     <Card>
         <template #content>
             <div class="flex items-center gap-[10px]">
-                <PlayerProfileAvatar :name="name" />
+                <Avatar :name="name" />
                 <div class="flex-1">
                     <span v-if="clickable" class="font-bold text-[14px] text-[--p-primary-color] cursor-pointer hover:underline" @click="$emit('open', name)">{{ name }}</span>
                     <div v-else class="font-bold text-[14px] break-words">{{ name }}</div>
@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import Tag from 'primevue/tag';
 import Card from 'primevue/card';
-import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps<{
     name: string;

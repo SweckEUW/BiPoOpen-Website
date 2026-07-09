@@ -23,7 +23,7 @@
         <Column header="Team" :pt="{ headerCell: { class: '!text-left' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
             <template #body="slotProps">
                 <div class="flex items-center justify-start">
-                    <PlayerProfileAvatar class="min-w-[65px] min-h-[65px] max-[600px]:min-w-[50px] max-[600px]:min-h-[50px] max-[400px]:min-w-[40px] max-[400px]:min-h-[40px] mr-[10px] max-[400px]:mr-[6px]" :name="slotProps.data.name" :avatarImage="slotProps.data.logo" :shape="'square'"/>
+                    <Avatar class="min-w-[65px] min-h-[65px] max-[600px]:min-w-[50px] max-[600px]:min-h-[50px] max-[400px]:min-w-[40px] max-[400px]:min-h-[40px] mr-[10px] max-[400px]:mr-[6px]" :name="slotProps.data.name" :avatarImage="slotProps.data.logo" :shape="'square'"/>
                     <div class="!text-left whitespace-pre-line leading-tight" :class="getNameSizeClass(slotProps.data.name)">{{ slotProps.data.name }}</div>
                 </div>
             </template>
@@ -61,7 +61,7 @@
 import { onMounted, onUnmounted, PropType, ref } from "vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 import StandingsGroupTeamDrawer from '@/components/frontend/tournament/StandingsGroupTeamDrawer.vue';
 
 const props = defineProps({

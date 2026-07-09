@@ -48,7 +48,7 @@
                </td>
                <td>{{id+1}}</td>
                <td class="flex">
-                  <PlayerProfileAvatar v-if="team" class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
+                  <Avatar v-if="team" class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
                   <div>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</div>
                </td>
                <td v-if="team">
@@ -72,7 +72,7 @@ import { generateRandomGroups, generateRandomMatchesGroupPhase, setGameResultGro
 import { initMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { useToast } from "primevue";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import PlayerProfileAvatar from '@/components/frontend/playerProfile/PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps({
    getTournament: {type: Function, required: true },

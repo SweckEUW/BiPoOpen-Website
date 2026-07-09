@@ -9,7 +9,7 @@
         @hide="onDialogHide"
     >
         <div class="flex flex-col items-center gap-4 py-4">
-            <PlayerProfileAvatar :name="playerName" size="xlarge" shape="circle" class="!w-[250px] !h-[250px] !text-[40px]" />
+            <Avatar :name="playerName" size="xlarge" shape="circle" class="!w-[250px] !h-[250px] !text-[40px]" />
             <p class="text-[--p-text-muted-color] text-center text-sm">
                 Wähle ein Bild aus, um dein Profilbild zu ändern.
             </p>
@@ -56,7 +56,7 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import { useToast } from 'primevue/usetoast';
 import axios from 'axios';
-import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 import ImageCropDialog from '@/components/shared/ImageCropDialog.vue';
 import { getPlayerProfileImageFromBackend, invalidatePlayerProfileImageCache } from './PlayerProfileImageMapping';
 

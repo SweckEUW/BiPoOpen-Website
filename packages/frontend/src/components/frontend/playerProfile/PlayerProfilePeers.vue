@@ -25,7 +25,7 @@
                         <template #content>
                             <div class="flex items-center gap-[10px]">
                                 <div class="flex -space-x-2">
-                                    <PlayerProfileAvatar
+                                    <Avatar
                                         v-for="player in rival.players"
                                         :key="player"
                                         :name="player"
@@ -67,7 +67,7 @@ import Tag from 'primevue/tag';
 import Card from 'primevue/card';
 import Panel from 'primevue/panel';
 import PlayerPeerCard from './PlayerPeerCard.vue';
-import PlayerProfileAvatar from './PlayerProfileAvatar.vue';
+import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps<{
     partners: PartnerData[];
