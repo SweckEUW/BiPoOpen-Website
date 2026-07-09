@@ -116,12 +116,12 @@ export const generateRandomMatchesGroupPhase = async (tournament:Tournament) => 
             matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[4]._id, _id: ""});
 
         }else if(ammountOfGames == 6){ // 4er Gruppen
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id, _id: ""});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
-            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id, _id: ""});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id, _id: ""});
-            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
-            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""}); // 1. vs 2.
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[3]._id, _id: ""}); // 3. vs 4.
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[3]._id, _id: ""}); // 1. vs 4.
+            matchesForGroup.push({team1ID: teams[2]._id, team2ID: teams[1]._id, _id: ""}); // 3. vs 2.
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""}); // 1. vs 3.
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[3]._id, _id: ""}); // 2. vs 4.
 
         }else if(ammountOfGames == 3){ // 3er Gruppen
             // Hinrunde
@@ -130,9 +130,9 @@ export const generateRandomMatchesGroupPhase = async (tournament:Tournament) => 
             matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
 
             // Rückrunde
-            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
-            // matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
-            // matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[1]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[0]._id, team2ID: teams[2]._id, _id: ""});
+            matchesForGroup.push({team1ID: teams[1]._id, team2ID: teams[2]._id, _id: ""});
 
         }else{
             for (let x = 0; x < teams.length; x++){
