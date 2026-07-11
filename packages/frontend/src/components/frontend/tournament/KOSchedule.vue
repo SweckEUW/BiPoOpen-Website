@@ -15,7 +15,7 @@
                             <div v-for="(pair, pIndex) in getMatchPairs(round.matches)" :key="pIndex" class="tb-pair">
                                 <div v-for="(match, mIndex) in pair" :key="mIndex" class="tb-slot">
                                     <div class="tb-match">
-                                        <MatchElement :match="match" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                        <MatchElement :match="match"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
                                             :team1Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, false)"
                                             :team2Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, true)"/>
                                     </div>
@@ -26,14 +26,14 @@
                         <template v-else>
                             <div class="tb-round-title">Finale</div>
                             <div class="tb-match">
-                                <MatchElement :match="round.matches[0]" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                <MatchElement :match="round.matches[0]"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
                                     :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 0, false)"
                                     :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 0, true)"/>
                             </div>
                             <template v-if="round.matches[1]">
                                 <div class="tb-round-title tb-third-place-title">Spiel um Platz 3</div>
                                 <div class="tb-match">
-                                    <MatchElement :match="round.matches[1]" :hideAvatars="true" :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                    <MatchElement :match="round.matches[1]"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
                                         :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 1, false)"
                                         :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 1, true)"/>
                                 </div>
@@ -117,7 +117,7 @@ const getKOPlaceholderName = (tournament:Tournament, stageIndex:number, matchInd
 .tb-round {
     display: flex;
     flex-direction: column;
-    min-width: 180px;
+    min-width: 350px;
     flex: 1;
     flex-shrink: 0;
     margin-right: 30px;
@@ -233,10 +233,11 @@ const getKOPlaceholderName = (tournament:Tournament, stageIndex:number, matchInd
     font-size: 8px;
 }
 
+
 /* ═══════ MOBILE ═══════ */
 @media (width <= 900px) {
     .tb-round {
-        min-width: 140px;
+        min-width: 200px;
         margin-right: 24px;
     }
     .tb-round:last-child {
@@ -259,6 +260,10 @@ const getKOPlaceholderName = (tournament:Tournament, stageIndex:number, matchInd
     }
     .tb-match :deep(.mt-team) {
         font-size: 11px;
+    }
+    .tb-match :deep(.p-avatar) {
+        min-width: 30px;
+        min-height: 30px;
     }
 }
 </style>

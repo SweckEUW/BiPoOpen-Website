@@ -11,7 +11,7 @@
 
                 <!-- Team Logo -->
                 <Avatar
-                    v-if="displayTeamLogo"
+                    v-if="displayTeamLogo && team"
                     :name="teamName"
                     :avatarImage="teamLogo"
                     shape="square"
@@ -20,7 +20,7 @@
                 />
 
                 <div
-                    v-else
+                    v-else-if="team"
                     v-for="(player, index) in team.players"
                     :key="`${player.name}-${index}`"
                     class="cursor-pointer"
