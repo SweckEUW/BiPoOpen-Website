@@ -79,7 +79,7 @@ getTournament()
 
 let updateInterval = setInterval(() => {
    getTournament();
-}, 10000);
+}, 60000);
 
 onUnmounted(() => {
    clearInterval(updateInterval);
