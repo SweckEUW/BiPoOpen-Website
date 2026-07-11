@@ -22,21 +22,24 @@
             >
 
                 <!-- Platz -->
-                <Column field="placement" sortable :header="windowWidth > 900 ? 'Platz' : 'Pl.'" :pt="{ headerCell: { class: 'mvp-sticky-header !px-1 !w-[35px] !max-w-[35px]' }, bodyCell: { class: '!w-[35px] !max-w-[35px]' } }">
+                <Column :header="windowWidth > 900 ? 'Platz' : 'Pl.'" :pt="{ headerCell: { class: 'mvp-sticky-header !px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
                     <template #body="slotProps">
                         {{ slotProps.data.placement! + 1 }}
                     </template>
                 </Column>
 
                 <!-- Name -->
-                <Column field="name" sortable header="Name" :pt="{ headerCell: { class: 'mvp-sticky-header' } }">
+                <Column header="Name" :pt="{ headerCell: { class: 'mvp-sticky-header !text-left z-9999' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
                     <template #body="slotProps">
-                        <div class="!text-left whitespace-pre-line">{{ slotProps.data.name }}</div>
+                        <div class="flex items-center gap-[8px] !text-left">
+                            <Avatar :name="slotProps.data.name" shape="circle" class="mvp-avatar shrink-0 !w-[35px] !h-[35px] !text-[10px]"/>
+                            <div class="whitespace-pre-line !text-left">{{ slotProps.data.name }}</div>
+                        </div>
                     </template>
                 </Column>
 
                 <!-- Trefferquote -->
-                <Column field="averageHits" sortable :header="windowWidth > 900 ? 'Trefferquote' : 'Trfq.'"  :pt="{ headerCell: { class: 'mvp-sticky-header' } }">
+                <Column field="averageHits" sortable :header="windowWidth > 900 ? 'Trefferquote' : 'Trfq.'" :pt="{ headerCell: { class: 'mvp-sticky-header' } }">
                     <template #body="slotProps">
                         {{ slotProps.data.averageHits.toFixed(2) }}
                     </template>
@@ -69,6 +72,7 @@
 import { ref, computed, inject, PropType } from "vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Avatar from '@/components/shared/Avatar.vue';
 import { getMVPList } from "@/util/tournamentPlayerFunctions";
 
 let props = defineProps({
@@ -131,6 +135,18 @@ const getRowClass = (row:PlayerWithStats) => {
     font-weight: 500;
 }
 
+/* Label-Avatare nutzen intern opacity:0.7 und erzeugen dadurch einen eigenen
+   Stacking-Context, wodurch sie sich beim Scrollen über den Sticky-Header legen.
+   opacity entfernen (-> kein Stacking-Context, scrollt hinter den Header wie die
+   Bild-Avatare) und den gedämpften Look über eine transluzente Hintergrundfarbe
+   nachbilden. */
+.MVP-Table :deep(.mvp-avatar){
+    opacity: 1 !important;
+}
+.MVP-Table :deep(.mvp-avatar:not(:has(img))){
+    background-color: color-mix(in srgb, var(--main-color) 70%, transparent) !important;
+}
+
 /* Sortier-Pfeil nur an der aktiv sortierten Spalte anzeigen */
 .MVP-Table :deep(.p-datatable-sort-icon){
     display: none;
@@ -149,5 +165,6 @@ const getRowClass = (row:PlayerWithStats) => {
     .MVP-Table :deep(tr.mvp-rank-1 > td){ font-size: 15px; }
     .MVP-Table :deep(tr.mvp-rank-2 > td){ font-size: 14px; }
     .MVP-Table :deep(tr.mvp-rank-3 > td){ font-size: 14px; }
+    .MVP-Table :deep(.mvp-avatar){ width: 22px !important; height: 22px !important; }
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
     <PrimeAvatar
+        ref="rootRef"
         :label="avatarImageComputed ? undefined : playerInitials"
         :image="avatarImageComputed || undefined"
         :shape="shape"
@@ -15,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import PrimeAvatar from 'primevue/avatar';
 import { getPlayerInitials, getPlayerProfileImage, fetchPlayerProfileImage, backendImageCache } from '@/components/frontend/playerProfile/PlayerProfileImageMapping';
 
@@ -24,11 +25,39 @@ const props = defineProps({
     avatarImage: {type: String, required: false},
     shape: {type: String as () => 'circle' | 'square', default: 'circle'},
     grayscale: {type: Boolean, default: false},
+    lazy: {type: Boolean, default: true},
 });
 
-// Trigger backend fetch on mount (result lands in reactive cache)
+const rootRef = ref<{ $el?: Element } | null>(null);
+let observer: IntersectionObserver | null = null;
+
 onMounted(() => {
-    fetchPlayerProfileImage(props.name);
+    // Eager: sofort laden wie bisher.
+    if (!props.lazy || typeof IntersectionObserver === 'undefined') {
+        fetchPlayerProfileImage(props.name);
+        return;
+    }
+
+    // Lazy: erst beim ersten Sichtbarwerden laden, dann Observer trennen.
+    const el = rootRef.value?.$el;
+    if (!el) {
+        fetchPlayerProfileImage(props.name);
+        return;
+    }
+
+    observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+            fetchPlayerProfileImage(props.name);
+            observer?.disconnect();
+            observer = null;
+        }
+    });
+    observer.observe(el);
+});
+
+onBeforeUnmount(() => {
+    observer?.disconnect();
+    observer = null;
 });
 
 const avatarImageComputed = computed(() => {
