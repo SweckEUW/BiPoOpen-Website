@@ -140,11 +140,25 @@ const initGroupAndKOMatches = async () => {
    // DEBUG!
    // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
    //    groupMatches.forEach(async (match) => {
+   //       if (!match) return; 
+
    //       let team1Won = Math.random() > 0.5;
-   //       match.team1.players[0].score = team1Won ? 10 : Math.floor(Math.random() * 9);
-   //       match.team1.players[1].score = Math.floor(Math.random() * 9);
-   //       match.team2.players[0].score = team1Won ? Math.floor(Math.random() * 9) : 10;
-   //       match.team2.players[1].score = Math.floor(Math.random() * 9);
+
+   //       // Calc winner scores summing exactly 10
+   //       let winScoreP1 = Math.floor(Math.random() * 11);
+   //       let winScoreP2 = 10 - winScoreP1;
+
+   //       // Calc loser scores summing max 9
+   //       let loseTotal = Math.floor(Math.random() * 10);
+   //       let loseScoreP1 = Math.floor(Math.random() * (loseTotal + 1));
+   //       let loseScoreP2 = loseTotal - loseScoreP1;
+
+   //       // Assign scores
+   //       match.team1.players[0].score = team1Won ? winScoreP1 : loseScoreP1;
+   //       match.team1.players[1].score = team1Won ? winScoreP2 : loseScoreP2;
+   //       match.team2.players[0].score = team1Won ? loseScoreP1 : winScoreP1;
+   //       match.team2.players[1].score = team1Won ? loseScoreP2 : winScoreP2;
+
    //       await setGameResultGroupPhase(props.tournament, match);
    //    });
    // });
