@@ -137,6 +137,7 @@ declare global {
         wins: number;
         hits: number;
         averageHits: number;
+        trackedMatches: number;
     };
 
     type TurnAnalysis = {

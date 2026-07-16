@@ -26,7 +26,7 @@
             <div class="flex justify-center items-end gap-[32px] pb-[14px] pt-[14px] border-b border-[--p-content-border-color]">
                 <div class="text-center">
                     <div class="text-[13px] text-[--p-text-muted-color] mb-[4px]">Treffer / Spiel</div>
-                    <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.averageHits }}</div>
+                    <div class="text-[28px] font-bold text-[--p-primary-color]">{{ data.totalHits > 0 ? data.averageHits : '/' }}</div>
                     <TrendIndicator :value="data.trends.averageHitsTrend" />
                 </div>
                 <div class="text-center">
@@ -78,7 +78,7 @@
                 </Column>
                 <Column header="Trf/Spiel">
                     <template #body="{ data: row }">
-                        {{ row.averageHits.toFixed(2) }}
+                        {{ row.trackedMatches > 0 ? row.averageHits.toFixed(2) : '/' }}
                     </template>
                 </Column>
             </DataTable>

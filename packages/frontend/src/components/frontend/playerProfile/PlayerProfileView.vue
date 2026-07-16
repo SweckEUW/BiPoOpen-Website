@@ -148,7 +148,7 @@ defineEmits<{
     (e: 'openPlayer', name: string): void;
 }>();
 
-const activeTabValue = ref('1v1');
+const activeTabValue = ref('2v2');
 const showImageUpload = ref(false);
 const avatarKey = ref(0);
 

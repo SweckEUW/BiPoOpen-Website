@@ -309,7 +309,7 @@ const calculateStreaksFromResults = (matchHistory: { time: number; won: boolean 
     return { current: temp, best, longestLosing: worstLosing };
 };
 
-const calculateTrends = (matchHistory: (MatchHistoryEntry & { won: boolean; hits: number })[], trendPeriod: Exclude<TrendPeriod, 'all'>): TrendData => {
+const calculateTrends = (matchHistory: (MatchHistoryEntry & { won: boolean; hits: number; hitsTracked: boolean })[], trendPeriod: Exclude<TrendPeriod, 'all'>): TrendData => {
     let now = Date.now();
     let periodMs = TREND_PERIOD_DAYS[trendPeriod] * 24 * 60 * 60 * 1000;
     let cutoff = now - periodMs;
@@ -331,9 +331,14 @@ const calculateTrends = (matchHistory: (MatchHistoryEntry & { won: boolean; hits
         let rWr = recent.filter(m => m.won).length / recent.length * 100;
         let hWr = historical.filter(m => m.won).length / historical.length * 100;
         winrateTrend = Math.round((rWr - hWr) * 10) / 10;
+    }
 
-        let rAvg = recent.reduce((a, m) => a + m.hits, 0) / recent.length;
-        let hAvg = historical.reduce((a, m) => a + m.hits, 0) / historical.length;
+    // Trefferquoten-Trend nur über Spiele mit erfassten Treffern (2020-2022 ohne Treffer ausgenommen)
+    let rTracked = recent.filter(m => m.hitsTracked);
+    let hTracked = historical.filter(m => m.hitsTracked);
+    if (rTracked.length > 0 && hTracked.length >= 5) {
+        let rAvg = rTracked.reduce((a, m) => a + m.hits, 0) / rTracked.length;
+        let hAvg = hTracked.reduce((a, m) => a + m.hits, 0) / hTracked.length;
         averageHitsTrend = Math.round((rAvg - hAvg) * 100) / 100;
     }
 
@@ -556,20 +561,20 @@ export const getGlobalMaxStreaks = async (): Promise<{ maxWinStreak: number; max
 
 export const getPlayerProfileData = async (playerName: string, trendPeriod: TrendPeriod = '1m'): Promise<PlayerProfileData> => {
     let playerNameLower = playerName.toLowerCase();
-    let matchHistory: (MatchHistoryEntry & { won: boolean; hits: number })[] = [];
+    let matchHistory: (MatchHistoryEntry & { won: boolean; hits: number; hitsTracked: boolean })[] = [];
     let rivals: Map<string, { wins: number; losses: number }> = new Map();
     let partnersMap: Map<string, { matches: number; wins: number; losses: number }> = new Map();
     let categories: CategoryStats[] = [];
 
     const processMatches = (matches: Match[], source: string, categoryName: string, nameForMatch?: string) => {
         let effectiveName = nameForMatch || playerName;
-        let stats = { name: categoryName, matches: matches.length, wins: 0, hits: 0, averageHits: 0 };
+        let stats = { name: categoryName, matches: matches.length, wins: 0, hits: 0, averageHits: 0, trackedMatches: matches.length };
         matches.forEach(m => {
             let won = didPlayerWinMatch(m, effectiveName);
             let hits = getPlayerHitsInMatch(m, effectiveName);
             if (won) stats.wins++;
             stats.hits += hits;
-            matchHistory.push({ match: m, source, time: m.time || 0, won, hits });
+            matchHistory.push({ match: m, source, time: m.time || 0, won, hits, hitsTracked: true });
 
             let oppName = getOpponentName(m, effectiveName);
             let rival = rivals.get(oppName) || { wins: 0, losses: 0 };
@@ -584,7 +589,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
                 partnersMap.set(partnerName, p);
             }
         });
-        stats.averageHits = stats.matches > 0 ? stats.hits / stats.matches : 0;
+        stats.averageHits = stats.trackedMatches > 0 ? stats.hits / stats.trackedMatches : 0;
         if (stats.matches > 0) categories.push(stats);
     };
 
@@ -609,13 +614,17 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     }
 
     // 3. Tournaments - combine all BiPo Open tournaments into one category
-    let bipoOpenStats = { name: "BiPo Open Turniere", matches: 0, wins: 0, hits: 0, averageHits: 0 };
+    let bipoOpenStats = { name: "BiPo Open Turniere", matches: 0, wins: 0, hits: 0, averageHits: 0, trackedMatches: 0 };
     for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
         let tournament = await getTournamentByName(year);
         if (!tournament) continue;
         let tMatches = getFinishedMatchesFromPlayer(tournament, playerName, false);
         let fallbackTime = getBiPoOpenTournamentFallbackTime(year);
         if (tMatches.length === 0) continue;
+
+        // 2020-2022: Treffer pro Spieler wurden nicht erfasst (trackPlayerShots = false).
+        // Diese Spiele bleiben in der Wertung (Spiele/Siege), fließen aber nicht in die Trefferquote ein.
+        let hitsTracked = tournament.settings.trackPlayerShots;
 
         tMatches.forEach(m => {
             let isTeam1 = m.team1.players.some(p => p.name === playerName);
@@ -626,8 +635,9 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
             let player = [...m.team1.players, ...m.team2.players].find(p => p.name === playerName);
             let hits = player ? (player.score ?? 0) : 0;
             bipoOpenStats.hits += hits;
+            if (hitsTracked) bipoOpenStats.trackedMatches++;
             let matchTime = m.time && m.time > 0 ? m.time : fallbackTime;
-            matchHistory.push({ match: m, source: "BiPo Open Turniere", time: matchTime, won, hits });
+            matchHistory.push({ match: m, source: "BiPo Open Turniere", time: matchTime, won, hits, hitsTracked });
 
             let opponents = isTeam1 ? m.team2.players : m.team1.players;
             let oppName = getNormalizedPlayerCombination(opponents);
@@ -645,7 +655,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
         });
     }
     if (bipoOpenStats.matches > 0) {
-        bipoOpenStats.averageHits = bipoOpenStats.hits / bipoOpenStats.matches;
+        bipoOpenStats.averageHits = bipoOpenStats.trackedMatches > 0 ? bipoOpenStats.hits / bipoOpenStats.trackedMatches : 0;
         categories.push(bipoOpenStats);
     }
 
@@ -661,14 +671,15 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     // Recalculate categories from filtered history
     let filteredCategories: Map<string, CategoryStats> = new Map();
     filteredHistory.forEach(m => {
-        let existing = filteredCategories.get(m.source) || { name: m.source, matches: 0, wins: 0, hits: 0, averageHits: 0 };
+        let existing = filteredCategories.get(m.source) || { name: m.source, matches: 0, wins: 0, hits: 0, averageHits: 0, trackedMatches: 0 };
         existing.matches++;
         if (m.won) existing.wins++;
         existing.hits += m.hits;
+        if (m.hitsTracked) existing.trackedMatches++;
         filteredCategories.set(m.source, existing);
     });
     let finalCategories = Array.from(filteredCategories.values()).map(c => {
-        c.averageHits = c.matches > 0 ? c.hits / c.matches : 0;
+        c.averageHits = c.trackedMatches > 0 ? c.hits / c.trackedMatches : 0;
         return c;
     });
 
@@ -676,6 +687,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     let totalMatches = finalCategories.reduce((a, c) => a + c.matches, 0);
     let totalWins = finalCategories.reduce((a, c) => a + c.wins, 0);
     let totalHits = finalCategories.reduce((a, c) => a + c.hits, 0);
+    let totalTrackedMatches = finalCategories.reduce((a, c) => a + c.trackedMatches, 0);
 
     let streaks = calculateStreaksFromResults(filteredHistory);
     let trends = trendPeriod === 'all'
@@ -740,7 +752,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
         totalLosses: totalMatches - totalWins,
         winrate: totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0,
         totalHits,
-        averageHits: totalMatches > 0 ? Math.round((totalHits / totalMatches) * 100) / 100 : 0,
+        averageHits: totalTrackedMatches > 0 ? Math.round((totalHits / totalTrackedMatches) * 100) / 100 : 0,
         currentWinStreak: streaks.current,
         bestWinStreak: streaks.best,
         trends,
@@ -762,7 +774,7 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
         : ['Offene Spiele 2v2', 'BiPo Open Turniere'];
 
     // Filter matchHistory - cast to the extended type since runtime data includes won/hits
-    const filteredHistory = (data.matchHistory as (MatchHistoryEntry & { won: boolean; hits: number })[]).filter(m => sourcesToInclude.includes(m.source));
+    const filteredHistory = (data.matchHistory as (MatchHistoryEntry & { won: boolean; hits: number; hitsTracked: boolean })[]).filter(m => sourcesToInclude.includes(m.source));
 
     if (filteredHistory.length === 0) {
         // Return empty state
@@ -799,14 +811,15 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
     // Recalculate categories from filtered history
     const filteredCategories: Map<string, CategoryStats> = new Map();
     filteredHistory.forEach(m => {
-        const existing = filteredCategories.get(m.source) || { name: m.source, matches: 0, wins: 0, hits: 0, averageHits: 0 };
+        const existing = filteredCategories.get(m.source) || { name: m.source, matches: 0, wins: 0, hits: 0, averageHits: 0, trackedMatches: 0 };
         existing.matches++;
         if (m.won) existing.wins++;
         existing.hits += m.hits;
+        if (m.hitsTracked) existing.trackedMatches++;
         filteredCategories.set(m.source, existing);
     });
     const finalCategories = Array.from(filteredCategories.values()).map(c => {
-        c.averageHits = c.matches > 0 ? c.hits / c.matches : 0;
+        c.averageHits = c.trackedMatches > 0 ? c.hits / c.trackedMatches : 0;
         return c;
     });
 
@@ -814,8 +827,9 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
     const totalMatches = filteredHistory.length;
     const totalWins = filteredHistory.filter(m => m.won).length;
     const totalHits = filteredHistory.reduce((a, m) => a + m.hits, 0);
+    const totalTrackedMatches = filteredHistory.filter(m => m.hitsTracked).length;
     const winrate = totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0;
-    const averageHits = totalMatches > 0 ? Math.round((totalHits / totalMatches) * 100) / 100 : 0;
+    const averageHits = totalTrackedMatches > 0 ? Math.round((totalHits / totalTrackedMatches) * 100) / 100 : 0;
 
     // Recalculate streaks
     const streaks = calculateStreaksFromResultsExport(filteredHistory as { time: number; won: boolean }[]);
