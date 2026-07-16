@@ -1,4 +1,4 @@
-export const BIPO_OPEN_TOURNAMENT_YEARS = ['2020', '2022', '2023', '2024', '2025'] as const;
+export const BIPO_OPEN_TOURNAMENT_YEARS = ['2020', '2022', '2023', '2024', '2025', '2026'] as const;
 
 export type BiPoOpenTournamentYear = (typeof BIPO_OPEN_TOURNAMENT_YEARS)[number];
 
@@ -10,6 +10,7 @@ export const BIPO_OPEN_TOURNAMENT_DATE_MAP: Record<BiPoOpenTournamentYear, strin
     '2023': '2023-07-01',
     '2024': '2024-07-01',
     '2025': '2025-07-01',
+    '2026': '2026-08-11',
 };
 
 export const getBiPoOpenTournamentFallbackTime = (year: string): number => {

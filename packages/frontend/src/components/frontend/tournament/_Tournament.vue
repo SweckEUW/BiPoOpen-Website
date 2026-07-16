@@ -92,6 +92,12 @@ const changeRouter = (path:string|number) => {
 };
 
 const getTournamentPhotos = () => {
+   if(tournament.value!.name == "Weck BiPo Open 2026"){
+      return {
+			driveImageIDs: new URL(`/src/assets/2026/driveImageIDs.json`, import.meta.url),
+		}
+   }
+
    if(tournament.value!.name == "Weck BiPo Open 2025"){
       return {
 			driveImageIDs: new URL(`/src/assets/2025/driveImageIDs.json`, import.meta.url),

@@ -118,6 +118,7 @@ const giveArrowClass = (value:string) => {
 }
 
 let winners = [
+    { year: "2026", name: "Alki Süd", player1: "Jannick Becker", player2: "Frederick Reckhaus"},
     { year: "2025", name: "Weck-Knicken", player1: "Nick Brinkrolf", player2: "Simon Weck"},
     { year: "2024", name: "Team Vogelnest", player1: "Lewin Pohlschmidt", player2: "Mattis Post"},
     { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
