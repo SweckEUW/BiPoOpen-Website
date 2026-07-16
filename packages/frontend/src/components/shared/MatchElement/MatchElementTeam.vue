@@ -11,10 +11,10 @@
 
                 <!-- Team Logo -->
                 <Avatar
-                    v-if="displayTeamLogo && team"
+                    v-if="teamLogo && team"
                     :name="teamName"
                     :avatarImage="teamLogo"
-                    shape="square"
+                    :shape="avatarShape"
                     :grayscale="teamScore < opponentTeamScore"
                     class="min-w-[50px] min-h-[50px]"
                 />
@@ -27,7 +27,7 @@
                 >   
                     <Avatar
                         :name="player.name"
-                        shape="circle"
+                        :shape="avatarShape"
                         size="normal"
                         :grayscale="teamScore < opponentTeamScore"
                         class="!text-[12px] border-[2px] border-[--p-surface-0]"
@@ -38,7 +38,9 @@
                 class="mt-team-name"
                 :class="{ 'cursor-pointer': team && team.players.length === 1 }"
                 @click="team && team.players.length === 1 && openPlayerProfile?.(team.players[0].name)"
-            >{{ teamName }}</div>
+            >
+                {{ teamName }}
+            </div>
             <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
         </div>
 
@@ -48,7 +50,7 @@
                 <Avatar
                     v-if="!hideAvatars"
                     :name="player.name"
-                    shape="circle"
+                    :shape="avatarShape"
                     size="normal"
                     class="!text-[12px] !w-[32px] !h-[32px] !min-w-[32px] shrink-0"
                     :grayscale="teamScore < opponentTeamScore"
@@ -71,8 +73,8 @@ const props = defineProps({
     playersVisible: {type: Boolean, required: true },
     isTeam2: {type: Boolean, required: true },
     hideAvatars: {type: Boolean, default: false},
-    displayTeamLogo: {type: Boolean, default: false},
     placeholder: {type: String, default: undefined},
+    avatarShape: {type: String as () => 'circle' | 'square', default: 'circle'},
 });
 
 const team = computed(() => props.isTeam2 ? props.match.team2 : props.match.team1);

@@ -20,8 +20,8 @@
 
          <!-- Team Name & Score -->
          <div class="mt-teams" @click="togglePlayersVisible()">
-            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" :placeholder="team1Placeholder" /> <!-- Team 1 -->
-            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :displayTeamLogo="displayTeamLogo" :placeholder="team2Placeholder"/> <!-- Team 2 -->
+            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team1Placeholder" :avatarShape="avatarShape"/> <!-- Team 1 -->
+            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team2Placeholder" :avatarShape="avatarShape"/> <!-- Team 2 -->
 
             <!-- Spielverlauf Timeline -->
             <MatchTimeline v-if="match.turns && match.turns.length > 0 && playersVisible" :match="match" />
@@ -49,9 +49,9 @@ const props = defineProps({
    isBackend: {type: Boolean, default: false},
    editName: {type: Boolean, default: false},
    hideAvatars: {type: Boolean, default: false},
-   displayTeamLogo: {type: Boolean, default: false},
    team1Placeholder: {type: String, default: undefined},
-   team2Placeholder: {type: String, default: undefined}
+   team2Placeholder: {type: String, default: undefined},
+   avatarShape: {type: String as () => 'circle' | 'square', default: 'circle'},
 });
 
 let showModal = ref(false);

@@ -24,7 +24,7 @@
                         :match="match" 
                         :isBackend="isBackend" 
                         :setGameResult="setGameResult"
-                        :displayTeamLogo="true"
+                        :avatarShape="'square'"
                      />
                   </div>
 
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, PropType, watch, ref } from "vue"
+import { onMounted, PropType, watch } from "vue"
 import { convertNumberToCharacter } from "@/util/util.js"; 
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import StandingsGroups from '@/components/frontend/tournament/StandingsGroups.vue';

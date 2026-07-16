@@ -6,7 +6,7 @@
         :shape="shape"
         :pt="{
             root: {
-                class: `${avatarImageComputed ? '!bg-transparent' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[var(--main-color)] opacity-70 !text-[white]')}`
+                class: `!outline-none !border-none ${avatarImageComputed ? '!bg-transparent' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[var(--main-color)] opacity-70 !text-[white]')}`
             },
             image: {
                 class: `${shape === 'square' ? 'object-contain' : 'object-cover'} bg-transparent ${grayscale ? 'grayscale' : ''}`

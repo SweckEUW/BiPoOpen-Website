@@ -39,7 +39,7 @@
 
                         <div v-for="match in leagueGames" :key="match.time!" style="margin-top: 10px;">
                             <div style="color: var(--main-color)">{{ getGameTime(match.time!) }}</div>
-                            <MatchElement :match="match"/> 
+                            <MatchElement :match="match" :avatarShape="'square'"/> 
                         </div>
                     </TabPanel>
 
@@ -149,4 +149,9 @@ ul{
     padding: 0;
 }
 
+/* Make Avatars Bigger */
+:deep(.p-avatar){
+    width: 50px;
+    height: 50px;
+}
 </style>

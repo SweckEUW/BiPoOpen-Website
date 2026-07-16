@@ -36,7 +36,7 @@
                         />
                         <div v-if="match.time">{{ getGameTime(match.time) }}</div>
                     </div>
-                    <MatchElement :match="match"/>
+                    <MatchElement :match="match" :avatarShape="'square'"/>
                 </div>
 
                 <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
@@ -44,7 +44,7 @@
                         <div class="font-bold text-[20px] lg-sticky-subheadline">Offene Spiele</div>
                     </div>
                     <div v-for="match in round.data.matchesToPlay" style="margin-top: 10px;">
-                        <MatchElement :match="match"/>
+                        <MatchElement :match="match" :avatarShape="'square'"/>
                     </div>
                 </div>
             </div>
@@ -202,6 +202,12 @@ const getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
 .mobile-sheet {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
+}
+
+/* Make Avatars Bigger */
+:deep(.p-avatar){
+    width: 50px;
+    height: 50px;
 }
 
 @media (width <= 900px) {
