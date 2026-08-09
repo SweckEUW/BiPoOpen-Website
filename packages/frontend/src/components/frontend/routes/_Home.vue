@@ -19,8 +19,8 @@
             <!-- Actual content once loaded -->
             <template v-else>
                 <div class="ho-hero-overlay"></div>
-                <h1 class="ho-title-1">BiPo Open 2026</h1>
-                <p class="ho-subtitle" v-if="!countdownOver">Samstag 11.07.2026 - 14:00 Uhr</p>
+                <h1 class="ho-title-1">BiPo Open 2027</h1>
+                <p class="ho-subtitle" v-if="!countdownOver">Samstag 26.06.2027 - 14:00 Uhr</p>
 
                 <div v-if="!countdownOver" class="ho-timer">
                     <div v-for="unit in countdown" :key="unit.label" class="ho-time">
@@ -39,11 +39,11 @@
                 </div> -->
 
                 <!-- Turnier Links -->
-                <div class="ho-hero-links">
+                <!-- <div class="ho-hero-links">
                     <router-link class="ho-hero-btn" to="/2026/Gruppenphase">Spielplan</router-link>
                     <router-link class="ho-hero-btn" to="/2026/MVP">MVP</router-link>
                     <router-link class="ho-hero-btn" to="/Regeln">Regeln</router-link>
-                </div>
+                </div> -->
             </template>
         </section>
 
@@ -250,7 +250,7 @@ const countdown = ref<{ value: number; label: string }[]>([]);
 let timer: ReturnType<typeof setInterval> | undefined = undefined;
 
 const updateCountdown = () => {
-    const diff = new Date(2026, 6, 11, 13).getTime() - Date.now();
+    const diff = new Date(2027, 5, 26, 13).getTime() - Date.now();
     if (diff <= 0) { countdownOver.value = true; clearInterval(timer); return; }
     const d = Math.floor(diff / 86400000);
     const h = Math.floor((diff % 86400000) / 3600000);
@@ -387,11 +387,6 @@ const getGameTime = (dateNumber: number) => {
     const time = date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
     return date.toLocaleDateString('de-DE') + '  -  ' + time + ' Uhr';
 };
-
-const getTeamScore = (match: Match, teamKey: 'team1' | 'team2') => {
-    return match[teamKey].players.reduce((sum, p) => sum + p.score, 0);
-};
-
 </script>
 
 <style scoped>
