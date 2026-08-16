@@ -415,7 +415,7 @@ const getGameTime = (dateNumber: number) => {
     background-position: center;
     border-radius: 16px;
     overflow: hidden;
-    min-height: 440px;
+    min-height: 800px;
     transition: background-image 0.5s ease;
     margin-top: 20px;
 }
