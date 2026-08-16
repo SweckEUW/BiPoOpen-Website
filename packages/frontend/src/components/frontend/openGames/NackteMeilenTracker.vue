@@ -59,6 +59,7 @@ let removedMatched = [
     { id: "6a19c18adb067206212a65d0", completedAt: new Date(2026, 4, 29) }, // Jonas Weck
     { id: "6779b105c8962cfa56f74847", completedAt: new Date(2026, 4, 29) }, // Giulia Sanio
     { id: "694721edb49c327da2268200", completedAt: new Date(2026, 4, 29) }, // Leon Rose 
+    { id: "6a7f86a880132170ad914a3a", completedAt: new Date(2026, 7, 14) }, // Jens Schauf
 ];
 
 // Einträge ohne bekanntes Spiel – name und completedAt manuell eintragen
