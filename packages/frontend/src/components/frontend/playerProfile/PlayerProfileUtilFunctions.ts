@@ -2,7 +2,7 @@ import { getAllOpenGames, getMatchesFromPlayer as getOpenGameMatchesFromPlayer }
 import { getAllLeagueGames, getMatchesFromPlayer as getLeagueMatchesFromPlayer } from "@/components/frontend/league/LeagueUtilFunctions";
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
-import { checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
+import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
 import { BIPO_OPEN_TOURNAMENT_YEARS, getBiPoOpenTournamentFallbackTime } from "@/util/bipoOpenTournamentMeta";
 import { calculateBadges } from "./BadgeRegistry";
 import { getLeagueTeamForPlayer, getPlayerForLeagueTeam } from "@/components/frontend/league/LeaguePlayersData";
@@ -14,10 +14,12 @@ const TREND_PERIOD_DAYS: Record<Exclude<TrendPeriod, 'all'>, number> = {
     '1y': 365,
 };
 
-const PLAYER_NAMES_CACHE_KEY = 'bipo-player-names-cache-v2';
+const PLAYER_NAMES_CACHE_KEY = 'bipo-player-names-cache-v3';
 const PLAYER_NAMES_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 let cachedPlayerNames: string[] | null = null;
 let playerNamesRequest: Promise<string[]> | null = null;
+let cachedPlayerMatchCounts: Record<string, number> | null = null;
+let playerMatchCountsRequest: Promise<Record<string, number>> | null = null;
 
 let globalMaxStreaksCache: { maxWinStreak: number; maxLossStreak: number } | null = null;
 let globalMaxStreaksRequest: Promise<{ maxWinStreak: number; maxLossStreak: number }> | null = null;
@@ -35,14 +37,20 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
         try {
             const rawCache = window.localStorage.getItem(PLAYER_NAMES_CACHE_KEY);
             if (rawCache) {
-                const parsed = JSON.parse(rawCache) as { timestamp: number; names: string[] };
+                const parsed = JSON.parse(rawCache) as {
+                    timestamp: number;
+                    names: string[];
+                    matchCounts: Record<string, number>;
+                };
                 if (
                     parsed &&
                     Array.isArray(parsed.names) &&
+                    parsed.matchCounts &&
                     typeof parsed.timestamp === 'number' &&
                     Date.now() - parsed.timestamp < PLAYER_NAMES_CACHE_TTL_MS
                 ) {
                     cachedPlayerNames = parsed.names;
+                    cachedPlayerMatchCounts = parsed.matchCounts;
                     return cachedPlayerNames;
                 }
             }
@@ -53,6 +61,14 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
 
     playerNamesRequest = (async () => {
         const allNames: Set<string> = new Set();
+        const matchCounts: Record<string, number> = {};
+        const addMatchPlayers = (match: Match) => {
+            [...match.team1.players, ...match.team2.players].forEach(player => {
+                const name = normalizePlayerNameForList(player.name);
+                allNames.add(name);
+                matchCounts[name] = (matchCounts[name] ?? 0) + 1;
+            });
+        };
 
         const [openGames, leagueGames, tournaments] = await Promise.all([
             getAllOpenGames(),
@@ -61,32 +77,33 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
         ]);
 
         openGames.forEach(game => {
-            [...game.team1.players, ...game.team2.players].forEach(p => {
-                allNames.add(normalizePlayerNameForList(p.name));
-            });
+            addMatchPlayers(game);
         });
 
         leagueGames.forEach(game => {
-            [...game.team1.players, ...game.team2.players].forEach(p => {
-                allNames.add(normalizePlayerNameForList(p.name));
-            });
+            addMatchPlayers(game);
         });
 
         tournaments.forEach(tournament => {
             if (!tournament) return;
             tournament.teams.forEach(team => {
-                team.players.forEach(p => allNames.add(normalizePlayerNameForList(p.name)));
+                team.players.forEach(player => allNames.add(normalizePlayerNameForList(player.name)));
             });
+            [...tournament.groupPhase.matches, ...tournament.koPhase.matches]
+                .flat()
+                .filter(checkIfMatchFinished)
+                .forEach(addMatchPlayers);
         });
 
         const names = Array.from(allNames).sort();
         cachedPlayerNames = names;
+        cachedPlayerMatchCounts = matchCounts;
 
         if (typeof window !== 'undefined') {
             try {
                 window.localStorage.setItem(
                     PLAYER_NAMES_CACHE_KEY,
-                    JSON.stringify({ timestamp: Date.now(), names })
+                    JSON.stringify({ timestamp: Date.now(), names, matchCounts })
                 );
             } catch {
                 // Ignore storage quota/private mode errors.
@@ -100,6 +117,18 @@ export const getAllPlayerNames = async (): Promise<string[]> => {
         return await playerNamesRequest;
     } finally {
         playerNamesRequest = null;
+    }
+};
+
+export const getPlayerMatchCounts = async (): Promise<Record<string, number>> => {
+    if (cachedPlayerMatchCounts) return cachedPlayerMatchCounts;
+    if (playerMatchCountsRequest) return playerMatchCountsRequest;
+
+    playerMatchCountsRequest = getAllPlayerNames().then(() => cachedPlayerMatchCounts ?? {});
+    try {
+        return await playerMatchCountsRequest;
+    } finally {
+        playerMatchCountsRequest = null;
     }
 };
 

@@ -183,7 +183,6 @@
                         @item-select="onPlayerSelect"
                         placeholder="Spieler suchen..."
                         className="ho-player-autocomplete"
-                        overlayClass="ho-autocomplete-panel-top"
                     />
                 </div>
 
@@ -737,12 +736,6 @@ const getGameTime = (dateNumber: number) => {
 .ho-player-autocomplete :deep(input) {
     width: 100%;
 }
-.ho-autocomplete-panel-top {
-    transform: translateY(-100%) !important;
-    top: 0 !important;
-    margin-top: -4px;
-}
-
 /* ─── League Skeleton ─── */
 .ho-league-skeleton {
     display: flex;

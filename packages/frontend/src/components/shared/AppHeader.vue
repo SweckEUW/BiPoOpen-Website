@@ -255,11 +255,10 @@ a:hover{
 }
 .ap-player-autocomplete :deep(.p-autocomplete-panel),
 .ap-player-autocomplete :deep(.p-autocomplete-overlay){
-	top: auto !important;
-	bottom: calc(100% + 8px) !important;
 	left: 0 !important;
 	right: 0 !important;
-	inset: auto 0 calc(100% + 8px) 0 !important;
+	top: auto !important;
+	bottom: calc(100% + 8px) !important;
 	max-height: min(40vh, 280px);
 }
 .ap-tournament-dropdown :deep(.p-select-list-container){

@@ -1,7 +1,7 @@
 <template>
     <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
         <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
-            <div class="relative cursor-pointer group mb-[10px]" @click="showImageUpload = true">
+            <div class="relative cursor-pointer group" @click="showImageUpload = true">
                 <Avatar
                     :key="avatarKey"
                     :name="profileData.name"
@@ -24,7 +24,7 @@
             >
                 {{ profileData.name }}
             </div>
-            <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mt-[4px]" />
+            <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mb-[30px]" />
             <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" :playerName="profileData.name" class="mt-[10px]" />
         </div>
 

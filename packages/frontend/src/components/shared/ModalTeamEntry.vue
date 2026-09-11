@@ -1,9 +1,9 @@
 <template>
-    <Modal>
+    <Modal class="team-entry-modal">
         <template #title>{{ title }}</template>
 
         <template #template>
-            <div class="flex justify-center overflow-hidden gap-[5px]">
+            <div class="flex justify-center overflow-visible gap-[5px]">
                 <div v-for="team in 2" :key="team" class="w-full">
                     <div
                         v-for="(_, index) in (team == 1 ? ammountOfPlayersTeam1 : ammountOfPlayersTeam2)"
@@ -136,6 +136,10 @@ input[type=number] {
 }
 
 @media (width <= 900px) {
+    .team-entry-modal :deep(.mo-container) {
+        transform: translateY(-15vh);
+    }
+
     .team-modal-autocomplete {
         width: 100%;
         padding: 0px 4px;
