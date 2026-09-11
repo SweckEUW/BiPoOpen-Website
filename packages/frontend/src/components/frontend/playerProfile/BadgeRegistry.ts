@@ -1,6 +1,8 @@
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { checkIfTeam1WonVsTeam2, checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
 import { BIPO_OPEN_TOURNAMENT_YEARS } from "@/util/bipoOpenTournamentMeta";
+import { getAllLeagueGames, getLeagueList } from "@/components/frontend/league/LeagueUtilFunctions";
+import { LEAGUE_PLAYERS, LEAGUE_PLAYER_MAP } from "@/components/frontend/league/LeaguePlayersData";
 
 export interface BadgeContext {
     playerName: string;
@@ -88,7 +90,7 @@ registerBadge(async ({ playerName }) => {
         badges.push({
             id: `tournament-win-${2021}`,
             icon: 'emoji_events',
-            label: `BiPo Open ${2021} Sieger`,
+            label: `BiPo Open ${2021}`,
             description: `Gewinner des BiPo Open ${2021} Turniers`,
             date: null,
             priority: 1000,
@@ -108,7 +110,7 @@ registerBadge(async ({ playerName }) => {
             badges.push({
                 id: `tournament-win-${year}`,
                 icon: 'emoji_events',
-                label: `BiPo Open ${year} Sieger`,
+                label: `BiPo Open ${year}`,
                 description: `Gewinner des BiPo Open ${year} Turniers`,
                 date: dateStr(finalMatch.time || 0),
                 priority: 1000,
@@ -117,6 +119,81 @@ registerBadge(async ({ playerName }) => {
         }
     }
     return badges;
+});
+
+const getTeamNames = (team: Team | undefined) => team
+    ? [team.name, ...team.players.map(player => player.name)].filter(Boolean).map(name => name!.toLocaleLowerCase())
+    : [];
+
+const getSeriesResult = (games: Match[], team1: Team | undefined, team2: Team | undefined) => {
+    if (!team1 || !team2)
+        return { winner: undefined, games: [] as Match[] };
+
+    const team1Names = getTeamNames(team1);
+    const team2Names = getTeamNames(team2);
+    const seriesGames = games.filter(match => {
+        const matchTeam1Names = getTeamNames(match.team1);
+        const matchTeam2Names = getTeamNames(match.team2);
+        return matchTeam1Names.some(name => team1Names.includes(name)) && matchTeam2Names.some(name => team2Names.includes(name))
+            || matchTeam1Names.some(name => team2Names.includes(name)) && matchTeam2Names.some(name => team1Names.includes(name));
+    }).slice(0, 3);
+    let team1Wins = 0;
+    let team2Wins = 0;
+
+    seriesGames.forEach(match => {
+        const matchTeam1Score = match.team1.players.reduce((score, player) => score + (player.score ?? 0), 0);
+        const matchTeam2Score = match.team2.players.reduce((score, player) => score + (player.score ?? 0), 0);
+        if (matchTeam1Score === matchTeam2Score)
+            return;
+
+        const matchUsesTeam1 = getTeamNames(match.team1).some(name => team1Names.includes(name));
+        if (matchUsesTeam1 === (matchTeam1Score > matchTeam2Score))
+            team1Wins++;
+        else
+            team2Wins++;
+    });
+
+    return {
+        winner: team1Wins >= 2 ? team1 : team2Wins >= 2 ? team2 : undefined,
+        games: seriesGames,
+    };
+};
+
+// Liga-Sieg 2025/26
+registerBadge(async ({ playerName }) => {
+    const leagueGames = await getAllLeagueGames();
+    const sortedGames = [...leagueGames].sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0));
+    const regularSeasonGames = sortedGames.slice(0, 210);
+    const finalFourGames = sortedGames.slice(210);
+
+    if (regularSeasonGames.length < 210)
+        return [];
+
+    const standings = getLeagueList(regularSeasonGames, LEAGUE_PLAYERS).slice(0, 4);
+    const seedTeams = standings.map(standing => ({
+        _id: '',
+        name: standing.name,
+        players: [{ _id: '', name: LEAGUE_PLAYER_MAP[standing.name] ?? standing.name, score: 0 }],
+    } as Team));
+    if (seedTeams.length < 4)
+        return [];
+
+    const semiFinal1 = getSeriesResult(finalFourGames, seedTeams[0], seedTeams[3]);
+    const semiFinal2 = getSeriesResult(finalFourGames, seedTeams[1], seedTeams[2]);
+    const final = getSeriesResult(finalFourGames, semiFinal1.winner, semiFinal2.winner);
+    const winnerPlayer = final.winner ? LEAGUE_PLAYER_MAP[final.winner.name!] : undefined;
+    if (!winnerPlayer || winnerPlayer !== playerName || !final.games.length)
+        return [];
+
+    return [{
+        id: 'league-win-2025-26',
+        icon: 'emoji_events',
+        label: 'BiPo League 25/26',
+        description: 'Gewinner der BiPo League Saison 2025/26',
+        date: dateStr(final.games[final.games.length - 1].time || 0),
+        priority: 1000,
+        special: 'rainbow',
+    }];
 });
 
 // Spiele-Meilensteine

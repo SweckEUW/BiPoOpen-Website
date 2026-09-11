@@ -10,7 +10,7 @@
             ]"
             @click="openBadgeDetail(badge)"
         >
-            <template #content>
+            <template #content >
                 <span
                     class="material-icons text-[--p-primary-color]"
                     :class="[
@@ -155,6 +155,16 @@ const grouped = computed((): PlayerBadge[] => {
 
 .pp-badge-card-compact :deep(.p-card-body) {
     padding: 0.45rem;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.pp-badge-card-compact {
+    height: 116px;
+    min-height: 116px;
 }
 
 .pp-badge-icon-compact {

@@ -4,8 +4,8 @@
     <LeaguePlayerOverviewDrawer
         v-model:visible="leaguePlayerOverviewVisible"
         :selectedPlayer="selectedLeaguePlayer"
-        :leaguePlayers="props.leaguePlayers"
-        :leagueGames="props.leagueGames"
+        :leaguePlayers="leaguePlayers"
+        :leagueGames="games"
     />
 
     <Tabs v-model:value="activeTableTab" class="pt-[10px]">
@@ -19,7 +19,7 @@
             <TabPanel value="overall">
                 <LeagueStandingsTable
                     :leaguePlayers="props.leaguePlayers"
-                    :leagueGames="props.leagueGames"
+                    :leagueGames="games"
                     @select-player="openPlayerOverview"
                 />
             </TabPanel>
@@ -64,7 +64,8 @@ const activeTableTab = ref('overall');
 const leaguePlayerOverviewVisible = ref(false);
 const selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
 
-const leagueGamesByRound = computed(() => splitLeagueGamesByRound(props.leagueGames));
+let games = computed(() => props.leagueGames.toReversed().toSpliced(210));
+const leagueGamesByRound = computed(() => splitLeagueGamesByRound(games.value));
 
 const openPlayerOverview = (playerName: string) => {
     const selectedPlayer = props.leaguePlayers.find(player => player.name === playerName);
