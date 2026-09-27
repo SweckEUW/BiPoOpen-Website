@@ -16,6 +16,7 @@
                                     team1Placeholder="1. der Tabelle"
                                     team2Placeholder="4. der Tabelle"
                                     :leagueGames="leagueGames"
+                                    :regularSeasonGameCount="regularSeasonGameCount"
                                 />
                             </div>
                         </div>
@@ -27,6 +28,7 @@
                                     team1Placeholder="2. der Tabelle"
                                     team2Placeholder="3. der Tabelle"
                                     :leagueGames="leagueGames"
+                                    :regularSeasonGameCount="regularSeasonGameCount"
                                 />
                             </div>
                         </div>
@@ -45,6 +47,7 @@
                             team1Placeholder="Sieger Halbfinale 1"
                             team2Placeholder="Sieger Halbfinale 2"
                             :leagueGames="leagueGames"
+                            :regularSeasonGameCount="regularSeasonGameCount"
                         />
                     </div>
                 </div>
@@ -60,6 +63,7 @@
                             team1Placeholder="Verlierer Halbfinale 1"
                             team2Placeholder="Verlierer Halbfinale 2"
                             :leagueGames="leagueGames"
+                            :regularSeasonGameCount="regularSeasonGameCount"
                         />
                     </div>
                 </div>
@@ -73,11 +77,13 @@
 import { computed } from 'vue';
 import FinalFourSeries from './FinalFourSeries.vue';
 import { getLeagueList } from './LeagueUtilFunctions';
-import { LEAGUE_PLAYERS, LEAGUE_PLAYER_MAP } from './LeaguePlayersData';
+import { LeagueTeam } from './LeagueSeasonsData';
 
 const props = defineProps({
     leaguePlayers: { type: Array as () => LeaguePlayer[], required: true },
     leagueGames: { type: Array as () => Match[], required: true },
+    regularSeasonGameCount: { type: Number, required: true },
+    teams: { type: Array as () => LeagueTeam[], required: true },
 });
 
 const getTeamNames = (team: Team | undefined) => team
@@ -87,7 +93,7 @@ const getTeamNames = (team: Team | undefined) => team
 const getRegularSeasonGames = () => props.leagueGames
     .slice()
     .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0))
-    .slice(0, 210);
+    .slice(0, props.regularSeasonGameCount);
 
 const getSeriesResult = (team1: Team | undefined, team2: Team | undefined) => {
     const team1Names = getTeamNames(team1);
@@ -95,7 +101,7 @@ const getSeriesResult = (team1: Team | undefined, team2: Team | undefined) => {
     const games = props.leagueGames
         .slice()
         .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0))
-        .slice(210)
+        .slice(props.regularSeasonGameCount)
         .filter(match => {
             const matchTeam1Names = getTeamNames(match.team1);
             const matchTeam2Names = getTeamNames(match.team2);
@@ -125,8 +131,17 @@ const getSeriesResult = (team1: Team | undefined, team2: Team | undefined) => {
     };
 };
 
-// Top 4 der aktuellen Tabelle (positional, damit Ties nicht das Seeding verfaelschen).
+// Die Hauptrunde muss komplett gespielt sein, bevor gesetzt wird.
+const isRegularSeasonComplete = computed(() =>
+    props.regularSeasonGameCount > 0 && getRegularSeasonGames().length >= props.regularSeasonGameCount
+);
+
+// Top 4 der Abschlusstabelle (positional, damit Ties nicht das Seeding verfaelschen).
+// Solange die Hauptrunde laeuft, bleiben alle Plaetze leer -> FinalFourSeries zeigt die Platzhalter-Texte.
 const seedTeams = computed<(Team | undefined)[]>(() => {
+    if (!isRegularSeasonComplete.value)
+        return [undefined, undefined, undefined, undefined];
+
     const standings = getLeagueList(getRegularSeasonGames(), props.leaguePlayers).slice(0, 4);
 
     return [0, 1, 2, 3].map((index) => {
@@ -134,8 +149,8 @@ const seedTeams = computed<(Team | undefined)[]>(() => {
         if (!player)
             return undefined;
 
-        const logo = LEAGUE_PLAYERS.find(leaguePlayer => leaguePlayer.name === player.name)?.logo;
-        const playerName = LEAGUE_PLAYER_MAP[player.name] ?? player.name;
+        const logo = props.leaguePlayers.find(leaguePlayer => leaguePlayer.name === player.name)?.logo;
+        const playerName = props.teams.find(team => team.teamName === player.name)?.playerName ?? player.name;
 
         // Mock-Team ohne Score -> MatchElement zeigt "vs.".
         return {

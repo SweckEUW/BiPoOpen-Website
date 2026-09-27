@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import LeagueGame from "../models/LeagueGame";
 
 const createLeagueGame = (req: Request, res: Response, next: NextFunction) => {
-    const { team1, team2, time, turns, endTime } = req.body;
+    const { team1, team2, time, turns, endTime, season, league } = req.body;
 
     const leagueGame = new LeagueGame({
         _id: new mongoose.Types.ObjectId(),
@@ -11,6 +11,8 @@ const createLeagueGame = (req: Request, res: Response, next: NextFunction) => {
         team2,
         time,
         endTime,
+        season,
+        league,
         turns: turns || [] // Falls noch keine Runden vorhanden sind
     });
 

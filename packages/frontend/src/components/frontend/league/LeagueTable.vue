@@ -20,6 +20,9 @@
                 <LeagueStandingsTable
                     :leaguePlayers="props.leaguePlayers"
                     :leagueGames="games"
+                    :highlightTopSlots="props.highlightTopSlots"
+                    :promotionSlots="props.promotionSlots"
+                    :relegationSlots="props.relegationSlots"
                     @select-player="openPlayerOverview"
                 />
             </TabPanel>
@@ -28,6 +31,9 @@
                 <LeagueStandingsTable
                     :leaguePlayers="props.leaguePlayers"
                     :leagueGames="leagueGamesByRound.rueckrunde"
+                    :highlightTopSlots="props.highlightTopSlots"
+                    :promotionSlots="props.promotionSlots"
+                    :relegationSlots="props.relegationSlots"
                     @select-player="openPlayerOverview"
                 />
             </TabPanel>
@@ -36,6 +42,9 @@
                 <LeagueStandingsTable
                     :leaguePlayers="props.leaguePlayers"
                     :leagueGames="leagueGamesByRound.hinrunde"
+                    :highlightTopSlots="props.highlightTopSlots"
+                    :promotionSlots="props.promotionSlots"
+                    :relegationSlots="props.relegationSlots"
                     @select-player="openPlayerOverview"
                 />
             </TabPanel>
@@ -57,14 +66,19 @@ import LeagueStandingsTable from './LeagueStandingsTable.vue';
 
 const props = defineProps({
     leaguePlayers: { type: Array as () => LeaguePlayer[], required: true },
-    leagueGames: { type: Array as () => Match[], required: true }
+    leagueGames: { type: Array as () => Match[], required: true },
+    regularSeasonGameCount: { type: Number, required: true },
+    highlightTopSlots: { type: Number, default: 4 },
+    promotionSlots: { type: Number, default: 0 },
+    relegationSlots: { type: Number, default: 3 }
 });
 
 const activeTableTab = ref('overall');
 const leaguePlayerOverviewVisible = ref(false);
 const selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
 
-let games = computed(() => props.leagueGames.toReversed().toSpliced(210));
+// Nur die Hauptrunde zaehlt fuer die Tabelle, die Final-Four-Spiele kommen danach.
+let games = computed(() => props.leagueGames.toReversed().toSpliced(props.regularSeasonGameCount));
 const leagueGamesByRound = computed(() => splitLeagueGamesByRound(games.value));
 
 const openPlayerOverview = (playerName: string) => {
@@ -80,13 +94,13 @@ const openPlayerOverview = (playerName: string) => {
 <style scoped>
 :deep(.league-table-sticky-tablist) {
     position: sticky;
-    top: 205px;
+    top: calc(205px + var(--league-sticky-extra, 0px));
     z-index: 3;
 }
 
 @media (max-width: 900px) {
     :deep(.league-table-sticky-tablist) {
-        top: 125px;
+        top: calc(125px + var(--league-sticky-extra, 0px));
     }
 }
 </style>

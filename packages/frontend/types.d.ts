@@ -42,6 +42,9 @@ declare global {
         time?: number;
         endTime?: number;
         turns?: Turn[];
+        // Nur bei Liga-Spielen gesetzt. Altdaten ohne diese Felder gelten als Saison 2025/26, 1. Liga.
+        season?: string;
+        league?: number;
     };
 
     type Team = {

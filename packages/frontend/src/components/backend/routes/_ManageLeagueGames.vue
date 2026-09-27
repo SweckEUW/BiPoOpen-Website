@@ -6,20 +6,49 @@
         <Loadingscreen v-show="!leagueGames"/>
 
         <div v-if="leagueGames">
-            <MatchElement v-for="leagueGame in leagueGames" :key="leagueGame._id"
+            <div class="ml-filters">
+                <Select v-model="selectedSeason" :options="seasonOptions" optionLabel="label" optionValue="value" class="w-[50%]" />
+                <Select v-model="selectedLeague" :options="leagueOptions" optionLabel="label" optionValue="value" class="w-[50%]" />
+            </div>
+
+            <div v-if="!filteredLeagueGames.length" class="ml-empty">Keine Spiele in dieser Liga.</div>
+
+            <MatchElement v-for="leagueGame in filteredLeagueGames" :key="leagueGame._id"
                 :match="leagueGame" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
-            /> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+            />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import Select from 'primevue/select';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { getAllLeagueGames, updateLeagueGame, deleteLeagueGame} from "@/components/frontend/league/LeagueUtilFunctions";
+import { filterLeagueGames, getAllLeagueGames, updateLeagueGame, deleteLeagueGame} from "@/components/frontend/league/LeagueUtilFunctions";
+import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason } from "@/components/frontend/league/LeagueSeasonsData";
 
 let leagueGames = ref<Match[]|undefined>();
+
+// Filter, damit die Liste ueber mehrere Saisons hinweg bedienbar bleibt.
+const selectedSeason = ref(CURRENT_SEASON_SLUG);
+const selectedLeague = ref(getSeason(CURRENT_SEASON_SLUG)?.divisions[0].league ?? 1);
+
+const seasonOptions = LEAGUE_SEASONS.map(season => ({ label: `Saison ${season.label}`, value: season.slug }));
+
+const leagueOptions = computed(() =>
+    (getSeason(selectedSeason.value)?.divisions ?? []).map(division => ({ label: division.label, value: division.league }))
+);
+
+// Beim Saisonwechsel auf eine Liga springen, die es in dieser Saison auch gibt.
+watch(selectedSeason, () => {
+    if (!leagueOptions.value.some(option => option.value === selectedLeague.value))
+        selectedLeague.value = leagueOptions.value[0]?.value ?? 1;
+});
+
+const filteredLeagueGames = computed(() =>
+    filterLeagueGames(leagueGames.value ?? [], selectedSeason.value, selectedLeague.value)
+);
 
 const getLeagueGames = async () => {
     let leagueGamesWrongOrder = await getAllLeagueGames();
@@ -41,6 +70,17 @@ const deleteMatch = async (match:Match) => {
 </script>
 
 <style scoped>
+.ml-filters{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.ml-empty{
+    text-align: center;
+    color: var(--main-color);
+    opacity: 0.8;
+    padding: 30px 20px;
+}
 .bp-title{
     padding-bottom: 10px;   
 }

@@ -35,6 +35,10 @@
                     </div>                    
                 </div>
 
+                <div v-if="isSameTeamSelected" class="text-center text-[var(--secondary-color)] mb-[10px]">
+                    Ein Team kann nicht gegen sich selbst spielen.
+                </div>
+
                 <!-- <div class="mt-[20px] mb-[20px]">
                     <div>Schiedsrichter</div>
                     <Select :options="leaguePlayers" optionLabel="name" scrollHeight="300px" :placeholder="'Schiedsrichter'" class="w-full h-[120px]"
@@ -71,7 +75,7 @@
 
         <!-- Button 2 -->
         <template #confirm>
-            <div @click="addGame();" :style="{ opacity: players[0] && players[1] ? 1 : 0.3, pointerEvents: players[0] && players[1] ? 'auto' : 'none' }">Eintragen</div>
+            <div @click="addGame();" :style="{ opacity: canAddGame ? 1 : 0.3, pointerEvents: canAddGame ? 'auto' : 'none' }">Eintragen</div>
         </template>
 
         <template #loading v-if="loading">
@@ -87,7 +91,7 @@ import Modal from '@/components/shared/Modal.vue';
 import Select from 'primevue/select';
 import ProgressSpinner from 'primevue/progressspinner';
 import { useToast } from 'primevue/usetoast';
-import { PropType, ref } from 'vue';
+import { computed, PropType, ref } from 'vue';
 import { addLeagueGame } from './LeagueUtilFunctions';
 
 const toast = useToast();
@@ -96,19 +100,29 @@ const props = defineProps({
     leaguePlayers: {type: Array as () => LeaguePlayer[], required: true },
     toggleModalAddGame: {type: Function, required: true },
     setMatch: {type: Function as PropType<(match:Match) => void>, required: true },
-    getLeagueGames: {type: Function, required: true }
+    getLeagueGames: {type: Function, required: true },
+    seasonSlug: {type: String, required: true },
+    league: {type: Number, required: true }
 });
 
 const players = ref<(LeaguePlayer | null)[]>([null, null]);
 const scores = ref<[number, number]>([0, 0]);
 const loading = ref(false);
 
+const isSameTeamSelected = computed(() =>
+    !!players.value[0] && players.value[0]?.name === players.value[1]?.name
+);
+
+const canAddGame = computed(() => !!players.value[0] && !!players.value[1] && !isSameTeamSelected.value);
+
 const addGame = async () => {
-    if (loading.value) return;
+    if (loading.value || !canAddGame.value) return;
 
     let match:Match = {
         _id: "placeholder",
         time: new Date().getTime(),
+        season: props.seasonSlug,
+        league: props.league,
         team1: {
             _id: "placeholder",
             players: [

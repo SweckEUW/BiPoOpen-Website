@@ -16,7 +16,8 @@ const AVATAR_CENTER_Y = 315;
 const AVATAR_OUTER_RADIUS = 210;
 const AVATAR_INNER_RADIUS = 194;
 const GENERATED_ROOT_RELATIVE = 'Spieler';
-const LEAGUE_PLAYER_DATA_RELATIVE = path.join('src', 'components', 'frontend', 'league', 'LeaguePlayersData.ts');
+// Die Spielernamen stehen seit der Saison-Umstellung in LeagueSeasonsData.ts (Fallback-Quelle, wenn das Backend nicht erreichbar ist).
+const LEAGUE_SEASONS_DATA_RELATIVE = path.join('src', 'components', 'frontend', 'league', 'LeagueSeasonsData.ts');
 const PROFILE_IMAGES_SOURCE_RELATIVE = path.join('src', 'assets', 'playerProfiles');
 const GENERATED_OG_IMAGES_RELATIVE = path.join('.generated', 'playerProfiles', 'generated');
 const BACKEND_BASE_URL = 'https://bipoopen-backend.vercel.app/';
@@ -203,8 +204,8 @@ const createPlayerPreviewHtml = (playerName: string, ogImagePath: string): strin
 `;
 };
 
-const extractPlayerNames = (leaguePlayerDataPath: string): string[] => {
-  const fileContent = fs.readFileSync(leaguePlayerDataPath, 'utf-8');
+const extractPlayerNames = (leagueSeasonsDataPath: string): string[] => {
+  const fileContent = fs.readFileSync(leagueSeasonsDataPath, 'utf-8');
   const regex = /playerName:\s*'([^']+)'/g;
   const playerNames = new Set<string>();
 
@@ -216,7 +217,7 @@ const extractPlayerNames = (leaguePlayerDataPath: string): string[] => {
   return [...playerNames].sort((a, b) => a.localeCompare(b));
 };
 
-const getAllPlayerNamesForBuild = async (leaguePlayerDataPath: string): Promise<string[]> => {
+const getAllPlayerNamesForBuild = async (leagueSeasonsDataPath: string): Promise<string[]> => {
   try {
     axios.defaults.baseURL = BACKEND_BASE_URL;
 
@@ -253,7 +254,7 @@ const getAllPlayerNamesForBuild = async (leaguePlayerDataPath: string): Promise<
 
     return Array.from(allNames).sort((a, b) => a.localeCompare(b));
   } catch {
-    return extractPlayerNames(leaguePlayerDataPath);
+    return extractPlayerNames(leagueSeasonsDataPath);
   }
 };
 
@@ -282,11 +283,11 @@ export interface PlayerPreviewBuildArtifacts {
 
 export const generatePlayerPreviewBuildArtifacts = async (frontendRoot: string): Promise<PlayerPreviewBuildArtifacts> => {
   const generatedRoot = path.resolve(frontendRoot, GENERATED_ROOT_RELATIVE);
-  const leaguePlayerDataPath = path.resolve(frontendRoot, LEAGUE_PLAYER_DATA_RELATIVE);
+  const leagueSeasonsDataPath = path.resolve(frontendRoot, LEAGUE_SEASONS_DATA_RELATIVE);
   const profileImagesSourceDir = path.resolve(frontendRoot, PROFILE_IMAGES_SOURCE_RELATIVE);
   const generatedOgImagesDir = path.resolve(frontendRoot, GENERATED_OG_IMAGES_RELATIVE);
 
-  const playerNames = await getAllPlayerNamesForBuild(leaguePlayerDataPath);
+  const playerNames = await getAllPlayerNamesForBuild(leagueSeasonsDataPath);
   const sourceImageMap = buildSourceImageMap(profileImagesSourceDir);
 
   fs.rmSync(generatedRoot, { recursive: true, force: true });

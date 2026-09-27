@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { CURRENT_SEASON_SLUG } from '@/components/frontend/league/LeagueSeasonsData'
 
 const routes = [
 	// Frontend
@@ -54,16 +55,16 @@ const routes = [
 
 	{
 		path: '/BiPo-League',
-		name: 'BiPo-League',
-		component: () => import('@/components/frontend/league/_League.vue'),
-		meta: {
-			title: 'Weck BiPo League',
-			description: 'BiPo League'
-		}
+		redirect: '/League'
 	},
 
 	{
 		path: '/League',
+		redirect: () => `/League/${CURRENT_SEASON_SLUG}`
+	},
+
+	{
+		path: '/League/:Season/:League?',
 		name: 'BiPo League',
 		component: () => import('@/components/frontend/league/_League.vue'),
 		meta: {

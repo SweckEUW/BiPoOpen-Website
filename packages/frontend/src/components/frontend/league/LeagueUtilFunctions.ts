@@ -1,5 +1,5 @@
 import axios from "axios";
-import { h } from "vue";
+import { LEGACY_LEAGUE, LEGACY_SEASON_SLUG } from "./LeagueSeasonsData";
 
 /////////////
 // GENERAL //
@@ -26,7 +26,19 @@ export const deleteLeagueGame = async (leagueGame: Match) => {
     let response = await axios.delete("/leagueGames/delete/" + leagueGame._id);
     return response.status == 200;
 }
-    
+
+////////////////////////
+// SAISON / LIGA      //
+////////////////////////
+// Altdaten haben kein season/league Feld und gehoeren zur ersten Liga der Saison 2025/26.
+export const getGameSeason = (match: Match) => match.season ?? LEGACY_SEASON_SLUG;
+
+export const getGameLeague = (match: Match) => match.league ?? LEGACY_LEAGUE;
+
+export const filterLeagueGames = (leagueGames: Match[], seasonSlug: string, league: number) =>
+    leagueGames.filter(match => getGameSeason(match) === seasonSlug && getGameLeague(match) === league);
+
+
 ////////////////
 // STATISTICS //
 ////////////////

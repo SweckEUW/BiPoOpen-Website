@@ -228,7 +228,7 @@
 <script setup lang="ts">
 import { ref, onBeforeUnmount, inject } from 'vue';
 import { getAllOpenGames } from '@/components/frontend/openGames/OpenGamesUtilFunctions';
-import { getAllLeagueGames, getLeagueList } from '@/components/frontend/league/LeagueUtilFunctions';
+import { filterLeagueGames, getAllLeagueGames, getLeagueList } from '@/components/frontend/league/LeagueUtilFunctions';
 import { getTournamentByName } from '@/util/tournamentFunctions';
 import { BIPO_OPEN_TOURNAMENT_YEARS } from '@/util/bipoOpenTournamentMeta';
 import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
@@ -238,7 +238,7 @@ import Skeleton from 'primevue/skeleton';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import router from '@/router.js';
-import { LEAGUE_PLAYERS } from '../league/LeaguePlayersData';
+import { CURRENT_SEASON_SLUG, getDivision, getSeason, toLeaguePlayers } from '../league/LeagueSeasonsData';
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 
@@ -297,7 +297,10 @@ const loadHeroImage = async () => {
 loadHeroImage();
 
 // ─── League Data ───
-let leaguePlayers: LeaguePlayer[] = LEAGUE_PLAYERS;
+// Das Widget zeigt immer die erste Liga der aktuellen Saison.
+const currentSeason = getSeason(CURRENT_SEASON_SLUG);
+const currentDivision = getDivision(currentSeason, undefined);
+let leaguePlayers: LeaguePlayer[] = toLeaguePlayers(currentDivision?.teams ?? []);
 
 const leagueTop5 = ref<PlayerWithStats[]>([]);
 const leagueLoading = ref(true);
@@ -339,7 +342,8 @@ const onTournamentSelect = (value: string | null) => {
 const loadLeague = async () => {
     try {
         const games = await getAllLeagueGames();
-        const list = getLeagueList(games, leaguePlayers);
+        const seasonGames = filterLeagueGames(games, CURRENT_SEASON_SLUG, currentDivision?.league ?? 1);
+        const list = getLeagueList(seasonGames, leaguePlayers);
         leagueTop5.value = list.slice(0, 5);
     } catch { /* silent */ }
     leagueLoading.value = false;

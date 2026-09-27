@@ -68,10 +68,17 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { getLeagueList } from './LeagueUtilFunctions';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     leaguePlayers: LeaguePlayer[];
     leagueGames: Match[];
-}>();
+    highlightTopSlots?: number;
+    promotionSlots?: number;
+    relegationSlots?: number;
+}>(), {
+    highlightTopSlots: 4,
+    promotionSlots: 0,
+    relegationSlots: 3,
+});
 
 const emit = defineEmits<{
     (e: 'select-player', playerName: string): void;
@@ -86,17 +93,29 @@ const playerOrderByName = computed(() => {
     }, {});
 });
 
+// Literale Klassen-Strings, damit Tailwind sie beim Scannen findet (dynamisch gebaute Werte werden nicht generiert).
+const FINAL_FOUR_CLASSES = ['!bg-[#8fe4f7]', '!bg-[#aaeafa]', '!bg-[#b5ecfa]', '!bg-[#c6f2fd]'];
+const PROMOTION_CLASS = '!bg-[#8ff7b0]';
+const RELEGATION_CLASS = '!bg-[#e97f89]';
+
 const getRowClass = (row: PlayerWithStats) => {
     const index = playerOrderByName.value[row.name];
+    if (index === undefined) return '';
+
     const total = sortedLeaguePlayers.value.length;
 
-    if (index === 0) return '!bg-[#8fe4f7]';
-    if (index === 1) return '!bg-[#aaeafa]';
-    if (index === 2) return '!bg-[#b5ecfa]';
-    if (index === 3) return '!bg-[#c6f2fd]';
-    if (index === total - 3) return '!bg-[#f3d4d7]';
-    if (index === total - 2) return '!bg-[#eeaab1]';
-    if (index === total - 1) return '!bg-[#e97f89]';
+    // Aufstiegszone: einheitliches Gruen.
+    if (index < props.promotionSlots)
+        return PROMOTION_CLASS;
+
+    // Final-Four-Zone: abgestuftes Blau (nur dort, wo highlightTopSlots gesetzt ist).
+    if (index < props.highlightTopSlots)
+        return FINAL_FOUR_CLASSES[Math.min(index, FINAL_FOUR_CLASSES.length - 1)];
+
+    // Abstiegszone: einheitliches Rot.
+    const placesFromBottom = total - 1 - index;
+    if (props.relegationSlots > 0 && placesFromBottom < props.relegationSlots)
+        return RELEGATION_CLASS;
 
     return '';
 };
@@ -127,7 +146,7 @@ onUnmounted(() => {
 <style scoped>
 :deep(.league-standings-sticky-header) {
     position: sticky;
-    top: 260px;
+    top: calc(260px + var(--league-sticky-extra, 0px));
     z-index: 2;
 }
 
@@ -144,7 +163,7 @@ onUnmounted(() => {
 
 @media (max-width: 900px) {
     :deep(.league-standings-sticky-header) {
-        top: 185px;
+        top: calc(185px + var(--league-sticky-extra, 0px));
     }
 
 }

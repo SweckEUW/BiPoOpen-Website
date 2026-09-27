@@ -62,6 +62,7 @@ const props = defineProps({
     team2Placeholder: { type: String, default: 'TBD' },
     avatarShape: { type: String as () => 'circle' | 'square', default: 'square' },
     leagueGames: { type: Array as () => Match[], required: true },
+    regularSeasonGameCount: { type: Number, required: true },
 });
 
 const getTeamNames = (team: Team | undefined) => team
@@ -71,7 +72,7 @@ const getTeamNames = (team: Team | undefined) => team
 const getFinalFourGames = () => props.leagueGames
     .slice()
     .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0))
-    .slice(210);
+    .slice(props.regularSeasonGameCount);
 
 const getSeriesResult = (team1: Team | undefined, team2: Team | undefined) => {
     const team1Names = getTeamNames(team1);

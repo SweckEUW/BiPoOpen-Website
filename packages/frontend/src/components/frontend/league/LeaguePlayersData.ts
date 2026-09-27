@@ -1,27 +1,27 @@
+import { LEAGUE_SEASONS } from './LeagueSeasonsData';
+
 export type LeaguePlayerData = {
     teamName: string;
     playerName: string;
     logo: string;
 };
 
-// Single source of truth: Teamname, echter Spielername und Teamlogo an einer Stelle.
-export const LEAGUE_PLAYER_DATA: LeaguePlayerData[] = [
-    { teamName: 'Hangover Heroes', playerName: 'David Jones', logo: new URL('/src/assets/league/teams/Hangover-Heroes.webp', import.meta.url).href },
-    { teamName: 'Hopfenstreife', playerName: 'Jonas Weck', logo: new URL('/src/assets/league/teams/Hopfenstreife.webp', import.meta.url).href },
-    { teamName: 'Cupfire Squad', playerName: 'Matthias Weck', logo: new URL('/src/assets/league/teams/Cupfire-Squad.webp', import.meta.url).href },
-    { teamName: 'Lokomotive Wiedenbrück', playerName: 'Simon Weck', logo: new URL('/src/assets/league/teams/Lokomotive-Wiedenbrueck.webp', import.meta.url).href },
-    { teamName: 'Don Promillo', playerName: 'Patrick Pohlmann', logo: new URL('/src/assets/league/teams/Don-Promillo.webp', import.meta.url).href },
-    { teamName: 'Wonne', playerName: 'Daniel Wonnemann', logo: new URL('/src/assets/league/teams/Wonne.webp', import.meta.url).href },
-    { teamName: 'El Gunto', playerName: 'Matthias Gunter', logo: new URL('/src/assets/league/teams/El-Gunto.webp', import.meta.url).href },
-    { teamName: 'BPC Likör', playerName: 'Leon Rose', logo: new URL('/src/assets/league/teams/BPC-Likoer.webp', import.meta.url).href },
-    { teamName: 'Schlauti Saufmann', playerName: 'Sara Schlautmann', logo: new URL('/src/assets/league/teams/Schlauti-Saufmann.webp', import.meta.url).href },
-    { teamName: 'FC Pongus Longus', playerName: 'Jerome Campigotto', logo: new URL('/src/assets/league/teams/FC-Pongus-Longus.webp', import.meta.url).href },
-    { teamName: 'BPC Knick', playerName: 'Nick Brinkrolf', logo: new URL('/src/assets/league/teams/BPC-Knick.webp', import.meta.url).href },
-    { teamName: 'Ostgold', playerName: 'Giulia Sanio', logo: new URL('/src/assets/league/teams/Ostgold.webp', import.meta.url).href },
-    { teamName: 'Schaufautomat', playerName: 'Jens Schauf', logo: new URL('/src/assets/league/teams/BPC-Schauf.webp', import.meta.url).href },
-    { teamName: 'Anime Dude', playerName: 'Fritz Falkenreck', logo: new URL('/src/assets/league/teams/Anime-Dude.webp', import.meta.url).href },
-    { teamName: 'SallyWin All-in', playerName: 'Sally Hollenbeck', logo: new URL('/src/assets/league/teams/SallyWin-All-in.webp', import.meta.url).href },
-];
+// Abgeleitet aus LeagueSeasonsData: alle Teams ueber alle Saisons und Ligen, dedupliziert.
+// Saisonuebergreifende Konsumenten (Spielerprofil, Badges, OG-Bilder) nutzen weiterhin diese Liste.
+export const LEAGUE_PLAYER_DATA: LeaguePlayerData[] = (() => {
+    const teamsByName = new Map<string, LeaguePlayerData>();
+
+    LEAGUE_SEASONS.forEach((season) => {
+        season.divisions.forEach((division) => {
+            division.teams.forEach(({ teamName, playerName, logo }) => {
+                // Neuere Saisons stehen weiter hinten und gewinnen bei gleichem Teamnamen.
+                teamsByName.set(teamName, { teamName, playerName, logo });
+            });
+        });
+    });
+
+    return [...teamsByName.values()];
+})();
 
 // Kompatibilitaet: bestehende Verwendungen koennen weiter LEAGUE_PLAYERS/LEAGUE_PLAYER_MAP nutzen.
 export const LEAGUE_PLAYERS: LeaguePlayer[] = LEAGUE_PLAYER_DATA.map(({ teamName, logo }) => ({
