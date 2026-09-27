@@ -23,7 +23,7 @@
         <Column header="Team" :pt="{ headerCell: { class: 'league-standings-sticky-header ' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!p-1' } }">
             <template #body="slotProps">
                 <div class="flex items-center justify-start">
-                    <img class="w-[80px] h-[80px] object-contain mr-[20px] max-[900px]:mr-[10px] max-[450px]:w-[60px] max-[450px]:h-[60px] max-[380px]:w-[40px] max-[375px]:h-[40px]" :src="getPlayerLogo(slotProps.data.name)">
+                    <img class="w-[64px] h-[64px] object-contain mr-[20px] max-[900px]:mr-[10px] max-[450px]:w-[48px] max-[450px]:h-[48px] max-[380px]:w-[32px] max-[380px]:h-[32px]" :src="getPlayerLogo(slotProps.data.name)">
                     <div class="!text-left whitespace-pre-line">{{ slotProps.data.name.replace(' ', '\n') }}</div>
                 </div>
             </template>

@@ -113,8 +113,8 @@ export const LEAGUE_SEASONS: LeagueSeason[] = [
 ];
 
 // Saison, auf die /League weiterleitet und die das Home-Widget zeigt.
-// !! Erst auf '2026-27' umstellen, wenn dort Teams eingetragen sind !!
-export const CURRENT_SEASON_SLUG = '2025-26';
+// Bei jedem Saisonwechsel hier auf die neue Saison umstellen.
+export const CURRENT_SEASON_SLUG = '2026-27';
 
 // Saison/Liga fuer Altdaten, die noch kein season/league Feld in der DB haben.
 export const LEGACY_SEASON_SLUG = '2025-26';
