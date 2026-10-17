@@ -252,3 +252,24 @@ export const splitLeagueGamesByRound = (leagueMatches: Match[]) => {
         rueckrunde
     };
 }
+
+// Gegner je Team aus den Spielen einer Runde. Namen kleingeschrieben wie in getLeagueMatchupKey.
+export const getPlayedOpponents = (roundMatches: Match[]) => {
+    const playedOpponents = new Map<string, Set<string>>();
+
+    const addOpponent = (teamName: string, opponentName: string) => {
+        if (!playedOpponents.has(teamName))
+            playedOpponents.set(teamName, new Set());
+        playedOpponents.get(teamName)!.add(opponentName);
+    }
+
+    roundMatches.forEach((match) => {
+        const team1Name = match.team1.players[0]?.name?.toLocaleLowerCase() ?? '';
+        const team2Name = match.team2.players[0]?.name?.toLocaleLowerCase() ?? '';
+
+        addOpponent(team1Name, team2Name);
+        addOpponent(team2Name, team1Name);
+    });
+
+    return playedOpponents;
+}

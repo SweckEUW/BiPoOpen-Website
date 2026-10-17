@@ -61,7 +61,8 @@
                     </TabPanel>
 
                     <TabPanel value="games">
-                        <div class="bp-button" @click="toggleModalAddGame()">Spiel eintragen</div>
+                        <div class="bp-button !mb-[10px]" @click="toggleModalAddGame()">Spiel eintragen</div>
+                        <div class="bp-button" @click="toggleModalDraw()">Spiel auslosen</div>
 
                         <Teleport to="body">
                             <Transition name="fade">
@@ -72,6 +73,17 @@
                                     :getLeagueGames="getLeagueGames"
                                     :seasonSlug="season.slug"
                                     :league="division.league"
+                                />
+                            </Transition>
+                        </Teleport>
+
+                        <Teleport to="body">
+                            <Transition name="fade">
+                                <ModalLeagueDraw v-if="showModalDraw"
+                                    :toggleModalDraw="toggleModalDraw"
+                                    :leaguePlayers="leaguePlayers"
+                                    :leagueGames="divisionGames"
+                                    :regularSeasonGameCount="regularSeasonGameCount"
                                 />
                             </Transition>
                         </Teleport>
@@ -106,6 +118,7 @@ import LeagueTable from './LeagueTable.vue';
 import LeagueFinalFour from './LeagueFinalFour.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
+import ModalLeagueDraw from './ModalLeagueDraw.vue';
 import { filterLeagueGames, getAllLeagueGames } from './LeagueUtilFunctions';
 import {
     CURRENT_SEASON_SLUG,
@@ -128,6 +141,7 @@ const route = useRoute();
 const router = useRouter();
 
 let showModalAddGame = ref(false);
+let showModalDraw = ref(false);
 let isLoading = ref(true);
 let allLeagueGames = ref<Match[]>([]);
 let match = ref<Match>();
@@ -195,6 +209,10 @@ getLeagueGames();
 
 const toggleModalAddGame = () => {
     showModalAddGame.value = !showModalAddGame.value;
+}
+
+const toggleModalDraw = () => {
+    showModalDraw.value = !showModalDraw.value;
 }
 
 let getGameTime = (dateNumber:number) => {

@@ -238,7 +238,7 @@ import Skeleton from 'primevue/skeleton';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import router from '@/router.js';
-import { CURRENT_SEASON_SLUG, getDivision, getSeason, toLeaguePlayers } from '../league/LeagueSeasonsData';
+import { CURRENT_SEASON_SLUG, getDivision, getSeason, toLeaguePlayers } from '@/components/frontend/league/LeagueSeasonsData';
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 
