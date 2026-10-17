@@ -93,7 +93,7 @@ export const LEAGUE_SEASONS: LeagueSeason[] = [
                 promotionSlots: 3,
                 relegationSlots: 0,
                 teams: [
-                    { teamName: 'FC Pongus Longus', playerName: 'Jerome Campigotto', logo: teamLogo('FC-Pongus-Longus.webp') },
+                    { teamName: 'Parmigiano Beer-Giano', playerName: 'Jerome Campigotto', logo: teamLogo('Parmigiano-Beer-Giano.webp') },
                     { teamName: 'Ostgold', playerName: 'Giulia Sanio', logo: teamLogo('Ostgold.webp') },
                     { teamName: 'JP Pongande', playerName: 'Janine Pergande', logo: teamLogo('JP-Pongande.webp') },
                     { teamName: 'Bruderluie', playerName: 'Michael Pohlmann', logo: teamLogo('Bruderluie.webp') },
