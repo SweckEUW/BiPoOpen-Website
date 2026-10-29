@@ -14,9 +14,24 @@
             <div v-if="!filteredLeagueGames.length" class="ml-empty">Keine Spiele in dieser Liga.</div>
 
             <MatchElement v-for="leagueGame in filteredLeagueGames" :key="leagueGame._id"
-                :match="withLeagueTeamLogos(leagueGame)" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
+                :match="withLeagueTeamLogos(leagueGame)" :isBackend="true" :avatarShape="'square'" @edit="openEdit(leagueGame)"
             />
         </div>
+
+        <GameEntryDrawer
+            v-model:visible="editVisible"
+            title="Spiel bearbeiten"
+            :subtitle="editSubtitle"
+            :initialSides="editSides"
+            :sideLabels="['Team 1', 'Team 2']"
+            incompleteLabel="Teams wählen"
+            :save="setGameResult"
+            :remove="deleteMatch"
+        >
+            <template #player="{ player, excludedNames, setName }">
+                <LeagueTeamSelect :modelValue="player.name" :teams="editTeams" :excludedNames="excludedNames" @update:modelValue="setName"/>
+            </template>
+        </GameEntryDrawer>
     </div>
 </template>
 
@@ -25,11 +40,25 @@ import { computed, ref, watch } from 'vue';
 import Select from 'primevue/select';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { filterLeagueGames, getAllLeagueGames, updateLeagueGame, deleteLeagueGame} from "@/components/frontend/league/LeagueUtilFunctions";
-import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason } from "@/components/frontend/league/LeagueSeasonsData";
+import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
+import LeagueTeamSelect from '@/components/frontend/league/LeagueTeamSelect.vue';
+import { applySidesToMatch, useMatchEdit, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
+import { filterLeagueGames, getAllLeagueGames, getGameLeague, getGameSeason, updateLeagueGame, deleteLeagueGame} from "@/components/frontend/league/LeagueUtilFunctions";
+import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason, toLeaguePlayers } from "@/components/frontend/league/LeagueSeasonsData";
 import { withLeagueTeamLogos } from "@/components/frontend/league/LeaguePlayersData";
 
 let leagueGames = ref<Match[]|undefined>();
+const { editingMatch, editVisible, editSides, openEdit } = useMatchEdit();
+
+// Teams der Liga, in der das bearbeitete Spiel stattfand.
+const editSeason = computed(() => editingMatch.value ? getSeason(getGameSeason(editingMatch.value)) : undefined);
+const editDivision = computed(() =>
+    editingMatch.value ? editSeason.value?.divisions.find(division => division.league === getGameLeague(editingMatch.value!)) : undefined
+);
+const editTeams = computed(() => toLeaguePlayers(editDivision.value?.teams ?? []));
+const editSubtitle = computed(() =>
+    ['BiPo League', editSeason.value?.label, editDivision.value?.label].filter(part => part).join(' · ')
+);
 
 // Filter, damit die Liste ueber mehrere Saisons hinweg bedienbar bleibt.
 const selectedSeason = ref(CURRENT_SEASON_SLUG);
@@ -57,14 +86,14 @@ const getLeagueGames = async () => {
 }
 getLeagueGames();
 
-const setGameResult = async (match:Match) => {
-    let success = await updateLeagueGame(match);
+const setGameResult = async (sides: GameEntrySide[]) => {
+    let success = await updateLeagueGame(applySidesToMatch(editingMatch.value!, sides));
     await getLeagueGames();
     return success;
 }
 
-const deleteMatch = async (match:Match) => {
-    let success = await deleteLeagueGame(match);
+const deleteMatch = async () => {
+    let success = await deleteLeagueGame(editingMatch.value!);
     await getLeagueGames();
     return success;
 }

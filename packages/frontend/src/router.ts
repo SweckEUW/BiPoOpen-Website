@@ -6,7 +6,7 @@ const routes = [
 	{
 		path: '/',
 		name: 'Home',
-		component: () => import('@/components/frontend/_Home.vue'),
+		component: () => import('@/components/frontend/home/_Home.vue'),
 		meta: {
 			title: 'Weck BiPo Open',
 			description: ''
@@ -29,6 +29,16 @@ const routes = [
 		meta: {
 			title: 'Weck BiPo Open - Offene Spiele',
 			description: 'Offene Spiel'
+		}
+	},
+
+	{
+		path: '/Weltrangliste',
+		name: 'Weltrangliste',
+		component: () => import('@/components/frontend/worldRanking/_WorldRanking.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Weltrangliste',
+			description: 'Weltrangliste'
 		}
 	},
 

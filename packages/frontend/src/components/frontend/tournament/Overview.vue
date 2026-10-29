@@ -28,8 +28,8 @@
                         <tr>
                             <th>#</th>
                             <th class="text-left">Name</th>
-                            <th>Trfq.</th>
-                            <th>Spiele</th>
+                            <th>Ø</th>
+                            <th>SP</th>
                         </tr>
                     </thead>
                     <tbody>

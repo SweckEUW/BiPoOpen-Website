@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getLeagueTeamLogo } from "./LeaguePlayersData";
+import { getLeagueTeamLogo } from "../LeaguePlayersData";
 
 // URL-Segment fuer den Pokal-Reiter: /League/2026-27/Pokal
 export const CUP_URL_SEGMENT = 'Pokal';
@@ -64,19 +64,23 @@ export const getRoundName = (teamCount: number, roundIndex: number) => {
     return `${roundIndex + 1}. Runde`;
 }
 
-// Alle Runden des Pokals, auch die noch nicht festgelegten: 25 -> 1. Runde, 2. Runde, Viertelfinale, Halbfinale, Finale.
-export const getPlannedRoundNames = (participantCount: number) => {
-    const roundNames: string[] = [];
+// Teams je Runde, auch fuer die noch nicht festgelegten: 25 -> 25, 16, 8, 4, 2.
+export const getPlannedRoundTeamCounts = (participantCount: number) => {
+    const teamCounts: number[] = [];
     let teamCount = participantCount;
 
     while (teamCount >= 2) {
         const byeCount = getByeCount(teamCount);
-        roundNames.push(getRoundName(teamCount, roundNames.length));
+        teamCounts.push(teamCount);
         teamCount = byeCount + (teamCount - byeCount) / 2;
     }
 
-    return roundNames;
+    return teamCounts;
 }
+
+// Alle Runden des Pokals, auch die noch nicht festgelegten: 25 -> 1. Runde, 2. Runde, Viertelfinale, Halbfinale, Finale.
+export const getPlannedRoundNames = (participantCount: number) =>
+    getPlannedRoundTeamCounts(participantCount).map((teamCount, roundIndex) => getRoundName(teamCount, roundIndex));
 
 ////////////////////////
 // ERGEBNISSE         //

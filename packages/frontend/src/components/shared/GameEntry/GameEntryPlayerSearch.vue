@@ -1,0 +1,248 @@
+<template>
+    <div class="GameEntryPlayerSearch">
+        <!-- Gewaehlter Spieler -->
+        <div v-if="modelValue" class="gp-chip">
+            <Avatar :name="modelValue" shape="circle" class="gp-avatar" />
+            <span class="gp-chip-name">{{ modelValue }}</span>
+            <button type="button" class="gp-icon-button" aria-label="Spieler entfernen" @click="emit('clear')">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
+
+        <!-- Suche: Treffer klappen direkt unter dem Feld auf, kein Overlay (im Sheet sonst abgeschnitten) -->
+        <template v-else>
+            <div class="gp-input-wrap" :class="{ 'gp-input-wrap--open': showResults }">
+                <i class="pi pi-search gp-search-icon"></i>
+                <input
+                    ref="inputEl"
+                    v-model="query"
+                    class="gp-input"
+                    type="text"
+                    :placeholder="placeholder"
+                    autocomplete="off"
+                    enterkeyhint="done"
+                    @focus="onFocus"
+                    @blur="isFocused = false"
+                    @keydown.enter.prevent="selectFirst"
+                    @keydown.esc="inputEl?.blur()"
+                />
+                <button v-if="removable" type="button" class="gp-icon-button" aria-label="Mitspieler entfernen" @mousedown.prevent @click="emit('clear')">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <div v-if="showResults" class="gp-results" role="listbox">
+                <button v-for="name in suggestions" :key="name"
+                    type="button"
+                    role="option"
+                    class="gp-result"
+                    @mousedown.prevent
+                    @click="select(name)"
+                >
+                    <Avatar :name="name" shape="circle" class="gp-avatar" />
+                    <span>{{ name }}</span>
+                </button>
+
+                <button v-if="newName" type="button" role="option" class="gp-result gp-result-new" @mousedown.prevent @click="select(newName)">
+                    <span class="gp-new-icon"><i class="pi pi-plus"></i></span>
+                    <span>„{{ newName }}“ als neuen Spieler hinzufügen</span>
+                </button>
+            </div>
+        </template>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import Avatar from '@/components/shared/Avatar.vue';
+import { getAllPlayerNames, getPlayerMatchCounts } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
+
+const MAX_RESULTS = 6;
+
+const props = withDefaults(defineProps<{
+    modelValue: string;
+    excludedNames?: string[];   // schon im Spiel gewaehlt
+    removable?: boolean;        // zusaetzlicher Mitspieler: x entfernt den Platz
+    placeholder?: string;
+}>(), {
+    excludedNames: () => [],
+    placeholder: 'Spieler suchen …',
+});
+
+const emit = defineEmits<{
+    'update:modelValue': [name: string];
+    clear: [];
+}>();
+
+const inputEl = ref<HTMLInputElement>();
+const query = ref('');
+const isFocused = ref(false);
+const names = ref<string[]>([]);
+const matchCounts = ref<Record<string, number>>({});
+
+const normalize = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
+
+const onFocus = async () => {
+    isFocused.value = true;
+    if (names.value.length) return;
+    [names.value, matchCounts.value] = await Promise.all([getAllPlayerNames(), getPlayerMatchCounts()]);
+}
+
+// Leere Suche: die aktivsten Spieler zur schnellen Auswahl.
+const suggestions = computed(() => {
+    const search = normalize(query.value);
+    const excluded = props.excludedNames.map(normalize);
+    return names.value
+        .filter(name => !excluded.includes(normalize(name)) && normalize(name).includes(search))
+        .sort((name1, name2) =>
+            (matchCounts.value[name2] ?? 0) - (matchCounts.value[name1] ?? 0) || name1.localeCompare(name2, 'de', { sensitivity: 'base' })
+        )
+        .slice(0, MAX_RESULTS);
+});
+
+// Neuer Spieler nur, wenn es den Namen noch nicht gibt.
+const newName = computed(() => {
+    const name = query.value.trim().replace(/\s+/g, ' ');
+    if (!name || names.value.some(existing => normalize(existing) === normalize(name))) return '';
+    return props.excludedNames.some(excluded => normalize(excluded) === normalize(name)) ? '' : name;
+});
+
+const showResults = computed(() => isFocused.value && (suggestions.value.length > 0 || !!newName.value));
+
+const select = (name: string) => {
+    query.value = '';
+    emit('update:modelValue', name);
+}
+
+const selectFirst = () => {
+    const first = suggestions.value[0] ?? newName.value;
+    if (first) select(first);
+}
+
+defineExpose({ focus: () => inputEl.value?.focus() });
+</script>
+
+<style scoped>
+.gp-input-wrap,
+.gp-chip{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 6px 0 12px;
+    border: 1px solid #DCDFE4;
+    border-radius: 10px;
+    background: white;
+}
+.gp-input-wrap:focus-within{
+    border-color: #1F2328;
+}
+.gp-input-wrap--open{
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.gp-search-icon{
+    color: #8A9099;
+    font-size: 15px;
+}
+.gp-input{
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #1F2328;
+    font: inherit;
+    font-size: 15px;
+}
+.gp-input::placeholder{
+    color: #9AA0A8;
+}
+
+.gp-chip{
+    padding-left: 8px;
+}
+.gp-chip-name{
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #1F2328;
+    font-size: 15px;
+    font-weight: 600;
+}
+.gp-avatar{
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px;
+    font-size: 11px !important;
+}
+
+.gp-icon-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: #8A9099;
+    cursor: pointer;
+}
+.gp-icon-button:hover{
+    background: #F1F2F4;
+}
+.gp-icon-button .pi{
+    font-size: 12px;
+}
+
+.gp-results{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #1F2328;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    background: white;
+    overflow: hidden;
+}
+.gp-result{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 6px 12px;
+    border: none;
+    border-top: 1px solid #F1F2F4;
+    background: white;
+    color: #1F2328;
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+.gp-result:hover{
+    background: #F6F7F9;
+}
+.gp-result-new{
+    color: var(--main-color);
+    font-weight: 600;
+}
+.gp-new-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    background: #FDECEE;
+}
+.gp-new-icon .pi{
+    font-size: 11px;
+}
+</style>

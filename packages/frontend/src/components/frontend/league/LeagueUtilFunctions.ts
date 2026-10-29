@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LEGACY_LEAGUE, LEGACY_SEASON_SLUG } from "./LeagueSeasonsData";
+import { LEAGUE_SEASONS, LEGACY_LEAGUE, LEGACY_SEASON_SLUG, getRegularSeasonGameCount, toLeaguePlayers } from "./LeagueSeasonsData";
 
 /////////////
 // GENERAL //
@@ -40,6 +40,30 @@ export const isCupGame = (match: Match) => !!match.cupId;
 
 export const filterLeagueGames = (leagueGames: Match[], seasonSlug: string, league: number) =>
     leagueGames.filter(match => !isCupGame(match) && getGameSeason(match) === seasonSlug && getGameLeague(match) === league);
+
+// Team, Liga und Tabellenplatz fuer jede Saison, in der der Spieler gemeldet ist (neueste zuerst).
+// Platz nach der Hauptrunde-Tabelle, null solange das Team noch kein Spiel hat.
+export const getLeagueStandingsForPlayer = (leagueGames: Match[], playerName: string): LeagueStanding[] => {
+    const normalizeName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
+
+    return [...LEAGUE_SEASONS].reverse().flatMap(season => season.divisions.flatMap(division => {
+        const team = division.teams.find(team => normalizeName(team.playerName) === normalizeName(playerName));
+        if (!team) return [];
+
+        const regularSeasonGames = filterLeagueGames(leagueGames, season.slug, division.league)
+            .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0))
+            .slice(0, getRegularSeasonGameCount(division));
+        const entry = getLeagueList(regularSeasonGames, toLeaguePlayers(division.teams))
+            .find(player => player.name === team.teamName);
+
+        return [{
+            teamName: team.teamName,
+            divisionLabel: division.label,
+            seasonLabel: season.label,
+            placement: entry && entry.ammountOfMatches > 0 ? entry.placement! + 1 : null,
+        }];
+    }));
+}
 
 
 ////////////////

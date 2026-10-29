@@ -8,14 +8,14 @@
         :leagueGames="games"
     />
 
-    <Tabs v-model:value="activeTableTab" class="pt-[10px]">
-        <TabList class="league-table-sticky-tablist pb-[10px] text-[12px]">
-            <Tab value="overall">Aktuelle Tabelle</Tab>
-            <Tab value="rueckrunde">Rückrunde</Tab>
+    <Tabs v-model:value="activeTableTab" class="p-tabs-chips">
+        <TabList v-if="hasRueckrunde" ref="tabList" class="league-table-sticky-tablist pt-[12px] pb-[12px]" :style="{ top: tabListTop }">
+            <Tab value="overall">Gesamt</Tab>
             <Tab value="hinrunde">Hinrunde</Tab>
+            <Tab value="rueckrunde">Rückrunde</Tab>
         </TabList>
 
-        <TabPanels class="!pt-[0px]">
+        <TabPanels :class="hasRueckrunde ? '!pt-[0px]' : '!pt-[12px]'">
             <TabPanel value="overall">
                 <LeagueStandingsTable
                     :leaguePlayers="props.leaguePlayers"
@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch, type ComponentPublicInstance } from 'vue';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
@@ -63,6 +63,7 @@ import TabPanel from 'primevue/tabpanel';
 import { splitLeagueGamesByRound } from './LeagueUtilFunctions';
 import LeaguePlayerOverviewDrawer from './LeaguePlayerOverviewDrawer.vue';
 import LeagueStandingsTable from './LeagueStandingsTable.vue';
+import { useStickyBar } from '@/components/shared/useStickyStack';
 
 const props = defineProps({
     leaguePlayers: { type: Array as () => LeaguePlayer[], required: true },
@@ -74,12 +75,23 @@ const props = defineProps({
 });
 
 const activeTableTab = ref('overall');
+
+// Der Tabellenkopf klebt direkt unter diesen Reitern.
+const tabList = ref<ComponentPublicInstance | null>(null);
+const tabListTop = useStickyBar(tabList);
 const leaguePlayerOverviewVisible = ref(false);
 const selectedLeaguePlayer = ref<LeaguePlayer | undefined>(undefined);
 
 // Nur die Hauptrunde zaehlt fuer die Tabelle, die Final-Four-Spiele kommen danach.
 let games = computed(() => props.leagueGames.toReversed().toSpliced(props.regularSeasonGameCount));
 const leagueGamesByRound = computed(() => splitLeagueGamesByRound(games.value));
+
+// Hin-/Rueckrunden-Reiter erst, sobald das erste Rueckrundenspiel gespielt ist.
+const hasRueckrunde = computed(() => leagueGamesByRound.value.rueckrunde.length > 0);
+watch(hasRueckrunde, (value) => {
+    if (!value)
+        activeTableTab.value = 'overall';
+});
 
 const openPlayerOverview = (playerName: string) => {
     const selectedPlayer = props.leaguePlayers.find(player => player.name === playerName);
@@ -92,15 +104,9 @@ const openPlayerOverview = (playerName: string) => {
 </script>
 
 <style scoped>
-:deep(.league-table-sticky-tablist) {
+:deep(.p-tablist.league-table-sticky-tablist) {
     position: sticky;
-    top: calc(205px + var(--league-sticky-extra, 0px));
     z-index: 3;
-}
-
-@media (max-width: 900px) {
-    :deep(.league-table-sticky-tablist) {
-        top: calc(125px + var(--league-sticky-extra, 0px));
-    }
+    background: var(--page-gray);
 }
 </style>

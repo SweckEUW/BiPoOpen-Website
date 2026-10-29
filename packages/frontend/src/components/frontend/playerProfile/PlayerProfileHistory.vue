@@ -4,21 +4,16 @@
     <div class="mb-[40px]">
         <Panel :pt="{ header: { class: 'p-2' } }">
             <div class="flex flex-col gap-[12px]">
-                <div v-for="(item, i) in displayed" :key="i" class="match-entry">
-                    <div class="flex items-center gap-[8px] mb-[6px]">
-                        <Tag :value="item.source" severity="secondary" rounded />
-                        <span class="text-[12px] text-[--p-text-muted-color]" v-if="item.time">
-                            {{ formatDate(item.time) }}, {{ formatTime(item.time) }}
-                        </span>
+                <MatchElement v-for="(item, i) in displayed" :key="i" :match="item.match" :chipLabel="item.source" showChip showDate class="match-entry">
+                    <template #meta>
                         <Tag
                             :severity="isWin(item) ? 'success' : 'danger'"
                             :value="isWin(item) ? 'Sieg' : 'Niederlage'"
                             rounded
                             class="ml-auto"
                         />
-                    </div>
-                    <MatchElement :match="item.match" />
-                </div>
+                    </template>
+                </MatchElement>
             </div>
             <Button
                 v-if="matchHistory.length > limit"
@@ -65,11 +60,6 @@ const isWin = (entry: MatchHistoryEntry) => {
     return false;
 };
 
-const formatDate = (ts: number) => new Date(ts).toLocaleDateString('de-DE');
-const formatTime = (ts: number) => {
-    let d = new Date(ts);
-    return d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes() + ' Uhr';
-};
 </script>
 
 <style scoped>
@@ -79,12 +69,7 @@ const formatTime = (ts: number) => {
     color: var(--p-primary-color);
     margin-bottom: 12px;
 }
-.match-entry {
-    border-bottom: 1px solid var(--p-content-border-color);
-    padding-bottom: 12px;
-}
-.match-entry:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
+.flex > .match-entry {
+    margin-bottom: 0;
 }
 </style>

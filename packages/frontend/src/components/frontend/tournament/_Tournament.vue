@@ -10,13 +10,16 @@
 
             <!-- Tabs -->
             <Tabs v-model:value="place" @update:value="changeRouter">
-               <TabList class="pb-[20px]">
-                  <Tab value="Teams">Teams</Tab>
-                  <Tab value="Gruppenphase">Gruppenphase</Tab>
-                  <Tab value="K.o.Phase">K.o.Phase</Tab>
-                  <Tab v-if="tournament.settings.trackPlayerShots" value="MVP">MVP</Tab>
-                  <Tab v-if="getTournamentPhotos()" value="Fotos">Fotos</Tab>
-               </TabList>
+               <!-- Reiter kleben unter dem App-Header -->
+               <div ref="stickyBar" class="to-sticky-bar" :style="{ top: stickyBarTop }">
+                  <TabList class="pb-[20px]">
+                     <Tab value="Teams">Teams</Tab>
+                     <Tab value="Gruppenphase">Gruppenphase</Tab>
+                     <Tab value="K.o.Phase">K.o.Phase</Tab>
+                     <Tab v-if="tournament.settings.trackPlayerShots" value="MVP">MVP</Tab>
+                     <Tab v-if="getTournamentPhotos()" value="Fotos">Fotos</Tab>
+                  </TabList>
+               </div>
                <TabPanels class="!p-[0px]">
                   <TabPanel value="Teams">
                      <Teams :tournament="tournament"/>
@@ -53,9 +56,13 @@ import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
+import { useStickyBar } from '@/components/shared/useStickyStack';
 
 import { useRoute } from "vue-router";
 const route = useRoute()
+
+const stickyBar = ref<HTMLElement | null>(null);
+const stickyBarTop = useStickyBar(stickyBar);
 
 let tournament = ref<Tournament|undefined>();
 
@@ -161,27 +168,18 @@ const getTournamentPhotos = () => {
 </script>
 
 <style scoped>
-:deep(.p-tablist){
+.to-sticky-bar{
    position: sticky;
-   top: 160px;
    background: white;
-   z-index: 2;
+   z-index: 3;
 }
 :deep(.p-tabs){
    padding-bottom: 30px;
 }
-:deep(.p-tab){
-   padding: 15px 10px;
-   font-weight: bold;
-}
 /* MOBILE */
 @media (width <= 900px){
-   :deep(.p-tablist){
-      top: 140px;
-   }
    :deep(.p-tab){
-      font-size: 14px;
-      padding: 10px 10px;
+      font-size: 15px;
    }
 }
 </style>

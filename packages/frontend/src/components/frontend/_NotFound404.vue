@@ -7,6 +7,7 @@
 
 <style scoped>
 .bp-title{
+    text-align: center;
     padding-bottom: 0px;
     padding-top: 0px;
 }

@@ -1,5 +1,5 @@
 <template>
-    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-content-center" v-if="selectedPlayer">
                 <div class="flex flex-column align-items-center">
@@ -27,16 +27,16 @@
                     </div>
                 </div>
                 <div v-for="match in round.data.matchesPlayed" style="margin-top: 10px;">
-                    <div class="lg-match-meta" v-if="match.time || getMatchResult(match)">
-                        <Tag
-                            v-if="getMatchResult(match)"
-                            :severity="getMatchResult(match) === 'Sieg' ? 'success' : 'danger'"
-                            :value="getMatchResult(match)"
-                            rounded
-                        />
-                        <div v-if="match.time">{{ getGameTime(match.time) }}</div>
-                    </div>
-                    <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'"/>
+                    <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'" showDate>
+                        <template v-if="getMatchResult(match)" #meta>
+                            <Tag
+                                :severity="getMatchResult(match) === 'Sieg' ? 'success' : 'danger'"
+                                :value="getMatchResult(match)"
+                                rounded
+                                class="ml-auto"
+                            />
+                        </template>
+                    </MatchElement>
                 </div>
 
                 <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
@@ -49,13 +49,13 @@
                 </div>
             </div>
         </div>
-    </Drawer>
+    </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import Image from 'primevue/image';
-import Drawer from 'primevue/drawer';
+import BottomSheet from '@/components/shared/BottomSheet.vue';
 import Tag from 'primevue/tag';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import { withLeagueTeamLogos } from './LeaguePlayersData';
@@ -133,11 +133,6 @@ const orderedRounds = computed(() => {
     return [hinrunde, rückrunde];
 });
 
-const getGameTime = (dateNumber: number) => {
-    const date = new Date(dateNumber);
-    const time = date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-    return date.toLocaleDateString('de-DE') + '  -  ' + time + ' Uhr';
-};
 
 const getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
     if (!props.selectedPlayer || !checkIfMatchFinished(match)) return undefined;
@@ -156,12 +151,6 @@ const getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
 </script>
 
 <style scoped>
-.lg-match-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
 
 .lg-sticky-round-block {
     position: sticky;
@@ -198,11 +187,6 @@ const getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
 .lg-sticky-subheadline {
     margin-top: 0;
     line-height: 1.2;
-}
-
-.mobile-sheet {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
 }
 
 /* Make Avatars Bigger */

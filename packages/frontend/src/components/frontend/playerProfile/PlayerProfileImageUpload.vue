@@ -44,7 +44,7 @@
         :src="cropSrc"
         stencil="circle"
         :output-size="400"
-        output-format="jpeg"
+        output-format="png"
         header="Profilbild zuschneiden"
         @cropped="onCropped"
     />

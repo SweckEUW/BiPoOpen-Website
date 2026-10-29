@@ -67,14 +67,7 @@
 
 <style scoped>
 .Imprint{
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    flex-wrap: wrap;
     text-align: left;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
     margin-bottom: 50px;
 }
 h2{
@@ -89,7 +82,6 @@ p{
 @media (width <= 900px){
 	.Imprint{
 		margin-bottom: 20px;
-		width: 90%;
 	}
 }
 </style>

@@ -148,8 +148,6 @@ declare global {
     
     type SortValueLeague = 'placement'|'name'|'ammountOfMatches'|'wins'|'looses';
     type SortValueMVP = 'averageHits'|'placement'|'hits'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
-    type SortValueHallOfFame = 'averageHits'|'wins'|'placement'|'name'|'ammountOfMatches'|'averageWins';
-    type SortValueOpenGames = 'placement'|'name'|'ammountOfMatches'|'wins'|'averageHits'|'averageWins'|'ammountOfDrunkenCups';
 
     // Player Profile Types
     type TrendPeriod = 'all' | '1m' | '3m' | '6m' | '1y';
@@ -225,9 +223,17 @@ declare global {
         matches: number;
     };
 
+    type LeagueStanding = {
+        teamName: string;
+        divisionLabel: string;   // "1. Liga"
+        seasonLabel: string;     // "2026/27"
+        placement: number | null; // 1-basiert, null = noch kein Spiel
+    };
+
     type PlayerProfileData = {
         name: string;
         leagueTeam: string | null;
+        leagueStandings: LeagueStanding[]; // alle Saisons, neueste zuerst, fuer die Liga-Chips
         firstGameTime: number | null;
         totalMatches: number;
         totalWins: number;

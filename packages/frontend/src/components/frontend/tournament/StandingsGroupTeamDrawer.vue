@@ -1,5 +1,5 @@
 <template>
-    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-content-center" v-if="selectedTeam">
                 <div class="flex flex-column align-items-center">
@@ -26,19 +26,16 @@
             <div v-if="teamMatches.length === 0" class="mt-[10px]">Keine Spiele vorhanden</div>
 
             <div v-for="match in teamMatches" :key="match._id" style="margin-top: 10px;">
-                <div class="sg-match-meta" v-if="match.time">
-                    <div>{{ getGameTime(match.time) }}</div>
-                </div>
-                <MatchElement :match="match" :displayTeamLogo="true"/>
+                <MatchElement :match="match" showDate/>
             </div>
         </div>
-    </Drawer>
+    </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import Image from 'primevue/image';
-import Drawer from 'primevue/drawer';
+import BottomSheet from '@/components/shared/BottomSheet.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });
@@ -59,20 +56,9 @@ const teamMatches = computed(() => {
         .sort((a, b) => (a.time ?? 0) - (b.time ?? 0));
 });
 
-const getGameTime = (dateNumber: number) => {
-    const date = new Date(dateNumber);
-    const time = date.getHours() + ':' + (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
-    return date.toLocaleDateString('de-DE') + '  -  ' + time + ' Uhr';
-};
 </script>
 
 <style scoped>
-.sg-match-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
 
 .lg-sticky-round-block {
     position: sticky;
@@ -93,11 +79,6 @@ const getGameTime = (dateNumber: number) => {
     top: -10px;
     height: 10px;
     background: #fff;
-}
-
-.mobile-sheet {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
 }
 
 @media (width <= 900px) {

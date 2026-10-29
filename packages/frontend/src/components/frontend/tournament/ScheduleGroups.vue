@@ -4,7 +4,7 @@
       </div>
 
       <div v-else>
-         <div class="swiper-pagination" id="GameScheduleGroupsSwiper-Pagination"/>
+         <div ref="pagination" class="swiper-pagination" id="GameScheduleGroupsSwiper-Pagination" :style="{ top: paginationTop }"/>
 
          <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
             <div class="swiper-wrapper">
@@ -22,8 +22,8 @@
                   <div class="rt-matches">
                      <MatchElement v-for="(match) in tournament.groupPhase.matches[groupIndex]" :key="match._id" 
                         :match="match" 
-                        :isBackend="isBackend" 
-                        :setGameResult="setGameResult"
+                        :isBackend="isBackend"
+                        @edit="openEdit"
                         :avatarShape="'square'"
                      />
                   </div>
@@ -31,15 +31,30 @@
                </div>
             </div>
          </div>
+
+         <GameEntryDrawer v-if="isBackend"
+            v-model:visible="editVisible"
+            :title="editingMatch && checkIfMatchFinished(editingMatch) ? 'Spiel bearbeiten' : 'Spiel eintragen'"
+            :subtitle="`${tournament.name} · Gruppenphase`"
+            :initialSides="editSides"
+            :sideLabels="['Team 1', 'Team 2']"
+            lockedNames
+            avatarShape="square"
+            :save="saveGameResult"
+         />
       </div>
 </template>
 
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, PropType, watch } from "vue"
-import { convertNumberToCharacter } from "@/util/util.js"; 
+import { onMounted, PropType, ref, watch } from "vue"
+import { convertNumberToCharacter } from "@/util/util.js";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
+import { applySidesToMatch, useMatchEdit, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
+import { checkIfMatchFinished } from '@/util/tournamentMatchFunctions';
 import StandingsGroups from '@/components/frontend/tournament/StandingsGroups.vue';
+import { useStickyBar } from '@/components/shared/useStickyStack';
 import { setMatchesGroupPhase, getGroupsWithStats, setGameResultGroupPhase } from "@/util/tournamentGroupFunctions";
 
 import Swiper from 'swiper';
@@ -52,6 +67,10 @@ const props = defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },
    isBackend: {type: Boolean, required: true },
 });
+
+// Die Gruppenauswahl klebt unter den Reitern, die Gruppentabellen darunter.
+const pagination = ref<HTMLElement | null>(null);
+const paginationTop = useStickyBar(pagination);
 
 const onDragEnd = async (evt:Sortable.SortableEvent) => {
 
@@ -113,8 +132,10 @@ onMounted(() => {
    });
 });
 
-const setGameResult = async (match:Match) => {
-   await setGameResultGroupPhase(props.tournament, match);
+const { editingMatch, editVisible, editSides, openEdit } = useMatchEdit();
+
+const saveGameResult = async (sides: GameEntrySide[]) => {
+   await setGameResultGroupPhase(props.tournament, applySidesToMatch(editingMatch.value!, sides));
    await props.getTournament();
 
    return true;
@@ -123,7 +144,8 @@ const setGameResult = async (match:Match) => {
 
 <style>
 .GameScheduleGroups{
-   overflow: hidden;
+   /* clip statt hidden: kein eigener Scroll-Container, sonst klebt der Tabellenkopf nicht */
+   overflow: clip;
 }
 .rt-caption{
    margin-bottom: 10px;
@@ -138,7 +160,6 @@ const setGameResult = async (match:Match) => {
    padding-bottom: 20px;
    display: flex;
    background-color: white;
-   top: 200px;
 }
 #GameScheduleGroupsSwiper-Pagination .swiper-pagination-bullet, .Standings .swiper-pagination-bullet{
 	padding: 5px 10px; 
@@ -160,9 +181,6 @@ const setGameResult = async (match:Match) => {
 
 /* MOBILE */
 @media (width <= 900px){
-   #GameScheduleGroupsSwiper-Pagination .swiper-pagination{
-      top: 200px;
-   }
    .rt-caption{
       font-size: 22px;
    }

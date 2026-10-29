@@ -18,3 +18,16 @@ export const getBiPoOpenTournamentFallbackTime = (year: string): number => {
     if (!date) return 0;
     return new Date(`${date}T14:00:00`).getTime();
 };
+
+// Next upcoming tournament (shown in the tournament picker)
+export const NEXT_BIPO_OPEN = { year: '2027', date: '2027-06-26' };
+
+export const BIPO_OPEN_WINNERS = [
+    { year: "2026", name: "Alki Süd", player1: "Jannick Becker", player2: "Frederick Reckhaus"},
+    { year: "2025", name: "Weck-Knicken", player1: "Nick Brinkrolf", player2: "Simon Weck"},
+    { year: "2024", name: "Team Vogelnest", player1: "Lewin Pohlschmidt", player2: "Mattis Post"},
+    { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
+    { year: "2022", name: "Taube Nüsschen", player1: "Patrick Pohlmann", player2: "Tim Becker"},
+    { year: "2021", name: "Pong Daddys", player1: "Matthias Weck", player2: "Lennard Kaffitz"},
+    { year: "2020", name: "Dynamo #DruckAmGlas", player1: "Alexander Borsig", player2: "Björn Harz"}
+];

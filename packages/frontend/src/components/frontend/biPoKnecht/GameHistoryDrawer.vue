@@ -1,5 +1,5 @@
 <template>
-    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-center">
                 <div class="font-bold text-[24px] text-[--p-primary-color]">Spielverlauf</div>
@@ -44,12 +44,12 @@
                 </div>
             </template>
         </div>
-    </Drawer>
+    </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { computed, PropType } from 'vue';
-import Drawer from 'primevue/drawer';
+import BottomSheet from '@/components/shared/BottomSheet.vue';
 import type { BiPoKnechtGame } from './useBiPoKnecht';
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });
@@ -101,10 +101,3 @@ const teamBgColor = (teamIndex: number) =>
 
 const points = (turn: Turn, index: number) => props.game.scoreTurn(turn, index, props.game.turns);
 </script>
-
-<style scoped>
-.mobile-sheet {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-}
-</style>

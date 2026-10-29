@@ -89,11 +89,6 @@
 </template>
 
 <style scoped>
-.Rules{
-    width: 90%;
-    width: 90%;
-    margin: auto;
-}
 h2{
     font-size: 24px;
     width: 100%;

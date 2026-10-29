@@ -1,26 +1,14 @@
 <template>
-    <DataTable
+    <AppTable
         :value="sortedLeaguePlayers"
         :rowClass="getRowClass"
         @row-click="onRowClick"
-        :pt="{
-            tableContainer: {
-                class: '!overflow-visible'
-            }
-        }"
-        stripedRows
-        class="w-full league-standings-table text-[14px]"
+        rank
+        class="mb-[30px]"
     >
 
-        <!-- Platzierung -->
-        <Column header="Pl." :pt="{ headerCell: { class: 'league-standings-sticky-header !px-1 !w-[25px] !max-w-[25px]' }, bodyCell: { class: '!p-1 !w-[25px] !max-w-[25px]' } }">
-            <template #body="slotProps">
-                {{ (slotProps.data.placement ?? slotProps.index) + 1 }}
-            </template>
-        </Column>
-
         <!-- Team -->
-        <Column header="Team" :pt="{ headerCell: { class: 'league-standings-sticky-header ' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!p-1' } }">
+        <Column header="Team" :pt="{ columnTitle: { class: '!text-left' }, bodyCell: { class: '!p-1' } }">
             <template #body="slotProps">
                 <div class="flex items-center justify-start">
                     <img class="w-[64px] h-[64px] object-contain mr-[20px] max-[900px]:mr-[10px] max-[450px]:w-[48px] max-[450px]:h-[48px] max-[380px]:w-[32px] max-[380px]:h-[32px]" :src="getPlayerLogo(slotProps.data.name)">
@@ -30,20 +18,20 @@
         </Column>
 
         <!-- Spiele -->
-        <Column :header="windowWidth > 900 ? 'Spiele' : 'Spi.'" field="ammountOfMatches" :pt="{ headerCell: { class: 'league-standings-sticky-header' } }" />
+        <Column :header="labels.games" field="ammountOfMatches" />
 
         <!-- Siege -->
-        <Column :header="windowWidth > 900 ? 'Siege' : 'S'" field="wins" :pt="{ headerCell: { class: 'league-standings-sticky-header' } }" />
+        <Column :header="labels.wins" field="wins" />
 
         <!-- Niederlagen -->
-        <Column :header="windowWidth > 900 ? 'Niederlagen' : 'N'" :pt="{ headerCell: { class: 'league-standings-sticky-header' } }">
+        <Column :header="labels.losses">
             <template #body="slotProps">
                 {{ slotProps.data.ammountOfMatches - slotProps.data.wins }}
             </template>
         </Column>
 
         <!-- Trefferverhältnis -->
-        <Column :header="windowWidth > 900 ? 'Trefferverhältnis' : 'Trfv.'" :pt="{ headerCell: { class: 'league-standings-sticky-header !w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
+        <Column :header="labels.diff" :pt="{ headerCell: { class: '!w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
             <template #body="slotProps">
                 <div class="leading-tight">
                     <span class="whitespace-nowrap">{{ slotProps.data.hitDifference }}</span>
@@ -51,21 +39,14 @@
                 </div>
             </template>
         </Column>
-    </DataTable>
-
-    <div v-if="windowWidth < 900" class="text-[14px] text-[var(--main-color)] mb-[30px]">
-        <div>*Pl. = Platz</div>
-        <div>*Spi. = Spiele</div>
-        <div>*S = Siege</div>
-        <div>*N = Niederlagen</div>
-        <div>*Trfv. = Trefferverhältnis</div>
-    </div>
+    </AppTable>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
-import DataTable from 'primevue/datatable';
+import { computed } from 'vue';
 import Column from 'primevue/column';
+import AppTable from '@/components/shared/AppTable.vue';
+import { useTableLabels } from '@/components/shared/appTable';
 import { getLeagueList } from './LeagueUtilFunctions';
 
 const props = withDefaults(defineProps<{
@@ -128,43 +109,6 @@ const onRowClick = (event: any) => {
     emit('select-player', event.data.name);
 }
 
-const windowWidth = ref(window.screen.width);
-
-const updateWindowWidth = () => {
-    windowWidth.value = window.screen.width;
-};
-
-onMounted(() => {
-    window.addEventListener('resize', updateWindowWidth);
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize', updateWindowWidth);
-});
+const labels = useTableLabels();
 </script>
 
-<style scoped>
-:deep(.league-standings-sticky-header) {
-    position: sticky;
-    top: calc(260px + var(--league-sticky-extra, 0px));
-    z-index: 2;
-}
-
-:deep(.league-standings-table .p-datatable-thead > tr > th) {
-    border-width: 0;
-    text-align: center;
-}
-
-:deep(.league-standings-table .p-datatable-tbody > tr > td) {
-    border-width: 0;
-    text-align: center;
-    vertical-align: middle;
-}
-
-@media (max-width: 900px) {
-    :deep(.league-standings-sticky-header) {
-        top: calc(185px + var(--league-sticky-extra, 0px));
-    }
-
-}
-</style>

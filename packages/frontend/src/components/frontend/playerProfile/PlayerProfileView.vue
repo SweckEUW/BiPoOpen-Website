@@ -24,7 +24,9 @@
             >
                 {{ profileData.name }}
             </div>
-            <Tag v-if="profileData.leagueTeam" severity="info" :value="'Liga: ' + profileData.leagueTeam" rounded class="mb-[30px]" />
+            <div v-if="leagueChipLabels.length" class="flex flex-col items-center gap-[6px] mb-[30px]">
+                <Tag v-for="label in leagueChipLabels" :key="label" severity="info" :value="label" rounded />
+            </div>
             <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" :playerName="profileData.name" class="mt-[10px]" />
         </div>
 
@@ -42,9 +44,9 @@
         <Divider />
 
         <Tabs v-model:value="activeTabValue" class="mb-[10px]">
-            <TabList class="w-full">
-                <Tab value="1v1" class="flex-1 justify-center">1v1 Spiele</Tab>
-                <Tab value="2v2" class="flex-1 justify-center">2v2 Spiele</Tab>
+            <TabList>
+                <Tab value="1v1">1v1 Spiele</Tab>
+                <Tab value="2v2">2v2 Spiele</Tab>
             </TabList>
             <TabPanels
                 :pt="{
@@ -148,6 +150,13 @@ defineEmits<{
     (e: 'openPlayer', name: string): void;
 }>();
 
+// Ein Chip pro Saison, z.B. "Lokomotive Wiedenbrück · 1. Liga 2026/27 · Platz 10"
+const leagueChipLabels = computed(() => props.profileData.leagueStandings.map(standing =>
+    [standing.teamName, `${standing.divisionLabel} ${standing.seasonLabel}`, standing.placement ? `Platz ${standing.placement}` : null]
+        .filter(Boolean)
+        .join(' · ')
+));
+
 const activeTabValue = ref('2v2');
 const showImageUpload = ref(false);
 const avatarKey = ref(0);
@@ -162,15 +171,4 @@ const onImageUploaded = () => {
 const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
 const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));
 </script>
-
-<style scoped>
-:deep(.p-tablist-tab-list) {
-    width: 100%;
-}
-
-:deep(.p-tab) {
-    flex: 1 1 0;
-    justify-content: center;
-}
-</style>
 

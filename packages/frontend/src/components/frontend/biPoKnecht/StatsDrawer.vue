@@ -1,5 +1,5 @@
 <template>
-    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-center">
                 <div class="font-bold text-[24px] text-[--p-primary-color]">Becher-Statistik</div>
@@ -46,12 +46,12 @@
                 </div>
             </div>
         </div>
-    </Drawer>
+    </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { PropType } from 'vue';
-import Drawer from 'primevue/drawer';
+import BottomSheet from '@/components/shared/BottomSheet.vue';
 import type { BiPoKnechtGame } from './useBiPoKnecht';
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });
@@ -92,10 +92,3 @@ const statsFor = (teamIndex: number, playerIndex: number) => {
     return { total, hits, bouncers, bombs, ballsBack, lastCups };
 };
 </script>
-
-<style scoped>
-.mobile-sheet {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-}
-</style>

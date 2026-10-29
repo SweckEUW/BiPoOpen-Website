@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import AppHeader from '@/components/shared/AppHeader.vue';
 import AppFooter from '@/components/shared/AppFooter.vue';
+import AppBottomNav from '@/components/shared/AppBottomNav.vue';
+import TournamentPickerDrawer from '@/components/shared/TournamentPickerDrawer.vue';
 import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
 import Toast from 'primevue/toast';
 import { Analytics } from '@vercel/analytics/vue';
@@ -54,6 +56,10 @@ onBeforeMount(async() => {
 	<!-- App footer -->
 	<AppFooter/>
 
+	<!-- Mobile bottom navigation + tournament picker -->
+	<AppBottomNav/>
+	<TournamentPickerDrawer/>
+
 	<!-- Global Player Profile Drawer -->
 	<PlayerProfileDrawer
 		v-model:visible="playerProfileVisible"
@@ -71,6 +77,9 @@ onBeforeMount(async() => {
   --secondary-color-weak: #d3f7ff;
   --main-color-hover: rgb(241, 200, 200);
   --loose-gray: rgb(209, 209, 209);
+  --page-gray: #F6F7F9;
+  --app-header-height: 72px;
+  --app-bottom-nav-height: 64px;
 }
 
 body{
@@ -83,9 +92,9 @@ body{
 
 .Page{
 	margin: auto;
-	margin-top: 150px;
+	margin-top: calc(var(--app-header-height) + 51px);
 	padding-bottom: 50px;
-	min-height: calc(100dvh - 146px - 80px);
+	min-height: calc(100dvh - var(--app-header-height) - 47px - 80px);
 	width: 90%;
 }
 .bp-button{
@@ -103,15 +112,13 @@ body{
 	color: white;
 }
 .bp-title{
-	margin: 0%;
-	padding-bottom: 20px;
+	margin: 0;
+	padding: 10px 0 16px;
 	color: var(--main-color);
-    font-size: 40px;
-    text-align: center;
-	position: sticky;
-	background-color: white;
-	top: 99px; /* 99px = AppHeader Height */
-	z-index: 2;
+	font-size: 36px;
+	font-weight: 700;
+	line-height: 1.15;
+	text-align: left;
 }
 
 /* Transition Animations */
@@ -151,17 +158,21 @@ body{
   opacity: 0;
 }
 @media (width <= 900px){
+	:root{
+		--app-header-height: 54px;
+	}
+	body{
+		padding-bottom: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom));
+	}
 	.Page{
-		margin-top: 80px;
+		margin-top: calc(var(--app-header-height) + 1px);
 		width: 95%;
 		padding-bottom: 30px;
-		min-height: calc(100dvh - 75px - 80px);
+		min-height: calc(100dvh - var(--app-header-height) + 4px - 80px - var(--app-bottom-nav-height));
 	}
 	.bp-title{
 		font-size: 28px;
-		padding-bottom: 30px;
-		padding-top: 10px;
-		top: 79px; /* 79px = AppHeader Height */
+		padding: 12px 0 14px;
 	}
 }
 
@@ -190,7 +201,7 @@ body{
 @media (width <= 900px){
 	.p-toast.p-toast-bottom-right {
 		right: 0;
-		bottom: 0;
+		bottom: calc(var(--app-bottom-nav-height) + env(safe-area-inset-bottom));
 		left: 0;
 		width: 100%;
 		padding: 10px;

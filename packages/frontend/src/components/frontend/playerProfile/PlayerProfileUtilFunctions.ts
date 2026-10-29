@@ -1,5 +1,5 @@
 import { getAllOpenGames, getMatchesFromPlayer as getOpenGameMatchesFromPlayer } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
-import { getAllLeagueGames, getMatchesFromPlayer as getLeagueMatchesFromPlayer } from "@/components/frontend/league/LeagueUtilFunctions";
+import { getAllLeagueGames, getLeagueStandingsForPlayer, getMatchesFromPlayer as getLeagueMatchesFromPlayer, isCupGame } from "@/components/frontend/league/LeagueUtilFunctions";
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getFinishedMatchesFromPlayer } from "@/util/tournamentPlayerFunctions";
 import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from "@/util/tournamentMatchFunctions";
@@ -627,20 +627,13 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     processMatches(getOpenGameMatchesFromPlayer(openGames, playerNameLower, true), "Offene Spiele 1v1", "Offene Spiele 1v1");
     processMatches(getOpenGameMatchesFromPlayer(openGames, playerNameLower, false), "Offene Spiele 2v2", "Offene Spiele 2v2");
 
-    // 2. League Games (via mapping)
+    // 2. League Games (via mapping) - Pokalspiele laufen als eigene Kategorie
     let leagueTeam = getLeagueTeamForPlayer(playerName);
     let leagueGames = await getAllLeagueGames();
-    if (leagueTeam) {
-        let leaguePlayerNameLower = leagueTeam.toLowerCase();
-        let leagueMatches = getLeagueMatchesFromPlayer(leagueGames, leaguePlayerNameLower);
-        processMatches(leagueMatches, "BiPo League", "BiPo League", leagueTeam);
-    } else {
-        // Fallback: try direct name match (for league players not in mapping)
-        let directLeagueMatches = getLeagueMatchesFromPlayer(leagueGames, playerNameLower);
-        if (directLeagueMatches.length > 0) {
-            processMatches(directLeagueMatches, "BiPo League", "BiPo League");
-        }
-    }
+    // Fallback: try direct name match (for league players not in mapping)
+    let allLeagueMatches = getLeagueMatchesFromPlayer(leagueGames, (leagueTeam ?? playerName).toLowerCase());
+    processMatches(allLeagueMatches.filter(m => !isCupGame(m)), "BiPo League", "BiPo League", leagueTeam ?? undefined);
+    processMatches(allLeagueMatches.filter(isCupGame), "BiPo League Cup", "BiPo League Cup", leagueTeam ?? undefined);
 
     // 3. Tournaments - combine all BiPo Open tournaments into one category
     let bipoOpenStats = { name: "BiPo Open Turniere", matches: 0, wins: 0, hits: 0, averageHits: 0, trackedMatches: 0 };
@@ -775,6 +768,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
     return {
         name: playerName,
         leagueTeam,
+        leagueStandings: getLeagueStandingsForPlayer(leagueGames, playerName),
         firstGameTime,
         totalMatches,
         totalWins,
@@ -799,7 +793,7 @@ export const getPlayerProfileData = async (playerName: string, trendPeriod: Tren
 
 export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '1v1' | '2v2'): PlayerProfileData => {
     const sourcesToInclude = gameType === '1v1' 
-        ? ['Offene Spiele 1v1', 'BiPo League']
+        ? ['Offene Spiele 1v1', 'BiPo League', 'BiPo League Cup']
         : ['Offene Spiele 2v2', 'BiPo Open Turniere'];
 
     // Filter matchHistory - cast to the extended type since runtime data includes won/hits

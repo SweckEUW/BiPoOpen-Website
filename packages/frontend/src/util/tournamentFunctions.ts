@@ -1,5 +1,5 @@
 import axios from "axios";
-import { checkIfMatchFinished } from "./tournamentMatchFunctions";
+import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
 import { resolveTeamLogo } from "./supabaseStorage";
 
 ////////////////
@@ -46,6 +46,29 @@ export const checkIfTournamentFinished = (tournament:Tournament) => {
     });
 
     return tournamentFinished;
+}
+
+export const getTeamDisplayName = (team:Team) => team.name || team.players.map(p => p.name).join(' & ');
+
+export type PodiumEntry = { place: number; team: Team };
+
+// Plaetze 1-3 aus Finale (erstes Spiel der letzten K.o.-Runde) und Spiel um Platz 3 (zweites Spiel).
+export const getTournamentPodium = (tournament:Tournament) => {
+    const podium: PodiumEntry[] = [];
+    const finalRound = tournament.koPhase.matches[tournament.koPhase.matches.length - 1] ?? [];
+    const [finalMatch, thirdPlaceMatch] = finalRound;
+
+    const finalTeam1Won = finalMatch ? checkIfTeam1WonVsTeam2(finalMatch) : undefined;
+    if(finalTeam1Won !== undefined){
+        podium.push({ place: 1, team: finalTeam1Won ? finalMatch.team1 : finalMatch.team2 });
+        podium.push({ place: 2, team: finalTeam1Won ? finalMatch.team2 : finalMatch.team1 });
+    }
+
+    const thirdTeam1Won = thirdPlaceMatch ? checkIfTeam1WonVsTeam2(thirdPlaceMatch) : undefined;
+    if(thirdTeam1Won !== undefined)
+        podium.push({ place: 3, team: thirdTeam1Won ? thirdPlaceMatch.team1 : thirdPlaceMatch.team2 });
+
+    return podium;
 }
 
 const convertTournament = (tournament:any) => {

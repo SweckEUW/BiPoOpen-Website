@@ -1,5 +1,5 @@
 <template>
-    <Drawer v-model:visible="drawerVisible" position="bottom" class="!h-[90%] rounded-t-xl mobile-sheet" :blockScroll="true" :showCloseIcon="false" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
         <template #header>
             <div class="w-full flex justify-center">
                 <div class="flex flex-col items-center">
@@ -27,7 +27,7 @@
         <Message v-if="!isLoading && !profileData" severity="warn" :closable="false" class="mt-[40px]">
             Spieler "{{ playerName }}" wurde nicht gefunden.
         </Message>
-    </Drawer>
+    </BottomSheet>
 </template>
 
 <script setup lang="ts">
@@ -35,7 +35,7 @@ import { computed, inject } from 'vue';
 import PlayerProfileView from './PlayerProfileView.vue';
 import { usePlayerProfileData } from './usePlayerProfileData';
 
-import Drawer from 'primevue/drawer';
+import BottomSheet from '@/components/shared/BottomSheet.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import Message from 'primevue/message';
 
@@ -58,11 +58,6 @@ const openPlayer = (name: string) => {
 </script>
 
 <style scoped>
-.mobile-sheet {
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-}
-
 .pp-spinner :deep(.p-progressspinner-circle) {
     stroke: #EA5160 !important;
 }

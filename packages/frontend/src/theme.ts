@@ -35,33 +35,96 @@ const BiPoPreset = definePreset(Aura, {
         }
     },
     components: {
+        // Minimale Reiter: linksbuendiger Text, aktiver Reiter rot mit Unterstrich
         tabs: {
+            // Nur eine feine Linie unter den Reitern, kein Schatten
+            tablist: {
+                borderWidth: '0 0 1px 0'
+            },
+            tab: {
+                borderWidth: '0',
+                margin: '0',
+                padding: '0.75rem 0',
+                fontWeight: '700'
+            },
+            activeBar: {
+                height: '3px',
+                bottom: '0'
+            },
             colorScheme: {
                 light: {
                     tablist: {
                         background: '#ffffff',
-                        borderColor: 'transparent'
+                        borderColor: '#ECEEF1'
+                    },
+                    // Inhalt unter den Reitern liegt immer auf dem grauen Seitengrund
+                    tabpanel: {
+                        background: '#F6F7F9'
                     },
                     tab: {
-                        background: '#ffffff',
-                        color: '#4ab1c9',
-                        activeBackground: '#EA5160',
-                        activeColor: '#ffffff'
+                        background: 'transparent',
+                        hoverBackground: 'transparent',
+                        activeBackground: 'transparent',
+                        color: '{surface.500}',
+                        hoverColor: '{surface.800}',
+                        activeColor: '{primary.color}'
                     },
                     activeBar: {
-                        background: '#EA5160'
+                        background: '{primary.color}'
                     }
                 }
             },
             css: `
                 .p-tablist-tab-list {
-                    width: 100%;
+                    gap: 1.5rem;
                 }
-                .p-tab {
-                    flex: 1;
-                    justify-content: center;
+                .p-tablist-active-bar {
+                    border-radius: 3px 3px 0 0;
+                }
+
+                /* Chip-Variante: <Tabs class="p-tabs-chips"> */
+                .p-tabs-chips .p-tablist {
+                    background: transparent;
+                }
+                .p-tabs-chips .p-tablist-tab-list {
+                    gap: 0.5rem;
+                    border-width: 0;
+                }
+                .p-tabs-chips .p-tab {
+                    padding: 0.4rem 0.9rem;
+                    font-size: 13px;
+                    line-height: 1.2;
+                    color: var(--p-surface-900);
+                    background: #ffffff;
+                    border: 1px solid var(--p-surface-300);
+                    border-radius: 999px;
+                }
+                .p-tabs-chips .p-tab.p-tab-active {
+                    color: #ffffff;
+                    background: var(--main-color);
+                    border-color: var(--main-color);
+                }
+                .p-tabs-chips .p-tablist-active-bar {
+                    display: none;
                 }
             `
+        },
+        // Segment-Auswahl (SelectButton): graue Leiste, aktive Option als weisse Pille
+        selectbutton: {
+            root: {
+                borderRadius: '12px'
+            }
+        },
+        togglebutton: {
+            root: {
+                padding: '0.25rem',
+                fontWeight: '700'
+            },
+            content: {
+                padding: '0.5rem 0.75rem',
+                borderRadius: '9px',
+                checkedShadow: '0px 1px 3px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)'
+            }
         },
         datatable: {
             header: {

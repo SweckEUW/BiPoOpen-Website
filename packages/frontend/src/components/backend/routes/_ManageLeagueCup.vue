@@ -115,22 +115,29 @@
                         <span class="mc-pairing-status">{{ pairingEntry.result.winner ? `Weiter: ${pairingEntry.result.winner}` : 'offen' }}</span>
                     </div>
                     <MatchElement v-for="match in pairingEntry.result.games" :key="match._id"
-                        :match="withLeagueTeamLogos(match)" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :avatarShape="'square'"
+                        :match="withLeagueTeamLogos(match)" :isBackend="true" :avatarShape="'square'" @edit="openEditGame(match)"
                     />
                 </div>
             </div>
 
-            <Teleport to="body">
-                <Transition name="fade">
-                    <ModalAddCupGame v-if="addGameRoundIndex !== undefined"
-                        :leagueCup="leagueCup"
-                        :roundIndex="addGameRoundIndex"
-                        :cupGames="cupGames"
-                        :toggleModal="closeAddGame"
-                        :getLeagueGames="loadData"
-                    />
-                </Transition>
-            </Teleport>
+            <!-- Ein Drawer fuer Neu (Paarung waehlen) und Bearbeiten (Paarung steht fest) -->
+            <GameEntryDrawer
+                v-model:visible="gameDrawerVisible"
+                :title="editingMatch ? 'Spiel bearbeiten' : 'Spiel eintragen'"
+                :subtitle="`League Cup · ${roundNames[drawerRoundIndex] ?? ''}`"
+                :initialSides="editSides"
+                :sideLabels="['Team 1', 'Team 2']"
+                lockedNames
+                :allowDraw="false"
+                avatarShape="square"
+                incompleteLabel="Paarung wählen"
+                :save="saveGame"
+                :remove="editingMatch ? deleteMatch : undefined"
+            >
+                <template v-if="!editingMatch" #top="{ setTeams }">
+                    <CupPairingSelect :leagueCup="leagueCup" :roundIndex="drawerRoundIndex" :cupGames="cupGames" @select="setTeams"/>
+                </template>
+            </GameEntryDrawer>
         </template>
     </div>
 </template>
@@ -142,9 +149,11 @@ import { useToast } from 'primevue/usetoast';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import ModalAddCupGame from '@/components/frontend/league/ModalAddCupGame.vue';
+import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
+import CupPairingSelect from '@/components/frontend/league/cup/CupPairingSelect.vue';
+import { applySidesToMatch, matchToSides, sidesToNewMatch, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
 import { getLeagueTeamLogo, withLeagueTeamLogos } from '@/components/frontend/league/LeaguePlayersData';
-import { getAllLeagueGames, updateLeagueGame, deleteLeagueGame } from '@/components/frontend/league/LeagueUtilFunctions';
+import { addLeagueGame, getAllLeagueGames, updateLeagueGame, deleteLeagueGame } from '@/components/frontend/league/LeagueUtilFunctions';
 import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason } from '@/components/frontend/league/LeagueSeasonsData';
 import {
     addLeagueCupRound,
@@ -160,7 +169,7 @@ import {
     getPlannedRoundNames,
     getRemainingTeams,
     undoLeagueCupRound,
-} from '@/components/frontend/league/LeagueCupUtilFunctions';
+} from '@/components/frontend/league/cup/LeagueCupUtilFunctions';
 
 const toast = useToast();
 
@@ -176,7 +185,9 @@ const leagueGames = ref<Match[]>([]);
 
 const selectedParticipants = ref<string[]>([]);
 const selectedByes = ref<string[]>([]);
-const addGameRoundIndex = ref<number | undefined>();
+const gameDrawerVisible = ref(false);
+const drawerRoundIndex = ref(0);
+const editingMatch = ref<Match>();
 
 const loadData = async () => {
     try {
@@ -309,21 +320,36 @@ const deleteCup = () => {
     runAction(() => deleteLeagueCup(cup), 'Cup wurde gelöscht');
 }
 
+// ─── Spiel eintragen / bearbeiten ───
+// Logos kommen aus der Saison, das Spiel selbst speichert nur Teamnamen.
+const editSides = computed(() =>
+    editingMatch.value
+        ? matchToSides(editingMatch.value).map(side => ({ ...side, logo: getLeagueTeamLogo(side.players[0]?.name ?? '', selectedSeasonSlug.value) }))
+        : undefined
+);
+
 const openAddGame = (roundIndex: number) => {
-    addGameRoundIndex.value = roundIndex;
-}
-const closeAddGame = () => {
-    addGameRoundIndex.value = undefined;
+    editingMatch.value = undefined;
+    drawerRoundIndex.value = roundIndex;
+    gameDrawerVisible.value = true;
 }
 
-const setGameResult = async (match: Match) => {
-    const success = await updateLeagueGame(match);
+const openEditGame = (match: Match) => {
+    editingMatch.value = match;
+    drawerRoundIndex.value = match.cupRound ?? 0;
+    gameDrawerVisible.value = true;
+}
+
+const saveGame = async (sides: GameEntrySide[]) => {
+    const success = editingMatch.value
+        ? await updateLeagueGame(applySidesToMatch(editingMatch.value, sides))
+        : await addLeagueGame(sidesToNewMatch(sides, { season: leagueCup.value!.season, cupId: leagueCup.value!._id, cupRound: drawerRoundIndex.value }));
     await loadData();
     return success;
 }
 
-const deleteMatch = async (match: Match) => {
-    const success = await deleteLeagueGame(match);
+const deleteMatch = async () => {
+    const success = await deleteLeagueGame(editingMatch.value!);
     await loadData();
     return success;
 }

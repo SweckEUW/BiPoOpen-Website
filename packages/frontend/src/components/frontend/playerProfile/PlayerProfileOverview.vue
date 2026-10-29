@@ -67,21 +67,21 @@
             </div>
 
             <!-- Kategorien -->
-            <DataTable :value="data.categories" stripedRows size="small">
+            <AppTable :value="data.categories" size="small">
                 <Column field="name" header="Kategorie" />
-                <Column field="matches" header="Spiele" />
-                <Column header="Siege">
+                <Column field="matches" :header="labels.games" />
+                <Column :header="labels.wins">
                     <template #body="{ data: row }">
                         {{ row.wins }}
                         <Tag class="ml-[4px]" severity="secondary" :value="(row.matches > 0 ? Math.round(row.wins / row.matches * 100) : 0) + '%'" rounded />
                     </template>
                 </Column>
-                <Column header="Trf/Spiel">
+                <Column :header="labels.hitRate">
                     <template #body="{ data: row }">
                         {{ row.trackedMatches > 0 ? row.averageHits.toFixed(2) : '/' }}
                     </template>
                 </Column>
-            </DataTable>
+            </AppTable>
         </Panel>
     </div>
 </template>
@@ -93,14 +93,17 @@ import Knob from 'primevue/knob';
 import Tag from 'primevue/tag';
 import Panel from 'primevue/panel';
 import Chip from 'primevue/chip';
-import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import AppTable from '@/components/shared/AppTable.vue';
+import { useTableLabels } from '@/components/shared/appTable';
 
 const props = defineProps<{
     data: PlayerProfileData;
 }>();
 
 const recentForm = computed(() => props.data.recentForm.slice(0, 5));
+
+const labels = useTableLabels();
 </script>
 
 <style scoped>

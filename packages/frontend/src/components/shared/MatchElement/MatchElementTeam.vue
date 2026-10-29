@@ -1,13 +1,13 @@
-<template> 
+<template>
     <div class="MatchElementTeam"
         :class="{
-            'mt-team-loose': teamScore < opponentTeamScore,
-            'mt-team-second': isTeam2
+            'mt-team-win': isWinner,
+            'mt-team-loose': isLoser
         }"
     >
         <!-- Team Header -->
         <div class="mt-team">
-            <div v-if="!hideAvatars" class="flex items-center -space-x-2 mr-[8px] shrink-0">
+            <div v-if="!hideAvatars" class="mt-team-avatars">
 
                 <!-- Team Logo -->
                 <Avatar
@@ -15,24 +15,21 @@
                     :name="teamName"
                     :avatarImage="teamLogo"
                     :shape="avatarShape"
-                    :grayscale="teamScore < opponentTeamScore"
-                    class="min-w-[50px] min-h-[50px]"
+                    :grayscale="isLoser"
+                    class="!w-[30px] !h-[30px] !min-w-[30px]"
                 />
 
-                <div
-                    v-else-if="team"
-                    v-for="(player, index) in team.players"
-                    :key="`${player.name}-${index}`"
-                    class="cursor-pointer"
-                >   
+                <template v-else-if="team">
                     <Avatar
+                        v-for="(player, index) in team.players"
+                        :key="`${player.name}-${index}`"
                         :name="player.name"
                         :shape="avatarShape"
                         size="normal"
-                        :grayscale="teamScore < opponentTeamScore"
-                        class="!text-[12px] border-[2px] border-[--p-surface-0]"
+                        :grayscale="isLoser"
+                        class="!w-[28px] !h-[28px] !min-w-[28px] !text-[11px] border-[2px] border-[--p-surface-0] box-content"
                     />
-                </div>
+                </template>
             </div>
             <div
                 class="mt-team-name"
@@ -41,22 +38,22 @@
             >
                 {{ teamName }}
             </div>
-            <div class="mt-team-score" v-if="teamScore != undefined">{{ teamScore }}</div>
+            <div class="mt-team-score">{{ teamScore ?? '–' }}</div>
         </div>
 
         <!-- Team Players when expanded -->
-        <div v-if="team && playersVisible && team.players.length > 1">
+        <div v-if="team && playersVisible && team.players.length > 1" class="mt-team-players">
             <div class="mt-team-player cursor-pointer" v-for="(player, index) in team.players" :key="`${player.name}-${index}`" @click.stop="openPlayerProfile?.(player.name)">
                 <Avatar
                     v-if="!hideAvatars"
                     :name="player.name"
                     :shape="avatarShape"
                     size="normal"
-                    class="!text-[12px] !w-[32px] !h-[32px] !min-w-[32px] shrink-0"
-                    :grayscale="teamScore < opponentTeamScore"
+                    class="!text-[9px] !w-[22px] !h-[22px] !min-w-[22px] shrink-0"
+                    :grayscale="isLoser"
                 />
                 <div class="mt-team-player-name">{{ player.name }}</div>
-                <div class="mt-team-player-score">{{ player.score }}</div>
+                <div class="mt-team-player-score">{{ formatPlayerScore(player.score) }}</div>
             </div>
         </div>
 
@@ -91,13 +88,16 @@ let teamName = computed(() => {
     return props.placeholder || "TBD";
 });
 
-let teamScore = computed(() => {
-    return getMatchScore(props.match, !props.isTeam2)!;
+let teamScore = computed<number | undefined>(() => {
+    return getMatchScore(props.match, !props.isTeam2);
 });
 
-let opponentTeamScore = computed(() => {
-    return getMatchScore(props.match, props.isTeam2)!;
+let opponentTeamScore = computed<number | undefined>(() => {
+    return getMatchScore(props.match, props.isTeam2);
 });
+
+const isWinner = computed(() => teamScore.value != undefined && opponentTeamScore.value != undefined && teamScore.value > opponentTeamScore.value);
+const isLoser = computed(() => teamScore.value != undefined && opponentTeamScore.value != undefined && teamScore.value < opponentTeamScore.value);
 
 let teamLogo = computed(() => {
     if(team.value && team.value.logo)
@@ -105,71 +105,94 @@ let teamLogo = computed(() => {
     return undefined;
 });
 
+// 6.5 -> "6,5"
+const formatPlayerScore = (score: number | undefined) => score == undefined ? '–' : score.toLocaleString('de-DE');
+
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 </script>
 
 <style scoped>
 .MatchElementTeam{
-    color: var(--main-color);
     display: flex;
-    flex-direction: column-reverse;
-}
-.mt-team-second{
-    color: var(--secondary-color);
     flex-direction: column;
-}
-.mt-team-loose{
-    color: var(--loose-gray);
+    color: #4a5058;
 }
 .mt-team{
-    font-size: 15px;
-    font-weight: normal;
     display: flex;
     align-items: center;
+    gap: 10px;
+    min-height: 32px;
+    font-size: 15px;
 }
-.mt-team-header-avatar{
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    font-size: 10px;
+.mt-team-avatars{
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+.mt-team-avatars > * + *{
+    margin-left: -10px;
 }
 .mt-team-name{
-    width: 100%;
-    margin-right: 10px;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
 }
-.mt-team-score, .mt-team-player-score{
-    background-color: var(--main-color);
-    padding: 2px 5px;
-    color: white;
-    width: 35px;
-    min-width: 35px;
+.mt-team-win .mt-team-name{
+    font-weight: 700;
+    color: #1f2328;
+}
+
+/* Ergebnis-Box: Sieger rot, sonst neutral grau */
+.mt-team-score{
+    min-width: 30px;
+    height: 26px;
+    padding: 0 6px;
+    border-radius: 6px;
+    background: #ECEEF1;
+    color: #1f2328;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 26px;
     text-align: center;
+    flex-shrink: 0;
 }
-.mt-team-second .mt-team-score, .mt-team-second .mt-team-player-score{
-    background-color: var(--secondary-color);
+.mt-team-win .mt-team-score{
+    background: var(--main-color);
+    color: white;
+    font-weight: 700;
 }
-.mt-team-loose .mt-team-score, .mt-team-loose .mt-team-player-score{
-    background-color: var(--loose-gray);
+
+/* Aufgeklappte Spieler mit Wuerfen */
+.mt-team-players{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 0 6px 38px;
 }
 .mt-team-player{
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 10px;
+    min-height: 24px;
+    font-size: 13px;
+    color: #4a5058;
 }
 .mt-team-player-name{
-    width: 100%;
-    padding-left: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 .mt-team-player-score{
-    padding: 0px 5px;
+    min-width: 30px;
+    text-align: center;
+    color: #1f2328;
+    flex-shrink: 0;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
     .mt-team{
-        font-size: 14px;
-    }
-    .mt-team-player{
         font-size: 14px;
     }
 }
@@ -179,8 +202,8 @@ const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
     .mt-team-name{
         font-size: 13px;
     }
-    .mt-team-player{
-        font-size: 13px;
+    .mt-team-players{
+        padding-left: 20px;
     }
 }
 </style>

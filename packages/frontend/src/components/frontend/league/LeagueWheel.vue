@@ -1,45 +1,31 @@
 <template>
-    <div class="LeagueWheel">
-        <div class="lw-wheel" :class="{ 'lw-wheel-disabled': !canSpin }">
-            <svg class="lw-rotor" :class="{ 'lw-rotor-has-winner': !!winnerName }" viewBox="0 0 500 500" :style="rotorStyle" @click="spin()">
-                <g v-for="segment in segments" :key="segment.entry.name" class="lw-segment" :class="{ 'lw-segment-winner': segment.entry.name === winnerName }">
-                    <circle v-if="segments.length === 1" :cx="CENTER" :cy="CENTER" :r="RADIUS" :fill="segment.color.fill" />
-                    <path v-else :d="segment.path" :fill="segment.color.fill" />
+    <div class="LeagueWheel" :class="{ 'lw-disabled': !canSpin }">
+        <svg class="lw-rotor" viewBox="0 0 500 500" :style="rotorStyle" @click="spin()">
+            <g v-for="segment in segments" :key="segment.entry.name">
+                <circle v-if="segments.length === 1" :cx="CENTER" :cy="CENTER" :r="RADIUS" :fill="segment.fill" />
+                <path v-else class="lw-segment" :d="segment.path" :fill="segment.fill" />
 
-                    <!-- Inhalt liegt auf der Segmentmitte, am Zeiger steht er dadurch aufrecht -->
-                    <g :transform="`rotate(${segment.midAngle} ${CENTER} ${CENTER})`">
-                        <image
-                            :href="segment.entry.logo"
-                            :x="CENTER + RADIUS - RIM_GAP - layout.logoSize"
-                            :y="CENTER - layout.logoSize / 2"
-                            :width="layout.logoSize"
-                            :height="layout.logoSize"
-                            preserveAspectRatio="xMidYMid meet"
-                        />
-                        <text
-                            :x="layout.textEnd"
-                            :y="CENTER"
-                            dy="0.35em"
-                            text-anchor="end"
-                            :font-size="segment.fontSize"
-                            :textLength="segment.textLength"
-                            :lengthAdjust="segment.textLength ? 'spacingAndGlyphs' : undefined"
-                            :fill="segment.color.text"
-                        >{{ segment.entry.name }}</text>
-                    </g>
-                </g>
-                <circle class="lw-rim" :cx="CENTER" :cy="CENTER" :r="RADIUS" fill="none" />
-            </svg>
+                <!-- Logo mittig im Segment, am Zeiger steht es dadurch aufrecht -->
+                <image
+                    :href="segment.entry.logo"
+                    :x="CENTER + LOGO_DISTANCE - logoSize / 2"
+                    :y="CENTER - logoSize / 2"
+                    :width="logoSize"
+                    :height="logoSize"
+                    :transform="`rotate(${segment.midAngle} ${CENTER} ${CENTER})`"
+                    preserveAspectRatio="xMidYMid meet"
+                />
+            </g>
 
-            <div class="lw-center" @click="spin()">
-                <img :src="BipoLeagueLogo" alt="BiPo League" />
-            </div>
-            <div class="lw-pointer"></div>
+            <!-- Gewinner-Segment: Umrandung liegt ueber den Nachbarsegmenten -->
+            <path v-if="winnerSegment && segments.length > 1" class="lw-highlight" :d="winnerSegment.path" />
+            <circle class="lw-rim" :cx="CENTER" :cy="CENTER" :r="RADIUS" />
+        </svg>
+
+        <div class="lw-hub" @click="spin()">
+            <img :src="BipoLeagueLogo" alt="BiPo League" />
         </div>
-
-        <div class="bp-button lw-spin-button" :class="{ 'lw-spin-button-disabled': !canSpin }" @click="spin()">
-            {{ isSpinning ? 'Dreht...' : 'Drehen' }}
-        </div>
+        <div class="lw-pointer"></div>
     </div>
 </template>
 
@@ -59,24 +45,17 @@ const emit = defineEmits<{
 
 // Masse im viewBox (500 x 500)
 const CENTER = 250;
-const RADIUS = 240;
-const RIM_GAP = 8;          // Abstand Logo zum Rand
-const HUB_RADIUS = 35;      // Mittelscheibe (14 % der Breite)
-const TEXT_GAP = 6;
-const MAX_LOGO_SIZE = 50;
-const MAX_FONT_SIZE = 20;
-const MIN_FONT_SIZE = 11;
-const CHAR_WIDTH = 0.6;     // geschaetzte Zeichenbreite in em (Arial Bold)
+const RADIUS = 247;         // + halbe Randbreite = 250, das Rad fuellt die volle Breite
+const HUB_RADIUS = 45;      // Mittelscheibe (18 % der Breite)
+const LOGO_DISTANCE = (HUB_RADIUS + RADIUS) / 2;  // Logomitte: halbe Strecke zwischen Mittelscheibe und Rand
+const MAX_LOGO_SIZE = 110;
 
 const SPIN_DURATION = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1500 : 5000;
 
-// Markenfarben im Wechsel, Textfarbe jeweils mit genug Kontrast
-const COLORS = [
-    { fill: '#EA5160', text: '#FFFFFF' },
-    { fill: '#61C3D9', text: '#12343C' },
-    { fill: '#F7B32B', text: '#3D2A00' },
-    { fill: '#2E8B7A', text: '#FFFFFF' },
-];
+// Rot und Blau im Wechsel, bei ungerader Anzahl bekommt das letzte Segment ein helles Blau
+const RED = '#EA5160';
+const BLUE = '#2F9BD6';
+const LIGHT_BLUE = '#7CC3E8';
 
 const rotation = ref(0);
 const isSpinning = ref(false);
@@ -90,18 +69,12 @@ const rotorStyle = computed(() => ({
     transition: `transform ${SPIN_DURATION}ms cubic-bezier(0.17, 0.67, 0.12, 0.99)`
 }));
 
-const layout = computed(() => {
-    const count = props.entries.length;
-    const segmentAngle = 360 / Math.max(count, 1);
-    const halfAngleSin = count > 1 ? Math.sin((segmentAngle / 2) * Math.PI / 180) : 1;
+const segmentAngle = computed(() => 360 / Math.max(props.entries.length, 1));
 
-    const logoSize = Math.min(MAX_LOGO_SIZE, 2 * (RADIUS - RIM_GAP - MAX_LOGO_SIZE / 2) * halfAngleSin * 0.8);
-    const textStart = CENTER + HUB_RADIUS + TEXT_GAP;
-    const textEnd = CENTER + RADIUS - RIM_GAP - logoSize - TEXT_GAP;
-    const textMidRadius = (textStart + textEnd) / 2 - CENTER;
-    const maxFontSize = Math.min(MAX_FONT_SIZE, 2 * textMidRadius * halfAngleSin * 0.75);
-
-    return { segmentAngle, logoSize, textEnd, textLength: textEnd - textStart, maxFontSize };
+// Logo so gross, dass es noch in die Sehne des Segments passt
+const logoSize = computed(() => {
+    const halfAngleSin = props.entries.length > 1 ? Math.sin((segmentAngle.value / 2) * Math.PI / 180) : 1;
+    return Math.min(MAX_LOGO_SIZE, 2 * LOGO_DISTANCE * halfAngleSin * 0.8);
 });
 
 const pointOnCircle = (angle: number) => {
@@ -109,36 +82,31 @@ const pointOnCircle = (angle: number) => {
     return `${CENTER + RADIUS * Math.cos(radians)} ${CENTER + RADIUS * Math.sin(radians)}`;
 }
 
-const getColor = (index: number, count: number) => {
-    // Letztes Segment darf nicht dieselbe Farbe wie das erste haben
-    if (count > 1 && index === count - 1 && index % COLORS.length === 0)
-        return COLORS[2];
-    return COLORS[index % COLORS.length];
+const getFill = (index: number, count: number) => {
+    if (count > 1 && count % 2 === 1 && index === count - 1)
+        return LIGHT_BLUE;
+    return index % 2 === 0 ? RED : BLUE;
 }
 
 const segments = computed(() => {
-    const { segmentAngle, textLength, maxFontSize } = layout.value;
+    const angle = segmentAngle.value;
     const count = props.entries.length;
 
     return props.entries.map((entry, index) => {
-        const startAngle = index * segmentAngle;
-        const endAngle = startAngle + segmentAngle;
-        const largeArc = segmentAngle > 180 ? 1 : 0;
-
-        // Lange Namen kleiner, notfalls auf die verfuegbare Laenge stauchen
-        const fontSize = Math.max(MIN_FONT_SIZE, Math.min(maxFontSize, textLength / (entry.name.length * CHAR_WIDTH)));
-        const estimatedWidth = entry.name.length * fontSize * CHAR_WIDTH;
+        const startAngle = index * angle;
+        const endAngle = startAngle + angle;
+        const largeArc = angle > 180 ? 1 : 0;
 
         return {
             entry,
-            color: getColor(index, count),
-            midAngle: startAngle + segmentAngle / 2,
-            path: `M ${CENTER} ${CENTER} L ${pointOnCircle(startAngle)} A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${pointOnCircle(endAngle)} Z`,
-            fontSize,
-            textLength: estimatedWidth > textLength ? textLength : undefined
+            fill: getFill(index, count),
+            midAngle: startAngle + angle / 2,
+            path: `M ${CENTER} ${CENTER} L ${pointOnCircle(startAngle)} A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${pointOnCircle(endAngle)} Z`
         };
     });
 });
+
+const winnerSegment = computed(() => segments.value.find(segment => segment.entry.name === winnerName.value));
 
 // Neue Eintraege (naechste Phase) -> Hervorhebung zuruecksetzen
 watch(() => props.entries.map(entry => entry.name).join('|'), () => {
@@ -153,8 +121,7 @@ const spin = () => {
     const winner = entries[winnerIndex];
 
     // Zufaelliger Punkt im Gewinnersegment soll am Ende unter dem Zeiger (rechts, 0 Grad) stehen
-    const segmentAngle = 360 / entries.length;
-    const targetAngle = (winnerIndex + 0.1 + Math.random() * 0.8) * segmentAngle;
+    const targetAngle = (winnerIndex + 0.1 + Math.random() * 0.8) * segmentAngle.value;
     const currentAngle = ((rotation.value % 360) + 360) % 360;
     const offset = (((360 - targetAngle - currentAngle) % 360) + 360) % 360;
     const fullTurns = 5 + Math.floor(Math.random() * 3);
@@ -171,107 +138,81 @@ const spin = () => {
     }, SPIN_DURATION);
 }
 
+defineExpose({ spin });
+
 onBeforeUnmount(() => clearTimeout(spinTimeout));
 </script>
 
 <style scoped>
 .LeagueWheel{
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.lw-wheel{
+    --lw-navy: #1C2541;
     position: relative;
-    width: min(100%, 520px);
+    width: 100%;
     aspect-ratio: 1;
-}
-.lw-wheel::before{
-    content: '';
-    position: absolute;
-    inset: 2%;
-    border-radius: 50%;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
 }
 
 .lw-rotor{
-    position: relative;
     display: block;
+    overflow: visible;      /* Gewinner-Umrandung darf ueber den Rand ragen */
     width: 100%;
     height: 100%;
     cursor: pointer;
     will-change: transform;
 }
-.lw-wheel-disabled .lw-rotor,
-.lw-wheel-disabled .lw-center{
+.lw-disabled .lw-rotor,
+.lw-disabled .lw-hub{
     cursor: default;
 }
 
 .lw-segment{
-    transition: opacity 0.3s ease;
-}
-.lw-segment path{
     stroke: white;
-    stroke-width: 1.5;
+    stroke-width: 3;
 }
-.lw-segment text{
-    font-family: Helvetica, Arial, sans-serif;
-    font-weight: 700;
-}
-.lw-segment text,
-.lw-segment image{
+.lw-rotor image{
     pointer-events: none;
 }
-.lw-rotor-has-winner .lw-segment:not(.lw-segment-winner){
-    opacity: 0.35;
+.lw-highlight{
+    fill: none;
+    stroke: var(--lw-navy);
+    stroke-width: 7;
+    stroke-linejoin: round;
 }
 .lw-rim{
-    stroke: white;
+    fill: none;
+    stroke: var(--lw-navy);
     stroke-width: 6;
 }
 
-.lw-center{
+.lw-hub{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 14%;
-    height: 14%;
+    width: 18%;
+    height: 18%;
     transform: translate(-50%, -50%);
     border-radius: 50%;
     background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+    border: 3px solid var(--lw-navy);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
-.lw-center img{
-    width: 75%;
-    height: 75%;
+.lw-hub img{
+    width: 78%;
+    height: 78%;
     object-fit: contain;
 }
 
-/* Zeiger rechts wie bei wheelofnames */
+/* Zeiger rechts, Spitze ragt ins Segment. Groesse in %, damit sie mit dem Rad skaliert. */
 .lw-pointer{
     position: absolute;
     top: 50%;
-    right: 0;
+    right: -2.5%;           /* ragt leicht ueber den Rand hinaus */
     transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 14px solid transparent;
-    border-bottom: 14px solid transparent;
-    border-right: 30px solid #333333;
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
-}
-
-.lw-spin-button{
-    width: min(100%, 520px);
-    margin: 15px 0 0;
-}
-.lw-spin-button-disabled{
-    opacity: 0.3;
-    pointer-events: none;
+    width: 8%;
+    height: 7%;
+    background: var(--lw-navy);
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
 }
 </style>

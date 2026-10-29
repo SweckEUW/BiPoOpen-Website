@@ -15,7 +15,7 @@
                             <div v-for="(pair, pIndex) in getMatchPairs(round.matches)" :key="pIndex" class="tb-pair">
                                 <div v-for="(match, mIndex) in pair" :key="mIndex" class="tb-slot">
                                     <div class="tb-match">
-                                        <MatchElement :match="match"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                        <MatchElement :match="match"  :isBackend="isBackend" @edit="openEdit"
                                             :team1Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, false)"
                                             :team2Placeholder="getKOPlaceholderName(tournament, rIndex, pIndex*2+mIndex, true)"/>
                                     </div>
@@ -26,14 +26,14 @@
                         <template v-else>
                             <div class="tb-round-title">Finale</div>
                             <div class="tb-match">
-                                <MatchElement :match="round.matches[0]"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                <MatchElement :match="round.matches[0]"  :isBackend="isBackend" @edit="openEdit"
                                     :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 0, false)"
                                     :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 0, true)"/>
                             </div>
                             <template v-if="round.matches[1]">
                                 <div class="tb-round-title tb-third-place-title">Spiel um Platz 3</div>
                                 <div class="tb-match">
-                                    <MatchElement :match="round.matches[1]"  :isBackend="isBackend" :setGameResult="setGameResult" :displayTeamLogo="true"
+                                    <MatchElement :match="round.matches[1]"  :isBackend="isBackend" @edit="openEdit"
                                         :team1Placeholder="getKOPlaceholderName(tournament, rIndex, 1, false)"
                                         :team2Placeholder="getKOPlaceholderName(tournament, rIndex, 1, true)"/>
                                 </div>
@@ -43,12 +43,26 @@
                 </div>
             </template>
         </div>
+
+        <GameEntryDrawer v-if="isBackend"
+           v-model:visible="editVisible"
+           :title="editingMatch && checkIfMatchFinished(editingMatch) ? 'Spiel bearbeiten' : 'Spiel eintragen'"
+           :subtitle="`${tournament.name} · K.o.-Phase`"
+           :initialSides="editSides"
+           :sideLabels="['Team 1', 'Team 2']"
+           lockedNames
+           avatarShape="square"
+           :save="saveGameResult"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, PropType } from 'vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
+import { applySidesToMatch, useMatchEdit, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
+import { checkIfMatchFinished } from '@/util/tournamentMatchFunctions';
 import { setGameResultKOPhase, getFirstStageSeeding } from '../../../util/tournamentKOPhaseFunctions';
 import { convertNumberToCharacter } from '../../../util/util';
 
@@ -85,8 +99,10 @@ const bracketRounds = computed(() => {
     }));
 });
 
-const setGameResult = async (match:Match) => {
-    await setGameResultKOPhase(props.tournament, match);
+const { editingMatch, editVisible, editSides, openEdit } = useMatchEdit();
+
+const saveGameResult = async (sides: GameEntrySide[]) => {
+    await setGameResultKOPhase(props.tournament, applySidesToMatch(editingMatch.value!, sides));
     await props.getTournament();
 
     return true;
@@ -225,9 +241,6 @@ const getKOPlaceholderName = (tournament:Tournament, stageIndex:number, matchInd
     padding: 3px 5px;
     width: 28px;
     font-size: 12px;
-}
-.tb-match :deep(.mt-vs) {
-    font-size: 11px;
 }
 .tb-match :deep(.mt-team-player-name) {
     font-size: 8px;

@@ -18,3 +18,22 @@ export const convertNumberToCharacter = (num:number) => {
       .map(c => String.fromCharCode(c))   // convert char codes to strings
       .join('');     // join values together
 }
+
+// "Heute, 15:37" / "Gestern, 21:10" / "18.10., 0:04" / "18.10.2025, 0:04"
+export const formatGameTime = (time: number) => {
+    const date = new Date(time);
+    const now = new Date();
+    const clock = `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+    const startOfDay = (value: Date) => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+    const dayDiff = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
+    if (dayDiff === 0) return `Heute, ${clock}`;
+    if (dayDiff === 1) return `Gestern, ${clock}`;
+
+    const day = date.toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: date.getFullYear() === now.getFullYear() ? undefined : 'numeric',
+    });
+    return `${day}, ${clock}`;
+};

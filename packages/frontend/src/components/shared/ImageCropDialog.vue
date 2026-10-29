@@ -104,4 +104,18 @@ const resizeCanvas = (source: HTMLCanvasElement, maxWidth: number, maxHeight: nu
     min-height: 300px;
     max-height: 55vh;
 }
+
+/* Schachbrett statt Schwarz, damit transparente Bereiche als solche erkennbar sind */
+.cropper :deep(.vue-advanced-cropper__background),
+.cropper :deep(.vue-circle-stencil__preview),
+.cropper :deep(.vue-rectangle-stencil__preview) {
+    background-color: #fff;
+    background-image:
+        linear-gradient(45deg, #ccc 25%, transparent 25%),
+        linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%),
+        linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
 </style>

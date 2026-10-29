@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { ref, inject } from "vue"
+import Column from 'primevue/column';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import AppTable from '@/components/shared/AppTable.vue';
+import { PODIUM_ROW_CLASSES, useTableLabels } from '@/components/shared/appTable';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
-import { BIPO_OPEN_TOURNAMENT_YEARS } from "@/util/bipoOpenTournamentMeta";
+import { BIPO_OPEN_TOURNAMENT_YEARS, BIPO_OPEN_WINNERS } from "@/util/bipoOpenTournamentMeta";
 
 const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile')!;
 
+const labels = useTableLabels();
+
 let tournaments:Tournament[] = [];
-let sortValue = ref<SortValueHallOfFame>("wins");
-let sortUp = ref(false);
-let sortedHallOfFameList:PlayerWithStats[] = [];
+const hallOfFameList = ref<PlayerWithStats[]>([]);
 let isLoading = ref(true);
 
 // Initial load tournaments
@@ -22,15 +25,10 @@ const getTournament = async () => {
             tournaments.push(tournament);
     }
 
-    sortedHallOfFameList = getSortedHallOfFameList();
+    hallOfFameList.value = getSortedHallOfFameList();
     isLoading.value = false;
 }
 getTournament();
-
-let windowWidth = ref(window.screen.width);
-window.addEventListener("resize", () => {
-    windowWidth.value = window.screen.width;
-});
 
 const getSortedHallOfFameList = () => {
     let players:PlayerWithStats[] = [];
@@ -62,11 +60,8 @@ const getSortedHallOfFameList = () => {
         // Calculate correct averageHits
         player.averageHits = player.hits / player.ammountOfMatchesWithTrackedShots;
         player.averageHits = Math.round(player.averageHits * 100) / 100; // Round average Hits
-        if(player.hits == 0){
-            // @ts-ignore
-            player.averageHits = "/"; // @ts-ignore
-            player.hits = "/";
-        }
+        if(!player.ammountOfMatchesWithTrackedShots)
+            player.averageHits = 0;
     });
 
     // Sort players by wins and averageWins
@@ -88,51 +83,20 @@ const getSortedHallOfFameList = () => {
         }
     }
 
-    // Sort the Players depending on the sortValue
-    players.sort((player1, player2) => {
-        if(sortValue.value == "name") // sort strings
-            return sortUp.value ? player1[sortValue.value].localeCompare(player2[sortValue.value]) : player2[sortValue.value].localeCompare(player1[sortValue.value])
-
-        if(player2[sortValue.value] == player1[sortValue.value])
-            return sortUp.value ? player2.placement! - player1.placement! : player1.placement! - player2.placement!;
-
-        return sortUp.value ? player1[sortValue.value]! - player2[sortValue.value]! : player2[sortValue.value]! - player1[sortValue.value]!
-    });
-
     return players;
 };
 
+// Platz 1-3 hervorheben, gleiche Platzierung = gleiche Farbe
+const getRowClass = (row: PlayerWithStats) => PODIUM_ROW_CLASSES[row.placement!] ?? '';
 
-const setSortValue = (value:SortValueHallOfFame) => {
-    if(sortValue.value == value)
-        sortUp.value = !sortUp.value;
-    else
-        sortUp.value = false;
-
-    sortValue.value = value;
-}
-
-const giveArrowClass = (value:string) => {
-    if(value == sortValue.value) //windowWidth.value > 900 && 
-        return sortUp.value ? "mvp-arrow mvp-arrow-up" : "mvp-arrow mvp-arrow-down";
-}
-
-let winners = [
-    { year: "2026", name: "Alki Süd", player1: "Jannick Becker", player2: "Frederick Reckhaus"},
-    { year: "2025", name: "Weck-Knicken", player1: "Nick Brinkrolf", player2: "Simon Weck"},
-    { year: "2024", name: "Team Vogelnest", player1: "Lewin Pohlschmidt", player2: "Mattis Post"},
-    { year: "2023", name: "Berufsalkoholiker", player1: "Jonas Weck", player2: "Leon Rose"},
-    { year: "2022", name: "Taube Nüsschen", player1: "Patrick Pohlmann", player2: "Tim Becker"},
-    { year: "2021", name: "Pong Daddys", player1: "Matthias Weck", player2: "Lennard Kaffitz"},
-    { year: "2020", name: "Dynamo #DruckAmGlas", player1: "Alexander Borsig", player2: "Björn Harz"}
-]
+let winners = BIPO_OPEN_WINNERS;
 let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 </script>
 
 <template>
     <div class="HallofFame">
         
-        <h1 class="bp-title">{{"Hall of Fame" }}</h1>
+        <h1 class="bp-title">Hall of Fame</h1>
 
         <Loadingscreen v-if="isLoading"/>
 
@@ -155,36 +119,33 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
-            <table class="table table-hover caption-top">
-                <thead>
-                    <tr style="height: auto;">
-                        <th @click="setSortValue('placement')" :class="giveArrowClass('placement')">{{ windowWidth > 900 ? 'Platz' :'Pl.'}}</th>
-                        <th @click="setSortValue('name')" :class="giveArrowClass('name')">{{'Name'}}</th>
-                        <th @click="setSortValue('averageHits')" :class="giveArrowClass('averageHits')">{{ windowWidth > 900 ? 'Trefferquote' : 'Trfq.'}}</th>
-                        <th @click="setSortValue('wins')" :class="giveArrowClass('wins')">{{ windowWidth > 900 ? 'Siege' : 'Sieg.'}}</th>
-                        <th @click="setSortValue('ammountOfMatches')" :class="giveArrowClass('ammountOfMatches')">{{ windowWidth > 900 ? 'Spiele' : 'Spie.'}}</th>
-                        <th @click="setSortValue('averageWins')" :class="giveArrowClass('averageWins')">{{ windowWidth > 900 ? 'Siegwahrscheinlichkeit' : 'Sieg. (%)'}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(player, index) in sortedHallOfFameList" :key="index">
-                        <td>{{ player.placement! + 1}}</td>
-                        <td><span class="hof-player-link" @click="openPlayerProfile(player.name)">{{ player.name.replace(" ","\n") }}</span></td>
-                        <td>{{ player.averageHits }}</td>
-                        <td>{{ player.wins }}</td>
-                        <td>{{ player.ammountOfMatches }}</td>
-                        <td>{{ player.averageWins + "%" }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div v-if="windowWidth < 900" class="hof-explain">
-                <div>*Pl. = Platz</div>
-                <div>*Trfq. = Trefferquote</div>
-                <div>*Sieg. = Siege</div>
-                <div>*Spie. = Spiele</div>
-                <div>*Sieg. (%) = Siegwahrscheinlichkeit in %</div>
-            </div>
+            <AppTable
+                :value="hallOfFameList"
+                :rowClass="getRowClass"
+                @row-click="openPlayerProfile($event.data.name)"
+                rank
+                sortField="wins"
+                :sortOrder="-1"
+                class="hof-table mb-[30px]"
+            >
+                <Column field="name" header="Name" sortable :pt="{ columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
+                    <template #body="slotProps">
+                        <span class="whitespace-pre-line">{{ slotProps.data.name.replace(" ", "\n") }}</span>
+                    </template>
+                </Column>
+                <Column field="averageHits" sortable :header="labels.hitRate">
+                    <template #body="slotProps">
+                        {{ slotProps.data.hits ? slotProps.data.averageHits : "/" }}
+                    </template>
+                </Column>
+                <Column field="wins" sortable :header="labels.wins"/>
+                <Column field="ammountOfMatches" sortable :header="labels.games"/>
+                <Column field="averageWins" sortable :header="labels.winRate">
+                    <template #body="slotProps">
+                        {{ slotProps.data.averageWins + "%" }}
+                    </template>
+                </Column>
+            </AppTable>
 
         </div>
 
@@ -257,61 +218,6 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
     font-size: 18px;
     color: var(--main-color);
 }
-.hof-player-link{
-    color: inherit;
-    text-decoration: none;
-    white-space: break-spaces;
-    cursor: pointer;
-}
-.hof-player-link:hover{
-    text-decoration: underline;
-    color: var(--main-color);
-}
-
-table{
-    text-align: center;
-}
-table *{
-    vertical-align: middle;
-}
-tbody tr{
-    font-size: 18px;
-}
-tbody tr:nth-of-type(1){
-    background: var(--secondary-color-weak);
-    font-size: 22px;
-}
-tbody tr:nth-of-type(2){
-    background: #e6faff;
-}
-tbody tr:nth-of-type(3){
-    background: #f4fdff;
-}
-table th{ 
-    position: sticky;
-    top: 165px;
-    background-color: #FFF;
-    color: var(--main-color);
-    font-size: 20px;
-    cursor: pointer;
-}
-table td{
-    background: inherit;
-}
-.mvp-arrow-down::after, .mvp-arrow-up::after{
-    content: ' ';
-    position: relative;
-    left: 10px;
-    border: 8px solid transparent;
-}
-.mvp-arrow-down::after{
-    top: 18px;
-    border-top-color: var(--main-color);
-}
-.mvp-arrow-up::after{
-    bottom: 18px;
-    border-bottom-color: var(--main-color);
-}
 
 /*MOBILE*/
 @media (width <= 900px){
@@ -322,89 +228,6 @@ table td{
         font-size: 16px;
         margin-bottom: 30px;
     }
-    .hof-explain{
-        font-size: 11px;
-        color: var(--main-color);
-    }
-    table *{
-        font-size: 15px;
-    }
-    tr{
-        height: 80px;
-    }
-    table th{ 
-        top: 140px;
-        font-size: 15px;
-        padding-top: 10px;
-        padding-bottom: 15px;
-    }
-    th:nth-of-type(1), td:nth-of-type(1){
-        max-width: 30px;
-        width: 30px;
-        padding-left: 2px;
-        padding-right: 10px;
-    }
-    th:nth-of-type(2), td:nth-of-type(2){
-        max-width: 80px;
-        white-space: break-spaces;
-    }
-    th:nth-of-type(6), td:nth-of-type(6){
-        max-width: 50px;
-    }
-
-    .mvp-arrow-down::after, .mvp-arrow-up::after{
-        left: 5px;
-        border-width: 6px;
-    }
-    .mvp-arrow-down::after{
-        top: 15px;
-    }
-    .mvp-arrow-up::after{
-        bottom: 15px;
-    }
 }
 
-/*MOBILE S*/
-@media (width <= 360px){
-    .bp-title{
-        font-size: 24px;
-    }
-    th:nth-of-type(2), td:nth-of-type(2){
-        max-width: 70px;
-        min-width: 70px;
-    }
-    table th{
-        font-size: 13px;
-    }
-    table td{
-        font-size: 13px;
-    }
-}
-
-/* Table Border */
-table {
-    border-collapse: collapse;
-}
-table td {
-    border: 1px solid rgba(0, 0, 0, 0.3); 
-}
-table th{
-    border: 1px solid rgba(0, 0, 0, 0.3); 
-    border-top: 0;
-}
-table th:first-child{
-    border-left: 0;
-}
-table th:last-child{
-    border-right: 0;
-}
-table tr td:first-child {
-    border-left: 0;
-}
-table tr:last-child td {
-    border-bottom: 0;
-}
-table tr td:last-child {
-    border-right: 0;
-}
 </style>

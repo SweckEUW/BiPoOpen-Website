@@ -1,17 +1,8 @@
 <template>
-    <DataTable
-        :value="teams"
-        :pt="{
-            tableContainer: {
-                class: '!overflow-visible'
-            }
-        }"
-        stripedRows
-        class="w-full max-[900px]:text-[14px] max-[360px]:text-[13px] mb-[30px]"
-    >
+    <AppTable :value="teams" class="mb-[30px]">
 
         <!-- Nummer -->
-        <Column header="Nr." :pt="{ headerCell: { class: '!px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
+        <Column header="#" :pt="{ headerCell: { class: '!px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
             <template #body="slotProps">
                 {{ slotProps.index + 1 }}
             </template>
@@ -47,13 +38,13 @@
             </template>
         </Column>
 
-    </DataTable>
+    </AppTable>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, PropType, computed, ref } from "vue"
-import DataTable from 'primevue/datatable';
+import { PropType, computed } from "vue"
 import Column from 'primevue/column';
+import AppTable from '@/components/shared/AppTable.vue';
 import Image from 'primevue/image';
 import Avatar from '@/components/shared/Avatar.vue';
 import { getAllTeams } from '@/util/tournamentTeamFunctions';
@@ -73,20 +64,6 @@ const getNameSizeClass = (name: string) => {
 
     return '';
 };
-
-const windowWidth = ref(window.screen.width);
-
-const updateWindowWidth = () => {
-    windowWidth.value = window.screen.width;
-};
-
-onMounted(() => {
-    window.addEventListener('resize', updateWindowWidth);
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize', updateWindowWidth);
-});
 </script>
 
 <style scoped>

@@ -1,63 +1,83 @@
 
 <template>
-    <div class="Match" ref="matchHTMLElement">
+    <div class="Match">
 
-         <Teleport to="body">
-            <Transition name="fade">
-               <ModalSetGameResult v-if="showModal" :toggleModal="toggleModal" :match="match" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="editName"/>
-            </Transition>
-         </Teleport>
-
-         <!-- <div v-if="isBackend" class="mt-handle">
-            <div style="margin-bottom: 5px;"/>
-            <div/>
-         </div> -->
-
-         <!-- Match Index -->
-         <!-- <div v-if="matchIndex != undefined" class="mt-index">
-           <div>{{ matchIndex + 1 + '.' }}</div> 
-         </div> -->
-
-         <!-- Team Name & Score -->
-         <div class="mt-teams" @click="togglePlayersVisible()">
-            <MatchElementTeam class="mb-[5px]" :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team1Placeholder" :avatarShape="avatarShape"/> <!-- Team 1 -->
-            <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team2Placeholder" :avatarShape="avatarShape"/> <!-- Team 2 -->
-
-            <!-- Spielverlauf Timeline -->
-            <MatchTimeline v-if="match.turns && match.turns.length > 0 && playersVisible" :match="match" />
+         <!-- Kopfzeile: Spielart-Chip, Datum und optionale Extras (z.B. Sieg/Niederlage) -->
+         <div v-if="showHeader" class="mt-header">
+            <span v-if="showChip" class="mt-chip" :class="`mt-chip--${resolvedGameType}`">{{ chipLabel ?? GAME_TYPE_LABELS[resolvedGameType] }}</span>
+            <span v-if="showDate && match.time" class="mt-date">{{ formatGameTime(match.time) }}</span>
+            <slot name="meta"/>
          </div>
 
-         <!-- VS. -->
-         <div v-if="!checkIfMatchFinished(match) && !isBackend || !match.team1 || !match.team2" class="mt-vs">vs.</div>
+         <!-- Team Name & Score -->
+         <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team1Placeholder" :avatarShape="avatarShape"/> <!-- Team 1 -->
+         <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team2Placeholder" :avatarShape="avatarShape"/> <!-- Team 2 -->
 
-         <!-- Enter Result Button -->
-         <div v-if="isBackend && match.team1 && match.team2" class="bp-button mt-button" @click="toggleModal()">{{ checkIfMatchFinished(match) ? 'Bearbeiten' : 'Eintragen'}}</div>
+         <!-- Spielverlauf Timeline -->
+         <MatchTimeline v-if="hasTurns && playersVisible" :match="match" />
+
+         <!-- Fusszeile: Eintragen-Button (Backend) und Wuerfe auf-/zuklappen -->
+         <div v-if="hasDetails || showEditButton" class="mt-footer">
+            <div v-if="showEditButton" class="bp-button mt-button" @click="emit('edit', match)">{{ checkIfMatchFinished(match) ? 'Bearbeiten' : 'Eintragen'}}</div>
+            <button v-if="hasDetails" type="button" class="mt-toggle" @click="togglePlayersVisible()">
+               {{ playersVisible ? 'Würfe ausblenden' : 'Würfe anzeigen' }}
+               <i class="pi" :class="playersVisible ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+            </button>
+         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { PropType, ref } from "vue"
-import ModalSetGameResult from '@/components/shared/MatchElement/ModalSetGameResult.vue';
+import { PropType, computed, ref, useSlots } from "vue"
 import MatchElementTeam from '@/components/shared/MatchElement/MatchElementTeam.vue';
 import MatchTimeline from '@/components/shared/MatchElement/MatchTimeline.vue';
 import { checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
+import { formatGameTime } from "@/util/util";
+
+type GameType = 'open' | 'league' | 'cup';
+
+const GAME_TYPE_LABELS: Record<GameType, string> = {
+   open: 'Offenes Spiel',
+   league: 'Liga',
+   cup: 'Cup',
+};
 
 const props = defineProps({
    match: {type: Object as PropType<Match>, required: true },
-   setGameResult: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
-   deleteMatch: {type: Function as PropType<(match:Match) => Promise<boolean> | void> },
+   // Backend: Button "Eintragen"/"Bearbeiten", die Seite oeffnet dafuer ihren GameEntryDrawer.
    isBackend: {type: Boolean, default: false},
-   editName: {type: Boolean, default: false},
    hideAvatars: {type: Boolean, default: false},
    team1Placeholder: {type: String, default: undefined},
    team2Placeholder: {type: String, default: undefined},
    avatarShape: {type: String as () => 'circle' | 'square', default: 'circle'},
+   // Kopfzeile im Element
+   showDate: {type: Boolean, default: false},
+   showChip: {type: Boolean, default: false},
+   // Ohne Angabe aus dem Spiel abgeleitet: cupId -> Cup, season/league -> Liga, sonst offenes Spiel.
+   gameType: {type: String as PropType<GameType>, default: undefined},
+   // Eigener Chip-Text statt des Spielart-Labels (z.B. Quelle im Spielerprofil).
+   chipLabel: {type: String, default: undefined},
 });
 
-let showModal = ref(false);
-const toggleModal = () => {
-   showModal.value = !showModal.value;
-}
+const emit = defineEmits<{ edit: [match: Match] }>();
+const slots = useSlots();
+
+const resolvedGameType = computed<GameType>(() => {
+   if(props.gameType) return props.gameType;
+   if(props.match.cupId) return 'cup';
+   if(props.match.season || props.match.league != undefined) return 'league';
+   return 'open';
+});
+
+const showHeader = computed(() => props.showChip || (props.showDate && !!props.match.time) || !!slots.meta);
+const showEditButton = computed(() => props.isBackend && !!props.match.team1 && !!props.match.team2);
+
+const hasTurns = computed(() => !!props.match.turns && props.match.turns.length > 0);
+const hasDetails = computed(() => {
+   if(hasTurns.value) return true;
+   if(!checkIfMatchFinished(props.match)) return false;
+   return props.match.team1.players.length > 1 || props.match.team2.players.length > 1;
+});
 
 let playersVisible = ref(false);
 let togglePlayersVisible = () => {
@@ -68,62 +88,84 @@ let togglePlayersVisible = () => {
 <style scoped>
 .Match{
    display: flex;
-   align-items: center;
+   flex-direction: column;
+   gap: 6px;
    width: 100%;
-   padding: 6px 10px;
-   border: 1px solid black;
-   margin-bottom: 6px;
-   border-radius: 4px;
+   padding: 10px 12px;
+   margin-bottom: 8px;
+   background: white;
+   border: 1px solid #ECEEF1;
+   border-radius: 12px;
+   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* Handle for moving teams between groups */
-.mt-handle{
-   cursor: grab;
-   margin-right: 20px;
+/* Kopfzeile */
+.mt-header{
+   display: flex;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 8px;
+   min-height: 22px;
 }
-.mt-handle div{
-   height: 2px;
-   width: 25px;
-   background-color: black;
+.mt-chip{
+   padding: 2px 8px;
+   border-radius: 6px;
+   font-size: 12px;
+   font-weight: 700;
+   line-height: 18px;
+}
+.mt-chip--cup{
+   background: #fde6e8;
+   color: #b42236;
+}
+.mt-chip--league{
+   background: var(--secondary-color-weak);
+   color: #1f7f95;
+}
+.mt-chip--open{
+   background: #ECEEF1;
+   color: #4a5058;
+}
+.mt-date{
+   font-size: 12px;
+   color: var(--p-text-muted-color);
 }
 
-.mt-index{
-   padding-right: 10px;
+/* Fusszeile */
+.mt-footer{
+   display: flex;
+   align-items: center;
+   gap: 10px;
 }
-
-.mt-teams{
-   flex-grow: 1;
+.mt-toggle{
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   margin-left: auto;
+   padding: 2px 0;
+   background: none;
+   border: 0;
+   font-size: 13px;
+   font-weight: 600;
+   color: #4a5058;
+   cursor: pointer;
 }
-
-/* Button for entering score */
+.mt-toggle .pi{
+   font-size: 11px;
+}
 .mt-button{
-   font-size: 16px;
-   margin: auto;
-   margin-left: 10px;
-}
-.mt-vs{
-   font-style: italic;
-   color: gray;
-}
-.mt-vs, .mt-button{
+   font-size: 14px;
+   padding: 4px 12px;
    text-align: center;
-   padding: 10px;
 }
 
 /*MOBILE*/
 @media (width <= 900px){
+   .Match{
+      padding: 10px;
+   }
    .mt-button{
-      font-size: 14px;
-   }
-   .mt-vs, .mt-button{
-      padding: 5px;
-   }
-}
-
-/*MOBILE S*/
-@media (width <= 360px){
-   .mt-index{
-      display: none;
+      font-size: 13px;
    }
 }
 </style>

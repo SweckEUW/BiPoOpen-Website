@@ -1,23 +1,11 @@
 <template>
-    <DataTable
+    <AppTable
         :value="group.teams"
         :rowClass="getRowClass"
         @row-click="onRowClick"
-        :pt="{
-            tableContainer: {
-                class: '!overflow-visible'
-            }
-        }"
-        stripedRows
-        class="w-full max-[900px]:text-[14px] max-[360px]:text-[13px] mb-[30px]"
+        rank
+        class="mb-[30px]"
     >
-
-        <!-- Platzierung -->
-        <Column :header="windowWidth > 900 ? 'Platz' : 'Pl.'" :pt="{ headerCell: { class: '!px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
-            <template #body="slotProps">
-                {{ slotProps.index + 1 }}
-            </template>
-        </Column>
 
         <!-- Teamname -->
         <Column header="Team" :pt="{ headerCell: { class: '!text-left' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
@@ -30,20 +18,20 @@
         </Column>
 
         <!-- Spieler -->
-        <Column v-if="windowWidth > 900" header="Spieler">
+        <Column v-if="!isMobile" header="Spieler">
             <template #body="slotProps">
                 <span v-for="player in slotProps.data.players" :key="player._id" class="block">{{ player.name }}</span>
             </template>
         </Column>
 
         <!-- Siege -->
-        <Column :header="windowWidth > 900 ? 'Siege' : 'Sieg.'" field="wins" :pt="{ headerCell: { class: '!px-[4px]' }}"/>
+        <Column :header="labels.wins" field="wins" :pt="{ headerCell: { class: '!px-[4px]' }}"/>
 
         <!-- Spiele -->
-        <Column :header="windowWidth > 900 ? 'Spiele' : 'Spie.'" field="ammountOfMatches" :pt="{ headerCell: { class: '!px-[4px]' } }"/>
+        <Column :header="labels.games" field="ammountOfMatches" :pt="{ headerCell: { class: '!px-[4px]' } }"/>
 
         <!-- Trefferverhältnis -->
-        <Column :header="windowWidth > 900 ? 'Trefferverhältnis' : 'Trfv.'" :pt="{ headerCell: { class: '!w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
+        <Column :header="labels.diff" :pt="{ headerCell: { class: '!w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
             <template #body="slotProps">
                 <div class="leading-tight">
                     <span class="whitespace-nowrap">{{ slotProps.data.hitDifference }}</span>
@@ -52,16 +40,17 @@
             </template>
         </Column>
 
-    </DataTable>
+    </AppTable>
 
     <StandingsGroupTeamDrawer v-model:visible="drawerVisible" :selected-team="selectedTeam" :tournament="tournament"/>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, PropType, ref } from "vue"
-import DataTable from 'primevue/datatable';
+import { PropType, ref } from "vue"
 import Column from 'primevue/column';
 import Avatar from '@/components/shared/Avatar.vue';
+import AppTable from '@/components/shared/AppTable.vue';
+import { PODIUM_ROW_CLASSES, useIsMobile, useTableLabels } from '@/components/shared/appTable';
 import StandingsGroupTeamDrawer from '@/components/frontend/tournament/StandingsGroupTeamDrawer.vue';
 
 const props = defineProps({
@@ -80,10 +69,7 @@ const onRowClick = (event: { data: TeamWithStats }) => {
 const getRowClass = (row: TeamWithStats) => {
     const index = props.group.teams.indexOf(row);
 
-    if (index === 0) return '!bg-[var(--secondary-color-weak)] cursor-pointer';
-    if (index === 1) return '!bg-[#e6faff] cursor-pointer';
-
-    return 'cursor-pointer';
+    return index < 2 ? PODIUM_ROW_CLASSES[index] : '';
 };
 
 const getNameSizeClass = (name: string) => {
@@ -96,17 +82,6 @@ const getNameSizeClass = (name: string) => {
     return '';
 };
 
-const windowWidth = ref(window.screen.width);
-
-const updateWindowWidth = () => {
-    windowWidth.value = window.screen.width;
-};
-
-onMounted(() => {
-    window.addEventListener('resize', updateWindowWidth);
-});
-
-onUnmounted(() => {
-    window.removeEventListener('resize', updateWindowWidth);
-});
+const isMobile = useIsMobile();
+const labels = useTableLabels();
 </script>

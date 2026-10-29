@@ -7,12 +7,19 @@
 
         <div v-if="openGames">
             <div v-for="openGame in openGames" :key="openGame._id">
-                <div class="og-time">{{ getGameTime(openGame.time!) }}</div>
-                <MatchElement
-                    :match="openGame" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
-                /> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
+                <MatchElement :match="openGame" :isBackend="true" @edit="openEdit" showDate/> <!-- TODO-Minor: Only Display some Games not all. Adjust Database download to only get the latest games -->
             </div>
         </div>
+
+        <GameEntryDrawer
+            v-model:visible="editVisible"
+            title="Spiel bearbeiten"
+            :subtitle="editingMatch?.time ? getGameTime(editingMatch.time) : 'Offenes Spiel'"
+            :initialSides="editSides"
+            allowExtraPlayers
+            :save="setGameResult"
+            :remove="deleteMatch"
+        />
     </div>
 </template>
 
@@ -20,9 +27,12 @@
 import { ref } from 'vue';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
+import { applySidesToMatch, useMatchEdit, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
 import { getAllOpenGames, updateOpenGame, deleteOpenGame } from "@/components/frontend/openGames/OpenGamesUtilFunctions";
 
 let openGames = ref<Match[]|undefined>();
+const { editingMatch, editVisible, editSides, openEdit } = useMatchEdit();
 
 const getOpenGames = async () => {
     let openGamesWrongOrder = await getAllOpenGames();
@@ -31,14 +41,14 @@ const getOpenGames = async () => {
 getOpenGames();
 
 
-const setGameResult = async (match:Match) => {
-    let success = await updateOpenGame(match);
+const setGameResult = async (sides: GameEntrySide[]) => {
+    let success = await updateOpenGame(applySidesToMatch(editingMatch.value!, sides));
     await getOpenGames();
     return success;
 }
 
-const deleteMatch = async (match:Match) => {
-    let success = await deleteOpenGame(match);
+const deleteMatch = async () => {
+    let success = await deleteOpenGame(editingMatch.value!);
     await getOpenGames();
     return success;
 }
@@ -51,11 +61,6 @@ let getGameTime = (dateNumber:number) => {
 </script>
 
 <style scoped>
-.og-time{
-    font-size: 20px;
-    margin-bottom: 5px;
-    color: var(--main-color);
-}
 .bp-title{
     padding-bottom: 10px;   
 }
