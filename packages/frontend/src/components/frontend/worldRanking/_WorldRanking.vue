@@ -3,8 +3,7 @@
 
         <div class="wr-header">
             <div class="wr-header-text">
-                <h1 class="wr-title">Weltrangliste</h1>
-                <div class="wr-subtitle">Stand {{ formattedDate }} · Punkte der letzten 12 Monate</div>
+                <h1 class="bp-title">Weltrangliste</h1>
             </div>
             <button type="button" class="wr-info-button" @click="showPointsSystem = true">
                 <i class="pi pi-info-circle"></i>
@@ -179,6 +178,10 @@ const getTrendClass = (trend: number | null) => {
     justify-content: space-between;
     gap: 12px;
     padding: 10px 0 14px;
+
+    h1{
+        padding: 0;
+    }
 }
 .wr-title {
     margin: 0;
