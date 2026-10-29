@@ -19,6 +19,7 @@ export type LeagueSeason = {
     slug: string;            // "2025-26" -> URL-Segment
     label: string;           // "2025/26" -> Untertitel
     divisions: LeagueDivision[];
+    hasCup?: boolean;        // League Cup als eigener Reiter neben den Ligen
 };
 
 const teamLogo = (fileName: string) => new URL(`/src/assets/league/teams/${fileName}`, import.meta.url).href;
@@ -60,6 +61,7 @@ export const LEAGUE_SEASONS: LeagueSeason[] = [
     {
         slug: '2026-27',
         label: '2026/27',
+        hasCup: true,
         divisions: [
             {
                 league: 1,

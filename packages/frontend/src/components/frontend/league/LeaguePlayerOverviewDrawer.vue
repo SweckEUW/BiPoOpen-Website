@@ -36,7 +36,7 @@
                         />
                         <div v-if="match.time">{{ getGameTime(match.time) }}</div>
                     </div>
-                    <MatchElement :match="match" :avatarShape="'square'"/>
+                    <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'"/>
                 </div>
 
                 <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
@@ -44,7 +44,7 @@
                         <div class="font-bold text-[20px] lg-sticky-subheadline">Offene Spiele</div>
                     </div>
                     <div v-for="match in round.data.matchesToPlay" style="margin-top: 10px;">
-                        <MatchElement :match="match" :avatarShape="'square'"/>
+                        <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'"/>
                     </div>
                 </div>
             </div>
@@ -58,6 +58,7 @@ import Image from 'primevue/image';
 import Drawer from 'primevue/drawer';
 import Tag from 'primevue/tag';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { withLeagueTeamLogos } from './LeaguePlayersData';
 import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from '@/util/tournamentMatchFunctions';
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });

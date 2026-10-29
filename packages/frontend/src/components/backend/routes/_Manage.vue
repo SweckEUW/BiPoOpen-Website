@@ -3,6 +3,7 @@
         <h1 class="bp-title" style="position: inherit; margin-bottom: 50px;">BiPo Open Backend</h1>
         <router-link class="ma-tournament" :to="'/Manage/OpenGames'">Open Games</router-link>
         <router-link class="ma-tournament" :to="'/Manage/LeagueGames'">League Games</router-link>
+        <router-link class="ma-tournament" :to="'/Manage/LeagueCup'">League Cup</router-link>
         <router-link class="ma-tournament" :to="'/Manage/Tournaments'">Tournaments</router-link>
         <!-- <router-link class="ma-tournament" :to="'/Manage/Anmeldungen'">Anmeldungen 2026</router-link> -->
     </div>

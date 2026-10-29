@@ -35,8 +35,11 @@ export const getGameSeason = (match: Match) => match.season ?? LEGACY_SEASON_SLU
 
 export const getGameLeague = (match: Match) => match.league ?? LEGACY_LEAGUE;
 
+// Pokalspiele (cupId gesetzt) gehoeren nicht in Liga-Tabellen und Liga-Spielelisten.
+export const isCupGame = (match: Match) => !!match.cupId;
+
 export const filterLeagueGames = (leagueGames: Match[], seasonSlug: string, league: number) =>
-    leagueGames.filter(match => getGameSeason(match) === seasonSlug && getGameLeague(match) === league);
+    leagueGames.filter(match => !isCupGame(match) && getGameSeason(match) === seasonSlug && getGameLeague(match) === league);
 
 
 ////////////////

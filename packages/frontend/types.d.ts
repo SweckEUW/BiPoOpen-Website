@@ -45,6 +45,35 @@ declare global {
         // Nur bei Liga-Spielen gesetzt. Altdaten ohne diese Felder gelten als Saison 2025/26, 1. Liga.
         season?: string;
         league?: number;
+        // Nur bei Pokalspielen gesetzt: zu welchem LeagueCup und welcher Runde das Spiel gehoert.
+        cupId?: string;
+        cupRound?: number;
+    };
+
+    type LeagueCupParticipant = {
+        teamName: string;
+        league: number;
+    };
+
+    type LeagueCupPairing = {
+        team1: string;
+        team2: string;
+    };
+
+    type LeagueCupRound = {
+        name: string;
+        bestOf: number;
+        createdTime: number;
+        pairings: LeagueCupPairing[];
+        byes: string[];
+    };
+
+    type LeagueCup = {
+        _id: string;
+        season: string;
+        name: string;
+        participants: LeagueCupParticipant[];
+        rounds: LeagueCupRound[];
     };
 
     type Team = {

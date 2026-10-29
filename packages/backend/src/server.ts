@@ -4,6 +4,7 @@ import { config } from './config/config';
 import tournamentRoutes from './routes/Tournament';
 import openGameRoutes from './routes/OpenGame';
 import leagueGameRoutes from './routes/LeagueGame';
+import leagueCupRoutes from './routes/LeagueCup';
 import playerImageRoutes from './routes/PlayerImage';
 import registrationRoutes from './routes/TournamentRegistration';
 
@@ -67,6 +68,7 @@ router.use((req, res, next) => {
 router.use('/tournaments', tournamentRoutes);
 router.use('/openGames', openGameRoutes);
 router.use('/leagueGames', leagueGameRoutes);
+router.use('/leagueCups', leagueCupRoutes);
 router.use('/playerImages', playerImageRoutes);
 router.use('/registrations', registrationRoutes);
 

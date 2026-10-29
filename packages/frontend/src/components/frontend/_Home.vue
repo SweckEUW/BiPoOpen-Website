@@ -233,6 +233,7 @@ import { getTournamentByName } from '@/util/tournamentFunctions';
 import { BIPO_OPEN_TOURNAMENT_YEARS } from '@/util/bipoOpenTournamentMeta';
 import PlayerSearchAutoComplete from '@/components/shared/PlayerSearchAutoComplete.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { withLeagueTeamLogos } from '@/components/frontend/league/LeaguePlayersData';
 import TournamentOverview from '@/components/frontend/tournament/Overview.vue';
 import Skeleton from 'primevue/skeleton';
 import Select from 'primevue/select';
@@ -357,7 +358,7 @@ const loadRecentGames = async () => {
         ]);
         const entries: MatchHistoryEntry[] = [
             ...openGames.map(m => ({ match: m, source: 'Offenes Spiel', time: m.time ?? 0 })),
-            ...leagueGames.map(m => ({ match: m, source: 'Liga', time: m.time ?? 0 })),
+            ...leagueGames.map(m => ({ match: withLeagueTeamLogos(m), source: 'Liga', time: m.time ?? 0 })),
         ];
         entries.sort((a, b) => b.time - a.time);
         recentGames.value = entries.slice(0, 5);

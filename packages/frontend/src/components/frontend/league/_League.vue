@@ -24,18 +24,25 @@
             />
         </div>
 
-        <!-- Liga-Auswahl, nur wenn die Saison mehr als eine Liga hat -->
-        <div v-if="season.divisions.length > 1" ref="divisionBar" class="lg-division-bar">
+        <!-- Liga-Auswahl, nur wenn die Saison mehr als eine Liga oder einen Pokal hat -->
+        <div v-if="season.divisions.length > 1 || season.hasCup" ref="divisionBar" class="lg-division-bar">
             <Tabs :value="activeLeague" @update:value="changeLeague">
                 <TabList>
                     <Tab v-for="divisionOption in season.divisions" :key="divisionOption.league" :value="divisionOption.league" class="flex-1 justify-center">
                         {{ divisionOption.label }}
                     </Tab>
+                    <Tab v-if="season.hasCup" value="cup" class="flex-1 justify-center">League Cup</Tab>
                 </TabList>
             </Tabs>
         </div>
 
         <Loadingscreen v-if="isLoading"/>
+
+        <LeagueCup v-else-if="isCupActive"
+            :season="season"
+            :allLeagueGames="allLeagueGames"
+            :getLeagueGames="getLeagueGames"
+        />
 
         <div v-else-if="!division.teams.length" class="lg-empty">
             Für diese Liga sind noch keine Teams eingetragen.
@@ -46,7 +53,7 @@
                 <TabList class="w-full">
                     <Tab value="table" class="flex-1 justify-center">Tabelle</Tab>
                     <Tab value="games" class="flex-1 justify-center">Spiele</Tab>
-                    <Tab v-if="division.hasFinalFour" value="finalfour" class="flex-1 justify-center">Final 4</Tab>
+                    <!-- <Tab v-if="division.hasFinalFour" value="finalfour" class="flex-1 justify-center">Final 4</Tab> -->
                 </TabList>
                 <TabPanels :pt="{ root: { style: { '--p-tabs-tabpanel-padding': '0.75rem 0' } } }">
                     <TabPanel value="table">
@@ -90,7 +97,7 @@
 
                         <div v-for="match in divisionGames" :key="match.time!" style="margin-top: 10px;">
                             <div style="color: var(--main-color)">{{ getGameTime(match.time!) }}</div>
-                            <MatchElement :match="match" :avatarShape="'square'"/>
+                            <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'"/>
                         </div>
                     </TabPanel>
 
@@ -119,7 +126,10 @@ import LeagueFinalFour from './LeagueFinalFour.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import ModalAddLeagueGame from './ModalAddLeagueGame.vue';
 import ModalLeagueDraw from './ModalLeagueDraw.vue';
+import LeagueCup from './LeagueCup.vue';
 import { filterLeagueGames, getAllLeagueGames } from './LeagueUtilFunctions';
+import { CUP_URL_SEGMENT } from './LeagueCupUtilFunctions';
+import { withLeagueTeamLogos } from './LeaguePlayersData';
 import {
     CURRENT_SEASON_SLUG,
     LEAGUE_SEASONS,
@@ -163,12 +173,17 @@ const changeSeason = (slug: string) => {
 }
 
 // ─── Liga ───
-const requestedLeague = Number(route.params.League);
-const activeLeague = ref(
-    season.value.divisions.some(entry => entry.league === requestedLeague)
-        ? requestedLeague
-        : season.value.divisions[0].league
+// 'cup' = Reiter League Cup (URL-Segment "Pokal") statt einer Liga.
+const requestedLeague = route.params.League as string | undefined;
+const activeLeague = ref<number | 'cup'>(
+    requestedLeague === CUP_URL_SEGMENT && season.value.hasCup
+        ? 'cup'
+        : season.value.divisions.some(entry => entry.league === Number(requestedLeague))
+            ? Number(requestedLeague)
+            : season.value.divisions[0].league
 );
+
+const isCupActive = computed(() => activeLeague.value === 'cup');
 
 const division = computed(() =>
     season.value.divisions.find(entry => entry.league === activeLeague.value) ?? season.value.divisions[0]
@@ -177,9 +192,10 @@ const division = computed(() =>
 // Liga-Wechsel ohne Remount: App.vue keyed die router-view auf route.fullPath,
 // ein router.push wuerde die Seite komplett neu aufbauen und neu laden.
 const changeLeague = (value: string | number) => {
-    activeLeague.value = Number(value);
+    activeLeague.value = value === 'cup' ? 'cup' : Number(value);
 
-    const newURL = `${window.location.origin}/League/${season.value.slug}/${activeLeague.value}`;
+    const urlSegment = activeLeague.value === 'cup' ? CUP_URL_SEGMENT : activeLeague.value;
+    const newURL = `${window.location.origin}/League/${season.value.slug}/${urlSegment}`;
     window.history.replaceState({ ...window.history.state, as: newURL, url: newURL }, '', newURL);
     window.scrollTo({ top: 0, behavior: 'instant' });
 }

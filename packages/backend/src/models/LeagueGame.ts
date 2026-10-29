@@ -54,6 +54,8 @@ const MatchSchema = new Schema(
     endTime: { type: Number },
     season: { type: String }, // z.B. "2026-27"; fehlt bei Altdaten -> gilt als "2025-26"
     league: { type: Number }, // 1 | 2; fehlt bei Altdaten -> gilt als 1
+    cupId: { type: String }, // gesetzt bei Pokalspielen -> _id des LeagueCup
+    cupRound: { type: Number }, // Index der Pokalrunde
     turns: { type: [TurnSchema], default: [] }
   },
   { versionKey: false }

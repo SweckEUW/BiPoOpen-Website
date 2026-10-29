@@ -201,6 +201,15 @@ const routes = [
 		}
 	},
 	{
+		path: '/Manage/LeagueCup',
+		name: 'Manage League Cup',
+		component: () => import('@/components/backend/routes/_ManageLeagueCup.vue'),
+		meta: {
+			title: 'Weck BiPo Open - Manage League Cup',
+			description: ''
+		}
+	},
+	{
 		path: '/Manage/Anmeldungen',
 		name: 'Manage Anmeldungen',
 		component: () => import('@/components/backend/routes/_ManageRegistrations.vue'),

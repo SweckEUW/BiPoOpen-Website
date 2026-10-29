@@ -39,7 +39,7 @@
             <div v-for="(gameMatch, index) in seriesResult.games" :key="gameMatch._id || index" class="ff-series-game">
                 <div class="ff-series-game-title">Spiel {{ index + 1 }}</div>
                 <MatchElement
-                    :match="gameMatch"
+                    :match="withLeagueTeamLogos(gameMatch)"
                     :avatarShape="avatarShape"
                     :team1Placeholder="team1Placeholder"
                     :team2Placeholder="team2Placeholder"
@@ -54,6 +54,7 @@
 import { computed, ref } from 'vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { withLeagueTeamLogos } from './LeaguePlayersData';
 
 const props = defineProps({
     team1: { type: Object as () => Team | undefined, default: undefined },

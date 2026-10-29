@@ -14,7 +14,7 @@
             <div v-if="!filteredLeagueGames.length" class="ml-empty">Keine Spiele in dieser Liga.</div>
 
             <MatchElement v-for="leagueGame in filteredLeagueGames" :key="leagueGame._id"
-                :match="leagueGame" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
+                :match="withLeagueTeamLogos(leagueGame)" :isBackend="true" :setGameResult="setGameResult" :deleteMatch="deleteMatch" :editName="true"
             />
         </div>
     </div>
@@ -27,6 +27,7 @@ import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import { filterLeagueGames, getAllLeagueGames, updateLeagueGame, deleteLeagueGame} from "@/components/frontend/league/LeagueUtilFunctions";
 import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason } from "@/components/frontend/league/LeagueSeasonsData";
+import { withLeagueTeamLogos } from "@/components/frontend/league/LeaguePlayersData";
 
 let leagueGames = ref<Match[]|undefined>();
 
