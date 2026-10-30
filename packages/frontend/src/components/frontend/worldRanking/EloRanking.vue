@@ -84,7 +84,7 @@ const props = defineProps<{ data: RankingData; now: number }>();
 
 const chips: { key: EloMode; label: string }[] = [
     { key: 'players', label: 'Spieler' },
-    { key: 'teams', label: 'Feste Teams' },
+    { key: 'teams', label: 'Teams' },
 ];
 
 const mode = ref<EloMode>('players');

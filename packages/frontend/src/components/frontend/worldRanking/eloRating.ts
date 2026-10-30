@@ -165,7 +165,7 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
     games.forEach(game => {
         if (!snapshotTaken && game.time > trendTime) takeSnapshot();
 
-        // Feste Teams: nur Doppel, ein Eintrag pro Spielerpaar
+        // Teams: nur Doppel, ein Eintrag pro Spielerpaar
         if (mode === 'teams' && game.sides.some(side => side.players.length !== 2)) return;
 
         // Pro Seite die Eintraege, die das Ergebnis bekommen

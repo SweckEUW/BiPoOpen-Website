@@ -61,7 +61,7 @@
 
         <p class="ees-footnote">
             Wer immer mit demselben Partner spielt, bekommt dieselben Ergebnisse wie der Partner. Für solche Duos ist die
-            Ansicht „Feste Teams“ aussagekräftiger.
+            Ansicht Teams“ aussagekräftiger.
         </p>
     </BottomSheet>
 </template>

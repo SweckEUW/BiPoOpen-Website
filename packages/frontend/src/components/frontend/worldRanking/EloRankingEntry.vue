@@ -161,7 +161,7 @@ const getTrendClass = (trend: number | null) => {
     font-size: 14px;
     font-weight: 700;
 }
-/* Feste Teams: zwei kleinere, ueberlappende Avatare */
+/* Teams: zwei kleinere, ueberlappende Avatare */
 .elo-avatars-team .elo-avatar {
     width: 28px !important;
     height: 28px !important;
@@ -184,7 +184,7 @@ const getTrendClass = (trend: number | null) => {
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-/* Feste Teams: zwei Namen, kleiner und notfalls zweizeilig statt abgeschnitten */
+/* Teams: zwei Namen, kleiner und notfalls zweizeilig statt abgeschnitten */
 .elo-name-team {
     display: -webkit-box;
     -webkit-box-orient: vertical;
