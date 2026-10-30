@@ -24,8 +24,9 @@ const readTournament = (req: Request, res: Response, next: NextFunction) => {
     let tournamentName = req.params.tournamentName;
     tournamentName = tournamentName.replaceAll("-", " ");
 
-    Tournament.aggregate(tournamentAggregation()).then((tournaments) => {
-        const tournament = tournaments.find((tournament) => tournament.name === tournamentName);
+    // Erst nach Namen filtern, damit nicht alle Turniere aufbereitet werden
+    Tournament.aggregate([{ $match: { name: tournamentName } }, ...tournamentAggregation()]).then((tournaments) => {
+        const tournament = tournaments[0];
         if (tournament) {
             res.status(200).json({ tournament });
         } else {
@@ -39,6 +40,7 @@ const readTournament = (req: Request, res: Response, next: NextFunction) => {
 
 const readAll = (req: Request, res: Response, next: NextFunction) => {
     Tournament.find()
+        .lean()
         .then((tournaments) => {
             res.status(200).json({ tournaments });
         })

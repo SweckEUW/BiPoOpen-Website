@@ -2,8 +2,8 @@
     <HeroSlideLayout
         :kicker="`Offene Spiele · ${monthName}`"
         :title="title"
-        ctaLabel="Zur Rangliste"
-        ctaTo="/Offene-Spiele"
+        ctaLabel="Zur Weltrangliste"
+        ctaTo="/Weltrangliste"
     >
         <div v-if="topPlayers.length" class="so-content">
             <div class="so-caption">Beste Siegquote · ab {{ MIN_GAMES + 1 }} Spielen</div>

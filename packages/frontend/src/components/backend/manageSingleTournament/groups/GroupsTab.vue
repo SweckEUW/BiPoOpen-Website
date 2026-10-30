@@ -68,7 +68,7 @@ import { convertNumberToCharacter } from "@/util/util";
 import Modal from '@/components/shared/Modal.vue';
 import GroupsSettings from '@/components/backend/manageSingleTournament/groups/GroupsSettings.vue';
 import { getTeamFromName } from "@/util/tournamentTeamFunctions";
-import { generateRandomGroups, generateRandomMatchesGroupPhase, setGameResultGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
+import { generateRandomGroups, generateRandomMatchesGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
 import { initMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { useToast } from "primevue";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
@@ -136,32 +136,6 @@ const initGroupAndKOMatches = async () => {
    await props.getTournament();
    initSortable();
    toggleModal();
-
-   // DEBUG!
-   // props.tournament.groupPhase.matches.forEach(async (groupMatches) => {
-   //    groupMatches.forEach(async (match) => {
-   //       if (!match) return; 
-
-   //       let team1Won = Math.random() > 0.5;
-
-   //       // Calc winner scores summing exactly 10
-   //       let winScoreP1 = Math.floor(Math.random() * 11);
-   //       let winScoreP2 = 10 - winScoreP1;
-
-   //       // Calc loser scores summing max 9
-   //       let loseTotal = Math.floor(Math.random() * 10);
-   //       let loseScoreP1 = Math.floor(Math.random() * (loseTotal + 1));
-   //       let loseScoreP2 = loseTotal - loseScoreP1;
-
-   //       // Assign scores
-   //       match.team1.players[0].score = team1Won ? winScoreP1 : loseScoreP1;
-   //       match.team1.players[1].score = team1Won ? winScoreP2 : loseScoreP2;
-   //       match.team2.players[0].score = team1Won ? loseScoreP1 : winScoreP1;
-   //       match.team2.players[1].score = team1Won ? loseScoreP2 : winScoreP2;
-
-   //       await setGameResultGroupPhase(props.tournament, match);
-   //    });
-   // });
 }
 
 let generateRandom = ref(false);

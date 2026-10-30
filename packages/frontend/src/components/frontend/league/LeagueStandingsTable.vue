@@ -1,18 +1,26 @@
 <template>
-    <AppTable
+    <DataTable
         :value="sortedLeaguePlayers"
         :rowClass="getRowClass"
         @row-click="onRowClick"
-        rank
-        class="mb-[30px]"
+        rowHover
+        scrollable
+        class="league-standings mb-[30px]"
     >
 
+        <!-- Platz -->
+        <Column header="#" frozen>
+            <template #body="{ index }">
+                <span class="bp-rank" :class="getZoneClass(index)">{{ index + 1 }}</span>
+            </template>
+        </Column>
+
         <!-- Team -->
-        <Column header="Team" :pt="{ columnTitle: { class: '!text-left' }, bodyCell: { class: '!p-1' } }">
+        <Column header="Team" frozen>
             <template #body="slotProps">
-                <div class="flex items-center justify-start">
-                    <img class="w-[64px] h-[64px] object-contain mr-[20px] max-[900px]:mr-[10px] max-[450px]:w-[48px] max-[450px]:h-[48px] max-[380px]:w-[32px] max-[380px]:h-[32px]" :src="getPlayerLogo(slotProps.data.name)">
-                    <div class="!text-left whitespace-pre-line">{{ slotProps.data.name.replace(' ', '\n') }}</div>
+                <div class="bp-name-cell">
+                    <Avatar :name="slotProps.data.name" :avatarImage="getPlayerLogo(slotProps.data.name)" shape="square"/>
+                    <span class="bp-name">{{ slotProps.data.name }}</span>
                 </div>
             </template>
         </Column>
@@ -21,7 +29,7 @@
         <Column :header="labels.games" field="ammountOfMatches" />
 
         <!-- Siege -->
-        <Column :header="labels.wins" field="wins" />
+        <Column :header="labels.wins" field="wins" class="bp-col-strong" />
 
         <!-- Niederlagen -->
         <Column :header="labels.losses">
@@ -30,24 +38,52 @@
             </template>
         </Column>
 
-        <!-- Trefferverhältnis -->
-        <Column :header="labels.diff" :pt="{ headerCell: { class: '!w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
+        <!-- Trefferdifferenz, Antippen zeigt die Treffer (öffnet nicht das Team) -->
+        <Column :header="labels.diff">
             <template #body="slotProps">
-                <div class="leading-tight">
-                    <span class="whitespace-nowrap">{{ slotProps.data.hitDifference }}</span>
-                    <div>({{ slotProps.data.hitDifferenceNumber > 0 ? '+' : '' }}{{ slotProps.data.hitDifferenceNumber }})</div>
+                <span
+                    v-tooltip.top.focus="`${slotProps.data.hitDifference} Treffer`"
+                    tabindex="0"
+                    class="bp-tooltip-target"
+                    :class="getDiffClass(slotProps.data.hitDifferenceNumber)"
+                    @click.stop
+                >{{ formatDiff(slotProps.data.hitDifferenceNumber) }}</span>
+            </template>
+        </Column>
+
+        <!-- Trend: letzte 5 Spiele, neuestes rechts -->
+        <Column header="Trend">
+            <template #body="slotProps">
+                <div class="league-form">
+                    <span
+                        v-for="(result, index) in getFormSlots(slotProps.data.name)"
+                        :key="index"
+                        class="league-form-item"
+                        :class="result === 'W' ? 'league-form-win' : result === 'L' ? 'league-form-loss' : ''"
+                        :title="result === 'W' ? 'Sieg' : result === 'L' ? 'Niederlage' : undefined"
+                    >{{ result === 'W' ? 'S' : result === 'L' ? 'N' : '' }}</span>
                 </div>
             </template>
         </Column>
-    </AppTable>
+
+        <template v-if="highlightTopSlots || promotionSlots || relegationSlots" #footer>
+            <div class="bp-legend">
+                <span v-if="promotionSlots" class="bp-zone-promotion">Aufstieg in die 1. Liga</span>
+                <span v-if="highlightTopSlots > promotionSlots" class="bp-zone-qualify">Final 4</span>
+                <span v-if="relegationSlots" class="bp-zone-relegation">Abstieg in die 2. Liga</span>
+                <span class="bp-legend-swipe">seitlich wischen</span>
+            </div>
+        </template>
+    </DataTable>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import AppTable from '@/components/shared/AppTable.vue';
-import { useTableLabels } from '@/components/shared/appTable';
-import { getLeagueList } from './LeagueUtilFunctions';
+import Avatar from '@/components/shared/Avatar.vue';
+import { formatDiff, getDiffClass, useTableLabels } from '@/components/shared/table';
+import { getLeagueList, getRecentForm } from './LeagueUtilFunctions';
 
 const props = withDefaults(defineProps<{
     leaguePlayers: LeaguePlayer[];
@@ -74,35 +110,46 @@ const playerOrderByName = computed(() => {
     }, {});
 });
 
-// Literale Klassen-Strings, damit Tailwind sie beim Scannen findet (dynamisch gebaute Werte werden nicht generiert).
-const FINAL_FOUR_CLASSES = ['!bg-[#8fe4f7]', '!bg-[#aaeafa]', '!bg-[#b5ecfa]', '!bg-[#c6f2fd]'];
-const PROMOTION_CLASS = '!bg-[#8ff7b0]';
-const RELEGATION_CLASS = '!bg-[#e97f89]';
-
-const getRowClass = (row: PlayerWithStats) => {
-    const index = playerOrderByName.value[row.name];
-    if (index === undefined) return '';
-
-    const total = sortedLeaguePlayers.value.length;
-
-    // Aufstiegszone: einheitliches Gruen.
+// Zone eines Tabellenplatzes: Aufstieg (gruen), Final Four (blau), Abstieg (rot)
+const getZoneClass = (index: number) => {
     if (index < props.promotionSlots)
-        return PROMOTION_CLASS;
+        return 'bp-zone-promotion';
 
-    // Final-Four-Zone: abgestuftes Blau (nur dort, wo highlightTopSlots gesetzt ist).
     if (index < props.highlightTopSlots)
-        return FINAL_FOUR_CLASSES[Math.min(index, FINAL_FOUR_CLASSES.length - 1)];
+        return 'bp-zone-qualify';
 
-    // Abstiegszone: einheitliches Rot.
-    const placesFromBottom = total - 1 - index;
-    if (props.relegationSlots > 0 && placesFromBottom < props.relegationSlots)
-        return RELEGATION_CLASS;
+    const placesFromBottom = sortedLeaguePlayers.value.length - 1 - index;
+    if (placesFromBottom < props.relegationSlots)
+        return 'bp-zone-relegation';
 
     return '';
 };
 
+// Gestrichelte Linie unter dem letzten Platz einer Zone
+const getRowClass = (row: PlayerWithStats) => {
+    const index = playerOrderByName.value[row.name];
+    if (index === undefined || index === sortedLeaguePlayers.value.length - 1) return '';
+
+    return getZoneClass(index) !== getZoneClass(index + 1) ? 'bp-row-divider' : '';
+};
+
 const getPlayerLogo = (playerName: string) => {
     return props.leaguePlayers.find(player => player.name === playerName)?.logo;
+};
+
+// Immer FORM_LENGTH Felder, noch nicht gespielte bleiben als leere Platzhalter vorne
+const FORM_LENGTH = 5;
+
+const recentFormByName = computed(() => {
+    return props.leaguePlayers.reduce<Record<string, ('W' | 'L')[]>>((acc, player) => {
+        acc[player.name] = getRecentForm(props.leagueGames, player.name, FORM_LENGTH);
+        return acc;
+    }, {});
+});
+
+const getFormSlots = (playerName: string) => {
+    const form = recentFormByName.value[playerName] ?? [];
+    return [...Array(FORM_LENGTH - form.length).fill(null), ...form] as ('W' | 'L' | null)[];
 };
 
 const onRowClick = (event: any) => {
@@ -112,3 +159,39 @@ const onRowClick = (event: any) => {
 const labels = useTableLabels();
 </script>
 
+<style scoped>
+.league-form {
+    display: flex;
+    gap: 0.1875rem;
+}
+.league-form-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 0.25rem;
+    background: #EEF0F3;
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+}
+.league-form-win { background: #1F9D55; }
+.league-form-loss { background: #D64545; }
+
+/* Kleine Handys: Logo und Name schmaler, damit mehr Statistik-Spalten sichtbar sind */
+@media (max-width: 400px) {
+    .league-standings :deep(.bp-name-cell) {
+        gap: 0.375rem;
+    }
+    .league-standings :deep(.bp-name) {
+        max-width: 6rem;
+        font-size: 0.8125rem;
+    }
+    .league-standings :deep(.p-datatable-tbody .p-avatar) {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.5625rem;
+    }
+}
+</style>

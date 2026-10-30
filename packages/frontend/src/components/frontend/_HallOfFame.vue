@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, inject } from "vue"
+import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import AppTable from '@/components/shared/AppTable.vue';
-import { PODIUM_ROW_CLASSES, useTableLabels } from '@/components/shared/appTable';
+import Avatar from '@/components/shared/Avatar.vue';
+import { useTableLabels } from '@/components/shared/table';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
 import { BIPO_OPEN_TOURNAMENT_YEARS, BIPO_OPEN_WINNERS } from "@/util/bipoOpenTournamentMeta";
@@ -86,9 +87,6 @@ const getSortedHallOfFameList = () => {
     return players;
 };
 
-// Platz 1-3 hervorheben, gleiche Platzierung = gleiche Farbe
-const getRowClass = (row: PlayerWithStats) => PODIUM_ROW_CLASSES[row.placement!] ?? '';
-
 let winners = BIPO_OPEN_WINNERS;
 let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 </script>
@@ -119,18 +117,33 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
-            <AppTable
+            <DataTable
                 :value="hallOfFameList"
-                :rowClass="getRowClass"
                 @row-click="openPlayerProfile($event.data.name)"
-                rank
+                rowHover
+                scrollable
                 sortField="wins"
                 :sortOrder="-1"
-                class="hof-table mb-[30px]"
+                class="mb-[30px]"
             >
-                <Column field="name" header="Name" sortable :pt="{ columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
+                <Column header="#" frozen>
+                    <template #body="{ data }">
+                        <span class="bp-rank" :class="`bp-rank-${data.placement + 1}`">{{ data.placement + 1 }}</span>
+                    </template>
+                </Column>
+                <Column field="name" header="Name" sortable frozen>
                     <template #body="slotProps">
-                        <span class="whitespace-pre-line">{{ slotProps.data.name.replace(" ", "\n") }}</span>
+                        <div class="bp-name-cell">
+                            <Avatar :name="slotProps.data.name"/>
+                            <span class="bp-name">{{ slotProps.data.name }}</span>
+                        </div>
+                    </template>
+                </Column>
+                <Column field="wins" sortable :header="labels.wins" class="bp-col-strong"/>
+                <Column field="ammountOfMatches" sortable :header="labels.games"/>
+                <Column field="averageWins" sortable :header="labels.winRate">
+                    <template #body="slotProps">
+                        {{ slotProps.data.averageWins + " %" }}
                     </template>
                 </Column>
                 <Column field="averageHits" sortable :header="labels.hitRate">
@@ -138,14 +151,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
                         {{ slotProps.data.hits ? slotProps.data.averageHits : "/" }}
                     </template>
                 </Column>
-                <Column field="wins" sortable :header="labels.wins"/>
-                <Column field="ammountOfMatches" sortable :header="labels.games"/>
-                <Column field="averageWins" sortable :header="labels.winRate">
-                    <template #body="slotProps">
-                        {{ slotProps.data.averageWins + "%" }}
-                    </template>
-                </Column>
-            </AppTable>
+            </DataTable>
 
         </div>
 

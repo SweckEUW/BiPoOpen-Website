@@ -211,7 +211,6 @@ watch(selectedSeasonSlug, () => {
 // ─── Abgeleitete Daten ───
 const cupGames = computed(() => leagueCup.value ? getCupGames(leagueGames.value, leagueCup.value) : []);
 const cupWinner = computed(() => leagueCup.value ? getCupWinner(leagueCup.value, cupGames.value) : undefined);
-const lastRound = computed(() => leagueCup.value?.rounds[leagueCup.value.rounds.length - 1]);
 
 const remaining = computed(() => leagueCup.value ? getRemainingTeams(leagueCup.value, cupGames.value) : { teams: [], complete: false });
 const byeCount = computed(() => getByeCount(remaining.value.teams.length));

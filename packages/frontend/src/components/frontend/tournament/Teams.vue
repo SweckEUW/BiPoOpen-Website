@@ -1,20 +1,20 @@
 <template>
-    <AppTable :value="teams" class="mb-[30px]">
+    <DataTable :value="teams" scrollable class="mb-[30px]">
 
         <!-- Nummer -->
-        <Column header="#" :pt="{ headerCell: { class: '!px-1 !w-[26px] !max-w-[26px]' }, bodyCell: { class: '!p-1 !w-[26px] !max-w-[26px]' } }">
+        <Column header="#" frozen>
             <template #body="slotProps">
-                {{ slotProps.index + 1 }}
+                <span class="bp-rank">{{ slotProps.index + 1 }}</span>
             </template>
         </Column>
 
         <!-- Team -->
-        <Column header="Team" :pt="{ headerCell: { class: '!text-left' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
+        <Column header="Team" frozen>
             <template #body="slotProps">
-                <div class="flex items-center justify-start">
+                <div class="bp-name-cell">
                     <Image
                         v-if="slotProps.data.logo"
-                        class="team-logo-preview min-w-[65px] max-w-[65px] max-[600px]:min-w-[50px] max-[600px]:max-w-[50px] max-[400px]:min-w-[40px] max-[400px]:max-w-[40px] mr-[10px] max-[400px]:mr-[6px]"
+                        class="team-logo-preview"
                         :src="slotProps.data.logo"
                         preview
                         :pt="{
@@ -23,28 +23,26 @@
                             mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
                         }"
                     />
-                    <Avatar v-else class="min-w-[65px] min-h-[65px] max-[600px]:min-w-[50px] max-[600px]:min-h-[50px] max-[400px]:min-w-[40px] max-[400px]:min-h-[40px] mr-[10px] max-[400px]:mr-[6px]" :name="slotProps.data.name" :avatarImage="slotProps.data.logo" :shape="'square'"/>
-                    <div class="!text-left whitespace-normal break-words leading-tight" :class="getNameSizeClass(slotProps.data.name)">{{ slotProps.data.name }}</div>
+                    <Avatar v-else :name="slotProps.data.name" shape="square"/>
+                    <span class="bp-name whitespace-normal">{{ slotProps.data.name }}</span>
                 </div>
             </template>
         </Column>
 
         <!-- Spieler -->
-        <Column header="Spieler" :pt="{ headerCell: { class: '!text-left' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
+        <Column header="Spieler" class="bp-col-start">
             <template #body="slotProps">
-                <div class="flex flex-col items-start">
-                    <span v-for="player in slotProps.data.players" :key="player._id" class="block text-left whitespace-nowrap">{{ player.name }}</span>
-                </div>
+                <span v-for="player in slotProps.data.players" :key="player._id" class="block">{{ player.name }}</span>
             </template>
         </Column>
 
-    </AppTable>
+    </DataTable>
 </template>
 
 <script setup lang="ts">
 import { PropType, computed } from "vue"
+import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import AppTable from '@/components/shared/AppTable.vue';
 import Image from 'primevue/image';
 import Avatar from '@/components/shared/Avatar.vue';
 import { getAllTeams } from '@/util/tournamentTeamFunctions';
@@ -54,22 +52,18 @@ const props = defineProps({
 })
 
 const teams = computed(() => getAllTeams(props.tournament));
-
-const getNameSizeClass = (name: string) => {
-    const length = name?.length ?? 0;
-
-    if (length > 40) return 'text-[11px] max-[900px]:text-[10px]';
-    if (length > 28) return 'text-[13px] max-[900px]:text-[12px]';
-    if (length > 20) return 'text-[15px] max-[900px]:text-[13px]';
-
-    return '';
-};
 </script>
 
 <style scoped>
+/* Logo in Avatar-Groesse, Klick oeffnet die Vorschau */
+.team-logo-preview {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+}
 .team-logo-preview :deep(img) {
     width: 100%;
-    height: auto;
+    height: 100%;
     object-fit: contain;
     cursor: pointer;
 }

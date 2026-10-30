@@ -8,12 +8,12 @@
 
             <h1 class="bp-title">{{ tournament.name }}</h1>
 
-            <!-- Tabs -->
-            <Tabs v-model:value="place" @update:value="changeRouter">
+            <!-- Tabs (lazy: nur der aktive Reiter wird gerendert, z.B. Fotos erst beim Oeffnen) -->
+            <Tabs v-model:value="place" lazy @update:value="changeRouter">
                <!-- Reiter kleben unter dem App-Header -->
                <div ref="stickyBar" class="to-sticky-bar" :style="{ top: stickyBarTop }">
                   <TabList class="pb-[20px]">
-                     <Tab value="Teams">Teams</Tab>
+                     <!-- <Tab value="Teams">Teams</Tab> -->
                      <Tab value="Gruppenphase">Gruppenphase</Tab>
                      <Tab value="K.o.Phase">K.o.Phase</Tab>
                      <Tab v-if="tournament.settings.trackPlayerShots" value="MVP">MVP</Tab>
@@ -21,9 +21,9 @@
                   </TabList>
                </div>
                <TabPanels class="!p-[0px]">
-                  <TabPanel value="Teams">
+                  <!-- <TabPanel value="Teams">
                      <Teams :tournament="tournament"/>
-                  </TabPanel>
+                  </TabPanel> -->
                   <TabPanel value="Gruppenphase">
                      <ScheduleGroups :getTournament="getTournament" :tournament="tournament" :isBackend="false"/>
                   </TabPanel>
@@ -44,8 +44,8 @@
 
 <script setup lang="ts">
 import { ref, onUnmounted, Ref } from "vue"
-import { getTournamentByName } from "@/util/tournamentFunctions"
-import Teams from '@/components/frontend/tournament/Teams.vue';
+import { getTournamentByName, getTournamentPodium } from "@/util/tournamentFunctions"
+// import Teams from '@/components/frontend/tournament/Teams.vue';
 import ScheduleGroups from '@/components/frontend/tournament/ScheduleGroups.vue';
 import KOSchedule from '@/components/frontend/tournament/KOSchedule.vue';
 import MVP from '@/components/frontend/tournament/MVP.vue';
@@ -66,7 +66,7 @@ const stickyBarTop = useStickyBar(stickyBar);
 
 let tournament = ref<Tournament|undefined>();
 
-let place:Ref<"Teams"|"Gruppenphase"|"K.o.Phase"|"MVP"|"Fotos"> = ref("Teams");
+let place:Ref<"Teams"|"Gruppenphase"|"K.o.Phase"|"MVP"|"Fotos"> = ref("Gruppenphase");
 let name = route.path.split("/").pop();
 if(name == "Teams")
    place.value = "Teams";
@@ -81,12 +81,16 @@ else if(name == "Fotos")
 
 const getTournament = async () => {
    tournament.value = await getTournamentByName(route.params.TournamentName as string);
+
+   // Beendete Turniere (Finale entschieden) aendern sich nicht mehr
+   if(tournament.value && getTournamentPodium(tournament.value).length)
+      clearInterval(updateInterval);
 }
-getTournament()
 
 let updateInterval = setInterval(() => {
    getTournament();
 }, 60000);
+getTournament()
 
 onUnmounted(() => {
    clearInterval(updateInterval);
@@ -108,7 +112,7 @@ const getTournamentPhotos = () => {
    if(tournament.value!.name == "Weck BiPo Open 2025"){
       return {
 			driveImageIDs: new URL(`/src/assets/2025/driveImageIDs.json`, import.meta.url),
-			poster: new URL(`/src/assets/2025/poster.png`, import.meta.url),
+			poster: new URL(`/src/assets/2025/poster.jpg`, import.meta.url),
          text: `
             Ein riesiges Dankeschön geht an Patrik Finger, der auch beim Weck BiPo Open 2025 als Fotograf mit am Start war.
             <br>

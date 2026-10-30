@@ -24,5 +24,3 @@ dist-ssr
 *.sw?
 *.env
 dev-dist
-packages/frontend/.generated
-packages/frontend/Spieler

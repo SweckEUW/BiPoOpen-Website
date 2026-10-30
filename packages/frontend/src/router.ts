@@ -22,13 +22,19 @@ const routes = [
 		}
 	},
 
+	// Offene Spiele haben keine eigene Seite mehr, eingetragen wird ueber das Plus in der Navigation
 	{
 		path: '/Offene-Spiele',
-		name: 'Offene Spiele',
-		component: () => import('@/components/frontend/openGames/_OpenGames.vue'),
+		redirect: '/'
+	},
+
+	{
+		path: '/Nackte-Meilen',
+		name: 'Nackte Meilen',
+		component: () => import('@/components/frontend/nackteMeilen/_NackteMeilen.vue'),
 		meta: {
-			title: 'Weck BiPo Open - Offene Spiele',
-			description: 'Offene Spiel'
+			title: 'Weck BiPo Open - Nackte Meilen',
+			description: 'Nackte Meilen'
 		}
 	},
 

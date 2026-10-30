@@ -4,8 +4,9 @@ import Column from 'primevue/column';
 import { getTournamentByName } from "@/util/tournamentFunctions";
 import { getPlayersWithStats } from "@/util/tournamentPlayerFunctions";
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import AppTable from '@/components/shared/AppTable.vue';
-import { PODIUM_ROW_CLASSES, useTableLabels } from '@/components/shared/appTable';
+import DataTable from 'primevue/datatable';
+import Avatar from '@/components/shared/Avatar.vue';
+import { useTableLabels } from '@/components/shared/table';
 
 const labels = useTableLabels();
 
@@ -81,9 +82,6 @@ const hallOfFameList = computed(() => {
     return players;
 });
 
-// Platz 1-3 hervorheben, gleiche Platzierung = gleiche Farbe
-const getRowClass = (row: PlayerWithStats) => PODIUM_ROW_CLASSES[row.placement!] ?? '';
-
 let winners = [
     { year: "Karneval 2025", name: "", player1: "Vadim Laukert", player2: "Marcel Brüggehofe"},
     { year: "Batenhorst 2024", name: "Lederlappen", player1: "Nick Brinkrolf", player2: "Fitim Shehi"},
@@ -119,32 +117,39 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
-            <AppTable
+            <DataTable
                 :value="hallOfFameList"
-                :rowClass="getRowClass"
-                rank
+                scrollable
                 sortField="averageWins"
                 :sortOrder="-1"
-                class="hof-table mb-[30px]"
+                class="mb-[30px]"
             >
-                <Column field="name" header="Name" sortable :pt="{ columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
-                    <template #body="slotProps">
-                        <span class="whitespace-pre-line">{{ slotProps.data.name.replace(" ", "\n") }}</span>
+                <Column header="#" frozen>
+                    <template #body="{ data }">
+                        <span class="bp-rank" :class="`bp-rank-${data.placement + 1}`">{{ data.placement + 1 }}</span>
                     </template>
                 </Column>
+                <Column field="name" header="Name" sortable frozen>
+                    <template #body="slotProps">
+                        <div class="bp-name-cell">
+                            <Avatar :name="slotProps.data.name"/>
+                            <span class="bp-name">{{ slotProps.data.name }}</span>
+                        </div>
+                    </template>
+                </Column>
+                <Column field="averageWins" sortable :header="labels.winRate" class="bp-col-strong">
+                    <template #body="slotProps">
+                        {{ slotProps.data.averageWins + " %" }}
+                    </template>
+                </Column>
+                <Column field="wins" sortable :header="labels.wins"/>
+                <Column field="ammountOfMatches" sortable :header="labels.games"/>
                 <Column field="averageHits" sortable :header="labels.hitRate">
                     <template #body="slotProps">
                         {{ slotProps.data.hits ? slotProps.data.averageHits : "/" }}
                     </template>
                 </Column>
-                <Column field="wins" sortable :header="labels.wins"/>
-                <Column field="ammountOfMatches" sortable :header="labels.games"/>
-                <Column field="averageWins" sortable :header="labels.winRate">
-                    <template #body="slotProps">
-                        {{ slotProps.data.averageWins + "%" }}
-                    </template>
-                </Column>
-            </AppTable>
+            </DataTable>
 
         </div>
 

@@ -4,6 +4,7 @@ import { getAllLeagueGames } from '@/components/frontend/league/LeagueUtilFuncti
 import { getLeagueCup } from '@/components/frontend/league/cup/LeagueCupUtilFunctions';
 import { CURRENT_SEASON_SLUG, getSeason } from '@/components/frontend/league/LeagueSeasonsData';
 import { getTournamentByName } from '@/util/tournamentFunctions';
+import { onGameSaved } from '@/components/shared/GameEntry/useAddGame';
 import { LAST_TOURNAMENT_YEAR } from './homeUtil';
 
 // Laedt alles fuer die Startseite einmal, Slider und "Zuletzt gespielt" teilen sich die Spiele.
@@ -39,6 +40,9 @@ export function useHomeData() {
 
     Promise.all([loadGames(), loadLeagueCup(), loadLastTournament()])
         .then(() => isLoading.value = false);
+
+    // Plus in der Navigation: neues Spiel sofort in "Zuletzt gespielt" und im Slider
+    onGameSaved(loadGames);
 
     return { openGames, leagueGames, leagueCup, lastTournament, gamesLoading, isLoading };
 }

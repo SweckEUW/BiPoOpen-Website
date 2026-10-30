@@ -67,8 +67,8 @@
             </div>
 
             <!-- Kategorien -->
-            <AppTable :value="data.categories" size="small">
-                <Column field="name" header="Kategorie" />
+            <DataTable :value="data.categories" scrollable>
+                <Column field="name" header="Kategorie" frozen />
                 <Column field="matches" :header="labels.games" />
                 <Column :header="labels.wins">
                     <template #body="{ data: row }">
@@ -81,7 +81,7 @@
                         {{ row.trackedMatches > 0 ? row.averageHits.toFixed(2) : '/' }}
                     </template>
                 </Column>
-            </AppTable>
+            </DataTable>
         </Panel>
     </div>
 </template>
@@ -93,9 +93,9 @@ import Knob from 'primevue/knob';
 import Tag from 'primevue/tag';
 import Panel from 'primevue/panel';
 import Chip from 'primevue/chip';
+import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import AppTable from '@/components/shared/AppTable.vue';
-import { useTableLabels } from '@/components/shared/appTable';
+import { useTableLabels } from '@/components/shared/table';
 
 const props = defineProps<{
     data: PlayerProfileData;

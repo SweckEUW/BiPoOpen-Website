@@ -4,26 +4,6 @@ import { getGroupsWithStats } from "@/util/tournamentGroupFunctions";
 import { convertNumberToCharacter } from "@/util/util";
 import axios from "axios";
 
-export const getTeamsKOPhase = (tournament:Tournament) => {
-    if(!tournament || !tournament.koPhase.matches)
-        return [];     
-
-    let teams:Team[] = [];
-
-    tournament.koPhase.matches.forEach((stage) => {
-        stage.forEach((match) => {
-            if(match.team1 && !teams.includes(match.team1))
-                teams.push(match.team1);
-
-            if(match.team2 && !teams.includes(match.team2))
-                teams.push(match.team2);
-        });
-    });
-
-    return teams;
-}
-
-
 export const setMatchesKOPhase = async (tournamentID:string, matches:Match[][]) => {
     let response = await axios.post("/tournaments/setMatchesKOPhase", {tournamentID: tournamentID, matches: matches})
     console.log(response.data.message);

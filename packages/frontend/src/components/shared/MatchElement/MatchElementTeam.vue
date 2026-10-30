@@ -7,7 +7,7 @@
     >
         <!-- Team Header -->
         <div class="mt-team">
-            <div v-if="!hideAvatars" class="mt-team-avatars">
+            <div class="mt-team-avatars">
 
                 <!-- Team Logo -->
                 <Avatar
@@ -45,7 +45,6 @@
         <div v-if="team && playersVisible && team.players.length > 1" class="mt-team-players">
             <div class="mt-team-player cursor-pointer" v-for="(player, index) in team.players" :key="`${player.name}-${index}`" @click.stop="openPlayerProfile?.(player.name)">
                 <Avatar
-                    v-if="!hideAvatars"
                     :name="player.name"
                     :shape="avatarShape"
                     size="normal"
@@ -69,7 +68,6 @@ const props = defineProps({
     match: {type: Object as PropType<Match>, required: true },
     playersVisible: {type: Boolean, required: true },
     isTeam2: {type: Boolean, required: true },
-    hideAvatars: {type: Boolean, default: false},
     placeholder: {type: String, default: undefined},
     avatarShape: {type: String as () => 'circle' | 'square', default: 'circle'},
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, PropType } from "vue"
+import { ref, onMounted, onUnmounted, PropType } from "vue"
 import ImageModal from '@/components/frontend/tournament/photos/ImageModal.vue';
 
 const props = defineProps({
@@ -7,8 +7,14 @@ const props = defineProps({
 });
 
 onMounted(async () => {
+    window.addEventListener("scroll", onScroll);
     await setupImages();
     adjustImageGrid();
+});
+
+// Reiter wird lazy gerendert und beim Wechsel entfernt, Listener darf nicht weiterlaufen
+onUnmounted(() => {
+    window.removeEventListener("scroll", onScroll);
 });
 
 let pictures:any = ref([]);
@@ -61,7 +67,7 @@ const adjustImageGrid = () => {
 
 const elementsShown = ref(20);
 let pauseScroll = false;
-window.onscroll = () => {
+const onScroll = () => {
     if((window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1000) && !pauseScroll) {
         elementsShown.value += 20;
         pauseScroll = true;
@@ -85,7 +91,7 @@ window.onscroll = () => {
 
         <!-- Poster -->
         <div class="pt-poster">
-            <img :src="tournamentPhotos.poster">
+            <img :src="tournamentPhotos.poster" loading="lazy">
         </div>
 
         <!-- Image Grid -->

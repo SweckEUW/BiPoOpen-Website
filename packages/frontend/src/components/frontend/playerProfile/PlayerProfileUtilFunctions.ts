@@ -141,124 +141,6 @@ const getNormalizedPlayerCombination = (players: Match['team1']['players']): str
         .sort((a, b) => a.localeCompare(b, 'de', { sensitivity: 'base' }))
         .join(" & ");
 
-export const getOpponentNameExport = (match: Match, playerName: string): string => {
-    let lo = playerName.toLowerCase();
-    let isTeam1 = match.team1.players.some(p => p.name.toLowerCase() === lo);
-    return getNormalizedPlayerCombination(isTeam1 ? match.team2.players : match.team1.players);
-};
-
-export const getPartnerNameExport = (match: Match, playerName: string): string | null => {
-    let lo = playerName.toLowerCase();
-    let isTeam1 = match.team1.players.some(p => p.name.toLowerCase() === lo);
-    let team = isTeam1 ? match.team1.players : match.team2.players;
-    if (team.length < 2) return null;
-    let partner = team.find(p => p.name.toLowerCase() !== lo);
-    return partner ? formatName(partner.name) : null;
-};
-
-export const calculateStreaksFromResultsExport = (matchHistory: { time: number; won: boolean }[]) => {
-    let sorted = [...matchHistory].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
-    let best = 0, temp = 0, worstLosing = 0, tempLosing = 0;
-
-    sorted.forEach(e => {
-        if (e.won) {
-            temp++;
-            if (temp > best) best = temp;
-            tempLosing = 0;
-        } else {
-            temp = 0;
-            tempLosing++;
-            if (tempLosing > worstLosing) worstLosing = tempLosing;
-        }
-    });
-
-    return { current: temp, best, longestLosing: worstLosing };
-};
-
-export const analyzeTurnsExport = (matchHistory: { match: Match }[], playerName: string): { turnAnalysis: TurnAnalysis; cupHeatmap: CupHeatmap } => {
-    let analysis: TurnAnalysis = { hit: 0, miss: 0, airball: 0, bomb: 0, bouncer: 0, trickshot: 0, onfire: 0, ballsback: 0, lastCup: 0, total: 0 };
-    let heatmap: CupHeatmap = new Array(10).fill(0);
-
-    matchHistory.forEach(({ match }) => {
-        if (!match.turns || match.turns.length === 0) return;
-        let idx = getPlayerIndexInMatch(match, playerName);
-        if (!idx) return;
-
-        match.turns.forEach(turn => {
-            if (turn.teamIndex !== idx!.teamIndex || turn.playerIndex !== idx!.playerIndex) return;
-            analysis.total++;
-            analysis[turn.type]++;
-
-            let data = turn.data as any;
-            if (data?.cupIndex !== undefined) heatmap[data.cupIndex] = (heatmap[data.cupIndex] || 0) + 1;
-            if (data?.cupIndex1 !== undefined) heatmap[data.cupIndex1] = (heatmap[data.cupIndex1] || 0) + 1;
-            if (data?.cupIndex2 !== undefined) heatmap[data.cupIndex2] = (heatmap[data.cupIndex2] || 0) + 1;
-            if (data?.cupIndex3 !== undefined) heatmap[data.cupIndex3] = (heatmap[data.cupIndex3] || 0) + 1;
-        });
-    });
-
-    return { turnAnalysis: analysis, cupHeatmap: heatmap };
-};
-
-export const calculateExtraStatsFromResultsExport = (matchHistory: { match: Match; time: number; won: boolean }[]): ExtraStats => {
-    let fastestWinMinutes: number | null = null;
-
-    matchHistory.forEach(({ match, time, won }) => {
-        if (!match.endTime || !time || time === 0) return;
-        if (!won) return;
-        let duration = (match.endTime - time) / 60000;
-        if (duration > 0 && (fastestWinMinutes === null || duration < fastestWinMinutes)) {
-            fastestWinMinutes = Math.round(duration * 10) / 10;
-        }
-    });
-
-    let timeBlocks: Map<number, { wins: number; total: number }> = new Map();
-    matchHistory.forEach(({ time, won }) => {
-        if (!time || time === 0) return;
-        let hour = new Date(time).getHours();
-        let blockStart = Math.floor(hour / 2) * 2;
-        let block = timeBlocks.get(blockStart) || { wins: 0, total: 0 };
-        block.total++;
-        if (won) block.wins++;
-        timeBlocks.set(blockStart, block);
-    });
-
-    let timeOfDayStats: TimeOfDayBlock[] = [];
-    for (let h = 0; h < 24; h += 2) {
-        let block = timeBlocks.get(h);
-        if (!block || block.total === 0) continue;
-        timeOfDayStats.push({
-            label: `${h}-${h + 2} Uhr`,
-            wins: block.wins,
-            losses: block.total - block.wins,
-            total: block.total,
-            winrate: Math.round(block.wins / block.total * 100),
-        });
-    }
-
-    let bestTimeOfDay: string | null = null;
-    let bestTimeWinrate: number | null = null;
-    timeOfDayStats.forEach(block => {
-        if (block.total <= 4) return;
-        if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
-            bestTimeWinrate = block.winrate;
-            bestTimeOfDay = block.label;
-        }
-    });
-
-    let mostActiveTimeOfDay: string | null = null;
-    let mostActiveGames: number | null = null;
-    timeOfDayStats.forEach(block => {
-        if (block.total <= 4) return;
-        if (mostActiveGames === null || block.total > mostActiveGames) {
-            mostActiveGames = block.total;
-            mostActiveTimeOfDay = block.label;
-        }
-    });
-
-    return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0, timeOfDayStats, mostActiveTimeOfDay, mostActiveGames };
-};
-
 const didPlayerWinMatch = (match: Match, playerName: string): boolean => {
     let lo = playerName.toLowerCase();
     let didTeam1Win = checkIfTeam1WonVsTeam2(match);
@@ -298,25 +180,6 @@ const getPlayerIndexInMatch = (match: Match, playerName: string): { teamIndex: n
         }
     }
     return null;
-};
-
-const calculateStreaks = (matchHistory: { match: Match; time: number }[], playerName: string) => {
-    let sorted = [...matchHistory].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
-    let best = 0, temp = 0, worstLosing = 0, tempLosing = 0;
-
-    sorted.forEach(e => {
-        if (didPlayerWinMatch(e.match, playerName)) {
-            temp++;
-            if (temp > best) best = temp;
-            tempLosing = 0;
-        } else {
-            temp = 0;
-            tempLosing++;
-            if (tempLosing > worstLosing) worstLosing = tempLosing;
-        }
-    });
-
-    return { current: temp, best, longestLosing: worstLosing };
 };
 
 const calculateStreaksFromResults = (matchHistory: { time: number; won: boolean }[]) => {
@@ -414,70 +277,6 @@ const analyzeTurns = (matchHistory: { match: Match }[], playerName: string): { t
     });
 
     return { turnAnalysis: analysis, cupHeatmap: heatmap };
-};
-
-const calculateExtraStats = (matchHistory: { match: Match; time: number }[], playerName: string): ExtraStats => {
-    let fastestWinMinutes: number | null = null;
-
-    // Fastest win
-    matchHistory.forEach(({ match, time }) => {
-        if (!match.endTime || !time || time === 0) return;
-        if (!didPlayerWinMatch(match, playerName)) return;
-        let duration = (match.endTime - time) / 60000;
-        if (duration > 0 && (fastestWinMinutes === null || duration < fastestWinMinutes)) {
-            fastestWinMinutes = Math.round(duration * 10) / 10;
-        }
-    });
-
-    // Time of day (2h blocks) - build all blocks from 0-24
-    let timeBlocks: Map<number, { wins: number; total: number }> = new Map();
-    matchHistory.forEach(({ match, time }) => {
-        if (!time || time === 0) return;
-        let hour = new Date(time).getHours();
-        let blockStart = Math.floor(hour / 2) * 2;
-        let block = timeBlocks.get(blockStart) || { wins: 0, total: 0 };
-        block.total++;
-        if (didPlayerWinMatch(match, playerName)) block.wins++;
-        timeBlocks.set(blockStart, block);
-    });
-
-    // Build sorted array of all blocks that have games
-    let timeOfDayStats: TimeOfDayBlock[] = [];
-    for (let h = 0; h < 24; h += 2) {
-        let block = timeBlocks.get(h);
-        if (!block || block.total === 0) continue;
-        timeOfDayStats.push({
-            label: `${h}-${h + 2} Uhr`,
-            wins: block.wins,
-            losses: block.total - block.wins,
-            total: block.total,
-            winrate: Math.round(block.wins / block.total * 100),
-        });
-    }
-
-    // Best time of day (more than 4 games)
-    let bestTimeOfDay: string | null = null;
-    let bestTimeWinrate: number | null = null;
-    timeOfDayStats.forEach(block => {
-        if (block.total <= 4) return;
-        if (bestTimeWinrate === null || block.winrate > bestTimeWinrate) {
-            bestTimeWinrate = block.winrate;
-            bestTimeOfDay = block.label;
-        }
-    });
-
-    // Most active time of day (more than 4 games)
-    let mostActiveTimeOfDay: string | null = null;
-    let mostActiveGames: number | null = null;
-    timeOfDayStats.forEach(block => {
-        if (block.total <= 4) return;
-        if (mostActiveGames === null || block.total > mostActiveGames) {
-            mostActiveGames = block.total;
-            mostActiveTimeOfDay = block.label;
-        }
-    });
-
-    return { fastestWinMinutes, bestTimeOfDay, bestTimeWinrate, longestLosingStreak: 0, timeOfDayStats, mostActiveTimeOfDay, mostActiveGames };
 };
 
 const calculateExtraStatsFromResults = (matchHistory: { match: Match; time: number; won: boolean }[]): ExtraStats => {
@@ -855,19 +654,19 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
     const averageHits = totalTrackedMatches > 0 ? Math.round((totalHits / totalTrackedMatches) * 100) / 100 : 0;
 
     // Recalculate streaks
-    const streaks = calculateStreaksFromResultsExport(filteredHistory as { time: number; won: boolean }[]);
+    const streaks = calculateStreaksFromResults(filteredHistory as { time: number; won: boolean }[]);
 
     // Recalculate rivals and partners
     const filteredRivals: Map<string, { wins: number; losses: number }> = new Map();
     const filteredPartners: Map<string, { matches: number; wins: number; losses: number }> = new Map();
     filteredHistory.forEach(({ match, won }) => {
         const effectiveName = data.leagueTeam && (match.team1.players.some(p => p.name.toLowerCase() === data.leagueTeam!.toLowerCase()) || match.team2.players.some(p => p.name.toLowerCase() === data.leagueTeam!.toLowerCase())) ? data.leagueTeam : data.name;
-        const oppName = getOpponentNameExport(match, effectiveName);
+        const oppName = getOpponentName(match, effectiveName);
         const rival = filteredRivals.get(oppName) || { wins: 0, losses: 0 };
         if (won) rival.wins++; else rival.losses++;
         filteredRivals.set(oppName, rival);
 
-        const partnerName = getPartnerNameExport(match, effectiveName);
+        const partnerName = getPartnerName(match, effectiveName);
         if (partnerName) {
             const p = filteredPartners.get(partnerName) || { matches: 0, wins: 0, losses: 0 };
             p.matches++;
@@ -887,10 +686,10 @@ export const filterProfileDataByGameType = (data: PlayerProfileData, gameType: '
         .slice(0, 5);
 
     // Recalculate turn analysis and cup heatmap
-    const { turnAnalysis, cupHeatmap } = analyzeTurnsExport(filteredHistory as { match: Match }[], data.name);
+    const { turnAnalysis, cupHeatmap } = analyzeTurns(filteredHistory as { match: Match }[], data.name);
 
     // Recalculate extra stats (time of day, fastest win, etc.)
-    const extraStats = calculateExtraStatsFromResultsExport(filteredHistory as { match: Match; time: number; won: boolean }[]);
+    const extraStats = calculateExtraStatsFromResults(filteredHistory as { match: Match; time: number; won: boolean }[]);
     extraStats.longestLosingStreak = streaks.longestLosing;
 
     // Recalculate recent form

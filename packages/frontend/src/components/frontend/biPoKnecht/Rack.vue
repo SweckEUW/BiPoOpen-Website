@@ -60,13 +60,6 @@
             Trickshot
           </span>
         </Button>
-
-        <!-- <Button
-          outlined
-          class="!rounded-full !bg-white !border-gray-300 !text-gray-700 !px-4 !py-[6px] !text-sm"
-        >
-          ...
-        </Button> -->
       </div>
     </div>
 

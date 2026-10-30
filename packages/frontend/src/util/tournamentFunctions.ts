@@ -1,5 +1,5 @@
 import axios from "axios";
-import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
+import { checkIfTeam1WonVsTeam2 } from "./tournamentMatchFunctions";
 import { resolveTeamLogo } from "./supabaseStorage";
 
 ////////////////
@@ -32,20 +32,6 @@ export const setSettings = async (tournamentID:string, settings:TournamentSettin
     let response = await axios.post("/tournaments/setSettings", {tournamentID: tournamentID, settings: settings})
     console.log(response.data.message);
     return response.status == 201;
-}
-
-export const checkIfTournamentFinished = (tournament:Tournament) => {
-    let tournamentFinished = true;
-
-    let matches = tournament.groupPhase.matches.concat(tournament.koPhase.matches);
-    matches.forEach((groups) => {
-        groups.forEach((match) => {
-            if(!checkIfMatchFinished(match))
-                tournamentFinished = false;  
-        });
-    });
-
-    return tournamentFinished;
 }
 
 export const getTeamDisplayName = (team:Team) => team.name || team.players.map(p => p.name).join(' & ');

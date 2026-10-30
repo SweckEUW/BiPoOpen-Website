@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LEAGUE_SEASONS, LEGACY_LEAGUE, LEGACY_SEASON_SLUG, getRegularSeasonGameCount, toLeaguePlayers } from "./LeagueSeasonsData";
+import { LEAGUE_SEASONS, LEGACY_LEAGUE, LEGACY_SEASON_SLUG, getRegularSeasonGameCount, toLeaguePlayers, type LeagueDivision } from "./LeagueSeasonsData";
 
 /////////////
 // GENERAL //
@@ -112,6 +112,24 @@ export const getMatchesFromPlayer = (leagueGames:Match[], playerName:string) => 
     });
 
     return matchesFromPlayer;
+}
+
+// Ergebnisse der letzten Spiele eines Spielers, aeltestes zuerst: 'W' = Sieg, 'L' = Niederlage.
+// Spiele ohne Zeit zaehlen als neueste, wie in splitLeagueGamesByRound.
+export const getRecentForm = (leagueGames:Match[], playerName:string, count = 5) => {
+    const name = playerName.toLowerCase();
+    const getScore = (team: Match['team1']) => team.players.reduce((acc, player) => acc + player.score, 0);
+
+    return getMatchesFromPlayer(leagueGames, name)
+        .map((match, index) => ({ match, index }))
+        .sort((a, b) => (a.match.time ?? Number.MAX_SAFE_INTEGER) - (b.match.time ?? Number.MAX_SAFE_INTEGER) || a.index - b.index)
+        .slice(-count)
+        .map(({ match }) => {
+            const isTeam1 = match.team1.players.some(player => player.name.toLowerCase() === name);
+            const ownScore = getScore(isTeam1 ? match.team1 : match.team2);
+            const enemyScore = getScore(isTeam1 ? match.team2 : match.team1);
+            return ownScore > enemyScore ? 'W' : 'L';
+        });
 }
 
 export const getAmmountOfWinsFromPlayer = (leagueGames:Match[], playerName:string) => {
@@ -278,6 +296,19 @@ export const splitLeagueGamesByRound = (leagueMatches: Match[]) => {
         hinrunde,
         rueckrunde
     };
+}
+
+// Untertitel beim Eintragen, z.B. "BiPo League · 1. Liga · Hinrunde".
+// Hinrunde, bis jede Paarung einmal gespielt ist (wie LeagueDrawDrawer), danach Rueckrunde. divisionGames: neueste zuerst.
+export const getLeagueGameSubtitle = (division: LeagueDivision, divisionGames: Match[]) => {
+    const teamCount = division.teams.length;
+    const regularSeasonGameCount = getRegularSeasonGameCount(division);
+    const regularSeasonGames = divisionGames.toReversed().toSpliced(regularSeasonGameCount);
+    const hinrundeGameCount = teamCount * (teamCount - 1) / 2;
+    const round = regularSeasonGames.length >= regularSeasonGameCount
+        ? (division.hasFinalFour ? 'Final Four' : '')
+        : splitLeagueGamesByRound(regularSeasonGames).hinrunde.length >= hinrundeGameCount ? 'Rückrunde' : 'Hinrunde';
+    return ['BiPo League', division.label, round].filter(part => part).join(' · ');
 }
 
 // Gegner je Team aus den Spielen einer Runde. Namen kleingeschrieben wie in getLeagueMatchupKey.

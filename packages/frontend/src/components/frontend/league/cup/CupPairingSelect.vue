@@ -19,12 +19,17 @@
                 </div>
             </template>
             <template #option="slotProps">
+                <!-- Feste Spalten: Team 1 links, vs. mittig, Team 2 rechts - lange Namen brechen nur in ihrer Spalte um -->
                 <div class="cp-option">
-                    <Avatar :name="slotProps.option.team1" :avatarImage="getLeagueTeamLogo(slotProps.option.team1, leagueCup.season)" shape="square" class="cp-avatar" />
-                    <span>{{ slotProps.option.team1 }}</span>
+                    <div class="cp-team">
+                        <Avatar :name="slotProps.option.team1" :avatarImage="getLeagueTeamLogo(slotProps.option.team1, leagueCup.season)" shape="square" class="cp-avatar" />
+                        <span class="cp-team-name">{{ slotProps.option.team1 }}</span>
+                    </div>
                     <span class="cp-vs">vs.</span>
-                    <Avatar :name="slotProps.option.team2" :avatarImage="getLeagueTeamLogo(slotProps.option.team2, leagueCup.season)" shape="square" class="cp-avatar" />
-                    <span>{{ slotProps.option.team2 }}</span>
+                    <div class="cp-team cp-team--right">
+                        <span class="cp-team-name">{{ slotProps.option.team2 }}</span>
+                        <Avatar :name="slotProps.option.team2" :avatarImage="getLeagueTeamLogo(slotProps.option.team2, leagueCup.season)" shape="square" class="cp-avatar" />
+                    </div>
                 </div>
             </template>
         </Select>
@@ -108,13 +113,32 @@ watch(selectedPairing, (pairing) => {
     font-weight: 600;
 }
 .cp-option{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.cp-team{
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
+    min-width: 0;
+}
+.cp-team--right{
+    justify-content: flex-end;
+    text-align: right;
+}
+.cp-team-name{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
 }
 .cp-vs{
-    margin: 0 4px;
     color: gray;
     font-size: 12px;
     font-style: italic;

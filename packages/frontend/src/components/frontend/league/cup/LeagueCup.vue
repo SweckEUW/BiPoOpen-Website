@@ -56,8 +56,6 @@
                     </div>
                 </div>
 
-                <FloatingActionButton label="Spiel eintragen" :visible="canAddGame" @click="toggleModalAddGame()"/>
-
                 <div v-if="selectedRound.byes.length" class="lc-group lc-group--byes">
                     <div class="lc-group-title">
                         Freilose
@@ -70,21 +68,6 @@
                         </div>
                     </div>
                 </div>
-
-                <GameEntryDrawer
-                    v-model:visible="showModalAddGame"
-                    :subtitle="`League Cup · ${roundOptions[selectedRoundIndex]?.label ?? ''}`"
-                    :sideLabels="['Team 1', 'Team 2']"
-                    lockedNames
-                    :allowDraw="false"
-                    avatarShape="square"
-                    incompleteLabel="Paarung wählen"
-                    :save="saveCupGame"
-                >
-                    <template #top="{ setTeams }">
-                        <CupPairingSelect :leagueCup="leagueCup" :roundIndex="selectedRoundIndex" :cupGames="cupGames" @select="setTeams"/>
-                    </template>
-                </GameEntryDrawer>
 
                 <!-- Best-of-3: Serie pro Paarung (aufklappbar), Best-of-1: einzelne Spiele chronologisch -->
                 <div v-if="playedCount" class="lc-group">
@@ -133,14 +116,9 @@ import { computed, PropType, ref } from 'vue';
 import Select from 'primevue/select';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Avatar from '@/components/shared/Avatar.vue';
-import FloatingActionButton from '@/components/shared/FloatingActionButton.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import FinalFourSeries from '../FinalFourSeries.vue';
 import { useStickyTop } from '@/components/shared/useStickyStack';
-import CupPairingSelect from './CupPairingSelect.vue';
-import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
-import { sidesToNewMatch, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
-import { addLeagueGame } from '../LeagueUtilFunctions';
 import { LeagueSeason } from '../LeagueSeasonsData';
 import { getLeagueTeamLogo, withLeagueTeamLogos } from '../LeaguePlayersData';
 import {
@@ -158,15 +136,12 @@ import {
 
 const props = defineProps({
     season: { type: Object as PropType<LeagueSeason>, required: true },
-    allLeagueGames: { type: Array as () => Match[], required: true },
-    getLeagueGames: { type: Function, required: true },
-});
+    allLeagueGames: { type: Array as () => Match[], required: true },});
 
 // undefined = laedt, null = kein Pokal fuer diese Saison
 const leagueCup = ref<LeagueCup | null | undefined>(undefined);
 const stickyTop = useStickyTop();
 const selectedRoundIndex = ref(0);
-const showModalAddGame = ref(false);
 
 const loadLeagueCup = async () => {
     try {
@@ -232,25 +207,6 @@ const potTeams = computed(() =>
 const potTeamCount = computed(() =>
     leagueCup.value ? getPlannedRoundTeamCounts(leagueCup.value.participants.length)[selectedRoundIndex.value] ?? 0 : 0
 );
-
-// Eintragen nur in der aktuellen (zuletzt angelegten) Runde.
-const canAddGame = computed(() =>
-    !!leagueCup.value
-    && selectedRoundIndex.value === leagueCup.value.rounds.length - 1
-    && openPairings.value.length > 0
-);
-
-const toggleModalAddGame = () => {
-    showModalAddGame.value = !showModalAddGame.value;
-}
-
-const saveCupGame = async (sides: GameEntrySide[]) => {
-    if (!leagueCup.value) return false;
-    const match = sidesToNewMatch(sides, { season: leagueCup.value.season, cupId: leagueCup.value._id, cupRound: selectedRoundIndex.value });
-    const success = await addLeagueGame(match);
-    if (success) await props.getLeagueGames();
-    return success;
-}
 </script>
 
 <style scoped>

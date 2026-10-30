@@ -8,7 +8,6 @@
     "scripts": {
         "dev": "npm run dev --workspace=bipoopen-frontend",
         "dev:backend": "npm run dev --workspace=bipoopen-backend",
-        "build": "npm run build --workspace=bipoopen-frontend",
-        "build:backend": "npm run build --workspace=bipoopen-backend"
+        "build": "npm run build --workspace=bipoopen-frontend"
     }
 }

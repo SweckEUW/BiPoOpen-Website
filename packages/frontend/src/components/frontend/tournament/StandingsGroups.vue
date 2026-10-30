@@ -1,59 +1,69 @@
 <template>
-    <AppTable
+    <DataTable
         :value="group.teams"
-        :rowClass="getRowClass"
         @row-click="onRowClick"
-        rank
+        rowHover
+        scrollable
         class="mb-[30px]"
     >
 
+        <!-- Platz: die ersten beiden kommen weiter -->
+        <Column header="#" frozen>
+            <template #body="{ index }">
+                <span class="bp-rank" :class="{ 'bp-zone-qualify': index < 2 }">{{ index + 1 }}</span>
+            </template>
+        </Column>
+
         <!-- Teamname -->
-        <Column header="Team" :pt="{ headerCell: { class: '!text-left' }, columnTitle: { class: '!text-left' }, bodyCell: { class: '!text-left' } }">
+        <Column header="Team" frozen>
             <template #body="slotProps">
-                <div class="flex items-center justify-start">
-                    <Avatar class="min-w-[65px] min-h-[65px] max-[600px]:min-w-[50px] max-[600px]:min-h-[50px] max-[400px]:min-w-[40px] max-[400px]:min-h-[40px] mr-[10px] max-[400px]:mr-[6px]" :name="slotProps.data.name" :avatarImage="slotProps.data.logo" :shape="'square'"/>
-                    <div class="!text-left whitespace-pre-line leading-tight" :class="getNameSizeClass(slotProps.data.name)">{{ slotProps.data.name }}</div>
+                <div class="bp-name-cell">
+                    <Avatar :name="slotProps.data.name" :avatarImage="slotProps.data.logo" shape="square"/>
+                    <span class="bp-name">{{ slotProps.data.name }}</span>
                 </div>
             </template>
         </Column>
 
         <!-- Spieler -->
-        <Column v-if="!isMobile" header="Spieler">
+        <Column v-if="!isMobile" header="Spieler" class="bp-col-start">
             <template #body="slotProps">
                 <span v-for="player in slotProps.data.players" :key="player._id" class="block">{{ player.name }}</span>
             </template>
         </Column>
 
         <!-- Siege -->
-        <Column :header="labels.wins" field="wins" :pt="{ headerCell: { class: '!px-[4px]' }}"/>
+        <Column :header="labels.wins" field="wins" class="bp-col-strong"/>
 
         <!-- Spiele -->
-        <Column :header="labels.games" field="ammountOfMatches" :pt="{ headerCell: { class: '!px-[4px]' } }"/>
+        <Column :header="labels.games" field="ammountOfMatches"/>
 
-        <!-- Trefferverhältnis -->
-        <Column :header="labels.diff" :pt="{ headerCell: { class: '!w-[75px] !max-w-[75px]'}, bodyCell: { class: '!w-[75px] !max-w-[75px]' }}">
+        <!-- Trefferdifferenz, Antippen zeigt die Treffer (öffnet nicht das Team) -->
+        <Column :header="labels.diff">
             <template #body="slotProps">
-                <div class="leading-tight">
-                    <span class="whitespace-nowrap">{{ slotProps.data.hitDifference }}</span>
-                    <div>({{ slotProps.data.hitDifferenceNumber > 0 ? '+' : '' }}{{ slotProps.data.hitDifferenceNumber }})</div>
-                </div>
+                <span
+                    v-tooltip.top.focus="`${slotProps.data.hitDifference} Treffer`"
+                    tabindex="0"
+                    class="bp-tooltip-target"
+                    :class="getDiffClass(slotProps.data.hitDifferenceNumber)"
+                    @click.stop
+                >{{ formatDiff(slotProps.data.hitDifferenceNumber) }}</span>
             </template>
         </Column>
 
-    </AppTable>
+    </DataTable>
 
     <StandingsGroupTeamDrawer v-model:visible="drawerVisible" :selected-team="selectedTeam" :tournament="tournament"/>
 </template>
 
 <script setup lang="ts">
 import { PropType, ref } from "vue"
+import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Avatar from '@/components/shared/Avatar.vue';
-import AppTable from '@/components/shared/AppTable.vue';
-import { PODIUM_ROW_CLASSES, useIsMobile, useTableLabels } from '@/components/shared/appTable';
+import { formatDiff, getDiffClass, useIsMobile, useTableLabels } from '@/components/shared/table';
 import StandingsGroupTeamDrawer from '@/components/frontend/tournament/StandingsGroupTeamDrawer.vue';
 
-const props = defineProps({
+defineProps({
    tournament: {type: Object as PropType<Tournament>, required: true },
    group: {type: Object as PropType<GroupWithStats>, required: true },
 })
@@ -64,22 +74,6 @@ const selectedTeam = ref<TeamWithStats>();
 const onRowClick = (event: { data: TeamWithStats }) => {
     selectedTeam.value = event.data;
     drawerVisible.value = true;
-};
-
-const getRowClass = (row: TeamWithStats) => {
-    const index = props.group.teams.indexOf(row);
-
-    return index < 2 ? PODIUM_ROW_CLASSES[index] : '';
-};
-
-const getNameSizeClass = (name: string) => {
-    const length = name?.length ?? 0;
-
-    if (length > 40) return 'text-[11px] max-[900px]:text-[10px]';
-    if (length > 28) return 'text-[13px] max-[900px]:text-[12px]';
-    if (length > 20) return 'text-[15px] max-[900px]:text-[13px]';
-
-    return '';
 };
 
 const isMobile = useIsMobile();

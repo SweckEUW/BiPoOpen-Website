@@ -4,9 +4,11 @@ import router from '@/router.js';
 import { MAIN_NAV_ITEMS, MainNavItem, isMainNavItemActive } from './mainNav';
 import { useTournamentPicker } from './useTournamentPicker';
 import { usePwaInstall } from './usePwaInstall';
+import { useAddGame } from './GameEntry/useAddGame';
 
 const route = useRoute();
 const { tournamentPickerVisible, openTournamentPicker } = useTournamentPicker();
+const { openAddGame } = useAddGame();
 const { canInstall, isInstalled, installPwa } = usePwaInstall();
 
 const scrollToTop = () => {
@@ -51,6 +53,12 @@ let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 					{{ item.label }}
 				</button>
 			</nav>
+
+			<!-- Spiel eintragen (mobil: Plus in AppBottomNav) -->
+			<button type="button" class="ap-add-btn" @click="openAddGame()">
+				<i class="pi pi-plus ap-add-icon"></i>
+				Spiel eintragen
+			</button>
 
 			<!-- PWA install -->
 			<button
@@ -138,6 +146,31 @@ let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 	opacity: 1;
 }
 
+/* SPIEL EINTRAGEN (Desktop) */
+.ap-add-btn{
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-left: 12px;
+	padding: 9px 16px;
+	border: none;
+	border-radius: 999px;
+	background: var(--main-color);
+	color: white;
+	font-weight: 700;
+	font-size: 14px;
+	line-height: 1;
+	white-space: nowrap;
+	transition: .2s background ease;
+}
+.ap-add-btn:hover{
+	background: #d4434f;
+}
+.ap-add-icon{
+	font-size: 12px;
+	font-weight: 700;
+}
+
 /* PWA INSTALL */
 .ap-install-btn{
 	display: flex;
@@ -171,7 +204,8 @@ let logo = new URL(`/src/assets/Logo_Website.svg`, import.meta.url).href;
 		width: 150px;
 		height: 25px;
 	}
-	.ap-nav{
+	.ap-nav,
+	.ap-add-btn{
 		display: none;
 	}
 	.ap-install-btn{

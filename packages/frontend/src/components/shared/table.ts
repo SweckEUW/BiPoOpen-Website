@@ -16,14 +16,13 @@ export function useIsMobile() {
 
 // Spaltenbezeichnungen aller Tabellen: [Desktop, Mobil].
 const TABLE_LABELS = {
-    rank: ['Platz', '#'],
     games: ['Spiele', 'SP'],
     wins: ['Siege', 'S'],
     losses: ['Niederlagen', 'N'],
-    diff: ['Trefferverhältnis', 'DIFF'],
-    hitRate: ['Trefferquote', 'Ø'],
-    hits: ['Treffer', 'TRF'],
-    winRate: ['Siegwahrscheinlichkeit', 'S%'],
+    diff: ['Differenz', 'Diff'],
+    hitRate: ['Trefferquote', 'Ø Treffer'],
+    hits: ['Treffer', 'Treffer'],
+    winRate: ['Siegquote', 'Sieg %'],
 } as const;
 
 type TableLabel = keyof typeof TABLE_LABELS;
@@ -39,5 +38,6 @@ export function useTableLabels() {
     });
 }
 
-// Hintergruende fuer Platz 1-3. Literale Strings, damit Tailwind sie beim Scannen findet.
-export const PODIUM_ROW_CLASSES = ['!bg-[var(--secondary-color-weak)]', '!bg-[#e6faff]', '!bg-[#f4fdff]'];
+// Differenz mit Vorzeichen und Farbklasse aus theme.ts
+export const formatDiff = (value: number) => value > 0 ? `+${value}` : `${value}`;
+export const getDiffClass = (value: number) => value > 0 ? 'bp-value-up' : value < 0 ? 'bp-value-down' : '';

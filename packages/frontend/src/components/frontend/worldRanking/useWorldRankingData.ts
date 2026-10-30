@@ -5,9 +5,7 @@ import { getLeagueCup } from '@/components/frontend/league/cup/LeagueCupUtilFunc
 import { LEAGUE_SEASONS } from '@/components/frontend/league/LeagueSeasonsData';
 import { getTournamentByName } from '@/util/tournamentFunctions';
 import { BIPO_OPEN_TOURNAMENT_YEARS, getBiPoOpenTournamentFallbackTime } from '@/util/bipoOpenTournamentMeta';
-import { RANKING_TREND_DAYS, RANKING_WINDOW_DAYS, RankingEvents, RankingTournament, buildRankingEvents } from './worldRankingPoints';
-
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { RankingData, RankingTournament } from './worldRankingPoints';
 
 // Turnierzeitpunkt: letztes Spiel mit Zeitstempel, sonst das hinterlegte Turnierdatum.
 const getTournamentTime = (tournament: Tournament, year: string) => {
@@ -18,10 +16,9 @@ const getTournamentTime = (tournament: Tournament, year: string) => {
     return lastMatchTime || getBiPoOpenTournamentFallbackTime(year);
 };
 
-const loadTournaments = async (now: number): Promise<RankingTournament[]> => {
-    // Nur Turniere, die fuer die aktuelle Rangliste oder die Trend-Rangliste in Frage kommen
-    const from = now - (RANKING_WINDOW_DAYS + RANKING_TREND_DAYS + 31) * DAY_MS;
-    const years = BIPO_OPEN_TOURNAMENT_YEARS.filter(year => getBiPoOpenTournamentFallbackTime(year) >= from);
+// Alle Turniere: das Elo-Rating rechnet ab 2020, die Saisonwertung filtert selbst nach Zeitraum.
+const loadTournaments = async (): Promise<RankingTournament[]> => {
+    const years = BIPO_OPEN_TOURNAMENT_YEARS;
 
     const results = await Promise.allSettled(years.map(year => getTournamentByName(year)));
     return results.flatMap((result, index) =>
@@ -38,18 +35,19 @@ const loadLeagueCups = async () => {
     return results.flatMap(result => result.status === 'fulfilled' && result.value ? [result.value] : []);
 };
 
+// Rohdaten werden einmal geladen und von Weltrangliste (Elo) und Saisonwertung geteilt.
 export function useWorldRankingData() {
     const now = Date.now();
-    const events = shallowRef<RankingEvents | null>(null);
+    const data = shallowRef<RankingData | null>(null);
     const isLoading = ref(true);
     const hasError = ref(false);
 
-    Promise.all([getAllOpenGames(), getAllLeagueGames(), loadLeagueCups(), loadTournaments(now)])
+    Promise.all([getAllOpenGames(), getAllLeagueGames(), loadLeagueCups(), loadTournaments()])
         .then(([openGames, leagueGames, leagueCups, tournaments]) => {
-            events.value = buildRankingEvents({ openGames, leagueGames, leagueCups, tournaments });
+            data.value = { openGames, leagueGames, leagueCups, tournaments };
         })
         .catch(() => hasError.value = true)
         .finally(() => isLoading.value = false);
 
-    return { now, events, isLoading, hasError };
+    return { now, data, isLoading, hasError };
 }

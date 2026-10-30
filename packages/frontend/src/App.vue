@@ -3,6 +3,7 @@ import AppHeader from '@/components/shared/AppHeader.vue';
 import AppFooter from '@/components/shared/AppFooter.vue';
 import AppBottomNav from '@/components/shared/AppBottomNav.vue';
 import TournamentPickerDrawer from '@/components/shared/TournamentPickerDrawer.vue';
+import AddGameDrawer from '@/components/shared/GameEntry/AddGameDrawer.vue';
 import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
 import Toast from 'primevue/toast';
 import { Analytics } from '@vercel/analytics/vue';
@@ -56,9 +57,10 @@ onBeforeMount(async() => {
 	<!-- App footer -->
 	<AppFooter/>
 
-	<!-- Mobile bottom navigation + tournament picker -->
+	<!-- Mobile bottom navigation + tournament picker + "Spiel eintragen" (Plus in der Navigation) -->
 	<AppBottomNav/>
 	<TournamentPickerDrawer/>
+	<AddGameDrawer/>
 
 	<!-- Global Player Profile Drawer -->
 	<PlayerProfileDrawer

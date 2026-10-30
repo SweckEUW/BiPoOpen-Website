@@ -1,4 +1,4 @@
-import { computed, ref, watch, type Ref } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 import { getPlayerProfileData } from './PlayerProfileUtilFunctions';
 
 const trendPeriodOptions = [

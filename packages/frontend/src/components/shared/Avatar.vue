@@ -1,4 +1,5 @@
 <template>
+    <!-- --avatar-background / --avatar-color ueberschreiben die Farben, z.B. graue Avatare in Tabellen (theme.ts) -->
     <PrimeAvatar
         ref="rootRef"
         :label="avatarImageComputed ? undefined : playerInitials"
@@ -6,7 +7,7 @@
         :shape="shape"
         :pt="{
             root: {
-                class: `!outline-none !border-none ${avatarImageComputed ? '!bg-transparent' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[var(--main-color)] opacity-70 !text-[white]')}`
+                class: `!outline-none !border-none ${avatarImageComputed ? '!bg-transparent' : (grayscale ? '!bg-gray-300 !text-gray-700' : '!bg-[var(--avatar-background,var(--main-color))] opacity-70 !text-[var(--avatar-color,white)]')}`
             },
             image: {
                 class: `${shape === 'square' ? 'object-contain' : 'object-cover'} bg-transparent ${grayscale ? 'grayscale' : ''}`

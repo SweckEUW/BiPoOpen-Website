@@ -126,16 +126,15 @@ export type RankingData = {
 
 export type RankingEvents = { points: PointEvent[]; games: GameEvent[]; displayNames: Record<string, string> };
 
-const normalizeName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
+export const normalizeName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
 
 const getTeamScore = (team: Team) => team.players.reduce((acc, player) => acc + (player.score ?? 0), 0);
 
-export const buildRankingEvents = (data: RankingData): RankingEvents => {
-    const points: PointEvent[] = [];
-    const games: GameEvent[] = [];
+// Liga-/Cup-Spiele speichern den Teamnamen, gewertet wird der Spieler dahinter.
+// Anzeigename = haeufigste Schreibweise
+export const createPlayerNameResolver = () => {
     const spellings: Record<string, Record<string, number>> = {};
 
-    // Liga-/Cup-Spiele speichern den Teamnamen, gewertet wird der Spieler dahinter.
     const toPlayerKey = (name: string) => {
         const playerName = (getPlayerForLeagueTeam(name) ?? name).trim().replace(/\s+/g, ' ');
         const key = normalizeName(playerName);
@@ -143,6 +142,18 @@ export const buildRankingEvents = (data: RankingData): RankingEvents => {
         spellings[key][playerName] = (spellings[key][playerName] ?? 0) + 1;
         return key;
     };
+
+    const getDisplayNames = (): Record<string, string> => Object.fromEntries(Object.entries(spellings).map(([key, counts]) =>
+        [key, Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]]
+    ));
+
+    return { toPlayerKey, getDisplayNames };
+};
+
+export const buildRankingEvents = (data: RankingData): RankingEvents => {
+    const points: PointEvent[] = [];
+    const games: GameEvent[] = [];
+    const { toPlayerKey, getDisplayNames } = createPlayerNameResolver();
 
     const addPoints = (name: string, category: RankingCategory, value: number, time: number) => {
         if (value) points.push({ player: toPlayerKey(name), category, points: value, time });
@@ -157,12 +168,7 @@ export const buildRankingEvents = (data: RankingData): RankingEvents => {
     data.leagueCups.forEach(leagueCup => addCupEvents(data.leagueGames, leagueCup, addPoints));
     data.tournaments.forEach(({ tournament, time }) => addTournamentEvents(tournament, time, addPoints, addGame));
 
-    // Anzeigename = haeufigste Schreibweise
-    const displayNames = Object.fromEntries(Object.entries(spellings).map(([key, counts]) =>
-        [key, Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]]
-    ));
-
-    return { points, games, displayNames };
+    return { points, games, displayNames: getDisplayNames() };
 };
 
 type AddPoints = (name: string, category: RankingCategory, value: number, time: number) => void;

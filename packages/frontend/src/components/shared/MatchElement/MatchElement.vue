@@ -10,8 +10,8 @@
          </div>
 
          <!-- Team Name & Score -->
-         <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team1Placeholder" :avatarShape="avatarShape"/> <!-- Team 1 -->
-         <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :hideAvatars="hideAvatars" :placeholder="team2Placeholder" :avatarShape="avatarShape"/> <!-- Team 2 -->
+         <MatchElementTeam :match="match" :isTeam2="false" :playersVisible="playersVisible" :placeholder="team1Placeholder" :avatarShape="avatarShape"/> <!-- Team 1 -->
+         <MatchElementTeam :match="match" :isTeam2="true" :playersVisible="playersVisible" :placeholder="team2Placeholder" :avatarShape="avatarShape"/> <!-- Team 2 -->
 
          <!-- Spielverlauf Timeline -->
          <MatchTimeline v-if="hasTurns && playersVisible" :match="match" />
@@ -46,7 +46,6 @@ const props = defineProps({
    match: {type: Object as PropType<Match>, required: true },
    // Backend: Button "Eintragen"/"Bearbeiten", die Seite oeffnet dafuer ihren GameEntryDrawer.
    isBackend: {type: Boolean, default: false},
-   hideAvatars: {type: Boolean, default: false},
    team1Placeholder: {type: String, default: undefined},
    team2Placeholder: {type: String, default: undefined},
    avatarShape: {type: String as () => 'circle' | 'square', default: 'circle'},

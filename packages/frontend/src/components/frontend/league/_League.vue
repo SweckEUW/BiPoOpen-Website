@@ -16,7 +16,8 @@
             />
         </div>
 
-        <Tabs v-model:value="activeTab">
+        <!-- lazy: nur der aktive Reiter wird gerendert -->
+        <Tabs v-model:value="activeTab" lazy>
             <!-- Liga/Cup-Auswahl + Reiter kleben gemeinsam unter dem App-Header -->
             <div ref="stickyBar" class="lg-sticky-bar" :style="{ top: stickyBarTop }">
                 <!-- Liga-Auswahl, nur wenn die Saison mehr als eine Liga oder einen Pokal hat -->
@@ -42,9 +43,7 @@
 
             <LeagueCup v-else-if="isCupActive"
                 :season="season"
-                :allLeagueGames="allLeagueGames"
-                :getLeagueGames="getLeagueGames"
-            />
+                :allLeagueGames="allLeagueGames"            />
 
             <div v-else-if="!division.teams.length" class="lg-empty">
                 Für diese Liga sind noch keine Teams eingetragen.
@@ -79,19 +78,11 @@
             </TabPanels>
         </Tabs>
 
-        <!-- Spiel eintragen: schwebt ueber Tabelle und Spielen (League Cup hat einen eigenen) -->
-        <FloatingActionButton
-            label="Spiel eintragen"
-            :visible="!isLoading && showDivisionTabs"
-            @click="toggleModalAddGame()"
-        />
-
-        <!-- Spiel auslosen: weisser Rad-Button ueber "Spiel eintragen" -->
+        <!-- Spiel auslosen: weisser Rad-Button (eingetragen wird ueber das Plus in der Navigation) -->
         <FloatingActionButton
             label="Spiele auslosen"
             :image="wheelIcon"
             light
-            stacked
             :visible="!isLoading && showDivisionTabs"
             @click="toggleModalDraw()"
         />
@@ -103,23 +94,11 @@
             :regularSeasonGameCount="regularSeasonGameCount"
         />
 
-        <GameEntryDrawer
-            v-model:visible="showModalAddGame"
-            :subtitle="addGameSubtitle"
-            :sideLabels="['Team 1', 'Team 2']"
-            incompleteLabel="Teams wählen"
-            :save="saveLeagueGame"
-        >
-            <template #player="{ player, excludedNames, setName }">
-                <LeagueTeamSelect :modelValue="player.name" :teams="leaguePlayers" :excludedNames="excludedNames" @update:modelValue="setName"/>
-            </template>
-        </GameEntryDrawer>
-
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import FloatingActionButton from '@/components/shared/FloatingActionButton.vue';
@@ -127,12 +106,10 @@ import wheelIcon from '@/assets/icons/wheel.png';
 import LeagueTable from './LeagueTable.vue';
 import LeagueFinalFour from './LeagueFinalFour.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import LeagueTeamSelect from './LeagueTeamSelect.vue';
-import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
-import { sidesToNewMatch, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';
+import { onGameSaved, useAddGameContext } from '@/components/shared/GameEntry/useAddGame';
 import LeagueDrawDrawer from './LeagueDrawDrawer.vue';
 import LeagueCup from './cup/LeagueCup.vue';
-import { addLeagueGame, filterLeagueGames, getAllLeagueGames, splitLeagueGamesByRound } from './LeagueUtilFunctions';
+import { filterLeagueGames, getAllLeagueGames } from './LeagueUtilFunctions';
 import { CUP_URL_SEGMENT } from './cup/LeagueCupUtilFunctions';
 import { withLeagueTeamLogos } from './LeaguePlayersData';
 import {
@@ -155,10 +132,10 @@ import TabPanel from 'primevue/tabpanel';
 const route = useRoute();
 const router = useRouter();
 
-let showModalAddGame = ref(false);
 let showModalDraw = ref(false);
 let isLoading = ref(true);
-let allLeagueGames = ref<Match[]>([]);
+// shallowRef: Spiele werden nur komplett ersetzt, nie veraendert
+let allLeagueGames = shallowRef<Match[]>([]);
 let activeTab = ref('table');
 
 // ─── Saison ───
@@ -230,26 +207,9 @@ const getLeagueGames = async () => {
 }
 getLeagueGames();
 
-const toggleModalAddGame = () => {
-    showModalAddGame.value = !showModalAddGame.value;
-}
-
-// Untertitel im Drawer: Hinrunde, bis jede Paarung einmal gespielt ist (wie LeagueDrawDrawer), danach Rueckrunde.
-const addGameSubtitle = computed(() => {
-    const teamCount = division.value.teams.length;
-    const regularSeasonGames = divisionGames.value.toReversed().toSpliced(regularSeasonGameCount.value);
-    const hinrundeGameCount = teamCount * (teamCount - 1) / 2;
-    const round = regularSeasonGames.length >= regularSeasonGameCount.value
-        ? (division.value.hasFinalFour ? 'Final Four' : '')
-        : splitLeagueGamesByRound(regularSeasonGames).hinrunde.length >= hinrundeGameCount ? 'Rückrunde' : 'Hinrunde';
-    return ['BiPo League', division.value.label, round].filter(part => part).join(' · ');
-});
-
-const saveLeagueGame = async (sides: GameEntrySide[]) => {
-    const success = await addLeagueGame(sidesToNewMatch(sides, { season: season.value.slug, league: division.value.league }));
-    if (success) await getLeagueGames();
-    return success;
-}
+// Plus in der Navigation: Liga bzw. Pokal vorausgewaehlt, nach dem Eintragen neu laden
+useAddGameContext(() => isCupActive.value ? { mode: 'cup' } : { mode: 'league', league: division.value.league });
+onGameSaved(getLeagueGames);
 
 const toggleModalDraw = () => {
     showModalDraw.value = !showModalDraw.value;
@@ -285,10 +245,13 @@ const showDivisionTabs = computed(() => !isCupActive.value && division.value.tea
     border-radius: 999px;
     padding-left: 6px;
     --p-select-focus-border-color: var(--main-color);
+    /* schmaler Pfeil-Bereich, damit der Pfeil naeher am Text sitzt */
+    --p-select-dropdown-width: 1.75rem;
 }
 :deep(.lg-season-select .p-select-label){
     font-weight: 700;
     color: #1f2328;
+    padding-right: 0;
 }
 
 .lg-sticky-bar{

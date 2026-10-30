@@ -84,7 +84,7 @@ let endGame = async () => {
     if(props.isLeagueGame){
         router.push({path: '/League'});
     }else{
-        router.push({path: '/Offene-Spiele'});
+        router.push({path: '/'});
     }
 }   
 </script>

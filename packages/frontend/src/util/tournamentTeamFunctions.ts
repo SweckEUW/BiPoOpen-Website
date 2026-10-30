@@ -19,11 +19,6 @@ export const removeTeam = async (tournamentID:string, teamID:string) => {
     return response.status == 201;
 }
 
-export const getTeamFromID = (tournament: Tournament, teamID:string) => {
-    let team = tournament.teams.find((team) => team._id == teamID);
-    return team;
-}
-
 export const getTeamFromName = (tournament: Tournament, teamName:string) => {
     let team = tournament.teams.find((team) => team.name == teamName);
     return team;

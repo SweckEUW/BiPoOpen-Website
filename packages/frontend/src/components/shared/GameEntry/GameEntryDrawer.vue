@@ -126,8 +126,9 @@ const toast = useToast();
 const sides = ref<GameEntrySide[]>(createEmptySides());
 const loading = ref(false);
 
-// Bei jedem Oeffnen frisch aus der Vorbelegung, die Eingaben eines abgebrochenen Versuchs verfallen.
-watch(visible, (isVisible) => {
+// Bei jedem Oeffnen und jeder neuen Vorbelegung (z.B. anderer Spieltyp) frisch aus der Vorbelegung,
+// die Eingaben eines abgebrochenen Versuchs verfallen.
+watch([visible, () => props.initialSides], ([isVisible]) => {
     if (isVisible)
         sides.value = props.initialSides ? JSON.parse(JSON.stringify(props.initialSides)) : createEmptySides();
 }, { immediate: true });

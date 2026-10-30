@@ -145,9 +145,6 @@ declare global {
         name: string;
         logo: string;
     }
-    
-    type SortValueLeague = 'placement'|'name'|'ammountOfMatches'|'wins'|'looses';
-    type SortValueMVP = 'averageHits'|'placement'|'hits'|'ammountOfMatches'|'ammountOfDrunkenCups'|'name';
 
     // Player Profile Types
     type TrendPeriod = 'all' | '1m' | '3m' | '6m' | '1y';

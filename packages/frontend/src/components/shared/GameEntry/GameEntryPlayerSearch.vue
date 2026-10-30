@@ -9,7 +9,7 @@
             </button>
         </div>
 
-        <!-- Suche: Treffer klappen direkt unter dem Feld auf, kein Overlay (im Sheet sonst abgeschnitten) -->
+        <!-- Suche: Treffer liegen als Dropdown ueber dem Inhalt darunter, ohne das Layout zu verschieben -->
         <template v-else>
             <div class="gp-input-wrap" :class="{ 'gp-input-wrap--open': showResults }">
                 <i class="pi pi-search gp-search-icon"></i>
@@ -31,7 +31,7 @@
                 </button>
             </div>
 
-            <div v-if="showResults" class="gp-results" role="listbox">
+            <div v-if="showResults" ref="resultsEl" class="gp-results" role="listbox">
                 <button v-for="name in suggestions" :key="name"
                     type="button"
                     role="option"
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import { getAllPlayerNames, getPlayerMatchCounts } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
 
@@ -109,6 +109,14 @@ const newName = computed(() => {
 
 const showResults = computed(() => isFocused.value && (suggestions.value.length > 0 || !!newName.value));
 
+// Dropdown liegt ueber dem Inhalt: weiter unten im Sheet so weit scrollen, dass es ganz sichtbar ist
+const resultsEl = ref<HTMLElement>();
+watch(showResults, async (visible) => {
+    if (!visible) return;
+    await nextTick();
+    resultsEl.value?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+});
+
 const select = (name: string) => {
     query.value = '';
     emit('update:modelValue', name);
@@ -123,6 +131,9 @@ defineExpose({ focus: () => inputEl.value?.focus() });
 </script>
 
 <style scoped>
+.GameEntryPlayerSearch{
+    position: relative;
+}
 .gp-input-wrap,
 .gp-chip{
     display: flex;
@@ -202,12 +213,18 @@ defineExpose({ focus: () => inputEl.value?.focus() });
 }
 
 .gp-results{
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 5; /* ueber Score-Auswahl und Speichern-Leiste */
     display: flex;
     flex-direction: column;
     border: 1px solid #1F2328;
     border-top: none;
     border-radius: 0 0 10px 10px;
     background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
     overflow: hidden;
 }
 .gp-result{

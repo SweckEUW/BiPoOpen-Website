@@ -9,7 +9,7 @@
          <div class="GameScheduleGroups swiper-container" id="GameScheduleGroupsSwiper">
             <div class="swiper-wrapper">
 
-               <div class="rt-table swiper-slide" v-for="(group, groupIndex) in getGroupsWithStats(tournament)" :key="groupIndex" :id="'Match-Table-'+groupIndex">
+               <div class="rt-table swiper-slide" v-for="(group, groupIndex) in groupsWithStats" :key="groupIndex" :id="'Match-Table-'+groupIndex">
 
                   <!-- Caption -->
                   <div class="rt-caption">{{ "Gruppe " + convertNumberToCharacter(groupIndex + 1)}}</div>
@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import Sortable from "sortablejs";
-import { onMounted, PropType, ref, watch } from "vue"
+import { computed, onMounted, PropType, ref, watch } from "vue"
 import { convertNumberToCharacter } from "@/util/util.js";
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
@@ -71,6 +71,9 @@ const props = defineProps({
 // Die Gruppenauswahl klebt unter den Reitern, die Gruppentabellen darunter.
 const pagination = ref<HTMLElement | null>(null);
 const paginationTop = useStickyBar(pagination);
+
+// Nur neu berechnen, wenn sich das Turnier aendert, nicht bei jedem Render
+const groupsWithStats = computed(() => getGroupsWithStats(props.tournament));
 
 const onDragEnd = async (evt:Sortable.SortableEvent) => {
 
@@ -122,6 +125,8 @@ onMounted(() => {
       allowTouchMove: !props.isBackend,
       spaceBetween: 50,
       speed: 500,
+      // Auf der Tabelle wischt der Finger die Tabelle seitlich, nicht den Slider
+      noSwipingSelector: '.p-datatable-table-container',
       pagination: {
          el: "#GameScheduleGroupsSwiper-Pagination",
          clickable: true,
@@ -144,7 +149,6 @@ const saveGameResult = async (sides: GameEntrySide[]) => {
 
 <style>
 .GameScheduleGroups{
-   /* clip statt hidden: kein eigener Scroll-Container, sonst klebt der Tabellenkopf nicht */
    overflow: clip;
 }
 .rt-caption{

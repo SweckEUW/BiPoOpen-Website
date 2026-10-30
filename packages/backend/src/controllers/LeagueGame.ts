@@ -24,24 +24,10 @@ const createLeagueGame = (req: Request, res: Response, next: NextFunction) => {
         .catch((error) => res.status(500).json({ error }));
 };
 
-const readLeagueGame = (req: Request, res: Response, next: NextFunction) => {
-    const leagueGameID = req.params.leagueGameID;
-
-    LeagueGame.findOne({ _id: leagueGameID })
-        .then((leagueGame) => {
-            if (leagueGame) {
-                res.status(200).json({ leagueGame });
-            } else {
-                res.status(404).json({ message: "League Game not found" });
-            }
-        })
-        .catch((error) => {
-            res.status(500).json({ error });
-        });
-};
-
 const readAll = (req: Request, res: Response, next: NextFunction) => {
+    // lean: reine Objekte statt Mongoose-Dokumente, deutlich schneller bei vielen Spielen
     LeagueGame.find()
+        .lean()
         .then((leagueGames) => {
             res.status(200).json({ leagueGames });
         })
@@ -83,4 +69,4 @@ const deleteLeagueGame = (req: Request, res: Response, next: NextFunction) => {
         });
 };
 
-export default { createLeagueGame, readLeagueGame, readAll, updateLeagueGame, deleteLeagueGame };
+export default { createLeagueGame, readAll, updateLeagueGame, deleteLeagueGame };

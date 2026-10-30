@@ -37,7 +37,9 @@ const readOpenGame = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const readAll = (req: Request, res: Response, next: NextFunction) => {
+    // lean: reine Objekte statt Mongoose-Dokumente, deutlich schneller bei vielen Spielen
     OpenGame.find()
+        .lean()
         .then((openGames) => {
             res.status(200).json({ openGames });
         })

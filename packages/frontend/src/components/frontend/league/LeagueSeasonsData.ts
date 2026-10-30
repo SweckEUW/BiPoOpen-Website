@@ -125,12 +125,6 @@ export const LEGACY_LEAGUE = 1;
 export const getSeason = (slug: string | undefined): LeagueSeason | undefined =>
     LEAGUE_SEASONS.find(season => season.slug === slug);
 
-export const getDivision = (season: LeagueSeason | undefined, league: number | undefined): LeagueDivision | undefined => {
-    if (!season) return undefined;
-    if (league === undefined) return season.divisions[0];
-    return season.divisions.find(division => division.league === league);
-};
-
 // Doppelte Hin- und Rueckrunde: jedes Team spielt gegen jedes andere zweimal.
 export const getRegularSeasonGameCount = (division: LeagueDivision | undefined): number => {
     const teamCount = division?.teams.length ?? 0;

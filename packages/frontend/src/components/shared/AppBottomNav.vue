@@ -1,18 +1,24 @@
 <template>
 	<nav class="AppBottomNav">
-		<component
-			v-for="item in MAIN_NAV_ITEMS"
-			:key="item.label"
-			:is="item.to ? 'router-link' : 'button'"
-			:to="item.to"
-			:type="item.to ? undefined : 'button'"
-			class="bn-item"
-			:class="{ 'bn-item-active': isMainNavItemActive(item, route, tournamentPickerVisible) }"
-			@click="onItemClick(item)"
-		>
-			<img :src="item.icon" alt="" class="bn-icon">
-			<span class="bn-label">{{ item.label }}</span>
-		</component>
+		<template v-for="(item, index) in MAIN_NAV_ITEMS" :key="item.label">
+			<!-- Plus zum Spiel eintragen in der Mitte -->
+			<button v-if="index === ADD_BUTTON_INDEX" type="button" class="bn-item bn-add" @click="onAddClick()">
+				<span class="bn-add-circle"><i class="pi pi-plus"></i></span>
+				<span class="bn-label">Eintragen</span>
+			</button>
+
+			<component
+				:is="item.to ? 'router-link' : 'button'"
+				:to="item.to"
+				:type="item.to ? undefined : 'button'"
+				class="bn-item"
+				:class="{ 'bn-item-active': isMainNavItemActive(item, route, tournamentPickerVisible) }"
+				@click="onItemClick(item)"
+			>
+				<img :src="item.icon" alt="" class="bn-icon">
+				<span class="bn-label">{{ item.label }}</span>
+			</component>
+		</template>
 	</nav>
 </template>
 
@@ -20,15 +26,24 @@
 import { useRoute } from 'vue-router';
 import { MAIN_NAV_ITEMS, MainNavItem, isMainNavItemActive } from './mainNav';
 import { useTournamentPicker } from './useTournamentPicker';
+import { useAddGame } from './GameEntry/useAddGame';
+
+const ADD_BUTTON_INDEX = Math.floor(MAIN_NAV_ITEMS.length / 2);
 
 const route = useRoute();
 const { tournamentPickerVisible, openTournamentPicker, closeTournamentPicker } = useTournamentPicker();
+const { openAddGame } = useAddGame();
 
 const onItemClick = (item: MainNavItem) => {
 	if (item.to)
 		closeTournamentPicker();
 	else
 		openTournamentPicker();
+};
+
+const onAddClick = () => {
+	closeTournamentPicker();
+	openAddGame();
 };
 </script>
 
@@ -86,5 +101,35 @@ const onItemClick = (item: MainNavItem) => {
 .bn-item-active .bn-icon {
 	filter: grayscale(0) contrast(1) brightness(1);
 	opacity: 1;
+}
+
+/* Plus: roter Kreis, ragt ueber die Leiste, Label auf Hoehe der anderen */
+.bn-add {
+	justify-content: flex-end;
+	padding-bottom: 6px;
+	color: var(--main-color);
+	font-weight: 700;
+}
+.bn-add-circle {
+	/* Nicht stauchen lassen: Kreis + Label sind hoeher als die Leiste */
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	margin-bottom: 3px;
+	border-radius: 50%;
+	background: var(--main-color);
+	color: white;
+	box-shadow: 0 0 0 4px white, 0 4px 12px rgba(234, 81, 96, 0.4);
+	transition: transform .15s ease;
+}
+.bn-add:active .bn-add-circle {
+	transform: scale(.94);
+}
+.bn-add-circle .pi {
+	font-size: 16px;
+	font-weight: 700;
 }
 </style>

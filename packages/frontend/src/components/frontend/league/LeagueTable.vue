@@ -8,7 +8,8 @@
         :leagueGames="games"
     />
 
-    <Tabs v-model:value="activeTableTab" class="p-tabs-chips">
+    <!-- lazy: nur die aktive Tabelle wird gerendert -->
+    <Tabs v-model:value="activeTableTab" class="p-tabs-chips" lazy>
         <TabList v-if="hasRueckrunde" ref="tabList" class="league-table-sticky-tablist pt-[12px] pb-[12px]" :style="{ top: tabListTop }">
             <Tab value="overall">Gesamt</Tab>
             <Tab value="hinrunde">Hinrunde</Tab>

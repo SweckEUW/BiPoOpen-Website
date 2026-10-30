@@ -92,6 +92,7 @@ const createLeagueCup = async (req: Request, res: Response, next: NextFunction) 
 
 const readLeagueCup = (req: Request, res: Response, next: NextFunction) => {
     LeagueCup.findOne({ season: req.params.season })
+        .lean()
         .then((leagueCup) => {
             if (leagueCup) return res.status(200).json({ leagueCup });
 

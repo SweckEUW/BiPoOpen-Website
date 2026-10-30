@@ -3,7 +3,7 @@
         kicker="Nackte Meilen"
         :title="title"
         ctaLabel="Wer schuldet was?"
-        ctaTo="/Offene-Spiele?tab=nackteMeilen"
+        ctaTo="/Nackte-Meilen"
     >
         <div class="sn-content">
             <div class="sn-progress-wrapper">
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import type { AbsolvierteMeile, OffeneMeile } from '@/components/frontend/openGames/nackteMeilen';
+import type { AbsolvierteMeile, OffeneMeile } from '@/components/frontend/nackteMeilen/nackteMeilen';
 import { formatPlayerName } from '../homeUtil';
 import HeroSlideLayout from './HeroSlideLayout.vue';
 

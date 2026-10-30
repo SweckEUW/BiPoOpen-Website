@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onMounted, PropType } from "vue"
+import { onMounted, PropType } from "vue"
 
 import Swiper from 'swiper';
 import { Pagination, Navigation, Zoom } from 'swiper/modules';

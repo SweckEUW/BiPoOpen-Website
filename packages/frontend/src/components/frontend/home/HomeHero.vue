@@ -77,7 +77,7 @@ import SlideLeagueCup from './slides/SlideLeagueCup.vue';
 import SlideOpenGames from './slides/SlideOpenGames.vue';
 import SlideBiPoOpen from './slides/SlideBiPoOpen.vue';
 import SlideNackteMeilen from './slides/SlideNackteMeilen.vue';
-import { getNackteMeilen } from '@/components/frontend/openGames/nackteMeilen';
+import { getNackteMeilen } from '@/components/frontend/nackteMeilen/nackteMeilen';
 
 const props = defineProps<{
     openGames: Match[];

@@ -126,52 +126,209 @@ const BiPoPreset = definePreset(Aura, {
                 checkedShadow: '0px 1px 3px 0px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.06)'
             }
         },
+        // Tabellen als weisse Karte: kleiner grauer Kopf in Grossbuchstaben, feine Zeilenlinien.
+        // Mit scrollable + frozen (Platz, Name) wischt der Rest seitlich, fixierte Spalten sind linksbuendig.
         datatable: {
-            header: {
-                padding: '0.5rem 0.5rem',
-                sm: {
-                    padding: '0.375rem 0.375rem'
-                }
-            },
             headerCell: {
-                padding: '0.5rem 0.5rem',
-                sm: {
-                    padding: '0.375rem 0.375rem'
-                }
+                padding: '0.625rem 0.5rem',
+                gap: '0.25rem'
+            },
+            columnTitle: {
+                fontWeight: '700'
             },
             bodyCell: {
-                padding: '0.5rem 0.5rem',
-                sm: {
-                    padding: '0.375rem 0.375rem'
-                }
+                padding: '0.5rem 0.5rem'
+            },
+            footer: {
+                padding: '0.625rem 0.875rem',
+                borderWidth: '1px 0 0 0'
             },
             colorScheme: {
                 light: {
-                    headerCell: {
-                        background: '#EA5160',
-                        color: '#ffffff',
-                        borderColor: '#EA5160',
-                        selectedBackground: '#EA5160',
-                        selectedColor: '#ffffff'
+                    root: {
+                        borderColor: '#ECEEF1'
                     },
-                    header: {
-                        background: '#EA5160',
-                        color: '#ffffff',
-                        borderColor: '#EA5160'
+                    headerCell: {
+                        background: '#ffffff',
+                        hoverBackground: '#ffffff',
+                        selectedBackground: '#ffffff',
+                        color: '#8A9099',
+                        hoverColor: '#16181D',
+                        selectedColor: '#16181D'
+                    },
+                    row: {
+                        background: '#ffffff',
+                        hoverBackground: '#F6F7F9',
+                        color: '#3B4048',
+                        hoverColor: '#3B4048'
+                    },
+                    footer: {
+                        background: '#ffffff',
+                        color: '#8A9099'
                     }
                 }
             },
             css: `
-                .p-datatable-column-title {
-                    font-size: 16px;
-                    font-weight: bold;
+                .p-datatable {
+                    overflow: hidden;
+                    background: #ffffff;
+                    border: 1px solid var(--p-datatable-border-color);
+                    border-radius: 14px;
                 }
-                .p-datatable-column-title{
-                    width: 100%;
+
+                .p-datatable-thead > tr > th {
+                    font-size: 0.6875rem;
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
                     text-align: center;
+                    white-space: nowrap;
                 }
-                .p-datatable-tbody *{
-                    text-align: center !important;
+                .p-datatable-column-header-content {
+                    justify-content: center;
+                }
+                .p-datatable .p-datatable-tbody > tr > td {
+                    font-size: 0.875rem;
+                    font-variant-numeric: tabular-nums;
+                    text-align: center;
+                    white-space: nowrap;
+                    vertical-align: middle;
+                }
+                .p-datatable-tbody > tr:last-child > td {
+                    border-bottom-width: 0;
+                }
+                .p-datatable-hoverable .p-datatable-tbody > tr {
+                    cursor: pointer;
+                }
+
+                /* Innenabstand zum Kartenrand */
+                .p-datatable-thead > tr > th:first-child,
+                .p-datatable-tbody > tr > td:first-child {
+                    padding-inline-start: 0.875rem;
+                }
+                .p-datatable-thead > tr > th:last-child,
+                .p-datatable-tbody > tr > td:last-child {
+                    padding-inline-end: 0.875rem;
+                }
+
+                /* Fixierte Spalten und <Column class="bp-col-start"> linksbuendig, Trennlinie nach der letzten fixierten */
+                .p-datatable .p-datatable-frozen-column,
+                .p-datatable .bp-col-start {
+                    text-align: start;
+                }
+                .p-datatable-frozen-column .p-datatable-column-header-content,
+                .bp-col-start .p-datatable-column-header-content {
+                    justify-content: flex-start;
+                }
+                .p-datatable .p-datatable-frozen-column:not(:has(+ .p-datatable-frozen-column)) {
+                    border-inline-end: 1px solid var(--p-datatable-border-color);
+                }
+
+                /* Hervorgehobene Spalte, z.B. Siege */
+                .p-datatable th.bp-col-strong {
+                    color: var(--p-datatable-header-cell-selected-color);
+                }
+                .p-datatable td.bp-col-strong {
+                    font-weight: 700;
+                    color: #16181D;
+                }
+
+                /* Sortierung als kleiner Pfeil am Spaltentitel statt Icon */
+                .p-datatable-sort-icon {
+                    display: none;
+                }
+                .p-datatable-column-sorted[aria-sort="descending"] .p-datatable-column-title::after {
+                    content: ' ▾';
+                }
+                .p-datatable-column-sorted[aria-sort="ascending"] .p-datatable-column-title::after {
+                    content: ' ▴';
+                }
+
+                /* Gestrichelte Linie zwischen zwei Tabellenzonen: rowClass "bp-row-divider" */
+                .p-datatable-tbody > tr.bp-row-divider > td {
+                    border-bottom: 1px dashed #CFD3D9;
+                }
+
+                /* Name mit Avatar */
+                .bp-name-cell {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.625rem;
+                }
+                .bp-name {
+                    overflow: hidden;
+                    max-width: 9rem;
+                    font-weight: 700;
+                    color: #16181D;
+                    text-overflow: ellipsis;
+                }
+                .p-datatable-tbody .p-avatar {
+                    flex-shrink: 0;
+                    width: 2rem;
+                    height: 2rem;
+                    font-size: 0.6875rem;
+                    font-weight: 700;
+                    opacity: 1;
+                    --avatar-background: #EEF0F3;
+                    --avatar-color: #6B717B;
+                }
+
+                /* Platz: Podium 1-3 (bp-rank-1..3) oder Tabellenzone (bp-zone-*) mit Pfeil */
+                .bp-rank {
+                    font-weight: 700;
+                    color: #16181D;
+                }
+                .bp-rank-1 { color: #C9A227; }
+                .bp-rank-2 { color: #8E949C; }
+                .bp-rank-3 { color: #B0703C; }
+                .bp-zone-qualify { --bp-zone-color: #1F97B0; --bp-zone-marker: '▲'; }
+                .bp-zone-promotion { --bp-zone-color: #1F9D55; --bp-zone-marker: '▲'; }
+                .bp-zone-relegation { --bp-zone-color: #D64545; --bp-zone-marker: '▼'; }
+                .bp-rank[class*="bp-zone-"] {
+                    color: var(--bp-zone-color);
+                }
+                .bp-rank[class*="bp-zone-"]::after {
+                    content: var(--bp-zone-marker);
+                    margin-inline-start: 0.125rem;
+                    font-size: 0.5625rem;
+                    vertical-align: 0.1em;
+                }
+
+                /* Positive / negative Werte, z.B. Trefferdifferenz */
+                .bp-value-up { color: #1F9D55; }
+                .bp-value-down { color: #D64545; }
+
+                /* Wert mit Tooltip (v-tooltip.focus + tabindex): gepunktet unterstrichen */
+                .bp-tooltip-target {
+                    cursor: pointer;
+                    outline: none;
+                    text-decoration: underline dotted;
+                    text-underline-offset: 3px;
+                }
+
+                /* Legende im #footer der Tabelle */
+                .bp-legend {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.25rem 1rem;
+                    font-size: 0.75rem;
+                }
+                .bp-legend > [class*="bp-zone-"]::before {
+                    content: var(--bp-zone-marker);
+                    margin-inline-end: 0.25rem;
+                    color: var(--bp-zone-color);
+                }
+                .bp-legend-swipe::before {
+                    content: '‹›';
+                    margin-inline-end: 0.25rem;
+                }
+
+                @media (width > 900px) {
+                    .bp-name {
+                        max-width: 18rem;
+                    }
+                    .bp-legend-swipe {
+                        display: none;
+                    }
                 }
             `
         }
