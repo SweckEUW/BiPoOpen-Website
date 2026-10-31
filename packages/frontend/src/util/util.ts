@@ -37,3 +37,6 @@ export const formatGameTime = (time: number) => {
     });
     return `${day}, ${clock}`;
 };
+
+// "Jonas Weck" -> "/Spieler/Jonas-Weck", _PlayerProfile.vue macht aus "-" wieder Leerzeichen
+export const getPlayerProfilePath = (name: string) => `/Spieler/${encodeURIComponent(name).replaceAll('%20', '-')}`;

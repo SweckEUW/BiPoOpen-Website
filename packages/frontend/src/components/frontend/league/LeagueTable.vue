@@ -6,6 +6,8 @@
         :selectedPlayer="selectedLeaguePlayer"
         :leaguePlayers="leaguePlayers"
         :leagueGames="games"
+        :divisionLabel="props.divisionLabel"
+        :canAddGames="props.canAddGames"
     />
 
     <!-- lazy: nur die aktive Tabelle wird gerendert -->
@@ -72,7 +74,9 @@ const props = defineProps({
     regularSeasonGameCount: { type: Number, required: true },
     highlightTopSlots: { type: Number, default: 4 },
     promotionSlots: { type: Number, default: 0 },
-    relegationSlots: { type: Number, default: 3 }
+    relegationSlots: { type: Number, default: 3 },
+    divisionLabel: { type: String, required: false },
+    canAddGames: { type: Boolean, default: false }
 });
 
 const activeTableTab = ref('overall');

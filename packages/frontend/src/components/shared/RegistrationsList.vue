@@ -1,6 +1,15 @@
 <template>
     <div>
-        <Loadingscreen v-show="registrations === undefined" />
+        <div v-if="registrations === undefined" aria-busy="true" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px;">
+            <div v-for="i in 6" :key="i" style="background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 20px; display: flex; align-items: center; gap: 16px;">
+                <div class="bp-skeleton" style="flex-shrink: 0; width: 56px; height: 56px; border-radius: 10px;"></div>
+                <div style="flex: 1;">
+                    <div class="bp-skeleton" style="width: 70%; height: 14px; border-radius: 6px;"></div>
+                    <div class="bp-skeleton" style="width: 50%; height: 11px; border-radius: 6px; margin-top: 8px;"></div>
+                    <div class="bp-skeleton" style="width: 45%; height: 11px; border-radius: 6px; margin-top: 6px;"></div>
+                </div>
+            </div>
+        </div>
 
         <div v-if="registrations !== undefined">
             <p v-if="registrations.length === 0" style="text-align: center; color: #888; font-size: 16px; padding: 40px 0;">
@@ -68,7 +77,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import axios from 'axios';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 
 interface Registration {
     _id: string;

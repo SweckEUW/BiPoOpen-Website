@@ -2,7 +2,7 @@
 import { ref, inject } from "vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import SkeletonList from '@/components/shared/SkeletonList.vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import { useTableLabels } from '@/components/shared/table';
 import { getTournamentByName } from "@/util/tournamentFunctions";
@@ -96,9 +96,7 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
         
         <h1 class="bp-title">Hall of Fame</h1>
 
-        <Loadingscreen v-if="isLoading"/>
-
-        <div v-show="!isLoading">
+        <div>
 
             <div class="hof-winners">
                 <div class="hof-winner" v-for="winner in winners">
@@ -117,7 +115,9 @@ let trophyIcon = new URL(`/src/assets/icons/trophy.png`, import.meta.url).href;
 
             <div class="hof-text">Statistiken alle Spieler aus allen Turnieren sortiert nach der Anzahl der Siegen</div>
 
-            <DataTable
+            <SkeletonList v-if="isLoading" :rows="10" rank class="mb-[30px]"/>
+
+            <DataTable v-else
                 :value="hallOfFameList"
                 @row-click="openPlayerProfile($event.data.name)"
                 rowHover

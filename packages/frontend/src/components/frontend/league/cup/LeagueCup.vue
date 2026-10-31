@@ -1,7 +1,15 @@
 <template>
     <div class="LeagueCup">
 
-        <Loadingscreen v-if="leagueCup === undefined"/>
+        <!-- Skelett: Rundenauswahl und Spiele -->
+        <div v-if="leagueCup === undefined" aria-busy="true">
+            <div class="lc-round-nav">
+                <div class="bp-skeleton lc-skeleton-arrow"></div>
+                <div class="bp-skeleton lc-skeleton-select"></div>
+                <div class="bp-skeleton lc-skeleton-arrow"></div>
+            </div>
+            <div v-for="i in 4" :key="i" class="bp-skeleton bp-skeleton-match"></div>
+        </div>
 
         <div v-else-if="leagueCup === null" class="lc-empty">
             Der League Cup startet in Kürze.
@@ -114,7 +122,6 @@
 <script setup lang="ts">
 import { computed, PropType, ref } from 'vue';
 import Select from 'primevue/select';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import FinalFourSeries from '../FinalFourSeries.vue';
@@ -255,6 +262,17 @@ const potTeamCount = computed(() =>
 .lc-arrow--disabled{
     opacity: 0.3;
     pointer-events: none;
+}
+
+.lc-skeleton-arrow{
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+}
+.lc-skeleton-select{
+    flex: 1;
+    height: 40px;
+    border-radius: 6px;
 }
 
 .lc-group{

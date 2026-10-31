@@ -3,7 +3,9 @@
         
         <h1 class="bp-title">Open Games Backend</h1>
 
-        <Loadingscreen v-show="!openGames"/>
+        <div v-if="!openGames" aria-busy="true">
+            <div v-for="i in 6" :key="i" class="bp-skeleton bp-skeleton-match"></div>
+        </div>
 
         <div v-if="openGames">
             <div v-for="openGame in openGames" :key="openGame._id">
@@ -25,7 +27,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
 import { applySidesToMatch, useMatchEdit, type GameEntrySide } from '@/components/shared/GameEntry/gameEntry';

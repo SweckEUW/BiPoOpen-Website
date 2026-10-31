@@ -1,102 +1,141 @@
 <template>
-    <div v-if="hasVisiblePeers">
-        <div class="text-[20px] font-bold text-[--p-primary-color] mb-[12px]">Mitspieler & Gegner</div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-[20px] mb-[10px]">
-            <Panel v-if="visiblePartners.length > 0" header="Häufigste Partner (2v2)">
-                <div class="flex flex-col gap-[10px]">
-                    <PlayerPeerCard
-                        v-for="partner in visiblePartners"
-                        :key="partner.name"
-                        :name="partner.name"
-                        :matches="partner.matches"
-                        :wins="partner.wins"
-                        :losses="partner.losses"
-                        :clickable="true"
-                        subtitle="zusammen"
-                        @open="$emit('openPlayer', $event)"
-                    />
-                </div>
-            </Panel>
-
-            <Panel v-if="visibleRivals.length > 0" header="Top Gegner">
-                <div class="flex flex-col gap-[10px]">
-                    <Card v-for="rival in visibleRivalsWithPlayers" :key="rival.name">
-                        <template #content>
-                            <div class="flex items-center gap-[10px]">
-                                <div class="flex -space-x-2">
-                                    <Avatar
-                                        v-for="player in rival.players"
-                                        :key="player"
-                                        :name="player"
-                                        class="border-[2px] border-[--p-surface-0]"
-                                    />
-                                </div>
-
-                                <div class="flex-1 min-w-0">
-                                    <div class="font-bold text-[14px] break-words">
-                                        <template v-for="(player, index) in rival.players" :key="player">
-                                            <span
-                                                class="text-[--p-primary-color] cursor-pointer hover:underline"
-                                                @click="$emit('openPlayer', player)"
-                                            >
-                                                {{ player }}
-                                            </span>
-                                            <span v-if="index < rival.players.length - 1"> &amp; </span>
-                                        </template>
-                                    </div>
-                                    <div class="text-[12px] text-[--p-text-muted-color]">{{ rival.matches }} Spiele</div>
-                                </div>
-
-                                <div class="flex gap-[4px]">
-                                    <Tag severity="success" :value="rival.wins + 'S'" rounded />
-                                    <Tag severity="danger" :value="rival.losses + 'N'" rounded />
-                                </div>
-                            </div>
-                        </template>
-                    </Card>
-                </div>
-            </Panel>
+    <section v-if="rows.length" class="pp-section">
+        <div class="pp-section-head">
+            <h2 class="pp-section-title">{{ isDouble ? 'Partner & Gegner im Doppel' : 'Gegner im Einzel' }}</h2>
         </div>
-    </div>
+
+        <div class="pp-card pp-peers">
+            <component
+                :is="row.players.length === 1 ? 'button' : 'div'"
+                v-for="row in rows"
+                :key="`${row.role}-${row.name}`"
+                :type="row.players.length === 1 ? 'button' : undefined"
+                class="pp-peer"
+                :class="{ 'is-clickable': row.players.length === 1 }"
+                @click="row.players.length === 1 && openPlayerProfile?.(row.players[0])"
+            >
+                <Avatar :name="row.players[0]" class="pp-peer-avatar"/>
+                <div class="pp-peer-main">
+                    <div class="pp-peer-name">
+                        <template v-if="row.players.length === 1">{{ row.name }}</template>
+                        <template v-else>
+                            <template v-for="(player, index) in row.players" :key="player">
+                                <button type="button" class="pp-peer-link" @click="openPlayerProfile?.(player)">{{ player }}</button>
+                                <template v-if="index < row.players.length - 1"> &amp; </template>
+                            </template>
+                        </template>
+                    </div>
+                    <div class="pp-peer-meta">
+                        <b :class="{ 'pp-loss': row.role === 'Gegner' }">{{ row.role }}</b> · {{ row.matches }} Spiele
+                    </div>
+                </div>
+                <div class="pp-peer-score">
+                    <span class="pp-win">{{ row.wins }}</span> : <span class="pp-loss">{{ row.losses }}</span>
+                </div>
+            </component>
+        </div>
+    </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Tag from 'primevue/tag';
-import Card from 'primevue/card';
-import Panel from 'primevue/panel';
-import PlayerPeerCard from './PlayerPeerCard.vue';
+import { computed, inject } from 'vue';
 import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps<{
     partners: PartnerData[];
     rivals: RivalData[];
+    isDouble: boolean;
 }>();
 
-defineEmits<{
-    openPlayer: [name: string];
-}>();
+const openPlayerProfile = inject<(name: string) => void>('openPlayerProfile');
 
-const visiblePartners = computed(() =>
-    props.partners
-        .filter(partner => partner.matches > 3)
-        .sort((a, b) => b.matches - a.matches),
-);
+// Je die 3 haeufigsten mit mehr als 3 gemeinsamen Spielen
+const MAX_PER_ROLE = 3;
+const MIN_MATCHES = 3;
 
-const visibleRivals = computed(() =>
-    props.rivals
-        .filter(rival => rival.matches > 3)
-        .sort((a, b) => b.matches - a.matches),
-);
+const rows = computed(() => {
+    const toRows = (entries: PartnerData[], role: 'Partner' | 'Gegner') => entries
+        .filter(entry => entry.matches > MIN_MATCHES)
+        .slice(0, MAX_PER_ROLE)
+        .map(entry => ({
+            ...entry,
+            role,
+            players: entry.name.split(' & ').map(player => player.trim()).filter(Boolean),
+        }));
 
-const visibleRivalsWithPlayers = computed(() =>
-    visibleRivals.value.map(rival => ({
-        ...rival,
-        players: rival.name.split(' & ').map(player => player.trim()).filter(Boolean),
-    })),
-);
-
-const hasVisiblePeers = computed(() => visiblePartners.value.length > 0 || visibleRivals.value.length > 0);
+    return [...toRows(props.partners, 'Partner'), ...toRows(props.rivals, 'Gegner')];
+});
 </script>
 
+<style scoped>
+.pp-peers {
+    overflow: hidden;
+}
+.pp-peer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 14px;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+}
+.pp-peer + .pp-peer {
+    border-top: 1px solid #eef0f2;
+}
+.pp-peer.is-clickable {
+    cursor: pointer;
+}
+.pp-peer.is-clickable:hover {
+    background: #fafbfc;
+}
+.pp-peer-avatar {
+    --avatar-background: #e9ebee;
+    --avatar-color: #3a3f47;
+    flex-shrink: 0;
+    font-size: 13px !important;
+    font-weight: 700;
+}
+.pp-peer-main {
+    flex: 1;
+    min-width: 0;
+}
+.pp-peer-name {
+    font-size: 14px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+.pp-peer-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.pp-peer-link:hover {
+    text-decoration: underline;
+}
+.pp-peer-meta {
+    margin-top: 1px;
+    font-size: 12px;
+    color: #6b717b;
+
+    b {
+        color: #1d1f23;
+    }
+    b.pp-loss {
+        color: #d64545;
+    }
+}
+.pp-peer-score {
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #a0a5ad;
+}
+</style>

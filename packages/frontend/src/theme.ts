@@ -82,7 +82,7 @@ const BiPoPreset = definePreset(Aura, {
                     border-radius: 3px 3px 0 0;
                 }
 
-                /* Chip-Variante: <Tabs class="p-tabs-chips"> */
+                /* Chip-Variante: <Tabs class="p-tabs-chips">, aktiver Chip immer in der Primaerfarbe */
                 .p-tabs-chips .p-tablist {
                     background: transparent;
                 }
@@ -99,10 +99,14 @@ const BiPoPreset = definePreset(Aura, {
                     border: 1px solid var(--p-surface-300);
                     border-radius: 999px;
                 }
+                .p-tabs-chips .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+                    color: var(--p-surface-900);
+                    background: var(--p-surface-100);
+                }
                 .p-tabs-chips .p-tab.p-tab-active {
-                    color: #ffffff;
-                    background: var(--main-color);
-                    border-color: var(--main-color);
+                    color: var(--p-primary-contrast-color);
+                    background: var(--p-primary-color);
+                    border-color: var(--p-primary-color);
                 }
                 .p-tabs-chips .p-tablist-active-bar {
                     display: none;

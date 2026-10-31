@@ -1,6 +1,42 @@
 import { isCupGame } from '@/components/frontend/league/LeagueUtilFunctions';
+import { getPlayerForLeagueTeam } from '@/components/frontend/league/LeaguePlayersData';
 import { getMatchScore } from '@/util/tournamentMatchFunctions';
-import { RankingData, createPlayerNameResolver } from './worldRankingPoints';
+
+////////////////////////
+// ROHDATEN           //
+////////////////////////
+export type RankingTournament = { tournament: Tournament; time: number };
+
+export type RankingData = {
+    openGames: Match[];
+    leagueGames: Match[];
+    tournaments: RankingTournament[];
+};
+
+const normalizeName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
+
+// Schluessel eines Spielers in den Elo-Eintraegen (Spielerprofil sucht sich darueber)
+export const getEloPlayerKey = (name: string) => normalizeName(getPlayerForLeagueTeam(name) ?? name);
+
+// Liga-/Cup-Spiele speichern den Teamnamen, gewertet wird der Spieler dahinter.
+// Anzeigename = haeufigste Schreibweise
+const createPlayerNameResolver = () => {
+    const spellings: Record<string, Record<string, number>> = {};
+
+    const toPlayerKey = (name: string) => {
+        const playerName = (getPlayerForLeagueTeam(name) ?? name).trim().replace(/\s+/g, ' ');
+        const key = normalizeName(playerName);
+        spellings[key] ??= {};
+        spellings[key][playerName] = (spellings[key][playerName] ?? 0) + 1;
+        return key;
+    };
+
+    const getDisplayNames = (): Record<string, string> => Object.fromEntries(Object.entries(spellings).map(([key, counts]) =>
+        [key, Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0]]
+    ));
+
+    return { toPlayerKey, getDisplayNames };
+};
 
 ////////////////////////
 // ELO-FORMEL         //
@@ -14,6 +50,8 @@ export const ELO_MIN_GAMES = 20;
 export const ELO_ACTIVE_DAYS = 182;
 // Trendpfeile und Rating-Veraenderung: Vergleich mit dem Stand vor so vielen Tagen.
 export const ELO_TREND_DAYS = 30;
+// Rating-Verlauf im Spielerprofil (Sparkline)
+export const ELO_HISTORY_DAYS = 90;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -132,6 +170,8 @@ export type EloRecord = {
     recent: EloRecentGame[]; // neuestes zuerst
     // Stand vor ELO_TREND_DAYS Tagen. undefined = damals noch kein Spiel.
     before?: { rating: number; games: number; lastTime: number };
+    // Rating-Verlauf seit dem Stand vor ELO_HISTORY_DAYS Tagen, erster Wert = Stand damals (Sparkline im Spielerprofil)
+    historyRatings: number[];
 };
 
 const RECENT_GAMES = 4;
@@ -140,6 +180,8 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
     const records = new Map<string, EloRecord>();
     const trendTime = now - ELO_TREND_DAYS * DAY_MS;
     let snapshotTaken = false;
+    const historyTime = now - ELO_HISTORY_DAYS * DAY_MS;
+    let historyStarted = false;
 
     const getName = (key: string) => displayNames[key] ?? key;
 
@@ -149,6 +191,7 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
             record = {
                 key, name: members.map(getName).join(' & '), members: members.map(getName),
                 rating: ELO_START, peak: ELO_START, games: 0, wins: 0, lastTime: 0, partners: {}, recent: [],
+                historyRatings: historyStarted ? [ELO_START] : [],
             };
             records.set(key, record);
         }
@@ -156,13 +199,21 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
     };
 
     const takeSnapshot = () => {
-        records.forEach(record => record.before = { rating: record.rating, games: record.games, lastTime: record.lastTime });
+        records.forEach(record => {
+            record.before = { rating: record.rating, games: record.games, lastTime: record.lastTime };
+        });
         snapshotTaken = true;
+    };
+
+    const startHistory = () => {
+        records.forEach(record => record.historyRatings = [record.rating]);
+        historyStarted = true;
     };
 
     const getOpponentLabel = (side: EloSide) => side.teamName || side.players.map(getName).join(' & ');
 
     games.forEach(game => {
+        if (!historyStarted && game.time > historyTime) startHistory();
         if (!snapshotTaken && game.time > trendTime) takeSnapshot();
 
         // Teams: nur Doppel, ein Eintrag pro Spielerpaar
@@ -194,6 +245,7 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
 
                 entry.rating += delta;
                 entry.peak = Math.max(entry.peak, entry.rating);
+                if (historyStarted) entry.historyRatings.push(entry.rating);
                 entry.games++;
                 if (won) entry.wins++;
                 entry.lastTime = Math.max(entry.lastTime, game.time);
@@ -203,6 +255,7 @@ export const computeElo = ({ games, displayNames }: EloGames, now: number, mode:
         });
     });
 
+    if (!historyStarted) startHistory();
     if (!snapshotTaken) takeSnapshot();
 
     return [...records.values()];

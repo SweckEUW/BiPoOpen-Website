@@ -2,7 +2,16 @@
 <template>
     <div class="Tournament">
 
-        <Loadingscreen v-if="!tournament"/>
+        <!-- Skelett, bis das Turnier geladen ist: Name steht schon in der URL -->
+        <div v-if="!tournament" aria-busy="true">
+            <h1 class="bp-title">{{ route.params.TournamentName }}</h1>
+            <div class="to-skeleton-tabs">
+                <div class="bp-skeleton" style="width: 110px"></div>
+                <div class="bp-skeleton" style="width: 90px"></div>
+                <div class="bp-skeleton" style="width: 50px"></div>
+            </div>
+            <div v-for="i in 3" :key="i" class="bp-skeleton to-skeleton-group"></div>
+        </div>
 
         <div v-if="tournament && tournament.groupPhase.groups">
 
@@ -50,7 +59,6 @@ import ScheduleGroups from '@/components/frontend/tournament/ScheduleGroups.vue'
 import KOSchedule from '@/components/frontend/tournament/KOSchedule.vue';
 import MVP from '@/components/frontend/tournament/MVP.vue';
 import Photos from '@/components/frontend/tournament/photos/_Photos.vue';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Tabs from 'primevue/tabs';
 import TabList from 'primevue/tablist';
 import Tab from 'primevue/tab';
@@ -179,6 +187,22 @@ const getTournamentPhotos = () => {
 }
 :deep(.p-tabs){
    padding-bottom: 30px;
+}
+.to-skeleton-tabs{
+   display: flex;
+   gap: 24px;
+   margin-bottom: 20px;
+   padding-bottom: 12px;
+   border-bottom: 1px solid #eef0f2;
+
+   .bp-skeleton{
+      height: 16px;
+      border-radius: 6px;
+   }
+}
+.to-skeleton-group{
+   height: 220px;
+   margin-bottom: 20px;
 }
 /* MOBILE */
 @media (width <= 900px){

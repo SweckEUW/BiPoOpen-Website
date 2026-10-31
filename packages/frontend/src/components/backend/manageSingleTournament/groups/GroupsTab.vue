@@ -1,8 +1,6 @@
 <template>
    <div class="LayoutTab">
 
-      <Loadingscreen v-show="displayLoading"/>
-
       <!-- Modal -->
       <Transition name="fade">
          <Modal v-if="showModal">
@@ -29,34 +27,41 @@
       <div class="bp-button" style="margin-bottom: 20px;" @click="toggleModal(true)">Gruppen auslosen</div>
       <div class="bp-button"  @click="toggleModal(false)">Gruppen umsortieren</div>
 
+      <!-- Skelett waehrend neu ausgelost wird; Tabellen bleiben im DOM (Sortable + changeGroups lesen sie) -->
+      <div v-if="displayLoading" aria-busy="true">
+         <div v-for="i in tournament.settings.fixedGroupAmmount" :key="i" class="bp-skeleton gt-skeleton-group"></div>
+      </div>
+
       <!-- Groups -->
-      <table class="table table-hover caption-top" v-for="(group,index) in tournament.groupPhase.groups" :key="index" :id="'Group-' + index">
-         <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
-         <thead>
-            <tr class="text-left"> 
-               <th></th>
-               <th>#</th>
-               <th>Team</th>
-               <th>Spieler</th>
-            </tr>
-         </thead>
-         <tbody>
-            <tr v-for="(team,id) in group.teams" :key="team ? team._id : ''" class="text-left">
-               <td class="lt-handle">
-                  <div style="margin-bottom: 5px; margin-top: 5px;"/>
-                  <div/>
-               </td>
-               <td>{{id+1}}</td>
-               <td class="flex">
-                  <Avatar v-if="team" class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
-                  <div>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</div>
-               </td>
-               <td v-if="team">
-                  <span v-for="player in team.players" class="mr-[15px]">{{player.name}}</span>
-               </td>
-            </tr>
-         </tbody>
-      </table>
+      <div v-show="!displayLoading">
+         <table class="table table-hover caption-top" v-for="(group,index) in tournament.groupPhase.groups" :key="index" :id="'Group-' + index">
+            <caption>{{"Gruppe "+ convertNumberToCharacter(index + 1)}}</caption>
+            <thead>
+               <tr class="text-left"> 
+                  <th></th>
+                  <th>#</th>
+                  <th>Team</th>
+                  <th>Spieler</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr v-for="(team,id) in group.teams" :key="team ? team._id : ''" class="text-left">
+                  <td class="lt-handle">
+                     <div style="margin-bottom: 5px; margin-top: 5px;"/>
+                     <div/>
+                  </td>
+                  <td>{{id+1}}</td>
+                  <td class="flex">
+                     <Avatar v-if="team" class="mr-[10px]" :name="team.name!" :avatarImage="team.logo" :size="'xlarge'"/>
+                     <div>{{team ? team.name : "Team nicht gefunden / wurde gelöscht"}}</div>
+                  </td>
+                  <td v-if="team">
+                     <span v-for="player in team.players" class="mr-[15px]">{{player.name}}</span>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
 
    </div>
 </template>
@@ -71,7 +76,6 @@ import { getTeamFromName } from "@/util/tournamentTeamFunctions";
 import { generateRandomGroups, generateRandomMatchesGroupPhase, setGroups } from "@/util/tournamentGroupFunctions";
 import { initMatchesKOPhase } from "@/util/tournamentKOPhaseFunctions";
 import { useToast } from "primevue";
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Avatar from '@/components/shared/Avatar.vue';
 
 const props = defineProps({
@@ -177,6 +181,13 @@ const initSortable = () => {
    height: 2px;
    width: 25px;
    background-color: black;
+}
+
+.gt-skeleton-group{
+   height: 260px;
+   margin-top: 20px;
+   margin-bottom: 30px;
+   border-radius: 4px;
 }
 
 table{

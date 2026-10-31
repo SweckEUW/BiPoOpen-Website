@@ -149,15 +149,6 @@ declare global {
     // Player Profile Types
     type TrendPeriod = 'all' | '1m' | '3m' | '6m' | '1y';
 
-    type TrendData = {
-        winrateTrend: number | null;
-        averageHitsTrend: number | null;
-        totalMatchesTrend: number | null;
-        totalHitsTrend: number | null;
-        avg1v1Trend: number | null;
-        avg2v2Trend: number | null;
-    };
-
     type CategoryStats = {
         name: string;
         matches: number;
@@ -166,21 +157,6 @@ declare global {
         averageHits: number;
         trackedMatches: number;
     };
-
-    type TurnAnalysis = {
-        hit: number;
-        miss: number;
-        airball: number;
-        bomb: number;
-        bouncer: number;
-        trickshot: number;
-        onfire: number;
-        ballsback: number;
-        lastCup: number;
-        total: number;
-    };
-
-    type CupHeatmap = number[];
 
     type PartnerData = {
         name: string;
@@ -211,6 +187,12 @@ declare global {
         match: Match;
         source: string;
         time: number;
+        won: boolean;
+        hits: number;
+        // 2020-2022: Treffer pro Spieler nicht erfasst, zaehlt nicht in die Trefferquote
+        hitsTracked: boolean;
+        ownScore: number;
+        opponentScore: number;
     };
 
     type RivalData = {
@@ -222,9 +204,12 @@ declare global {
 
     type LeagueStanding = {
         teamName: string;
+        seasonSlug: string;
+        league: number;
         divisionLabel: string;   // "1. Liga"
         seasonLabel: string;     // "2026/27"
-        placement: number | null; // 1-basiert, null = noch kein Spiel
+        placement: number | null; // 1-basiert, nach dem Final Four, null = noch kein Spiel
+        champion: boolean;        // Final Four gewonnen
     };
 
     type PlayerProfileData = {
@@ -232,6 +217,8 @@ declare global {
         leagueTeam: string | null;
         leagueStandings: LeagueStanding[]; // alle Saisons, neueste zuerst, fuer die Liga-Chips
         firstGameTime: number | null;
+        allTimeMatches: number; // unabhaengig vom gewaehlten Zeitraum
+        elo: PlayerEloSummary | null;
         totalMatches: number;
         totalWins: number;
         totalLosses: number;
@@ -240,25 +227,41 @@ declare global {
         averageHits: number;
         currentWinStreak: number;
         bestWinStreak: number;
-        trends: TrendData;
         categories: CategoryStats[];
         recentForm: ('W' | 'L')[];
         matchHistory: MatchHistoryEntry[];
         rivals: RivalData[];
         partners: PartnerData[];
-        turnAnalysis: TurnAnalysis;
-        cupHeatmap: CupHeatmap;
         extraStats: ExtraStats;
         badges: PlayerBadge[];
     };
 
+    type PlayerEloSummary = {
+        rank: number | null;       // null = nicht in der Liste
+        inactive: boolean;         // genug Spiele, aber laenger nicht gespielt
+        rating: number;
+        ratingChange: number;      // seit ELO_HISTORY_DAYS Tagen, passend zur Sparkline
+        peak: number;
+        games: number;
+        historyRatings: number[];  // Verlauf seit ELO_HISTORY_DAYS Tagen
+    };
+
+    type PlayerBadgeGroup = 'title' | 'record' | 'performance' | 'milestone';
+
     type PlayerBadge = {
         id: string;
+        group: PlayerBadgeGroup;
+        // Stufen einer Reihe (z.B. 'matches'): angezeigt werden die hoechste erreichte und die naechste offene Stufe
+        tier?: string;
         icon: string;
         label: string;
-        description: string;
+        caption: string;       // kurze Zeile unter dem Namen
+        description: string;   // Detail-Dialog
         date: string | null;
-        priority?: number;
-        special?: 'rainbow';
+        time: number;          // Sortierung, 0 = unbekannt
+        locked?: boolean;
+        // Rekorde: frueher gehalten, inzwischen von jemand anderem uebertroffen
+        former?: boolean;
+        progress?: { current: number; target: number };
     };
 }

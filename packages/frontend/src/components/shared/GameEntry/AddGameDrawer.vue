@@ -64,6 +64,8 @@ import { addOpenGame } from '@/components/frontend/openGames/OpenGamesUtilFuncti
 import { addLeagueGame, filterLeagueGames, getAllLeagueGames, getLeagueGameSubtitle } from '@/components/frontend/league/LeagueUtilFunctions';
 import { getCupGames, getCupRoundGames, getLeagueCup, getPairingResult, getPlannedRoundNames } from '@/components/frontend/league/cup/LeagueCupUtilFunctions';
 import { CURRENT_SEASON_SLUG, LEAGUE_SEASONS, getSeason, toLeaguePlayers } from '@/components/frontend/league/LeagueSeasonsData';
+import { clearPlayerCaches } from '@/components/frontend/playerProfile/PlayerProfileUtilFunctions';
+import { clearGameDataCache } from '@/util/gameDataCache';
 
 // Drawer-Einstellungen je Spieltyp
 const TEAM_LABELS: [string, string] = ['Team 1', 'Team 2'];
@@ -73,7 +75,7 @@ const MODE_PROPS = {
     cup: { sideLabels: TEAM_LABELS, lockedNames: true, allowDraw: false, avatarShape: 'square' as const, incompleteLabel: 'Paarung wählen' },
 };
 
-const { addGameVisible, pageContext, notifyGameSaved } = useAddGame();
+const { addGameVisible, pageContext, presetNames, notifyGameSaved } = useAddGame();
 
 // Eingetragen wird immer in der aktuellen Saison.
 const season = getSeason(CURRENT_SEASON_SLUG) ?? LEAGUE_SEASONS[0];
@@ -88,9 +90,16 @@ const divisionOptions = season.divisions.map(division => ({ label: division.labe
 const mode = ref<AddGameMode>('open');
 const league = ref(season.divisions[0].league);
 
-// Neue leere Seiten bei jedem Wechsel von Spieltyp oder Liga
+// Neue leere Seiten bei jedem Wechsel von Spieltyp oder Liga.
+// sync: laeuft sofort beim Oeffnen, bevor die Vorbelegung gesetzt wird, und ueberschreibt sie nicht.
 const initialSides = shallowRef<GameEntrySide[]>(createEmptySides());
-watch([mode, league], () => { initialSides.value = createEmptySides(); });
+watch([mode, league], () => { initialSides.value = createEmptySides(); }, { flush: 'sync' });
+
+const createPresetSides = (names: string[]) => {
+    const sides = createEmptySides();
+    names.forEach((name, index) => sides[index].players[0].name = name);
+    return sides;
+};
 
 // ─── Daten ───
 // Bei jedem Oeffnen neu laden, damit Runde und offene Paarungen aktuell sind.
@@ -114,6 +123,10 @@ watch(addGameVisible, (isVisible) => {
     mode.value = context && modeOptions.some(option => option.value === context.mode) ? context.mode : 'open';
     if (context?.league !== undefined && divisionOptions.some(option => option.value === context.league))
         league.value = context.league;
+
+    // Leer, falls beim letzten Oeffnen noch vorbelegt war
+    initialSides.value = presetNames.value ? createPresetSides(presetNames.value) : createEmptySides();
+    presetNames.value = null;
 
     loadData();
 });
@@ -163,7 +176,12 @@ const saveGame = (sides: GameEntrySide[]) => {
 
 const save = async (sides: GameEntrySide[]) => {
     const success = await saveGame(sides);
-    if (success) notifyGameSaved();
+    if (success) {
+        // Erst die Caches leeren, damit die Seiten beim Neuladen frische Daten bekommen
+        clearGameDataCache();
+        clearPlayerCaches();
+        notifyGameSaved();
+    }
     return success;
 };
 </script>

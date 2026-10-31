@@ -28,7 +28,13 @@
                 </div>
             </div>
 
-            <Loadingscreen v-if="isLoading"/>
+            <section v-if="isLoading" class="nm-section" aria-busy="true">
+                <div class="nm-section-head">
+                    <h2 class="nm-section-title">Wer noch läuft</h2>
+                    <span class="nm-section-meta">nach Anzahl</span>
+                </div>
+                <SkeletonList :rows="6" class="nm-card"/>
+            </section>
 
             <template v-else>
                 <!-- Offene Meilen je Spieler -->
@@ -99,7 +105,7 @@
 import { computed, ref, shallowRef } from 'vue';
 import { useRouter } from 'vue-router';
 import Avatar from '@/components/shared/Avatar.vue';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import SkeletonList from '@/components/shared/SkeletonList.vue';
 import { onGameSaved } from '@/components/shared/GameEntry/useAddGame';
 import { getAllOpenGames } from '@/components/frontend/openGames/OpenGamesUtilFunctions';
 import { formatPlayerName } from '@/components/frontend/home/homeUtil';

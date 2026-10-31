@@ -5,8 +5,8 @@
 		:blockScroll="true"
 		:showCloseIcon="false"
 		:pt="{ root: { style: rootStyle } }"
-		@show="resetPosition"
-		@after-hide="resetPosition"
+		@show="onShow"
+		@after-hide="onAfterHide"
 	>
 		<template #container>
 			<!-- Handle + header: draggable with touch and mouse -->
@@ -56,6 +56,11 @@
 	</Drawer>
 </template>
 
+<script lang="ts">
+// Ueber alle Instanzen: wie viele Sheets gerade offen sind
+let openSheetCount = 0;
+</script>
+
 <script setup lang="ts">
 /**
  * Unified bottom sheet with a drag handle, following the standard behaviour of
@@ -68,6 +73,7 @@
  */
 import { computed, onBeforeUnmount, ref } from 'vue';
 import Drawer from 'primevue/drawer';
+import { blockBodyScroll } from 'primevue/utils';
 import { resetStickyTop } from './useStickyStack';
 
 const visible = defineModel<boolean>('visible', { default: false });
@@ -139,6 +145,28 @@ const resetPosition = () => {
 	detentIndex.value = 0;
 	offset.value = 0;
 };
+
+// Uebereinander geoeffnete Sheets (z.B. Spiel eintragen aus einem anderen Sheet):
+// PrimeVue gibt den Body-Scroll beim Schliessen frei, auch wenn darunter noch ein Sheet offen ist.
+let isOpen = false;
+
+const onShow = () => {
+	if (!isOpen) openSheetCount++;
+	isOpen = true;
+	resetPosition();
+};
+
+const onAfterHide = () => {
+	if (isOpen) openSheetCount--;
+	isOpen = false;
+	if (openSheetCount > 0) blockBodyScroll();
+	resetPosition();
+};
+
+// Ausgeblendet ohne after-hide (z.B. Seitenwechsel bei offenem Sheet)
+onBeforeUnmount(() => {
+	if (isOpen) openSheetCount--;
+});
 
 const onResize = () => {
 	if (!isDragging.value && detentIndex.value > 0) snapTo(detentIndex.value);

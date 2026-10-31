@@ -3,7 +3,13 @@
         
         <h1 class="bp-title">League Games Backend</h1>
 
-        <Loadingscreen v-show="!leagueGames"/>
+        <div v-if="!leagueGames" aria-busy="true">
+            <div class="ml-filters">
+                <div class="bp-skeleton ml-skeleton-select"></div>
+                <div class="bp-skeleton ml-skeleton-select"></div>
+            </div>
+            <div v-for="i in 6" :key="i" class="bp-skeleton bp-skeleton-match"></div>
+        </div>
 
         <div v-if="leagueGames">
             <div class="ml-filters">
@@ -38,7 +44,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import Select from 'primevue/select';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
 import LeagueTeamSelect from '@/components/frontend/league/LeagueTeamSelect.vue';
@@ -104,6 +109,11 @@ const deleteMatch = async () => {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
+}
+.ml-skeleton-select{
+    width: 50%;
+    height: 40px;
+    border-radius: 6px;
 }
 .ml-empty{
     text-align: center;

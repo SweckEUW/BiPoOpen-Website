@@ -7,7 +7,10 @@
             <Select v-model="selectedSeasonSlug" :options="seasonOptions" optionLabel="label" optionValue="value" class="w-full" />
         </div>
 
-        <Loadingscreen v-if="isLoading"/>
+        <div v-if="isLoading" aria-busy="true">
+            <div class="bp-skeleton mc-skeleton-panel" style="height: 180px"></div>
+            <div class="bp-skeleton mc-skeleton-panel" style="height: 320px"></div>
+        </div>
 
         <!-- ─── Kein Cup: Teilnehmer waehlen und erstellen ─── -->
         <div v-else-if="!leagueCup" class="mc-panel">
@@ -146,7 +149,6 @@
 import { computed, ref, watch } from 'vue';
 import Select from 'primevue/select';
 import { useToast } from 'primevue/usetoast';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
 import GameEntryDrawer from '@/components/shared/GameEntry/GameEntryDrawer.vue';
@@ -365,6 +367,10 @@ const deleteMatch = async () => {
     padding: 15px;
     margin-bottom: 30px;
     border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+.mc-skeleton-panel{
+    margin-bottom: 30px;
     border-radius: 4px;
 }
 .mc-panel-title{

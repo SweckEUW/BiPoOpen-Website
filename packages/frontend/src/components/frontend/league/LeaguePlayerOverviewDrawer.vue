@@ -1,65 +1,102 @@
 <template>
-    <BottomSheet v-model:visible="drawerVisible" style="color: var(--main-color)">
+    <BottomSheet v-model:visible="drawerVisible">
         <template #header>
-            <div class="w-full flex justify-content-center" v-if="selectedPlayer">
-                <div class="flex flex-column align-items-center">
-                    <div class="font-bold text-[20px]">{{ selectedPlayer.name }}</div>
-                    <Image class="h-[120px]" :src="selectedPlayer.logo" preview
-                        :pt="{
-                            toolbar: { style: 'display: none' },
-                            previewMask: { style: 'background: transparent; opacity: 0' },
-                            mask: { style: 'background-color: rgba(0, 0, 0, 0.9) !important' }
-                        }"
-                    />
+            <div v-if="selectedPlayer" class="lpo-head">
+                <Avatar :name="selectedPlayer.name" :avatarImage="selectedPlayer.logo" shape="square" class="lpo-head-avatar" />
+                <div class="lpo-head-text">
+                    <div class="lpo-title">{{ selectedPlayer.name }}</div>
+                    <div v-if="subtitle" class="lpo-subtitle">{{ subtitle }}</div>
                 </div>
             </div>
         </template>
 
-        <div v-if="selectedPlayer">
-            <div v-for="round in orderedRounds" :key="round.name" class="mb-[40px]">
-                <div class="lg-sticky-round-block">
-                    <div class="font-bold text-[24px] capitalize lg-sticky-round">{{ round.name }}</div>
+        <div v-if="selectedPlayer" class="lpo">
+            <!-- Fortschritt: ein Balken je Runde -->
+            <div class="lpo-progress">
+                <div class="lpo-progress-text">
+                    <span><b>{{ playedCount }} von {{ opponents.length * 2 }}</b> Spielen gespielt</span>
+                    <span>Hin {{ playedPerRound[0] }}/{{ opponents.length }} · Rück {{ playedPerRound[1] }}/{{ opponents.length }}</span>
+                </div>
+                <div class="lpo-progress-bars">
+                    <div v-for="(played, roundIndex) in playedPerRound" :key="roundIndex" class="lpo-progress-bar">
+                        <div class="lpo-progress-fill" :style="{ width: `${opponents.length ? played / opponents.length * 100 : 0}%` }"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gegner in Tabellenreihenfolge, Antippen klappt die Details auf -->
+            <div class="lpo-table">
+                <div class="lpo-row lpo-row--head">
+                    <span class="lpo-col-opponent">Gegner</span>
+                    <span class="lpo-col-result">Hinrunde</span>
+                    <span class="lpo-col-result">Rückrunde</span>
                 </div>
 
-                <div class="lg-sticky-subblock lg-sticky-subblock--played">
-                    <div class="font-bold text-[20px] lg-sticky-subheadline">
-                        Absolvierte Spiele {{ round.data.matchesPlayed.length }}/{{ round.data.matchesPlayed.length + round.data.matchesToPlay.length }}
-                    </div>
-                </div>
-                <div v-for="match in round.data.matchesPlayed" style="margin-top: 10px;">
-                    <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'" showDate>
-                        <template v-if="getMatchResult(match)" #meta>
-                            <Tag
-                                :severity="getMatchResult(match) === 'Sieg' ? 'success' : 'danger'"
-                                :value="getMatchResult(match)"
-                                rounded
-                                class="ml-auto"
-                            />
-                        </template>
-                    </MatchElement>
-                </div>
+                <template v-for="opponent in opponents" :key="opponent.name">
+                    <button
+                        type="button"
+                        class="lpo-row"
+                        :aria-expanded="expandedOpponent === opponent.name"
+                        @click="toggleOpponent(opponent.name)"
+                    >
+                        <span class="lpo-col-opponent">
+                            <span class="lpo-rank">{{ opponent.placement }}</span>
+                            <Avatar :name="opponent.name" :avatarImage="opponent.logo" shape="square" class="lpo-avatar" />
+                            <span class="lpo-name">{{ opponent.name }}</span>
+                        </span>
+                        <span v-for="(leg, roundIndex) in opponent.legs" :key="roundIndex" class="lpo-col-result">
+                            <span class="lpo-result" :class="leg ? (leg.won ? 'lpo-result--win' : 'lpo-result--loss') : 'lpo-result--open'">
+                                {{ leg ? `${leg.ownScore}:${leg.enemyScore}` : 'offen' }}
+                            </span>
+                        </span>
+                    </button>
 
-                <div v-if="round.data.matchesToPlay.length > 0" class="mt-[20px]">
-                    <div class="lg-sticky-subblock lg-sticky-subblock--open">
-                        <div class="font-bold text-[20px] lg-sticky-subheadline">Offene Spiele</div>
+                    <div v-if="expandedOpponent === opponent.name" class="lpo-detail">
+                        <div v-for="(leg, roundIndex) in opponent.legs" :key="roundIndex" class="lpo-detail-row">
+                            <span class="lpo-detail-label">{{ ROUND_LABELS[roundIndex] }}</span>
+                            <span v-if="leg" class="lpo-detail-value">
+                                <b>{{ leg.won ? 'Sieg' : 'Niederlage' }} {{ leg.ownScore }} : {{ leg.enemyScore }}</b>
+                                <template v-if="leg.time"> · {{ formatGameTime(leg.time) }}</template>
+                            </span>
+                            <span v-else class="lpo-detail-value lpo-detail-open">
+                                noch offen
+                                <!-- Eingetragen wird immer das naechste Spiel der Paarung -->
+                                <button
+                                    v-if="canAddGames && opponent.legs.indexOf(null) === roundIndex"
+                                    type="button"
+                                    class="lpo-add"
+                                    @click="addGame(opponent.name)"
+                                >+ Eintragen</button>
+                            </span>
+                        </div>
                     </div>
-                    <div v-for="match in round.data.matchesToPlay" style="margin-top: 10px;">
-                        <MatchElement :match="withLeagueTeamLogos(match)" :avatarShape="'square'"/>
-                    </div>
+                </template>
+            </div>
+
+            <div class="lpo-legend">
+                <div class="lpo-legend-items">
+                    <span><span class="lpo-swatch lpo-result--win"></span>Sieg</span>
+                    <span><span class="lpo-swatch lpo-result--loss"></span>Niederlage</span>
+                    <span><span class="lpo-swatch lpo-result--open"></span>offen</span>
                 </div>
+                <div>Ergebnis immer aus Sicht von {{ selectedPlayer.name }}</div>
             </div>
         </div>
     </BottomSheet>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Image from 'primevue/image';
+import { computed, ref, watch } from 'vue';
 import BottomSheet from '@/components/shared/BottomSheet.vue';
-import Tag from 'primevue/tag';
-import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import { withLeagueTeamLogos } from './LeaguePlayersData';
-import { checkIfMatchFinished, checkIfTeam1WonVsTeam2 } from '@/util/tournamentMatchFunctions';
+import Avatar from '@/components/shared/Avatar.vue';
+import { useAddGame } from '@/components/shared/GameEntry/useAddGame';
+import { getLeagueList, getMatchesFromPlayer } from './LeagueUtilFunctions';
+import { getMatchScore } from '@/util/tournamentMatchFunctions';
+import { formatGameTime } from '@/util/util';
+
+const ROUND_LABELS = ['Hinrunde', 'Rückrunde'];
+
+type Leg = { ownScore: number; enemyScore: number; won: boolean; time?: number };
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });
 
@@ -67,144 +104,301 @@ const props = defineProps<{
     selectedPlayer?: LeaguePlayer;
     leaguePlayers: LeaguePlayer[];
     leagueGames: Match[];
+    divisionLabel?: string;
+    canAddGames?: boolean;     // nur in der aktuellen Saison
 }>();
 
-const gamesFromSelectedLeaguePlayer = computed(() => {
-    const result = {
-        hinrunde: {
-            matchesPlayed: [] as Match[],
-            matchesToPlay: [] as Match[]
-        },
-        rückrunde: {
-            matchesPlayed: [] as Match[],
-            matchesToPlay: [] as Match[]
-        }
-    };
+const { openAddGame } = useAddGame();
 
-    if (!props.selectedPlayer) return result;
+const expandedOpponent = ref<string>();
+watch(() => props.selectedPlayer, () => expandedOpponent.value = undefined);
 
-    const selectedPlayerName = props.selectedPlayer.name;
-    const matchCounts: Record<string, number> = {};
+const toggleOpponent = (name: string) => {
+    expandedOpponent.value = expandedOpponent.value === name ? undefined : name;
+};
 
-    const allMatchesPlayed = props.leagueGames
-        .filter((match) =>
-            match.team1.players.some((p) => p.name === selectedPlayerName) ||
-            match.team2.players.some((p) => p.name === selectedPlayerName)
-        )
-        .sort((a, b) => (a.time ?? 0) - (b.time ?? 0));
+const table = computed(() => getLeagueList(props.leagueGames, props.leaguePlayers));
 
-    allMatchesPlayed.forEach((match) => {
-        const isTeam1 = match.team1.players.some((p) => p.name === selectedPlayerName);
-        const opponentName = isTeam1 ? match.team2.players[0].name : match.team1.players[0].name;
-
-        matchCounts[opponentName] = (matchCounts[opponentName] || 0) + 1;
-
-        if (matchCounts[opponentName] === 1) result.hinrunde.matchesPlayed.push(match);
-        if (matchCounts[opponentName] === 2) result.rückrunde.matchesPlayed.push(match);
-    });
-
-    props.leaguePlayers.forEach((player) => {
-        if (player.name === selectedPlayerName) return;
-
-        const played = matchCounts[player.name] || 0;
-
-        const newMatch = {
-            team1: { _id: '', players: [{ name: selectedPlayerName }] },
-            team2: { _id: '', players: [{ name: player.name }] }
-        } as Match;
-
-        if (played === 0) result.hinrunde.matchesToPlay.push(newMatch);
-        if (played === 0) result.rückrunde.matchesToPlay.push({ ...newMatch });
-        if (played === 1) result.rückrunde.matchesToPlay.push(newMatch);
-    });
-
-    return result;
+// "1. Liga · Platz 6 von 12", Platz erst ab dem ersten Spiel
+const subtitle = computed(() => {
+    const entry = table.value.find(player => player.name === props.selectedPlayer?.name);
+    const placement = entry && entry.ammountOfMatches > 0 ? `Platz ${entry.placement! + 1} von ${table.value.length}` : undefined;
+    return [props.divisionLabel, placement].filter(part => part).join(' · ');
 });
 
-const orderedRounds = computed(() => {
-    const games = gamesFromSelectedLeaguePlayer.value;
-    if (!games) return [];
+// Spiele gegen einen Gegner nach Zeit: das erste ist die Hinrunde, das zweite die Rueckrunde.
+// Spiele ohne Zeit zaehlen als neueste, wie in splitLeagueGamesByRound.
+const opponents = computed(() => {
+    if (!props.selectedPlayer) return [];
 
-    const hinrunde = { name: 'hinrunde', data: games.hinrunde };
-    const rückrunde = { name: 'rückrunde', data: games.rückrunde };
+    const ownName = props.selectedPlayer.name.toLowerCase();
+    const ownMatches = getMatchesFromPlayer(props.leagueGames, ownName)
+        .map((match, index) => ({ match, index }))
+        .sort((a, b) => (a.match.time ?? Number.MAX_SAFE_INTEGER) - (b.match.time ?? Number.MAX_SAFE_INTEGER) || a.index - b.index)
+        .map(entry => entry.match);
 
-    if (games.hinrunde.matchesToPlay.length === 0) return [rückrunde, hinrunde];
+    return table.value
+        .filter(player => player.name.toLowerCase() !== ownName)
+        .map(player => {
+            const opponentName = player.name.toLowerCase();
+            const legs: (Leg | null)[] = ownMatches
+                .filter(match => [match.team1, match.team2].some(team => team.players[0].name.toLowerCase() === opponentName))
+                .slice(0, 2)
+                .map(match => {
+                    const isTeam1 = match.team1.players[0].name.toLowerCase() === ownName;
+                    const ownScore = getMatchScore(match, isTeam1) ?? 0;
+                    const enemyScore = getMatchScore(match, !isTeam1) ?? 0;
+                    return { ownScore, enemyScore, won: ownScore > enemyScore, time: match.time };
+                });
 
-    return [hinrunde, rückrunde];
+            while (legs.length < 2) legs.push(null);
+
+            return {
+                name: player.name,
+                logo: props.leaguePlayers.find(leaguePlayer => leaguePlayer.name === player.name)?.logo,
+                placement: player.placement! + 1,
+                legs,
+            };
+        });
 });
 
+const playedPerRound = computed(() => [0, 1].map(roundIndex => opponents.value.filter(opponent => opponent.legs[roundIndex]).length));
+const playedCount = computed(() => playedPerRound.value[0] + playedPerRound.value[1]);
 
-const getMatchResult = (match: Match): 'Sieg' | 'Niederlage' | undefined => {
-    if (!props.selectedPlayer || !checkIfMatchFinished(match)) return undefined;
-
-    const selectedPlayerName = props.selectedPlayer.name;
-    const isTeam1 = match.team1.players.some((p) => p.name === selectedPlayerName);
-    const isTeam2 = match.team2.players.some((p) => p.name === selectedPlayerName);
-    const team1Won = checkIfTeam1WonVsTeam2(match);
-
-    if (team1Won === undefined) return undefined;
-    if (isTeam1) return team1Won ? 'Sieg' : 'Niederlage';
-    if (isTeam2) return team1Won ? 'Niederlage' : 'Sieg';
-
-    return undefined;
+const addGame = (opponentName: string) => {
+    openAddGame([props.selectedPlayer!.name, opponentName]);
 };
 </script>
 
 <style scoped>
-
-.lg-sticky-round-block {
-    position: sticky;
-    top: 0;
-    z-index: 7;
-    background: #fff;
-    min-height: 52px;
-    display: flex;
-    align-items: flex-end;
-    padding: 8px 0;
-}
-
-.lg-sticky-round-block::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: -10px;
-    height: 10px;
-    background: #fff;
-}
-
-.lg-sticky-subblock {
-    position: sticky;
-    top: 52px;
-    z-index: 6;
-    background: #fff;
-    min-height: 42px;
+/* ─── Kopf ─── */
+.lpo-head {
     display: flex;
     align-items: center;
-    padding: 6px 0;
+    gap: 14px;
+    min-width: 0;
 }
-
-.lg-sticky-subheadline {
-    margin-top: 0;
+.lpo-head-avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    opacity: 1;
+    --avatar-background: #EEF0F3;
+    --avatar-color: #6B717B;
+}
+.lpo-head-text {
+    min-width: 0;
+}
+.lpo-title {
+    overflow: hidden;
+    font-size: 22px;
+    font-weight: 800;
+    color: #16181D;
     line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.lpo-subtitle {
+    font-size: 13px;
+    color: #6B7079;
 }
 
-/* Make Avatars Bigger */
-:deep(.p-avatar){
-    width: 50px;
-    height: 50px;
+/* ─── Fortschritt ─── */
+.lpo-progress {
+    margin-bottom: 18px;
+}
+.lpo-progress-text {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #4B5260;
+}
+.lpo-progress-text b {
+    color: #16181D;
+}
+.lpo-progress-bars {
+    display: flex;
+    gap: 6px;
+}
+.lpo-progress-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #E8EAED;
+    overflow: hidden;
+}
+.lpo-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: #2AA3B8;
+    transition: width .3s ease;
 }
 
-@media (width <= 900px) {
-    .lg-sticky-round-block {
-        min-height: 44px;
-        padding: 6px 0;
-    }
+/* ─── Gegner-Tabelle ─── */
+.lpo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 46px;
+    padding: 6px 0;
+    border: none;
+    border-bottom: 1px solid #EEF0F3;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.lpo-row:focus-visible {
+    outline: 2px solid var(--main-color);
+    outline-offset: -2px;
+    border-radius: 8px;
+}
+.lpo-row--head {
+    min-height: 0;
+    padding: 0 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #6B7079;
+    cursor: default;
+}
 
-    .lg-sticky-subblock {
-        top: 44px;
-        min-height: 36px;
-        padding: 4px 0;
-    }
+.lpo-col-opponent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.lpo-col-result {
+    flex: 0 0 76px;
+    display: flex;
+    justify-content: center;
+}
+
+.lpo-rank {
+    flex: 0 0 18px;
+    font-size: 12px;
+    color: #9AA0A9;
+    text-align: right;
+}
+.lpo-avatar {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    opacity: 1;
+    --avatar-background: #EEF0F3;
+    --avatar-color: #6B717B;
+}
+.lpo-name {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    color: #16181D;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lpo-result {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.lpo-result--win {
+    background: #E5F4EA;
+    color: #1F7A43;
+}
+.lpo-result--loss {
+    background: #FBE7E8;
+    color: #B3323C;
+}
+.lpo-result--open {
+    border: 1px dashed #CDD1D6;
+    color: #9AA0A9;
+    font-weight: 600;
+}
+
+/* ─── Details einer Paarung ─── */
+.lpo-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 8px 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #F4F5F7;
+    font-size: 13px;
+}
+.lpo-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 28px;
+}
+.lpo-detail-label {
+    color: #4B5260;
+}
+.lpo-detail-value {
+    color: #16181D;
+    text-align: right;
+}
+.lpo-detail-open {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6B7079;
+}
+.lpo-add {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 999px;
+    background: var(--main-color);
+    color: white;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.lpo-add:focus-visible {
+    outline: 2px solid var(--main-color);
+    outline-offset: 2px;
+}
+
+/* ─── Legende ─── */
+.lpo-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #6B7079;
+}
+.lpo-legend-items {
+    display: flex;
+    gap: 14px;
+}
+.lpo-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    border-radius: 3px;
+    vertical-align: -2px;
 }
 </style>

@@ -18,6 +18,16 @@
         <div v-if="view === 'draw'" class="ld-draw">
             <div class="ld-chips">
                 <Select
+                    v-if="leagueOptions.length > 1"
+                    v-model="league"
+                    :options="leagueOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    aria-label="Liga"
+                    :disabled="controlsLocked"
+                    class="ld-chip ld-select"
+                />
+                <Select
                     v-model="round"
                     :options="ROUND_OPTIONS"
                     optionLabel="label"
@@ -161,8 +171,10 @@ const REVEAL_DELAY = 1200;   // gezogenes Team kurz zeigen, bevor das Gegner-Rad
 const RESULT_DELAY = 600;
 
 const drawerVisible = defineModel<boolean>('visible', { default: false });
+const league = defineModel<number>('league', { required: true });
 
 const props = defineProps<{
+    leagueOptions: { label: string, value: number }[];
     leaguePlayers: LeaguePlayer[];
     leagueGames: Match[];
     regularSeasonGameCount: number;
@@ -285,6 +297,7 @@ const setDefaultRound = () => {
 watch(() => props.leaguePlayers.map(player => player.name).join('|'), () => {
     resetDraw();
     participants.value = new Set(props.leaguePlayers.map(player => player.name));
+    setDefaultRound();
 }, { immediate: true });
 
 watch(drawerVisible, (visible) => {

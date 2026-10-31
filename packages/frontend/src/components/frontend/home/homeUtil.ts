@@ -12,15 +12,18 @@ export const NEXT_BIPO_OPEN_START = new Date(`${NEXT_BIPO_OPEN.date}T14:00:00`).
 const DRIVE_PHOTO_FILES = import.meta.glob<DrivePhoto[]>('/src/assets/*/driveImageIDs.json', { import: 'default' });
 
 // Zufaellig gemischte Fotos aus allen Turnieren. Slider und Kacheln teilen sich den Ladevorgang.
+// Im Dev-Modus feste Reihenfolge: Jeder Reload laedt dieselben Fotos aus dem Browser-Cache,
+// sonst drosselt Google nach ein paar HMR-Reloads mit 429.
 let allPhotosPromise: Promise<DrivePhoto[]> | undefined;
 export const loadAllTournamentPhotos = () => {
     allPhotosPromise ??= Promise.allSettled(Object.values(DRIVE_PHOTO_FILES).map(load => load()))
         .then(results => results.flatMap(result => result.status === 'fulfilled' ? result.value : []));
-    return allPhotosPromise.then(shuffle);
+    return allPhotosPromise.then(photos => import.meta.env.DEV ? [...photos].reverse() : shuffle(photos));
 };
 
+// Direkt vom Google-CDN statt ueber drive.google.com/thumbnail (das ist stark rate-limitiert -> 429)
 export const getDriveThumbnail = (imgId: string, width: number) =>
-    `https://drive.google.com/thumbnail?&id=${imgId}&sz=w${width}`;
+    `https://lh3.googleusercontent.com/d/${imgId}=w${width}`;
 
 export const shuffle = <T>(items: T[]): T[] => {
     const shuffled = [...items];

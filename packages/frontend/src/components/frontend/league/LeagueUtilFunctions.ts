@@ -41,8 +41,90 @@ export const isCupGame = (match: Match) => !!match.cupId;
 export const filterLeagueGames = (leagueGames: Match[], seasonSlug: string, league: number) =>
     leagueGames.filter(match => !isCupGame(match) && getGameSeason(match) === seasonSlug && getGameLeague(match) === league);
 
-// Team, Liga und Tabellenplatz fuer jede Saison, in der der Spieler gemeldet ist (neueste zuerst).
-// Platz nach der Hauptrunde-Tabelle, null solange das Team noch kein Spiel hat.
+// Final Four: Halbfinale 1. gegen 4. und 2. gegen 3., danach das Finale, jeweils Best of 3.
+const getSeriesTeamNames = (team: Team | undefined) => team
+    ? [team.name, ...team.players.map(player => player.name)].filter(Boolean).map(name => name!.toLocaleLowerCase())
+    : [];
+
+const getSeriesResult = (games: Match[], team1: Team | undefined, team2: Team | undefined) => {
+    if (!team1 || !team2)
+        return { winner: undefined, loser: undefined, games: [] as Match[] };
+
+    const team1Names = getSeriesTeamNames(team1);
+    const team2Names = getSeriesTeamNames(team2);
+    const seriesGames = games.filter(match => {
+        const matchTeam1Names = getSeriesTeamNames(match.team1);
+        const matchTeam2Names = getSeriesTeamNames(match.team2);
+        return matchTeam1Names.some(name => team1Names.includes(name)) && matchTeam2Names.some(name => team2Names.includes(name))
+            || matchTeam1Names.some(name => team2Names.includes(name)) && matchTeam2Names.some(name => team1Names.includes(name));
+    }).slice(0, 3);
+    let team1Wins = 0;
+    let team2Wins = 0;
+
+    seriesGames.forEach(match => {
+        const matchTeam1Score = match.team1.players.reduce((score, player) => score + (player.score ?? 0), 0);
+        const matchTeam2Score = match.team2.players.reduce((score, player) => score + (player.score ?? 0), 0);
+        if (matchTeam1Score === matchTeam2Score)
+            return;
+
+        const matchUsesTeam1 = getSeriesTeamNames(match.team1).some(name => team1Names.includes(name));
+        if (matchUsesTeam1 === (matchTeam1Score > matchTeam2Score))
+            team1Wins++;
+        else
+            team2Wins++;
+    });
+
+    return {
+        winner: team1Wins >= 2 ? team1 : team2Wins >= 2 ? team2 : undefined,
+        loser: team1Wins >= 2 ? team2 : team2Wins >= 2 ? team1 : undefined,
+        games: seriesGames,
+    };
+};
+
+// Endstand einer Liga in einer Saison: Tabelle der Hauptrunde, nach gespieltem Final Four dessen Ergebnis.
+// finalRanking (Teamnamen): Meister, Finalist, Halbfinal-Verlierer nach Setzplatz, dann der Rest der Tabelle.
+// null, solange das Finale nicht entschieden ist.
+export const getDivisionResult = (leagueGames: Match[], seasonSlug: string, division: LeagueDivision) => {
+    const regularSeasonGameCount = getRegularSeasonGameCount(division);
+    const divisionGames = filterLeagueGames(leagueGames, seasonSlug, division.league)
+        .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0));
+    const regularSeasonGames = divisionGames.slice(0, regularSeasonGameCount);
+    const finalFourGames = divisionGames.slice(regularSeasonGameCount);
+    const table = getLeagueList(regularSeasonGames, toLeaguePlayers(division.teams));
+
+    const noResult = { table, champion: undefined as string | undefined, finalGames: [] as Match[], finalRanking: null as string[] | null };
+
+    // Final Four startet erst, wenn die Hauptrunde komplett gespielt ist.
+    if (!division.hasFinalFour || regularSeasonGameCount === 0 || regularSeasonGames.length < regularSeasonGameCount || table.length < 4)
+        return noResult;
+
+    const playerNameByTeam = (teamName: string) =>
+        division.teams.find(team => team.teamName === teamName)?.playerName ?? teamName;
+    const seeds = table.slice(0, 4).map(standing => ({
+        _id: '',
+        name: standing.name,
+        players: [{ _id: '', name: playerNameByTeam(standing.name), score: 0 }],
+    } as Team));
+
+    const semiFinal1 = getSeriesResult(finalFourGames, seeds[0], seeds[3]);
+    const semiFinal2 = getSeriesResult(finalFourGames, seeds[1], seeds[2]);
+    const final = getSeriesResult(finalFourGames, semiFinal1.winner, semiFinal2.winner);
+    if (!final.winner || !final.loser || !final.games.length)
+        return noResult;
+
+    const semiFinalLosers = [semiFinal1.loser!, semiFinal2.loser!].sort((team1, team2) => seeds.indexOf(team1) - seeds.indexOf(team2));
+    return {
+        table,
+        champion: final.winner.name!,
+        finalGames: final.games,
+        finalRanking: [final.winner, final.loser, ...semiFinalLosers].map(team => team.name!)
+            .concat(table.slice(4).map(standing => standing.name)),
+    };
+};
+
+// Team, Liga und Platzierung fuer jede Saison, in der der Spieler gemeldet ist (neueste zuerst).
+// Platz nach dem Final Four, solange das nicht entschieden ist nach der Hauptrunden-Tabelle.
+// null, solange das Team noch kein Spiel hat.
 export const getLeagueStandingsForPlayer = (leagueGames: Match[], playerName: string): LeagueStanding[] => {
     const normalizeName = (name: string) => name.trim().replace(/\s+/g, ' ').toLowerCase();
 
@@ -50,17 +132,19 @@ export const getLeagueStandingsForPlayer = (leagueGames: Match[], playerName: st
         const team = division.teams.find(team => normalizeName(team.playerName) === normalizeName(playerName));
         if (!team) return [];
 
-        const regularSeasonGames = filterLeagueGames(leagueGames, season.slug, division.league)
-            .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0))
-            .slice(0, getRegularSeasonGameCount(division));
-        const entry = getLeagueList(regularSeasonGames, toLeaguePlayers(division.teams))
-            .find(player => player.name === team.teamName);
+        const { table, champion, finalRanking } = getDivisionResult(leagueGames, season.slug, division);
+        const entry = table.find(player => player.name === team.teamName);
+        const tablePlacement = entry && entry.ammountOfMatches > 0 ? entry.placement! + 1 : null;
+        const finalPlacement = finalRanking ? finalRanking.indexOf(team.teamName) + 1 : 0;
 
         return [{
             teamName: team.teamName,
+            seasonSlug: season.slug,
+            league: division.league,
             divisionLabel: division.label,
             seasonLabel: season.label,
-            placement: entry && entry.ammountOfMatches > 0 ? entry.placement! + 1 : null,
+            placement: finalPlacement || tablePlacement,
+            champion: champion === team.teamName,
         }];
     }));
 }

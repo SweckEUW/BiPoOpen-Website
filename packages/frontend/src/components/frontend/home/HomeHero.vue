@@ -252,6 +252,8 @@ const onClickCapture = (event: MouseEvent) => {
     background-image: linear-gradient(135deg, #4a2a31 0%, #1f3a44 100%);
     background-size: cover;
     background-position: center;
+    filter: blur(1px);
+    transform: scale(1.03);
     opacity: 0;
     transition: opacity 0.8s ease;
 }

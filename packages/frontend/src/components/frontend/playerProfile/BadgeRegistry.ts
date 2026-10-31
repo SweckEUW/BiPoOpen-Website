@@ -1,312 +1,336 @@
-import { getTournamentByName } from "@/util/tournamentFunctions";
 import { checkIfTeam1WonVsTeam2, checkIfMatchFinished } from "@/util/tournamentMatchFunctions";
-import { BIPO_OPEN_TOURNAMENT_YEARS } from "@/util/bipoOpenTournamentMeta";
-import { filterLeagueGames, getAllLeagueGames, getLeagueList } from "@/components/frontend/league/LeagueUtilFunctions";
-import { LEAGUE_SEASONS, getRegularSeasonGameCount, toLeaguePlayers } from "@/components/frontend/league/LeagueSeasonsData";
+import { getDivisionResult } from "@/components/frontend/league/LeagueUtilFunctions";
+import { LEAGUE_SEASONS } from "@/components/frontend/league/LeagueSeasonsData";
+import type { GameData } from "@/util/gameDataCache";
+
+// Rekorde haelt immer genau ein Spieler: wer den Wert zuerst erreicht hat, bis ihn jemand uebertrifft.
+export type RecordKey = 'most-games' | 'most-wins' | 'most-hits' | 'streak-record' | 'loss-streak-record';
+
+export type RecordStanding = {
+    own: number;            // eigener Wert (Summe bzw. laengste Serie)
+    record: number;         // aktueller Rekord
+    holder: string;         // aktueller Rekordhalter
+    status: 'current' | 'former' | 'never';
+    until: number | null;   // bei 'former': seit wann jemand anderes den Rekord haelt
+};
 
 export interface BadgeContext {
+    data: GameData;
     playerName: string;
-    allMatchHistory: { match: Match; time: number; won: boolean; hits: number; source: string }[];
+    allMatchHistory: MatchHistoryEntry[];
     totalMatches: number;
     totalWins: number;
-    bestWinStreak: number;
-    bestLossStreak: number;
-    globalMaxWinStreak: number;
-    globalMaxLossStreak: number;
     totalHits: number;
     winrate: number;
+    records: Record<RecordKey, RecordStanding>;
 }
 
-export type BadgeChecker = (ctx: BadgeContext) => Promise<PlayerBadge[]> | PlayerBadge[];
+// Wie BadgeContext, die Spiele zusaetzlich aufsteigend nach Zeit (ohne Spiele ohne Zeitstempel)
+type CheckerContext = BadgeContext & { chronological: MatchHistoryEntry[] };
+
+export type BadgeChecker = (ctx: CheckerContext) => PlayerBadge[];
 
 const registry: BadgeChecker[] = [];
 
 export const registerBadge = (checker: BadgeChecker) => registry.push(checker);
 
-export const calculateBadges = async (ctx: BadgeContext): Promise<PlayerBadge[]> => {
-    let results: PlayerBadge[] = [];
-    for (let checker of registry) {
-        let r = await checker(ctx);
-        results.push(...r);
-    }
-    return results;
+export const calculateBadges = (ctx: BadgeContext): PlayerBadge[] => {
+    const chronological = ctx.allMatchHistory.filter(m => m.time > 0).sort((a, b) => a.time - b.time);
+    return registry.flatMap(checker => checker({ ...ctx, chronological }));
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const dateStr = (ts: number) => ts > 0 ? new Date(ts).toLocaleDateString('de-DE') : null;
 
-const findMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: number) => {
-    let sorted = [...history].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
-    return sorted.length >= count ? sorted[count - 1] : null;
+// "26.09.26"
+const shortDateStr = (ts: number) => ts > 0
+    ? new Date(ts).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })
+    : '';
+
+// "03/26"
+const monthStr = (ts: number) => {
+    const date = new Date(ts);
+    return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear()).slice(2)}`;
 };
 
-const findWinMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: number) => {
-    let sorted = [...history].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
-    let wins = 0;
-    for (let m of sorted) {
-        if (m.won) wins++;
-        if (wins >= count) return m;
+// Ganze Zahlen, auch bei halben Treffern in den Daten
+const formatNumber = (value: number) => value.toLocaleString('de-DE', { maximumFractionDigits: 0 });
+
+// Erstes Spiel, ab dem der aufsummierte Wert die Schwelle erreicht
+const findCumulativeMatch = (chronological: MatchHistoryEntry[], count: number, getValue: (entry: MatchHistoryEntry) => number) => {
+    let sum = 0;
+    for (const entry of chronological) {
+        sum += getValue(entry);
+        if (sum >= count) return entry;
     }
     return null;
 };
 
-const findHitMilestoneMatch = (history: BadgeContext['allMatchHistory'], count: number) => {
-    let sorted = [...history].filter(m => m.time > 0).sort((a, b) => a.time - b.time);
-    let hits = 0;
-    for (let m of sorted) {
-        hits += m.hits;
-        if (hits >= count) return m;
+type TierStep = { count: number; label: string };
+
+// Meilenstein-Reihe: alle erreichten Stufen und die naechste offene mit Fortschritt
+const getTierBadges = (
+    tier: string,
+    icon: string,
+    value: number,
+    steps: TierStep[],
+    unit: string,
+    verb: string,
+    findMatch: (count: number) => MatchHistoryEntry | null,
+): PlayerBadge[] => {
+    const badges: PlayerBadge[] = steps
+        .filter(step => value >= step.count)
+        .map(step => {
+            const match = findMatch(step.count);
+            return {
+                id: `${tier}-${step.count}`,
+                group: 'milestone',
+                tier,
+                icon,
+                label: `${formatNumber(step.count)} ${unit}`,
+                caption: match ? shortDateStr(match.time) : '',
+                description: `${step.label}: ${formatNumber(step.count)} ${unit} ${verb}`,
+                date: match ? dateStr(match.time) : null,
+                time: match?.time ?? 0,
+            };
+        });
+
+    const next = steps.find(step => value < step.count);
+    if (next) {
+        badges.push({
+            id: `${tier}-${next.count}`,
+            group: 'milestone',
+            tier,
+            icon,
+            label: `${formatNumber(next.count)} ${unit}`,
+            caption: `${formatNumber(value)} / ${formatNumber(next.count)}`,
+            description: `${next.label}: ${formatNumber(next.count)} ${unit} ${verb}`,
+            date: null,
+            time: 0,
+            locked: true,
+            progress: { current: value, target: next.count },
+        });
     }
-    return null;
+
+    return badges;
+};
+
+// ─── Titel (einmal pro Datenstand berechnet) ──────────────────────────────────
+
+type TitleWin = { id: string; playerNames: string[]; label: string; caption: string; description: string; time: number };
+
+const titleWinsCache = new WeakMap<GameData, TitleWin[]>();
+
+// Nicht in der Datenbank: BiPo Open 2021 und das All-Star Turnier
+const HARDCODED_TITLE_WINS: TitleWin[] = [
+    {
+        id: 'tournament-win-2021',
+        playerNames: ['Matthias Weck', 'Lennard Kaffitz'],
+        label: 'BiPo Open',
+        caption: 'Sieger 2021',
+        description: 'Gewinner des BiPo Open 2021',
+        time: new Date('2021-07-01T14:00:00').getTime(),
+    },
+    {
+        id: 'allstar-win-2025',
+        playerNames: ['Jonas Weck', 'Leon Rose'],
+        label: 'All-Star Turnier',
+        caption: 'Sieger 2025',
+        description: 'Gewinner des All-Star Turniers am 17.10.2025',
+        time: new Date('2025-10-17T20:00:00').getTime(),
+    },
+];
+
+const getLeagueWinBadgeId = (seasonSlug: string, league: number) =>
+    league === 1 ? `league-win-${seasonSlug}` : `league-win-${seasonSlug}-liga${league}`;
+
+const getTournamentWins = (data: GameData): TitleWin[] => data.tournaments.flatMap(({ year, tournament, time }) => {
+    const lastStage = tournament.koPhase.matches[tournament.koPhase.matches.length - 1];
+    const finalMatch = lastStage?.[0];
+    if (!finalMatch || !checkIfMatchFinished(finalMatch)) return [];
+
+    const winningTeam = checkIfTeam1WonVsTeam2(finalMatch) ? finalMatch.team1 : finalMatch.team2;
+    return [{
+        id: `tournament-win-${year}`,
+        playerNames: winningTeam.players.map(player => player.name),
+        label: 'BiPo Open',
+        caption: `Sieger ${year}`,
+        description: `Gewinner des BiPo Open ${year}`,
+        time: finalMatch.time || time,
+    }];
+});
+
+// Liga-Sieg je Saison und Liga: Sieger des Final Four
+const getLeagueWins = (data: GameData): TitleWin[] => LEAGUE_SEASONS.flatMap(season => season.divisions.flatMap((division): TitleWin[] => {
+    const { champion, finalGames } = getDivisionResult(data.leagueGames, season.slug, division);
+    if (!champion)
+        return [];
+
+    // "2025/26" -> "25/26"
+    const shortSeasonLabel = season.label.replace(/^\d{2}/, '');
+    const divisionSuffix = season.divisions.length > 1 ? ` · ${division.label}` : '';
+    return [{
+        id: getLeagueWinBadgeId(season.slug, division.league),
+        playerNames: [division.teams.find(team => team.teamName === champion)?.playerName ?? champion],
+        label: 'BiPo League',
+        caption: `Meister ${shortSeasonLabel}${divisionSuffix}`,
+        description: `Gewinner der BiPo League Saison ${season.label}${divisionSuffix}`,
+        time: finalGames[finalGames.length - 1].time || 0,
+    }];
+}));
+
+const getTitleWins = (data: GameData) => {
+    let wins = titleWinsCache.get(data);
+    if (!wins) {
+        wins = [...HARDCODED_TITLE_WINS, ...getTournamentWins(data), ...getLeagueWins(data)];
+        titleWinsCache.set(data, wins);
+    }
+    return wins;
 };
 
 // ─── Default Badge Registrations ──────────────────────────────────────────────
 
-// Erstes Spiel
-registerBadge(({ allMatchHistory }) => {
-    let firstMatch = [...allMatchHistory]
-        .filter(m => m.time > 0)
-        .sort((a, b) => a.time - b.time)[0];
+// Titel: Turniersiege und Liga-Meisterschaften
+registerBadge(({ data, playerName }) => getTitleWins(data)
+    .filter(win => win.playerNames.includes(playerName))
+    .map(win => ({
+        id: win.id,
+        group: 'title',
+        icon: 'emoji_events',
+        label: win.label,
+        caption: win.caption,
+        description: win.description,
+        date: win.id === 'tournament-win-2021' ? null : dateStr(win.time),
+        time: win.time,
+    })));
 
+// Rekorde
+const RECORDS: { key: RecordKey; label: string; unit: string; onlyIfHeld?: boolean }[] = [
+    { key: 'most-games', label: 'Meiste Spiele', unit: 'Spiele' },
+    { key: 'most-wins', label: 'Meiste Siege', unit: 'Siege' },
+    { key: 'most-hits', label: 'Meiste Treffer', unit: 'Treffer' },
+    { key: 'streak-record', label: 'Längste Serie', unit: 'Siege in Folge' },
+    // Negativ-Rekord: nur zeigen, wenn man ihn hat oder hatte
+    { key: 'loss-streak-record', label: 'Längste Pleite', unit: 'Niederlagen in Folge', onlyIfHeld: true },
+];
+
+registerBadge(({ records }) => RECORDS.flatMap(({ key, label, unit, onlyIfHeld }): PlayerBadge[] => {
+    const { own, record, holder, status, until } = records[key];
+    if (record <= 0 || (onlyIfHeld && status === 'never')) return [];
+
+    // "11 Siege in Folge" -> kurz "11 in Folge"
+    const shortUnit = unit.replace(/^(Siege|Niederlagen) /, '');
+    const caption = {
+        current: `${formatNumber(own)} ${shortUnit}`,
+        former: `${formatNumber(own)} · bis ${until ? monthStr(until) : '–'}`,
+        never: `${formatNumber(own)} / ${formatNumber(record)} ${shortUnit}`,
+    }[status];
+
+    return [{
+        id: key,
+        group: 'record',
+        icon: 'military_tech',
+        label,
+        caption,
+        description: `Rekord: ${holder} mit ${formatNumber(record)} ${unit}`,
+        date: null,
+        time: 0,
+        locked: status !== 'current',
+        former: status === 'former',
+        progress: status === 'never' ? { current: own, target: record } : undefined,
+    }];
+}));
+
+// Siegquote (mind. 20 Spiele)
+registerBadge(({ totalMatches, winrate }) => {
+    const steps = [
+        { value: 60, icon: 'trending_up' },
+        { value: 75, icon: 'rocket_launch' },
+    ];
+    const reached = (value: number) => totalMatches >= 20 && winrate >= value;
+
+    const badges: PlayerBadge[] = steps.filter(step => reached(step.value)).map(step => ({
+        id: `winrate-${step.value}`,
+        group: 'performance',
+        tier: 'winrate',
+        icon: step.icon,
+        label: `Über ${step.value} %`,
+        caption: 'Siegquote',
+        description: `Siegquote über ${step.value} % (mind. 20 Spiele)`,
+        date: null,
+        time: 0,
+    }));
+
+    const next = steps.find(step => !reached(step.value));
+    if (next) {
+        badges.push({
+            id: `winrate-${next.value}`,
+            group: 'performance',
+            tier: 'winrate',
+            icon: next.icon,
+            label: `Über ${next.value} %`,
+            caption: `${winrate} / ${next.value} %`,
+            description: `Siegquote über ${next.value} % (mind. 20 Spiele)`,
+            date: null,
+            time: 0,
+            locked: true,
+            progress: { current: Math.min(winrate, next.value), target: next.value },
+        });
+    }
+    return badges;
+});
+
+// Zu Null: ein Spiel gewonnen, ohne dass der Gegner getroffen hat
+registerBadge(({ chronological }) => {
+    const shutout = chronological.find(entry => entry.won && entry.opponentScore === 0 && entry.ownScore > 0);
+    return [{
+        id: 'shutout',
+        group: 'performance',
+        icon: 'shield',
+        label: 'Zu Null',
+        caption: shutout ? `${shutout.ownScore} : 0` : 'ein 10 : 0',
+        description: 'Ein Spiel gewonnen, ohne dass der Gegner einen Becher getroffen hat',
+        date: shutout ? dateStr(shutout.time) : null,
+        time: shutout?.time ?? 0,
+        locked: !shutout,
+    }];
+});
+
+// Spiele-Meilensteine
+registerBadge(({ chronological, totalMatches }) => getTierBadges('matches', 'star', totalMatches, [
+    { count: 100, label: 'Stammgast' },
+    { count: 200, label: 'Veteran' },
+    { count: 300, label: 'Legende' },
+    { count: 500, label: 'Unstoppable' },
+], 'Spiele', 'absolviert', count => chronological[count - 1] ?? null));
+
+// Sieg-Meilensteine
+registerBadge(({ chronological, totalWins }) => getTierBadges('wins', 'local_fire_department', totalWins, [
+    { count: 100, label: 'Dominator' },
+    { count: 200, label: 'Unbesiegbar' },
+], 'Siege', 'errungen', count => findCumulativeMatch(chronological, count, entry => entry.won ? 1 : 0)));
+
+// Treffer-Meilensteine
+registerBadge(({ chronological, totalHits }) => getTierBadges('hits', 'track_changes', totalHits, [
+    { count: 500, label: 'Präzisionsmaschine' },
+    { count: 1000, label: 'Tausender' },
+    { count: 2000, label: 'Scharfschütze' },
+], 'Treffer', 'erzielt', count => findCumulativeMatch(chronological, count, entry => entry.hits)));
+
+// Erstes Spiel
+registerBadge(({ chronological }) => {
+    const firstMatch = chronological[0];
     if (!firstMatch) return [];
 
     return [{
         id: 'first-game',
-        icon: 'event_available',
+        group: 'milestone',
+        icon: 'flag',
         label: 'Erstes Spiel',
+        caption: shortDateStr(firstMatch.time),
         description: 'Erstes Spiel absolviert',
         date: dateStr(firstMatch.time),
-        priority: 950,
+        time: firstMatch.time,
     }];
 });
-
-// Turniersieg
-registerBadge(async ({ playerName }) => {
-    let badges: PlayerBadge[] = [];
-
-    let hardcoded2021Winners = ['Matthias Weck', 'Lennard Kaffitz'];
-    if (hardcoded2021Winners.includes(playerName)) {
-        badges.push({
-            id: `tournament-win-${2021}`,
-            icon: 'emoji_events',
-            label: `BiPo Open ${2021}`,
-            description: `Gewinner des BiPo Open ${2021} Turniers`,
-            date: null,
-            priority: 1000,
-            special: 'rainbow',
-        });
-    }
-
-    for (let year of BIPO_OPEN_TOURNAMENT_YEARS) {
-        let tournament = await getTournamentByName(year);
-        if (!tournament?.koPhase.matches.length) continue;
-        let lastStage = tournament.koPhase.matches[tournament.koPhase.matches.length - 1];
-        let finalMatch = lastStage[0];
-        if (!finalMatch || !checkIfMatchFinished(finalMatch)) continue;
-        let team1Won = checkIfTeam1WonVsTeam2(finalMatch);
-        let winningTeam = team1Won ? finalMatch.team1 : finalMatch.team2;
-        if (winningTeam.players.some(p => p.name === playerName)) {
-            badges.push({
-                id: `tournament-win-${year}`,
-                icon: 'emoji_events',
-                label: `BiPo Open ${year}`,
-                description: `Gewinner des BiPo Open ${year} Turniers`,
-                date: dateStr(finalMatch.time || 0),
-                priority: 1000,
-                special: 'rainbow',
-            });
-        }
-    }
-    return badges;
-});
-
-const getTeamNames = (team: Team | undefined) => team
-    ? [team.name, ...team.players.map(player => player.name)].filter(Boolean).map(name => name!.toLocaleLowerCase())
-    : [];
-
-const getSeriesResult = (games: Match[], team1: Team | undefined, team2: Team | undefined) => {
-    if (!team1 || !team2)
-        return { winner: undefined, games: [] as Match[] };
-
-    const team1Names = getTeamNames(team1);
-    const team2Names = getTeamNames(team2);
-    const seriesGames = games.filter(match => {
-        const matchTeam1Names = getTeamNames(match.team1);
-        const matchTeam2Names = getTeamNames(match.team2);
-        return matchTeam1Names.some(name => team1Names.includes(name)) && matchTeam2Names.some(name => team2Names.includes(name))
-            || matchTeam1Names.some(name => team2Names.includes(name)) && matchTeam2Names.some(name => team1Names.includes(name));
-    }).slice(0, 3);
-    let team1Wins = 0;
-    let team2Wins = 0;
-
-    seriesGames.forEach(match => {
-        const matchTeam1Score = match.team1.players.reduce((score, player) => score + (player.score ?? 0), 0);
-        const matchTeam2Score = match.team2.players.reduce((score, player) => score + (player.score ?? 0), 0);
-        if (matchTeam1Score === matchTeam2Score)
-            return;
-
-        const matchUsesTeam1 = getTeamNames(match.team1).some(name => team1Names.includes(name));
-        if (matchUsesTeam1 === (matchTeam1Score > matchTeam2Score))
-            team1Wins++;
-        else
-            team2Wins++;
-    });
-
-    return {
-        winner: team1Wins >= 2 ? team1 : team2Wins >= 2 ? team2 : undefined,
-        games: seriesGames,
-    };
-};
-
-// Liga-Sieg je Saison und Liga
-registerBadge(async ({ playerName }) => {
-    const leagueGames = await getAllLeagueGames();
-    const badges: PlayerBadge[] = [];
-
-    LEAGUE_SEASONS.forEach((season) => {
-        season.divisions.forEach((division) => {
-            if (!division.hasFinalFour)
-                return;
-
-            const regularSeasonGameCount = getRegularSeasonGameCount(division);
-            if (regularSeasonGameCount === 0)
-                return;
-
-            const divisionGames = filterLeagueGames(leagueGames, season.slug, division.league)
-                .sort((match1, match2) => (match1.time ?? 0) - (match2.time ?? 0));
-
-            const regularSeasonGames = divisionGames.slice(0, regularSeasonGameCount);
-            const finalFourGames = divisionGames.slice(regularSeasonGameCount);
-
-            // Final Four startet erst, wenn die Hauptrunde komplett gespielt ist.
-            if (regularSeasonGames.length < regularSeasonGameCount)
-                return;
-
-            const leaguePlayers = toLeaguePlayers(division.teams);
-            const playerNameByTeam = (teamName: string) =>
-                division.teams.find(team => team.teamName === teamName)?.playerName ?? teamName;
-
-            const standings = getLeagueList(regularSeasonGames, leaguePlayers).slice(0, division.finalFourSeeds);
-            const seedTeams = standings.map(standing => ({
-                _id: '',
-                name: standing.name,
-                players: [{ _id: '', name: playerNameByTeam(standing.name), score: 0 }],
-            } as Team));
-            if (seedTeams.length < 4)
-                return;
-
-            const semiFinal1 = getSeriesResult(finalFourGames, seedTeams[0], seedTeams[3]);
-            const semiFinal2 = getSeriesResult(finalFourGames, seedTeams[1], seedTeams[2]);
-            const final = getSeriesResult(finalFourGames, semiFinal1.winner, semiFinal2.winner);
-            const winnerPlayer = final.winner ? playerNameByTeam(final.winner.name!) : undefined;
-            if (!winnerPlayer || winnerPlayer !== playerName || !final.games.length)
-                return;
-
-            // "2025/26" -> "25/26"
-            const shortSeasonLabel = season.label.replace(/^\d{2}/, '');
-            const divisionSuffix = season.divisions.length > 1 ? ` (${division.label})` : '';
-
-            badges.push({
-                id: division.league === 1 ? `league-win-${season.slug}` : `league-win-${season.slug}-liga${division.league}`,
-                icon: 'emoji_events',
-                label: `BiPo League ${shortSeasonLabel}${divisionSuffix}`,
-                description: `Gewinner der BiPo League Saison ${season.label}${divisionSuffix}`,
-                date: dateStr(final.games[final.games.length - 1].time || 0),
-                priority: 1000,
-                special: 'rainbow',
-            });
-        });
-    });
-
-    return badges;
-});
-
-// Spiele-Meilensteine
-registerBadge(({ allMatchHistory, totalMatches }) => {
-    let milestones = [
-        { count: 100, icon: 'star', label: 'Stammgast', desc: '100 Spiele absolviert' },
-        { count: 200, icon: 'military_tech', label: 'Veteran', desc: '200 Spiele absolviert' },
-        { count: 300, icon: 'workspace_premium', label: 'Legende', desc: '300 Spiele absolviert' },
-        { count: 500, icon: 'diamond', label: 'Unstoppable', desc: '500 Spiele absolviert' },
-    ];
-    return milestones
-        .filter(m => totalMatches >= m.count)
-        .map(m => {
-            let milestone = findMilestoneMatch(allMatchHistory, m.count);
-            return { id: `matches-${m.count}`, icon: m.icon, label: m.label, description: m.desc, date: milestone ? dateStr(milestone.time) : null };
-        });
-});
-
-// Sieg-Meilensteine
-registerBadge(({ allMatchHistory, totalWins }) => {
-    let milestones = [
-        { count: 100, icon: 'local_fire_department', label: 'Dominator', desc: '100 Siege errungen' },
-        { count: 200, icon: 'whatshot', label: 'Unbesiegbar', desc: '200 Siege errungen' },
-    ];
-    return milestones
-        .filter(m => totalWins >= m.count)
-        .map(m => {
-            let milestone = findWinMilestoneMatch(allMatchHistory, m.count);
-            return { id: `wins-${m.count}`, icon: m.icon, label: m.label, description: m.desc, date: milestone ? dateStr(milestone.time) : null };
-        });
-});
-
-// Treffer-Meilensteine
-registerBadge(({ allMatchHistory, totalHits }) => {
-    let milestones = [
-        { count: 500, icon: 'track_changes', label: 'Präzisionsmaschine', desc: '500 Treffer erzielt' },
-        { count: 1000, icon: 'crisis_alert', label: 'Tausender', desc: '1.000 Treffer erzielt' },
-    ];
-    return milestones
-        .filter(m => totalHits >= m.count)
-        .map(m => {
-            let milestone = findHitMilestoneMatch(allMatchHistory, m.count);
-            return { id: `hits-${m.count}`, icon: m.icon, label: m.label, description: m.desc, date: milestone ? dateStr(milestone.time) : null };
-        });
-});
-
-// Rekord-Siegesserie (nur der Spieler mit der längsten Siegesserie aller Spieler)
-registerBadge(({ bestWinStreak, globalMaxWinStreak }) => {
-    if (globalMaxWinStreak <= 0 || bestWinStreak < globalMaxWinStreak) return [];
-    return [{
-        id: 'streak-record',
-        icon: 'local_fire_department',
-        label: 'Serien-König',
-        description: `Längste Siegesserie aller Spieler: ${bestWinStreak} Siege in Folge`,
-        date: null,
-        priority: 750,
-    }];
-});
-
-// Rekord-Niederlagenserie (nur der Spieler mit der längsten Niederlagenserie aller Spieler)
-registerBadge(({ bestLossStreak, globalMaxLossStreak }) => {
-    if (globalMaxLossStreak <= 0 || bestLossStreak < globalMaxLossStreak) return [];
-    return [{
-        id: 'loss-streak-record',
-        icon: 'mood_bad',
-        label: 'Pechvogel',
-        description: `Längste Niederlagenserie aller Spieler: ${bestLossStreak} Niederlagen in Folge`,
-        date: null,
-        priority: 200,
-    }];
-});
-
-// Siegquote
-registerBadge(({ totalMatches, winrate }) => {
-    let badges: PlayerBadge[] = [];
-    if (totalMatches >= 20 && winrate >= 60) badges.push({ id: 'winrate-60', icon: 'trending_up', label: 'Überdurchschnittlich', description: 'Siegquote über 60% (mind. 20 Spiele)', date: null });
-    if (totalMatches >= 20 && winrate >= 75) badges.push({ id: 'winrate-75', icon: 'rocket_launch', label: 'Elite', description: 'Siegquote über 75% (mind. 20 Spiele)', date: null });
-    return badges;
-});
-
-// Perfect Game – nur in 2v2, da im 1v1 man sowieso immer 10 Treffer macht
-// registerBadge(({ allMatchHistory }) => {
-//     let perfectGame = allMatchHistory.find(m => {
-//         if (m.hits < 10) return false;
-//         let is1v1 = m.match.team1.players.length === 1 && m.match.team2.players.length === 1;
-//         return !is1v1;
-//     });
-//     if (!perfectGame) return [];
-//     return [{ id: 'perfect-game', icon: 'auto_awesome', label: 'Perfect Game', description: '10+ Treffer in einem 2v2 Spiel', date: dateStr(perfectGame.time) }];
-// });

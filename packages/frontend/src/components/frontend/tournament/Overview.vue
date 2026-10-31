@@ -71,6 +71,7 @@
 import { computed, PropType } from 'vue';
 import { getMVPList } from '@/util/tournamentPlayerFunctions';
 import { checkIfTeam1WonVsTeam2 } from '@/util/tournamentMatchFunctions';
+import { getDriveThumbnail } from '@/components/frontend/home/homeUtil';
 
 const props = defineProps({
     tournament: { type: Object as PropType<Tournament>, required: true },
@@ -130,7 +131,7 @@ const previewPhotos = computed(() => {
     if (!props.photoIds.length) return [];
     const shuffled = [...props.photoIds].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, 6).map(p => ({
-        thumbnail: `https://drive.google.com/thumbnail?&id=${p.img_id}&sz=w300`
+        thumbnail: getDriveThumbnail(p.img_id, 300)
     }));
 });
 </script>

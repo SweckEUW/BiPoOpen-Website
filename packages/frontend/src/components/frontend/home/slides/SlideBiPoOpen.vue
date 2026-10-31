@@ -40,7 +40,6 @@ const runnersUp = computed(() => props.podium.slice(1));
     background: var(--hs-glass);
     border: 1px solid var(--hs-glass-border);
     border-radius: 999px;
-    backdrop-filter: blur(6px);
     font-size: 13px;
 }
 </style>

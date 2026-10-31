@@ -39,7 +39,9 @@
                 </TabList>
             </div>
 
-            <Loadingscreen v-if="isLoading"/>
+            <div v-if="isLoading" class="lg-gray-panel pt-[12px]">
+                <SkeletonList :rows="10" avatar="square" rank/>
+            </div>
 
             <LeagueCup v-else-if="isCupActive"
                 :season="season"
@@ -58,6 +60,8 @@
                         :highlightTopSlots="division.highlightTopSlots"
                         :promotionSlots="division.promotionSlots"
                         :relegationSlots="division.relegationSlots"
+                        :divisionLabel="division.label"
+                        :canAddGames="season.slug === CURRENT_SEASON_SLUG"
                     />
                 </TabPanel>
 
@@ -89,9 +93,11 @@
 
         <LeagueDrawDrawer
             v-model:visible="showModalDraw"
-            :leaguePlayers="leaguePlayers"
-            :leagueGames="divisionGames"
-            :regularSeasonGameCount="regularSeasonGameCount"
+            v-model:league="drawLeague"
+            :leagueOptions="drawLeagueOptions"
+            :leaguePlayers="drawLeaguePlayers"
+            :leagueGames="drawDivisionGames"
+            :regularSeasonGameCount="drawRegularSeasonGameCount"
         />
 
     </div>
@@ -100,7 +106,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
+import SkeletonList from '@/components/shared/SkeletonList.vue';
 import FloatingActionButton from '@/components/shared/FloatingActionButton.vue';
 import wheelIcon from '@/assets/icons/wheel.png';
 import LeagueTable from './LeagueTable.vue';
@@ -211,7 +217,24 @@ getLeagueGames();
 useAddGameContext(() => isCupActive.value ? { mode: 'cup' } : { mode: 'league', league: division.value.league });
 onGameSaved(getLeagueGames);
 
+// ─── Auslosung ───
+// Liga im Drawer frei waehlbar, beim Oeffnen steht sie auf dem aktiven Reiter.
+const drawLeague = ref(division.value.league);
+const drawDivision = computed(() =>
+    season.value.divisions.find(entry => entry.league === drawLeague.value) ?? division.value
+);
+const drawLeagueOptions = computed(() =>
+    season.value.divisions
+        .filter(entry => entry.teams.length > 0)
+        .map(entry => ({ label: entry.label, value: entry.league }))
+);
+const drawLeaguePlayers = computed(() => toLeaguePlayers(drawDivision.value.teams));
+const drawRegularSeasonGameCount = computed(() => getRegularSeasonGameCount(drawDivision.value));
+const drawDivisionGames = computed(() => filterLeagueGames(allLeagueGames.value, season.value.slug, drawDivision.value.league));
+
 const toggleModalDraw = () => {
+    if (!showModalDraw.value)
+        drawLeague.value = division.value.league;
     showModalDraw.value = !showModalDraw.value;
 }
 

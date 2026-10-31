@@ -53,7 +53,6 @@ const formatDiff = (diff: number) => (diff > 0 ? `+${diff}` : `${diff}`);
     background: var(--hs-glass);
     border: 1px solid var(--hs-glass-border);
     border-radius: 12px;
-    backdrop-filter: blur(6px);
     overflow: hidden;
 }
 .sl-row{

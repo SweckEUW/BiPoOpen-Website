@@ -191,16 +191,17 @@ const saveLabel = computed(() => {
 });
 
 // ─── Aktionen ───
-const runAction = async (action: () => Promise<boolean | void>, successMessage: string, errorMessage: string) => {
+// Toasts nennen nur die Paarung (ggf. mit Ergebnis), ohne Beschreibung darunter.
+const runAction = async (action: () => Promise<boolean | void>, successSummary: string, errorSummary: string) => {
     if (loading.value) return;
     loading.value = true;
     try {
         const success = await action();
-        if (success === false) throw new Error(errorMessage);
+        if (success === false) throw new Error(errorSummary);
         visible.value = false;
-        setTimeout(() => toast.add({ severity: 'success', summary: 'Erfolg', detail: successMessage, life: 3000 }), 400);
+        setTimeout(() => toast.add({ severity: 'success', summary: successSummary, life: 3000 }), 400);
     } catch {
-        toast.add({ severity: 'error', summary: 'Fehler', detail: errorMessage, life: 3000 });
+        toast.add({ severity: 'error', summary: errorSummary, life: 3000 });
     } finally {
         loading.value = false;
     }
@@ -209,12 +210,14 @@ const runAction = async (action: () => Promise<boolean | void>, successMessage: 
 const onSave = () => {
     if (!canSave.value) return;
     const result: GameEntrySide[] = JSON.parse(JSON.stringify(sides.value));
-    runAction(() => props.save(result), 'Spiel wurde gespeichert', 'Spiel konnte nicht gespeichert werden');
+    const [name1, name2] = result.map(getSideName);
+    runAction(() => props.save(result), `${name1} ${totals.value[0]} : ${totals.value[1]} ${name2}`, 'Spiel nicht gespeichert');
 }
 
 const onDelete = () => {
     if (!props.remove || !confirm('Spiel wirklich löschen?')) return;
-    runAction(props.remove, 'Spiel wurde gelöscht', 'Spiel konnte nicht gelöscht werden');
+    const [name1, name2] = sides.value.map(getSideName);
+    runAction(props.remove, `Gelöscht · ${name1} gegen ${name2}`, 'Spiel nicht gelöscht');
 }
 </script>
 

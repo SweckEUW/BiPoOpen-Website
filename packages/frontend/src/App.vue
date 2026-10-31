@@ -4,22 +4,18 @@ import AppFooter from '@/components/shared/AppFooter.vue';
 import AppBottomNav from '@/components/shared/AppBottomNav.vue';
 import TournamentPickerDrawer from '@/components/shared/TournamentPickerDrawer.vue';
 import AddGameDrawer from '@/components/shared/GameEntry/AddGameDrawer.vue';
-import PlayerProfileDrawer from '@/components/frontend/playerProfile/PlayerProfileDrawer.vue';
 import Toast from 'primevue/toast';
 import { Analytics } from '@vercel/analytics/vue';
 import { SpeedInsights } from '@vercel/speed-insights/vue';
 
-import { onBeforeMount, ref, provide } from 'vue'
+import { onBeforeMount, provide } from 'vue'
 import router from './router.js';
 import axios from "axios";
+import { getPlayerProfilePath } from '@/util/util';
 
-// Global player profile drawer
-let playerProfileVisible = ref(false);
-let playerProfileName = ref('');
-
+// Spielerprofil ist eine eigene Seite, ueberall per inject('openPlayerProfile') erreichbar
 const openPlayerProfile = (name: string) => {
-	playerProfileName.value = name;
-	playerProfileVisible.value = true;
+	router.push(getPlayerProfilePath(name));
 };
 
 provide('openPlayerProfile', openPlayerProfile);
@@ -39,7 +35,23 @@ onBeforeMount(async() => {
 </script>
 
 <template>
-	<Toast position="bottom-right" />
+	<Toast position="bottom-right">
+		<template #container="{ message }">
+			<div class="app-toast" :class="`app-toast--${message.severity ?? 'info'}`">
+				<span class="app-toast-icon">
+					<i v-if="message.severity === 'success'" class="pi pi-check"></i>
+					<i v-else-if="!message.severity || message.severity === 'info'" class="pi pi-info"></i>
+					<template v-else>!</template>
+				</span>
+				<div class="app-toast-text">
+					<div class="app-toast-summary">{{ message.summary }}</div>
+					<div v-if="message.detail" class="app-toast-detail">{{ message.detail }}</div>
+				</div>
+				<!-- Restlaufzeit, schrumpft ueber die Lebensdauer des Toasts -->
+				<span v-if="message.life" class="app-toast-progress" :style="{ animationDuration: `${message.life}ms` }"></span>
+			</div>
+		</template>
+	</Toast>
 	<Analytics/>
 	<SpeedInsights/>
 
@@ -61,12 +73,6 @@ onBeforeMount(async() => {
 	<AppBottomNav/>
 	<TournamentPickerDrawer/>
 	<AddGameDrawer/>
-
-	<!-- Global Player Profile Drawer -->
-	<PlayerProfileDrawer
-		v-model:visible="playerProfileVisible"
-		:playerName="playerProfileName"
-	/>
 </template>
 
 <style>
@@ -121,6 +127,24 @@ body{
 	font-weight: 700;
 	line-height: 1.15;
 	text-align: left;
+}
+
+/* Lade-Skelett: grauer Platzhalter mit Schimmer, Groesse setzt der Aufrufer */
+.bp-skeleton{
+	border-radius: 16px;
+	background: linear-gradient(90deg, #eceef1 0%, #f6f7f9 50%, #eceef1 100%);
+	background-size: 200% 100%;
+	animation: bp-shimmer 1.2s ease-in-out infinite;
+}
+/* Platzhalter fuer ein MatchElement */
+.bp-skeleton-match{
+	height: 96px;
+	margin-bottom: 8px;
+	border-radius: 12px;
+}
+@keyframes bp-shimmer {
+	from { background-position: 100% 0; }
+	to { background-position: -100% 0; }
 }
 
 /* Transition Animations */
@@ -194,9 +218,83 @@ body{
 	transform: translateX(80%)
 }
 
-/* Toast close button hidden */
-.p-toast .p-toast-close-button {
-	display: none !important;
+/* Toast: eigenes Layout im #container-Slot, PrimeVue-Rahmen neutralisiert */
+.p-toast .p-toast-message {
+	margin-bottom: 8px;
+	border: none;
+	border-radius: 14px;
+	background: transparent;
+	box-shadow: none;
+	backdrop-filter: none;
+}
+.app-toast {
+	--toast-accent: #6B7079;
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 16px 16px;
+	overflow: hidden;
+	border-radius: 14px;
+	border: 1px solid #E6E8EB;
+	background: white;
+	box-shadow: 0 10px 30px rgba(15, 18, 22, .18), 0 2px 6px rgba(15, 18, 22, .08);
+	color: #1F2328;
+}
+.app-toast--success { --toast-accent: #2EA45F; }
+.app-toast--error { --toast-accent: #E5484D; }
+.app-toast--warn { --toast-accent: #E8A13A; }
+.app-toast-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	min-width: 28px;
+	border-radius: 50%;
+	background: var(--toast-accent);
+	color: white;
+	font-size: 15px;
+	font-weight: 800;
+}
+.app-toast-icon .pi {
+	font-size: 13px;
+	font-weight: 800;
+}
+.app-toast-text {
+	flex: 1;
+	min-width: 0;
+}
+/* Kein Abschneiden: Teamnamen muessen immer komplett lesbar sein */
+.app-toast-summary {
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+.app-toast-detail {
+	margin-top: 2px;
+	color: #6B7079;
+	font-size: 13px;
+	line-height: 1.3;
+}
+.app-toast-progress {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 3px;
+	background: var(--toast-accent);
+	transform-origin: left;
+	animation: toast-progress linear forwards;
+}
+/* PrimeVue haelt den Timer beim Hovern an, der Balken auch */
+.p-toast-message:hover .app-toast-progress {
+	animation-play-state: paused;
+}
+@keyframes toast-progress {
+	from { transform: scaleX(1); }
+	to { transform: scaleX(0); }
 }
 
 /* Toast mobile */

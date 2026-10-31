@@ -31,8 +31,8 @@ defineProps<{
 <style scoped>
 .HeroSlideLayout{
     /* Halbtransparente Flaechen in den Slides (Tabelle, Kacheln, Chips) */
-    --hs-glass: rgba(255, 255, 255, 0.14);
-    --hs-glass-border: rgba(255, 255, 255, 0.1);
+    --hs-glass: rgba(20, 22, 26, 0.45);
+    --hs-glass-border: rgba(255, 255, 255, 0.14);
 
     display: flex;
     flex-direction: column;

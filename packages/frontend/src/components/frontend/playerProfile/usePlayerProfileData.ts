@@ -1,7 +1,9 @@
-import { ref, watch, type Ref } from 'vue';
-import { getPlayerProfileData } from './PlayerProfileUtilFunctions';
+import { computed, ref, shallowRef, type Ref } from 'vue';
+import { buildPlayerProfileData } from './PlayerProfileUtilFunctions';
+import { onGameSaved } from '@/components/shared/GameEntry/useAddGame';
+import { GameData, getCachedGameData, getGameData } from '@/util/gameDataCache';
 
-const trendPeriodOptions = [
+export const trendPeriodOptions = [
     { label: 'Gesamte Zeit', value: 'all' as TrendPeriod },
     { label: 'Letzter Monat', value: '1m' as TrendPeriod },
     { label: 'Letzte 3 Monate', value: '3m' as TrendPeriod },
@@ -9,47 +11,37 @@ const trendPeriodOptions = [
     { label: 'Letztes Jahr', value: '1y' as TrendPeriod },
 ];
 
-export const usePlayerProfileData = (playerName: Ref<string>, shouldLoad?: Ref<boolean>) => {
-    const isLoading = ref(true);
-    const profileData = ref<PlayerProfileData | null>(null);
+// Alle Spiele kommen aus dem geteilten gameDataCache: schon geladene Daten (z.B. von der Weltrangliste)
+// werden sofort angezeigt, das Profil selbst wird lokal berechnet. Zeitraum-Wechsel laedt nichts nach.
+export const usePlayerProfileData = (playerName: Ref<string>) => {
+    const gameData = shallowRef<GameData | null>(getCachedGameData());
+    const isLoading = ref(!gameData.value);
+    const hasError = ref(false);
     const trendPeriod = ref<TrendPeriod>('all');
 
-    const loadProfile = async () => {
-        if (shouldLoad && !shouldLoad.value) {
-            return;
-        }
+    // Bei Fehler bleibt ein schon angezeigtes Profil stehen
+    const loadData = () => getGameData()
+        .then(data => {
+            gameData.value = data;
+            hasError.value = false;
+        })
+        .catch(() => { if (!gameData.value) hasError.value = true; })
+        .finally(() => isLoading.value = false);
 
-        if (!playerName.value) {
-            profileData.value = null;
-            isLoading.value = false;
-            return;
-        }
+    loadData();
+    onGameSaved(loadData);
 
-        isLoading.value = true;
-        try {
-            profileData.value = await getPlayerProfileData(playerName.value, trendPeriod.value);
-            if (profileData.value.totalMatches === 0) profileData.value = null;
-        } catch {
-            profileData.value = null;
-        }
-        isLoading.value = false;
-    };
-
-    watch([playerName, trendPeriod], () => {
-        if (!shouldLoad || shouldLoad.value) loadProfile();
-    }, { immediate: true });
-
-    if (shouldLoad) {
-        watch(shouldLoad, (visible) => {
-            if (visible) loadProfile();
-        });
-    }
+    // null = Spieler ohne Spiele
+    const profileData = computed<PlayerProfileData | null>(() => {
+        if (!gameData.value || !playerName.value) return null;
+        const data = buildPlayerProfileData(gameData.value, playerName.value, trendPeriod.value);
+        return data.allTimeMatches > 0 ? data : null;
+    });
 
     return {
         isLoading,
+        hasError,
         profileData,
         trendPeriod,
-        trendPeriodOptions,
-        loadProfile,
     };
 };

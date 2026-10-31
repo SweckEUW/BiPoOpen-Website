@@ -1,75 +1,85 @@
 <template>
-    <div class="pp-section-title">Spielverlauf</div>
+    <section v-if="matchHistory.length" class="pp-section">
+        <div class="pp-section-head">
+            <h2 class="pp-section-title">Letzte Spiele</h2>
+            <button v-if="!expanded && matchHistory.length > limit" type="button" class="pp-history-all" @click="showAll">
+                Alle {{ matchHistory.length.toLocaleString('de-DE') }} <i class="pi pi-angle-right"></i>
+            </button>
+        </div>
 
-    <div class="mb-[40px]">
-        <Panel :pt="{ header: { class: 'p-2' } }">
-            <div class="flex flex-col gap-[12px]">
-                <MatchElement v-for="(item, i) in displayed" :key="i" :match="item.match" :chipLabel="item.source" showChip showDate class="match-entry">
-                    <template #meta>
-                        <Tag
-                            :severity="isWin(item) ? 'success' : 'danger'"
-                            :value="isWin(item) ? 'Sieg' : 'Niederlage'"
-                            rounded
-                            class="ml-auto"
-                        />
-                    </template>
-                </MatchElement>
-            </div>
-            <Button
-                v-if="matchHistory.length > limit"
-                :label="'Mehr anzeigen (' + (matchHistory.length - limit) + ' weitere)'"
-                severity="secondary" outlined class="w-full mt-[10px]"
-                @click="limit += 20"
-            />
-        </Panel>
-    </div>
+        <div class="flex flex-col gap-[12px]">
+            <MatchElement
+                v-for="(entry, index) in displayed"
+                :key="entry.match._id || index"
+                :match="withLeagueTeamLogos(entry.match)"
+                :chipLabel="SOURCE_LABELS[entry.source] ?? entry.source"
+                showChip
+                showDate
+                class="pp-history-match"
+            >
+                <template #meta>
+                    <Tag :severity="entry.won ? 'success' : 'danger'" :value="entry.won ? 'Sieg' : 'Niederlage'" rounded class="ml-auto"/>
+                </template>
+            </MatchElement>
+        </div>
+
+        <Button
+            v-if="expanded && matchHistory.length > limit"
+            :label="`Mehr anzeigen (${matchHistory.length - limit} weitere)`"
+            severity="secondary"
+            outlined
+            class="w-full mt-[12px]"
+            @click="limit += PAGE_SIZE"
+        />
+    </section>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
-import Panel from 'primevue/panel';
 import Tag from 'primevue/tag';
 import Button from 'primevue/button';
+import MatchElement from '@/components/shared/MatchElement/MatchElement.vue';
+import { withLeagueTeamLogos } from '@/components/frontend/league/LeaguePlayersData';
 
-const props = defineProps<{
-    matchHistory: MatchHistoryEntry[];
-    playerName: string;
-    leagueTeam: string | null;
-}>();
+// Neueste zuerst
+const props = defineProps<{ matchHistory: MatchHistoryEntry[] }>();
 
-const limit = ref(20);
+const SOURCE_LABELS: Record<string, string> = {
+    'Offene Spiele 1v1': 'Offenes Spiel',
+    'Offene Spiele 2v2': 'Offenes Spiel',
+    'BiPo League': 'Liga',
+    'BiPo League Cup': 'Cup',
+    'BiPo Open Turniere': 'BiPo Open',
+};
+
+const INITIAL_COUNT = 5;
+const PAGE_SIZE = 20;
+
+const expanded = ref(false);
+const limit = ref(INITIAL_COUNT);
 
 const displayed = computed(() => props.matchHistory.slice(0, limit.value));
 
-const isWin = (entry: MatchHistoryEntry) => {
-    let lo = props.playerName.toLowerCase();
-    let leagueLo = props.leagueTeam ? props.leagueTeam.toLowerCase() : null;
-    let t1 = entry.match.team1.players.reduce((a, p) => a + p.score, 0);
-    let t2 = entry.match.team2.players.reduce((a, p) => a + p.score, 0);
-    let isTeam1 = entry.match.team1.players.some(p => {
-        let n = p.name.toLowerCase();
-        return n === lo || (leagueLo && n === leagueLo);
-    });
-    let isTeam2 = entry.match.team2.players.some(p => {
-        let n = p.name.toLowerCase();
-        return n === lo || (leagueLo && n === leagueLo);
-    });
-    if (isTeam1) return t1 > t2;
-    if (isTeam2) return t2 > t1;
-    return false;
+const showAll = () => {
+    expanded.value = true;
+    limit.value = PAGE_SIZE;
 };
-
 </script>
 
 <style scoped>
-.pp-section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--p-primary-color);
-    margin-bottom: 12px;
+.pp-history-all {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--main-color);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
 }
-.flex > .match-entry {
+.flex > .pp-history-match {
     margin-bottom: 0;
 }
 </style>

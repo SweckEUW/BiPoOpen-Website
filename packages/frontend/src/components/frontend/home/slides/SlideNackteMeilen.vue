@@ -106,7 +106,6 @@ const lastRun = computed(() => {
     background: var(--hs-glass);
     border: 1px solid var(--hs-glass-border);
     border-radius: 12px;
-    backdrop-filter: blur(6px);
     color: white;
     text-align: left;
     cursor: pointer;

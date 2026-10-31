@@ -8,14 +8,19 @@ export type AddGameContext = { mode: AddGameMode; league?: number };
 
 const addGameVisible = ref(false);
 const pageContext = ref<AddGameContext | null>(null);
+// Vorbelegte Namen je Seite, z.B. eine offene Liga-Paarung. Gilt nur fuer das naechste Oeffnen.
+const presetNames = ref<string[] | null>(null);
 // Zaehlt gespeicherte Spiele, damit Seiten ihre Daten neu laden koennen
 const savedGameCount = ref(0);
 
 export const useAddGame = () => {
-    const openAddGame = () => { addGameVisible.value = true; };
+    const openAddGame = (names?: string[]) => {
+        presetNames.value = names ?? null;
+        addGameVisible.value = true;
+    };
     const notifyGameSaved = () => { savedGameCount.value++; };
 
-    return { addGameVisible, pageContext, openAddGame, notifyGameSaved };
+    return { addGameVisible, pageContext, presetNames, openAddGame, notifyGameSaved };
 };
 
 // Vorauswahl der Seite, solange sie angezeigt wird. Ohne Vorauswahl: offenes Spiel.

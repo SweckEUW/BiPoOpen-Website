@@ -1,174 +1,158 @@
 <template>
-    <div :class="layout === 'page' ? 'px-[2px] md:px-[8px]' : 'px-[10px]'">
-        <div class="flex flex-col items-center" :class="layout === 'page' ? 'mb-[24px] md:mb-[30px]' : 'mb-[30px]'">
-            <div class="relative cursor-pointer group" @click="showImageUpload = true">
-                <Avatar
-                    :key="avatarKey"
-                    :name="profileData.name"
-                    size="xlarge"
-                    shape="circle"
-                    class="!w-[120px] !h-[120px] !text-[40px]"
+    <div class="pp-view">
+        <!-- Kopf -->
+        <div class="pp-hero">
+            <button type="button" class="pp-avatar-button" aria-label="Profilbild ändern" @click="emit('editImage')">
+                <Avatar :key="avatarKey" :name="profileData.name" :lazy="false" class="pp-hero-avatar"/>
+            </button>
+            <div class="min-w-0">
+                <h1 class="pp-hero-name">{{ profileData.name }}</h1>
+                <div class="pp-hero-meta">{{ heroMeta }}</div>
+            </div>
+        </div>
+
+        <PlayerProfileEloCard v-if="profileData.elo" :elo="profileData.elo"/>
+
+        <PlayerProfileLeagueCard v-if="profileData.leagueStandings.length" :standings="profileData.leagueStandings"/>
+
+        <PlayerProfileAchievements v-if="profileData.badges.length" :badges="profileData.badges" :playerName="profileData.name"/>
+
+        <!-- Statistik je Spielart -->
+        <section class="pp-section">
+            <div class="pp-section-head">
+                <h2 class="pp-section-title">Statistik</h2>
+                <Select
+                    v-model="trendPeriod"
+                    :options="trendPeriodOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    size="small"
+                    class="pp-period-select"
                 />
-                <div class="absolute bottom-[2px] right-[2px] w-[26px] h-[26px] rounded-full bg-[var(--main-color)] flex items-center justify-center shadow-md border-2 border-white">
-                    <span class="material-icons text-white !text-[16px]">edit</span>
-                </div>
             </div>
-            <PlayerProfileImageUpload
-                :playerName="profileData.name"
-                v-model:visible="showImageUpload"
-                @uploaded="onImageUploaded"
-            />
-            <div
-                class="font-bold text-[--p-primary-color]"
-                :class="layout === 'page' ? 'text-[30px] md:text-[36px] text-center' : 'text-[32px]'"
-            >
-                {{ profileData.name }}
+
+            <div class="pp-segmented" role="tablist">
+                <button
+                    v-for="option in gameTypeOptions"
+                    :key="option.value"
+                    type="button"
+                    role="tab"
+                    :aria-selected="gameType === option.value"
+                    :class="{ 'is-active': gameType === option.value }"
+                    @click="gameType = option.value"
+                >{{ option.label }}</button>
             </div>
-            <div v-if="leagueChipLabels.length" class="flex flex-col items-center gap-[6px] mb-[30px]">
-                <Tag v-for="label in leagueChipLabels" :key="label" severity="info" :value="label" rounded />
+
+            <PlayerProfileStats v-if="gameTypeData.totalMatches > 0" :data="gameTypeData"/>
+            <div v-else class="pp-card pp-no-games">
+                Keine {{ gameType === '1v1' ? '1 vs 1' : '2 vs 2' }} Spiele {{ trendPeriod === 'all' ? 'vorhanden' : 'im gewählten Zeitraum' }}
             </div>
-            <PlayerProfileBadges v-if="profileData.badges.length > 0" :badges="profileData.badges" :playerName="profileData.name" class="mt-[10px]" />
-        </div>
+        </section>
 
-        <div class="flex justify-center mb-[16px]">
-            <Select
-                :modelValue="trendPeriod"
-                @update:modelValue="value => $emit('update:trendPeriod', value as TrendPeriod)"
-                :options="trendPeriodOptions"
-                optionLabel="label"
-                optionValue="value"
-                class="w-[220px]"
-            />
-        </div>
+        <PlayerProfilePeers
+            v-if="gameTypeData.totalMatches > 0"
+            :partners="gameTypeData.partners"
+            :rivals="gameTypeData.rivals"
+            :isDouble="gameType === '2v2'"
+        />
 
-        <Divider />
-
-        <Tabs v-model:value="activeTabValue" class="mb-[10px]">
-            <TabList>
-                <Tab value="1v1">1v1 Spiele</Tab>
-                <Tab value="2v2">2v2 Spiele</Tab>
-            </TabList>
-            <TabPanels
-                :pt="{
-                    root: {
-                        style: { '--p-tabs-tabpanel-padding': '0.5rem 0' }
-                    }
-                }"
-            >
-                <TabPanel value="1v1">
-                    <div v-if="filteredData1v1.totalMatches === 0" class="text-center py-[30px] text-[--p-text-muted-color]">
-                        Keine 1v1 Spiele vorhanden
-                    </div>
-                    <template v-else>
-                        <PlayerProfileOverview :data="filteredData1v1" />
-
-                        <Divider />
-
-                        <PlayerProfileAnalysis :data="filteredData1v1" />
-
-                        <Divider />
-
-                        <PlayerProfilePeers
-                            :partners="filteredData1v1.partners"
-                            :rivals="filteredData1v1.rivals"
-                            @openPlayer="(name) => $emit('openPlayer', name)"
-                        />
-
-                        <Divider />
-
-                        <PlayerProfileHistory
-                            :matchHistory="filteredData1v1.matchHistory"
-                            :playerName="profileData.name"
-                            :leagueTeam="profileData.leagueTeam"
-                        />
-                    </template>
-                </TabPanel>
-
-                <TabPanel value="2v2">
-                    <div v-if="filteredData2v2.totalMatches === 0" class="text-center py-[30px] text-[--p-text-muted-color]">
-                        Keine 2v2 Spiele vorhanden
-                    </div>
-                    <template v-else>
-                        <PlayerProfileOverview :data="filteredData2v2" />
-
-                        <Divider />
-
-                        <PlayerProfileAnalysis :data="filteredData2v2" />
-
-                        <Divider />
-
-                        <PlayerProfilePeers
-                            :partners="filteredData2v2.partners"
-                            :rivals="filteredData2v2.rivals"
-                            @openPlayer="(name) => $emit('openPlayer', name)"
-                        />
-
-                        <Divider />
-
-                        <PlayerProfileHistory
-                            :matchHistory="filteredData2v2.matchHistory"
-                            :playerName="profileData.name"
-                            :leagueTeam="profileData.leagueTeam"
-                        />
-                    </template>
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
+        <PlayerProfileHistory :matchHistory="profileData.matchHistory"/>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import Tag from 'primevue/tag';
-import Divider from 'primevue/divider';
 import Select from 'primevue/select';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
-
-import PlayerProfileOverview from './PlayerProfileOverview.vue';
-import PlayerProfileAnalysis from './PlayerProfileAnalysis.vue';
-import PlayerProfileBadges from './PlayerProfileBadges.vue';
+import Avatar from '@/components/shared/Avatar.vue';
+import PlayerProfileEloCard from './PlayerProfileEloCard.vue';
+import PlayerProfileLeagueCard from './PlayerProfileLeagueCard.vue';
+import PlayerProfileAchievements from './PlayerProfileAchievements.vue';
+import PlayerProfileStats from './PlayerProfileStats.vue';
 import PlayerProfilePeers from './PlayerProfilePeers.vue';
 import PlayerProfileHistory from './PlayerProfileHistory.vue';
-import Avatar from '@/components/shared/Avatar.vue';
-import PlayerProfileImageUpload from './PlayerProfileImageUpload.vue';
-import { filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
-import { fetchPlayerProfileImage } from './PlayerProfileImageMapping';
+import { PROFILE_GAME_TYPE_SOURCES, filterProfileDataByGameType } from './PlayerProfileUtilFunctions';
+import { trendPeriodOptions } from './usePlayerProfileData';
+
+type GameType = '1v1' | '2v2';
 
 const props = defineProps<{
     profileData: PlayerProfileData;
-    trendPeriod: TrendPeriod;
-    trendPeriodOptions: { label: string; value: TrendPeriod }[];
-    layout: 'drawer' | 'page';
+    avatarKey: number;
 }>();
 
-defineEmits<{
-    (e: 'update:trendPeriod', value: TrendPeriod): void;
-    (e: 'openPlayer', name: string): void;
-}>();
+const emit = defineEmits<{ editImage: [] }>();
 
-// Ein Chip pro Saison, z.B. "Lokomotive Wiedenbrück · 1. Liga 2026/27 · Platz 10"
-const leagueChipLabels = computed(() => props.profileData.leagueStandings.map(standing =>
-    [standing.teamName, `${standing.divisionLabel} ${standing.seasonLabel}`, standing.placement ? `Platz ${standing.placement}` : null]
-        .filter(Boolean)
-        .join(' · ')
-));
+const trendPeriod = defineModel<TrendPeriod>('trendPeriod', { required: true });
 
-const activeTabValue = ref('2v2');
-const showImageUpload = ref(false);
-const avatarKey = ref(0);
+const gameTypeOptions: { value: GameType; label: string }[] = [
+    { value: '1v1', label: '1 vs 1' },
+    { value: '2v2', label: '2 vs 2' },
+];
 
-const onImageUploaded = () => {
-    // Re-fetch backend image and force avatar re-render
-    fetchPlayerProfileImage(props.profileData.name).then(() => {
-        avatarKey.value++;
-    });
-};
+// Standard Doppel, ausser der Spieler hat nur Einzel gespielt
+const hasDoubles = props.profileData.matchHistory.some(entry => PROFILE_GAME_TYPE_SOURCES['2v2'].includes(entry.source));
+const gameType = ref<GameType>(hasDoubles ? '2v2' : '1v1');
 
-const filteredData1v1 = computed(() => filterProfileDataByGameType(props.profileData, '1v1'));
-const filteredData2v2 = computed(() => filterProfileDataByGameType(props.profileData, '2v2'));
+const gameTypeData = computed(() => filterProfileDataByGameType(props.profileData, gameType.value));
+
+const heroMeta = computed(() => {
+    const parts = [];
+    if (props.profileData.firstGameTime) parts.push(`dabei seit ${new Date(props.profileData.firstGameTime).getFullYear()}`);
+    parts.push(`${props.profileData.allTimeMatches.toLocaleString('de-DE')} Spiele`);
+    return parts.join(' · ');
+});
 </script>
 
+<style scoped>
+.pp-avatar-button {
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+}
+.pp-hero-name {
+    margin: 0;
+}
+
+.pp-period-select {
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pp-segmented {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: #e9ebee;
+
+    button {
+        padding: 8px 0;
+        border: none;
+        border-radius: 9px;
+        background: transparent;
+        color: #6b717b;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    button.is-active {
+        background: white;
+        color: #1d1f23;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.pp-no-games {
+    padding: 30px 14px;
+    text-align: center;
+    font-size: 14px;
+    color: #6b717b;
+}
+</style>

@@ -1,56 +1,28 @@
 <template>
     <div class="WorldRanking">
-
-        <!-- lazy: nur der aktive Reiter wird gerendert -->
-        <Tabs v-model:value="activeTab" lazy>
-            <!-- Reiter kleben unter dem App-Header -->
-            <div ref="stickyBar" class="wr-sticky-bar" :style="{ top: stickyBarTop }">
-                <TabList class="wr-tablist">
-                    <Tab value="elo">Weltrangliste</Tab>
-                    <Tab value="saison">Saisonwertung</Tab>
-                </TabList>
+        <!-- Skelett im Aufbau der Rangliste: Titel steht schon fest -->
+        <div v-if="isLoading" aria-busy="true">
+            <div class="wr-skeleton-header">
+                <h1 class="bp-title">Weltrangliste</h1>
+                <div class="wr-subtitle">Elo-Rating · alle offiziellen Spiele seit 2020</div>
             </div>
-
-            <Loadingscreen v-if="isLoading"/>
-            <div v-else-if="hasError || !data" class="wr-error">Die Rangliste konnte nicht geladen werden.</div>
-
-            <TabPanels v-else :pt="{ root: { style: { '--p-tabs-tabpanel-padding': '0' } } }">
-                <TabPanel value="elo">
-                    <EloRanking :data="data" :now="now"/>
-                </TabPanel>
-
-                <TabPanel value="saison">
-                    <SeasonRanking :data="data" :now="now"/>
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
-
+            <div class="wr-skeleton-chips">
+                <div class="bp-skeleton wr-skeleton-chip"></div>
+                <div class="bp-skeleton wr-skeleton-chip"></div>
+            </div>
+            <SkeletonList :rows="12" rank/>
+        </div>
+        <div v-else-if="hasError || !data" class="wr-error">Die Rangliste konnte nicht geladen werden.</div>
+        <EloRanking v-else :data="data" :now="now"/>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute } from 'vue-router';
-import Loadingscreen from '@/components/shared/Loadingscreen.vue';
-import { useStickyBar } from '@/components/shared/useStickyStack';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import TabPanels from 'primevue/tabpanels';
-import TabPanel from 'primevue/tabpanel';
+import SkeletonList from '@/components/shared/SkeletonList.vue';
 import EloRanking from './EloRanking.vue';
-import SeasonRanking from './SeasonRanking.vue';
 import { useWorldRankingData } from './useWorldRankingData';
 
 const { now, data, isLoading, hasError } = useWorldRankingData();
-
-// Reiter per Link vorwaehlbar, z.B. /Weltrangliste?tab=saison
-const TABS = ['elo', 'saison'];
-const requestedTab = useRoute().query.tab as string | undefined;
-const activeTab = ref(requestedTab && TABS.includes(requestedTab) ? requestedTab : 'elo');
-
-const stickyBar = ref<HTMLElement | null>(null);
-const stickyBarTop = useStickyBar(stickyBar);
 </script>
 
 <style scoped>
@@ -60,40 +32,27 @@ const stickyBarTop = useStickyBar(stickyBar);
     color: #1d1f23;
 }
 
-/* ── Reiter als Segment-Schalter ── */
-.wr-sticky-bar {
-    position: sticky;
-    z-index: 4;
-    padding: 10px 0 4px;
-    background: white;
+.wr-skeleton-header {
+    padding: 10px 0 14px;
+
+    h1 {
+        padding: 0;
+    }
 }
-:deep(.wr-tablist .p-tablist-content) {
-    padding: 4px;
-    border-radius: 12px;
-    background: #f0f1f3;
-}
-:deep(.wr-tablist .p-tablist-tab-list) {
-    border: none;
-    background: transparent;
-}
-:deep(.wr-tablist .p-tablist-active-bar) {
-    display: none;
-}
-:deep(.wr-tablist .p-tab) {
-    flex: 1;
-    justify-content: center;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 9px;
-    background: transparent;
+.wr-subtitle {
+    margin-top: 4px;
+    font-size: 13px;
     color: #6b717b;
-    font-size: 14px;
-    font-weight: 600;
 }
-:deep(.wr-tablist .p-tab-active) {
-    background: white;
-    color: #1d1f23;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+.wr-skeleton-chips {
+    display: flex;
+    gap: 8px;
+    padding-bottom: 14px;
+}
+.wr-skeleton-chip {
+    width: 84px;
+    height: 34px;
+    border-radius: 999px;
 }
 
 .wr-error {

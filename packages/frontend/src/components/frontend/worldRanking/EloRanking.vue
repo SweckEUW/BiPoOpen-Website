@@ -12,18 +12,11 @@
             </button>
         </div>
 
-        <div class="elo-chips">
-            <button
-                v-for="chip in chips"
-                :key="chip.key"
-                type="button"
-                class="elo-chip"
-                :class="{ 'elo-chip-active': mode === chip.key }"
-                @click="selectMode(chip.key)"
-            >
-                {{ chip.label }}
-            </button>
-        </div>
+        <Tabs :value="mode" class="p-tabs-chips" @update:value="value => selectMode(value as EloMode)">
+            <TabList class="elo-chips">
+                <Tab v-for="chip in chips" :key="chip.key" :value="chip.key">{{ chip.label }}</Tab>
+            </TabList>
+        </Tabs>
 
         <div class="elo-card">
             <div class="elo-card-head">
@@ -75,10 +68,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
 import EloRankingEntry from './EloRankingEntry.vue';
 import EloExplainedSheet from './EloExplainedSheet.vue';
-import { RankingData } from './worldRankingPoints';
-import { ELO_MIN_GAMES, ELO_TREND_DAYS, EloMode, buildEloGames, computeElo, getEloRanking } from './eloRating';
+import { ELO_MIN_GAMES, ELO_TREND_DAYS, EloMode, RankingData, buildEloGames, computeElo, getEloRanking } from './eloRating';
 
 const props = defineProps<{ data: RankingData; now: number }>();
 
@@ -148,28 +143,8 @@ const ranking = computed(() => getEloRanking(records.value, props.now));
 }
 
 /* ── Filter ── */
-.elo-chips {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    padding-bottom: 14px;
-    scrollbar-width: none;
-}
-.elo-chip {
-    flex-shrink: 0;
-    padding: 9px 14px;
-    border: 1px solid #dcdfe4;
-    border-radius: 999px;
-    background: white;
-    color: #1d1f23;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-.elo-chip-active {
-    background: #1d1f23;
-    border-color: #1d1f23;
-    color: white;
+:deep(.elo-chips) {
+    padding: 0 0 14px;
 }
 
 /* ── Liste ── */
@@ -246,9 +221,6 @@ const ranking = computed(() => getEloRanking(records.value, props.now));
 @media (width <= 360px) {
     .elo-info-button {
         padding: 7px 10px;
-    }
-    .elo-chip {
-        padding: 8px 11px;
     }
 }
 </style>
