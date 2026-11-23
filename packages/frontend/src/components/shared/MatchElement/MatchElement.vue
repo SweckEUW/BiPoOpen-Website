@@ -26,6 +26,9 @@
                <i class="pi" :class="playersVisible ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
             </button>
          </div>
+
+         <!-- Zusatzinhalt unter dem Spiel, z.B. Aktionen in der Verwaltung -->
+         <slot name="bottom"/>
     </div>
 </template>
 

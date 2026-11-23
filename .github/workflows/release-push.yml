@@ -8,6 +8,8 @@
 # Fuer ein neues Update: unten in releases.json eine neue Version eintragen und nach main mergen.
 # Eintraege mit "draft": true sind Entwuerfe (Features nur im Entwicklermodus sichtbar, siehe
 # packages/frontend/src/util/featureFlags.ts): kein Push, bis "draft" entfernt wird.
+# Kleines Update ohne Push: bei der Version "push": false eintragen. Sie ist dann veroeffentlicht
+# (Neuigkeiten, Features frei), es wird aber nichts verschickt.
 
 name: Release-Push
 
@@ -31,7 +33,12 @@ jobs:
             echo "RELEASE_PUSH_SECRET fehlt - kein Release-Push"
             exit 0
           fi
-          RELEASE=$(jq -c '[.[] | select(.draft != true)] | .[-1] | {version, title, notes}' packages/frontend/src/releases.json)
+          LATEST=$(jq -c '[.[] | select(.draft != true)] | .[-1]' packages/frontend/src/releases.json)
+          if [ "$(echo "$LATEST" | jq '.push == false')" = "true" ]; then
+            echo "v$(echo "$LATEST" | jq -r '.version') hat \"push\": false - kein Release-Push"
+            exit 0
+          fi
+          RELEASE=$(echo "$LATEST" | jq -c '{version, title, notes}')
           echo "Release: $RELEASE"
           curl --fail-with-body -sS -X POST "https://bipoopen-backend.vercel.app/push/release" \
             -H "Authorization: Bearer $RELEASE_PUSH_SECRET" \

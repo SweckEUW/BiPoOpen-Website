@@ -28,7 +28,8 @@ const createLeagueGame = (req: Request, res: Response, next: NextFunction) => {
             const result = describeResult(leagueGame.team1, leagueGame.team2, true);
             const seasonPath = leagueGame.season ? `/League/${leagueGame.season}` : '/League';
             const url = leagueGame.cupId ? `${seasonPath}/Pokal` : `${seasonPath}/${leagueGame.league ?? 1}`;
-            await notify('leagueGames', {
+            // ?push=0: kein Push, z.B. wenn ein bestehendes Spiel nur in eine andere Spielart uebertragen wird
+            if (req.query.push !== '0') await notify('leagueGames', {
                 title: `🏆 ${result.title}`,
                 body: leagueGame.cupId ? 'BiPo League Cup' : `${leagueGame.league ?? 1}. Liga · BiPo League`,
                 url,

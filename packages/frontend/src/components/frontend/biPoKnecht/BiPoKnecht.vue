@@ -621,7 +621,7 @@ const showsShot = (team: number) => !multiDevice.value || getTeamDevice(devices.
 
 
 // ─── Knecht Pro: Wurfzeiten ("Zug starten") und genaue Kanten nach einem Kanten-Nullwurf ───
-// Je Modus und Handy eingestellt (wie die Animationen): im Schiri-Modus standardmaessig an, im Spieler-Modus aus.
+// Je Modus und Handy eingestellt (wie die Animationen): in beiden Modi standardmaessig aus.
 // Nur wenn dieses Handy den ganzen Tisch eintraegt (ein Handy, oder "fuer alle eintragen").
 const PRO_KEYS: Record<KnechtMode, string> = { referee: 'bipo_knecht_pro', player: 'bipo_knecht_pro_player' };
 const readPro = (key: string, fallback: boolean) => {
@@ -632,7 +632,7 @@ const readPro = (key: string, fallback: boolean) => {
         return fallback;
     }
 };
-// Knecht Pro ist in beiden Modi erst einmal aus (wer ihn eingeschaltet hat, behaelt ihn)
+// Gespeichert wird nur ein eigener Schalter-Tipp. Ohne gespeicherten Wert gilt "aus", auch fuer Schiris, die Pro frueher nur per Voreinstellung hatten
 const proSettings = ref<Record<KnechtMode, boolean>>({ referee: readPro(PRO_KEYS.referee, false), player: readPro(PRO_KEYS.player, false) });
 const proAvailable = computed(() => !twoPhone.value);
 const proEnabled = computed(() => proSettings.value[mode.value]);

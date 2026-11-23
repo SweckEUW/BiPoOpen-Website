@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildCupChart, CUP_CHART, getCupChartMoments } from './cupChart';
+import { buildCupChart, CUP_CHART, getCupChartMoments, getTurnVisits } from './cupChart';
 import { getShortPlayerName } from '@/components/frontend/biPoKnecht/KnechtUtilFunctions';
 
 // Feste Zeichenbreite statt echter Schrift
@@ -92,6 +92,41 @@ describe('Becherverlauf: Auslegung', () => {
         // Zweiter Name endet innerhalb der Breite
         const second = narrow.legend[1];
         expect(second.x + 20 + measure(second.name, 700, second.size)).toBeLessThanOrEqual(300);
+    });
+
+    it('stellt alle Treffer eines Zugs genau uebereinander', () => {
+        // Team 1: zwei Treffer, Balls Back, dritter Treffer in einem Zug; dann Team 2 mit einem Treffer
+        const turns = [
+            turn('hit', 0, 0, 10, { cupIndex: 0 }),
+            turn('ballsback', 0, 1, 14, { cupIndex1: 1 }),
+            turn('hit', 0, 0, 25, { cupIndex: 2 }),
+            turn('miss', 0, 1, 28, {}),
+            turn('miss', 1, 0, 50, {}),
+            turn('hit', 1, 1, 55, { cupIndex: 0 }),
+        ];
+        for (const timed of [true, false]) {
+            const match = timed ? makeMatch(turns) : makeMatch(turns.map(entry => ({ ...entry, time: 0 })));
+            const chart = buildCupChart(match, 360, measure)!;
+            const team1 = chart.dots.filter(dot => dot.teamIndex === 0);
+            expect(team1).toHaveLength(3);
+            expect(new Set(team1.map(dot => dot.x)).size).toBe(1);
+            const team2 = chart.dots.find(dot => dot.teamIndex === 1)!;
+            expect(team2.x).toBeGreaterThan(team1[0].x);
+            // Balls-Back-Fahne zeigt auf denselben Zug
+            expect(chart.notes.find(note => note.icon === 'ballsback')!.lineX).toBe(team1[0].x);
+        }
+    });
+
+    it('zaehlt eigene Becher zum laufenden Zug', () => {
+        const turns = [
+            turn('hit', 0, 0, 10, { cupIndex: 0 }),
+            turn('owncup', 1, 0, 12, { cups: [3] }),
+            turn('hit', 0, 1, 20, { cupIndex: 1 }),
+            turn('hit', 1, 0, 40, { cupIndex: 0 }),
+        ];
+        expect(getTurnVisits(turns)).toEqual([0, 0, 0, 1]);
+        const chart = buildCupChart(makeMatch(turns), 360, measure)!;
+        expect(new Set(chart.dots.filter(dot => dot.teamIndex === 0).map(dot => dot.x)).size).toBe(1);
     });
 
     it('nennt im Doppel den Spieler in der Fahne', () => {

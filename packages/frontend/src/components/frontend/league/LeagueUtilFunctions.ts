@@ -13,8 +13,9 @@ export const getAllLeagueGames = async () => {
     return [];
 }
 
-export const addLeagueGame = async (leagueGame:Match) => {
-    let response = await axios.post("/leagueGames/create", leagueGame);
+// push: false = ohne Benachrichtigung (z.B. beim Uebertragen eines bestehenden Spiels)
+export const addLeagueGame = async (leagueGame:Match, { push = true } = {}) => {
+    let response = await axios.post("/leagueGames/create", leagueGame, { params: push ? undefined : { push: 0 } });
     return response.status == 201
 }
 

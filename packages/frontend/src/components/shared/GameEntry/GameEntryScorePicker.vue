@@ -123,6 +123,12 @@ const gridStyle = computed(() => {
     border-color: var(--bp-border);
     cursor: default;
 }
+/* Gesperrt mit festem Wert (z.B. Treffer aus den Wuerfen): Wert bleibt sichtbar, nur gedaempft */
+.gs-disabled .gs-selected{
+    background: var(--bp-text-muted);
+    border-color: var(--bp-text-muted);
+    color: var(--bp-inverse-text);
+}
 
 /* MOBILE S */
 @media (max-width: 360px){

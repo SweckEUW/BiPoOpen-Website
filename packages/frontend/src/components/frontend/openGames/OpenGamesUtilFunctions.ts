@@ -12,8 +12,9 @@ export const getAllOpenGames = async () => {
     return [];
 }
 
-export const addOpenGame = async (openGame:Match) => {
-    let response = await axios.post("/openGames/create", openGame);
+// push: false = ohne Benachrichtigung (z.B. beim Uebertragen eines bestehenden Spiels)
+export const addOpenGame = async (openGame:Match, { push = true } = {}) => {
+    let response = await axios.post("/openGames/create", openGame, { params: push ? undefined : { push: 0 } });
     return response.status == 201
 }
 

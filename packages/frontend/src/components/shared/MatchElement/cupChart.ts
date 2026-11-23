@@ -148,6 +148,21 @@ export type CupChartLayout = {
     notes: CupChartNote[];
 };
 
+// Zug je Eintrag: Wuerfe eines Teams am Stueck (Balls Back und Nachwurf-Runden bleiben im Zug). Eigene Becher und
+// Ellenbogen-Calls sind keine Wuerfe und gehoeren zum laufenden Zug. Nach einer Verlaengerung beginnt ein neuer Zug.
+export const getTurnVisits = (turns: Turn[], events: MatchEvent[] = []) => {
+    const overtimes = new Set(events.filter(event => event.kind === 'overtime').map(event => event.afterTurnIndex));
+    let visit = -1;
+    let team: number | null = null;
+    return turns.map((turn, index) => {
+        if (overtimes.has(index)) team = null;
+        const isThrow = turn.type !== 'owncup' && turn.type !== 'penalty';
+        if (visit < 0 || (isThrow && turn.teamIndex !== team)) visit++;
+        if (isThrow) team = turn.teamIndex;
+        return visit;
+    });
+};
+
 // Masse in Pixeln (Webseite 1:1, im Story-Overlay hochskaliert)
 export const CUP_CHART = {
     legendRow: 18,
@@ -217,9 +232,15 @@ export const buildCupChart = (match: Match, width: number, measure: MeasureText,
     const useTime = !!start && !!end && end > start && hits.every(entry => !!entry.turn.time);
     const finals = scores[scores.length - 1].score;
     const maxScore = Math.max(10, ...finals);
-    const hitX = (hitIndex: number) => useTime
-        ? Math.min(1, Math.max(0, (hits[hitIndex].turn.time - start) / (end - start))) * plotWidth
-        : (hitIndex + 1) / hits.length * plotWidth;
+    const timeX = (time: number) => Math.min(1, Math.max(0, (time - start) / (end - start))) * plotWidth;
+    // Alle Treffer eines Zugs stehen genau uebereinander (Zeit des ersten Treffers im Zug), damit man sofort sieht,
+    // wie viele Becher in einem Zug gefallen sind
+    const visits = getTurnVisits(turns, match.events ?? []);
+    const hitVisits = [...new Set(hits.map(entry => visits[entry.index]))];
+    const visitX = new Map(hitVisits.map((visit, order) => [visit, useTime
+        ? timeX(hits.find(entry => visits[entry.index] === visit)!.turn.time)
+        : (order + 1) / hitVisits.length * plotWidth]));
+    const hitX = (hitIndex: number) => visitX.get(visits[hits[hitIndex].index])!;
     const toY = (score: number) => C.plotHeight - score / maxScore * C.plotHeight;
 
     // Treppenlinien und Punkte bei jedem neuen Stand
@@ -255,15 +276,18 @@ export const buildCupChart = (match: Match, width: number, measure: MeasureText,
         align: index === 0 ? 'start' as const : 'middle' as const,
     })) : [];
 
-    // Fahnen: Position wie die Linie, Spitze zeigt auf den Stand direkt nach dem Moment
+    // Fahnen: Position wie die Linie, Spitze zeigt auf den Stand direkt nach dem Moment.
+    // Momente an einem Wurf stehen beim Zug (nicht beim eigenen Zeitpunkt), Ereignisse zwischen den Wuerfen bei ihrer Zeit.
     const hitIndexUpTo = (position: number) => hits.reduce((found, entry, hitIndex) => entry.index <= position ? hitIndex : found, -1);
     const moments = getCupChartMoments(match).map(moment => {
         const timed = useTime && moment.time !== null;
         const upTo = hitIndexUpTo(moment.position);
         const scoreEntry = scores[Math.floor(moment.position)] ?? scores[Math.floor(moment.position) - 1];
+        const atThrow = moment.position >= 0 && moment.position % 1 !== .5;
+        const visit = atThrow ? visitX.get(visits[Math.floor(moment.position)]) : undefined;
         return {
             ...moment,
-            x: timed ? Math.min(1, Math.max(0, (moment.time! - start) / (end - start))) * plotWidth : upTo < 0 ? 0 : hitX(upTo),
+            x: visit ?? (timed ? timeX(moment.time!) : upTo < 0 ? 0 : hitX(upTo)),
             y: toY(scoreEntry?.score[moment.scoreTeam] ?? 0),
             clock: timed ? formatClock(Math.max(0, moment.time! - start) / 1000) : '',
             name: teams && moment.playerIndex !== null ? getShortPlayerName(match, moment.teamIndex, moment.playerIndex) : '',

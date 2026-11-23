@@ -23,7 +23,8 @@ const createOpenGame = (req: Request, res: Response, next: NextFunction) => {
         .then(async (openGame) => {
             // await, damit Vercel die Funktion nicht vor dem Versand einfriert
             const result = describeResult(openGame.team1, openGame.team2);
-            await notify('openGames', {
+            // ?push=0: kein Push, z.B. wenn ein bestehendes Spiel nur in eine andere Spielart uebertragen wird
+            if (req.query.push !== '0') await notify('openGames', {
                 title: `🍺 ${result.title}`,
                 body: result.isDraw ? 'Unentschieden · Offenes Spiel' : `gegen ${result.opponents} · Offenes Spiel`,
                 url: '/',
