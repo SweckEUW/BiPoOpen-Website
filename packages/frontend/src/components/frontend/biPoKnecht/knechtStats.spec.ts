@@ -60,4 +60,13 @@ describe('Knecht-Statistik', () => {
         expect(stats).toMatchObject({ games: 1, wins: 1, throws: 3, hits: 1, misses: 1, airballs: 1, lastCups: 1 });
         expect(game.turns!.map(getTurnCups)).toEqual([0, 0, 0, 1, 1]);
     });
+
+    it('merkt sich die laengste Serie eigener Wuerfe ohne Treffer', () => {
+        const turns = [
+            turn(0, 0, 'miss'), turn(0, 0, 'airball'), turn(0, 0, 'hit', { cupIndex: 0 }),
+            turn(0, 0, 'miss'), turn(0, 0, 'miss'), turn(0, 0, 'miss'), turn(0, 0, 'hit', { cupIndex: 1 }),
+        ];
+        const game = match([['Alice'], ['Chris']], [[2], [0]], turns);
+        expect(getTurnStats(game, turns, [[2], [0]])[0].longestDrought).toBe(3);
+    });
 });
