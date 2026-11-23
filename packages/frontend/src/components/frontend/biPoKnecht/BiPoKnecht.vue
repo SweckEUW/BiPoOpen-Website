@@ -44,12 +44,16 @@
             </div>
 
             <!-- Schiedsrichter: Tisch von der Seite, quer -->
-            <div v-else class="kn-field kn-field--referee">
+            <!-- Beide Tische in voller Hoehe, die Dreiecke stehen sich mittig gegenueber. Namen und Stand liegen oben als Leiste darueber. -->
+            <div v-else class="kn-field kn-field--referee" :style="{ gridTemplateColumns: `minmax(0, ${isTarget(leftTeam) ? 3 : 2}fr) minmax(0, ${isTarget(rightTeam) ? 3 : 2}fr)` }">
                 <div v-for="teamIndex in [leftTeam, rightTeam]" :key="teamIndex" class="kn-end" :class="{ 'kn-end--target': isTarget(teamIndex) }">
                     <div class="kn-end-rack">
-                        <KnechtRack :game="game" :teamIndex="teamIndex" :direction="teamIndex === leftTeam ? 'left' : 'right'" :isTarget="isTarget(teamIndex)" :pro="proActive" :owners="cupOwners.racks[teamIndex]" showDrinkers>
-                            <template #front><KnechtControls v-if="isTarget(teamIndex)" :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === 1 - teamIndex" @trickshot="openTrickshot" /></template>
-                        </KnechtRack>
+                        <KnechtRack :game="game" :teamIndex="teamIndex" :direction="teamIndex === leftTeam ? 'left' : 'right'" :isTarget="isTarget(teamIndex)" :pro="proActive" :owners="cupOwners.racks[teamIndex]" showDrinkers />
+                        <!-- Re-Rack, Bouncer, Trickshot beim werfenden Team, am Rand zum Ziel-Tisch (ueber dem ausgegrauten Dreieck):
+                             das Ziel-Dreieck bleibt gross -->
+                        <div v-if="isTarget(1 - teamIndex)" class="kn-end-controls" :class="teamIndex === leftTeam ? 'kn-end-controls--right' : 'kn-end-controls--left'">
+                            <KnechtControls :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === teamIndex" @trickshot="openTrickshot" />
+                        </div>
                     </div>
                     <KnechtPlayers :game="game" :teamIndex="teamIndex" :compact="!isThrowing(teamIndex)" />
                 </div>
@@ -946,7 +950,42 @@ onUnmounted(() => {
     min-height: 0;
 }
 .kn-field--player{ flex-direction: column; }
-.kn-field--referee{ flex-direction: row; }
+.kn-field--referee{
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    transition: grid-template-columns .35s cubic-bezier(.4, 0, .2, 1);
+}
+/* Becher und Spieler beider Tische liegen im selben Raster: die Spielerleiste ist links und rechts gleich hoch */
+.kn-field--referee .kn-end{ display: contents; }
+.kn-field--referee .kn-end > *{ grid-column: 1; min-width: 0; }
+.kn-field--referee .kn-end + .kn-end > *{ grid-column: 2; border-left: 2px solid var(--bp-surface); }
+.kn-field--referee .kn-end > *{ grid-row: 1; }
+.kn-field--referee .kn-end-rack{ position: relative; }
+.kn-end-controls{
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: min(150px, calc(100% - 16px));
+    transform: translateY(-50%);
+}
+/* Am Rand zum Ziel-Tisch, untereinander (ausgegraute Becher duerfen verdeckt sein) */
+.kn-end-controls--left{ left: 8px; }
+.kn-end-controls--right{ right: 8px; }
+.kn-end-controls :deep(.KnechtControls){ width: 100%; }
+/* Laengere Texte (z.B. "Bouncer: wo kam er auf?") brechen im Knopf um, statt herauszulaufen */
+.kn-end-controls :deep(.kn-control){ height: auto; min-height: 40px; padding: 4px 8px; font-size: 13px; line-height: 1.15; }
+/* Gesperrt: nicht durchsichtig, sonst scheinen die Becher darunter durch */
+.kn-end-controls :deep(.kn-control:disabled){ opacity: 1; color: var(--bp-text-subtle); box-shadow: none; }
+/* Namensleiste oben ueber dem Tisch (beim werfenden Team ueber dem ausgegrauten Dreieck) */
+.kn-field--referee .KnechtPlayers{
+    position: relative;
+    z-index: 2;
+    align-self: start;
+    background: color-mix(in srgb, var(--bp-surface) 82%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 1px 0 rgba(31, 35, 40, .08);
+}
 /* Zwei Handys, das andere Team ist dran: Stand bleibt lesbar, Eingabe gesperrt */
 .kn-field--player{ position: relative; }
 .kn-wait{
@@ -985,9 +1024,6 @@ onUnmounted(() => {
 .kn-end-rack{
     flex: 1;
     min-height: 0;
-}
-.kn-field--referee .kn-end + .kn-end{
-    border-left: 2px solid var(--bp-surface);
 }
 .kn-field--player .kn-end + .kn-end{
     border-top: 2px solid var(--bp-surface);
@@ -1148,6 +1184,19 @@ onUnmounted(() => {
 /* Schwebendes Menue (Rueckgaengig, Menue) bleibt bei der Sperre bedienbar */
 .KnechtSideBar{
     z-index: 25;
+}
+/* Schiri: Rueckgaengig, Menue und Verlauf unten mittig am Rand, nebeneinander. Dort liegt immer der Ziel-Tisch
+   neben seinem Hinweis, nicht ueber Bechern, Namen oder den Knoepfen des werfenden Teams. */
+.kn--referee .KnechtSideBar{
+    top: auto;
+    right: auto;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.kn--referee .KnechtSideBar :deep(.kn-fab-menu){
+    flex-direction: row;
+    gap: 8px;
 }
 .kn-turn-start{
     display: flex;
