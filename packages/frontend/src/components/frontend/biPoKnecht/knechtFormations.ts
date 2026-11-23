@@ -12,25 +12,28 @@ import { CUP_COUNT } from './knechtEngine';
 //
 // Namen einfach hier aendern oder neue Zeilen ergaenzen.
 
-export type FormationEffect = 'wall' | 'ring' | 'hole' | 'towers' | 'stripe' | 'pop' | 'eye' | 'spin';
+export type FormationEffect = 'wall' | 'donut' | 'hole' | 'towers' | 'stripe' | 'pop' | 'eye' | 'spin' | 'diamond';
 
 export type KnechtFormation = {
     name: string;
     cups: number[];             // stehende Becher (Nummern 1-10)
     effect: FormationEffect;    // Zusatzeffekt der Animation
+    onlyByThrows?: boolean;     // zaehlt nur, wenn Wuerfe sie stehen lassen, nicht wenn ein Re-Rack sie aufstellt
 };
 
 const allExcept = (...missing: number[]) => Array.from({ length: CUP_COUNT }, (_, i) => i + 1).filter(cup => !missing.includes(cup));
 
 export const KNECHT_FORMATIONS: KnechtFormation[] = [
     { name: 'Berliner Mauer', cups: [7, 8, 9, 10], effect: 'wall' },
-    { name: 'Ring of Fire', cups: [2, 3, 4, 6, 8, 9], effect: 'ring' },
+    { name: 'Donut', cups: [2, 3, 4, 6, 8, 9], effect: 'donut' },
     { name: 'Arschlochbecher', cups: allExcept(5), effect: 'hole' },
     { name: 'Twin Towers', cups: [2, 3], effect: 'towers' },
     { name: 'Schneise', cups: allExcept(3, 5, 8), effect: 'stripe' },
     { name: 'Friedrich März', cups: allExcept(2, 3, 5), effect: 'pop' },
     { name: 'Sharingan', cups: [1, 3, 4, 7, 9, 10], effect: 'eye' },     // gespiegelt: 1 2 6 7 8 10
     { name: 'Windmühle', cups: [1, 3, 4, 5, 7, 9, 10], effect: 'spin' },  // Sharingan + 5, Windmuehle mit drei Fluegeln
+    // Raute aus 1 2 3 5. Genau so stellt der Re-Rack 4 Becher auf: dann zaehlt sie nicht
+    { name: 'Merkel-Route', cups: [1, 2, 3, 5], effect: 'diamond', onlyByThrows: true },
 ];
 
 // Spiegelung links <-> rechts aus Sicht des Werfers

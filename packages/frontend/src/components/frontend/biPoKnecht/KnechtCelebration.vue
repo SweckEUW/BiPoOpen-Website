@@ -24,8 +24,11 @@
                     <!-- Formation: kleines Becher-Dreieck mit Nummern, stehende Becher ploppen auf -->
                     <div v-if="formation" class="kc-formation" :class="`kc-formation--${formation.effect}`" :style="spinStyle">
                         <div v-if="formation.effect === 'wall'" class="kc-wall"></div>
-                        <div v-if="formation.effect === 'ring'" class="kc-fire-ring"></div>
+                        <div v-if="formation.effect === 'donut'" class="kc-donut"></div>
                         <div v-if="formation.effect === 'eye'" class="kc-sharingan"><span v-for="i in 3" :key="i" class="kc-tomoe" :style="{ '--i': i }"></span></div>
+                        <svg v-if="formation.effect === 'diamond' && diamondPoints" class="kc-diamond" :viewBox="`0 0 ${RACK_WIDTH} ${RACK_HEIGHT}`">
+                            <polygon :points="diamondPoints" />
+                        </svg>
                         <svg v-if="formation.effect === 'stripe' && stripeLine" class="kc-stripe-line" :viewBox="`0 0 ${RACK_WIDTH} ${RACK_HEIGHT}`">
                             <line :x1="stripeLine.x1" :y1="stripeLine.y1" :x2="stripeLine.x2" :y2="stripeLine.y2" />
                         </svg>
@@ -60,7 +63,7 @@ const props = defineProps<{ celebration: KnechtCelebration | null; flipped?: boo
 type ParticleKind = 'debris' | 'flame' | 'ember' | 'spark' | 'confetti' | 'star';
 type Look = {
     title: string;
-    subtitle?: (player: string) => string;
+    subtitle?: (player: string, note?: string) => string;
     icon: KnechtIconName;
     color: string;
     dark: string;
@@ -88,21 +91,22 @@ const LOOKS: Record<KnechtCelebrationKind, Look> = {
     equalizer: { title: 'Ausgleich!', subtitle: player => player, icon: 'equalizer', color: '#3E63DD', dark: '#14245E', particle: 'spark', count: 12, rings: [1] },
     lastcup: { title: 'Letzter Becher!', subtitle: player => `${player} räumt ab`, icon: 'lastCup', color: '#E0A800', dark: '#5C4300', particle: 'star', count: 24, rings: [1, 2] },
     formation: { title: 'Formation', icon: 'reRack', color: '#E5484D', dark: '#7A1418', particle: 'spark', count: 12, rings: [] },
-    'yellow-card': { title: 'Gelbe Karte', subtitle: player => `${player} · Ellenbogen über der Kante`, icon: 'penalty', color: '#F5C518', dark: '#5C4700', particle: null, count: 0, rings: [1] },
-    'red-card': { title: 'Rote Karte!', subtitle: player => `${player} · Strafbecher`, icon: 'penalty', color: '#E5484D', dark: '#5E0E12', particle: 'debris', count: 14, rings: [1, 2] },
+    'yellow-card': { title: 'Verwarnung', subtitle: (player, note) => `${player} · ${note ?? 'Ellenbogen-Call'}`, icon: 'penalty', color: '#F5C518', dark: '#5C4700', particle: null, count: 0, rings: [1] },
+    'red-card': { title: 'Strafbier!', subtitle: (player, note) => `${player} · ${note ?? 'Strafbecher'}`, icon: 'penalty', color: '#E5484D', dark: '#5E0E12', particle: 'debris', count: 14, rings: [1, 2] },
     hit: { title: 'Treffer!', subtitle: player => player, icon: 'hit', color: '#2F9E44', dark: '#14532D', particle: 'spark', count: 8, rings: [1] },
     'trickshot-hit': { title: 'Trickshot!', subtitle: player => `${player} verwandelt`, icon: 'trickshot', color: '#F5A524', dark: '#6B4300', particle: 'star', count: 26, rings: [1, 2], ball: 'loop' },
 };
 
 const FORMATION_COLORS: Record<FormationEffect, [string, string]> = {
     wall: ['#8B5E3C', '#3B2414'],
-    ring: ['#F76B15', '#7A2400'],
+    donut: ['#F27BAA', '#7A2848'],
     hole: ['#8E4EC6', '#3A1260'],
     towers: ['#2EA3C7', '#0B4A5E'],
     stripe: ['#1F8A70', '#0A3D31'],
     pop: ['#E5484D', '#7A1418'],
     eye: ['#C1121F', '#1A0004'],
     spin: ['#5B6B7A', '#1F262E'],
+    diamond: ['#3E63DD', '#14215A'],
 };
 
 const formation = computed(() => props.celebration?.kind === 'formation' ? props.celebration.formation ?? null : null);
@@ -110,14 +114,14 @@ const look = computed<Look>(() => {
     const base = LOOKS[props.celebration?.kind ?? 'bomb'];
     if (!formation.value) return base;
     const [color, dark] = FORMATION_COLORS[formation.value.effect];
-    return { ...base, color, dark, particle: formation.value.effect === 'ring' ? 'ember' : 'spark', count: formation.value.effect === 'ring' ? 18 : 12 };
+    return { ...base, color, dark, particle: formation.value.effect === 'donut' ? 'confetti' : 'spark', count: formation.value.effect === 'donut' ? 18 : 12 };
 });
 const title = computed(() => formation.value?.name ?? look.value.title);
 // Lange Woerter passen sich der Breite an, damit nichts abgeschnitten wird
 const titleSize = computed(() => `min(15cqw, ${(118 / Math.max(title.value.length, 1)).toFixed(1)}cqw, 96px)`);
 const subtitle = computed(() => {
     if (formation.value) return `Becher ${[...formation.value.cups].sort((a, b) => a - b).join(' · ')} stehen`;
-    return props.celebration && look.value.subtitle ? look.value.subtitle(props.celebration.player).replace(/^ · /, '') : '';
+    return props.celebration && look.value.subtitle ? look.value.subtitle(props.celebration.player, props.celebration.note).replace(/^ · /, '') : '';
 });
 
 // ─── Formation: Becher aus Sicht des Werfers, Spitze unten ───
@@ -162,6 +166,18 @@ const stripeLine = computed(() => {
     const first = missing[0], last = missing[missing.length - 1];
     const dx = last.x - first.x, dy = last.y - first.y;
     return { x1: first.x - dx * .35, y1: first.y - dy * .35, x2: last.x + dx * .35, y2: last.y + dy * .35 };
+});
+
+// Merkel-Route: Raute um die stehenden Becher, etwas groesser als die Becher selbst
+const diamondPoints = computed(() => {
+    const cups = (formation.value?.cups ?? []).map(cupCenter);
+    if (cups.length < 3) return null;
+    const cx = cups.reduce((sum, cup) => sum + cup.x, 0) / cups.length;
+    const cy = cups.reduce((sum, cup) => sum + cup.y, 0) / cups.length;
+    return cups
+        .sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx))
+        .map(cup => `${(cx + (cup.x - cx) * 1.55).toFixed(1)},${(cy + (cup.y - cy) * 1.55).toFixed(1)}`)
+        .join(' ');
 });
 
 // Zufall je Animation fest (aus der id), damit sich nichts beim Neuzeichnen verschiebt
@@ -648,8 +664,8 @@ const rerackCups = computed(() => {
     86%{ transform: scaleY(1) rotate(2deg); }
     100%{ transform: scaleY(.2) translateY(40px); opacity: 0; }
 }
-/* Ring of Fire: brennender Ring um die Becher */
-.kc-fire-ring{
+/* Donut: glasierter Donut mit Streuseln um die Becher */
+.kc-donut{
     position: absolute;
     left: 50%;
     top: 46%;
@@ -657,16 +673,18 @@ const rerackCups = computed(() => {
     height: 210px;
     margin: -105px 0 0 -105px;
     border-radius: 50%;
-    background: conic-gradient(#E5484D, #F5A524, #FFF3B0, #F76B15, #E5484D, #F5A524, #E5484D);
-    -webkit-mask: radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%);
-    mask: radial-gradient(circle, transparent 58%, black 60%, black 70%, transparent 72%);
-    filter: drop-shadow(0 0 10px #F76B15);
-    animation: kc-fire-ring 1.2s linear infinite, kc-fire-ring-in .5s ease-out both;
+    background:
+        repeating-conic-gradient(from 7deg, transparent 0 11deg, #FFF3B0 11deg 13deg, transparent 13deg 23deg, #2EA3C7 23deg 25deg, transparent 25deg 37deg, #FFFFFF 37deg 39deg, transparent 39deg 47deg),
+        radial-gradient(circle, transparent 0 55%, #F27BAA 56% 69%, #D9935A 70% 74%, #B8743E 75%);
+    -webkit-mask: radial-gradient(circle, transparent 54%, black 55%, black 72%, transparent 73%);
+    mask: radial-gradient(circle, transparent 54%, black 55%, black 72%, transparent 73%);
+    filter: drop-shadow(0 4px 10px rgba(122, 40, 72, .45));
+    animation: kc-pop-in .5s ease-out both, kc-donut 3s linear infinite;
 }
-@keyframes kc-fire-ring{
+@keyframes kc-donut{
     100%{ rotate: 360deg; }
 }
-@keyframes kc-fire-ring-in{
+@keyframes kc-pop-in{
     0%{ transform: scale(.3); opacity: 0; }
     100%{ transform: scale(1); opacity: 1; }
 }
@@ -682,7 +700,7 @@ const rerackCups = computed(() => {
     border-radius: 50%;
     background: radial-gradient(circle, #111 0 12%, #E5191F 13% 62%, #111 63% 65%, #E5191F 66%);
     box-shadow: 0 0 24px rgba(229, 25, 31, .7);
-    animation: kc-fire-ring-in .5s ease-out both, kc-sharingan 1.6s cubic-bezier(.6, 0, .4, 1) .4s infinite;
+    animation: kc-pop-in .5s ease-out both, kc-sharingan 1.6s cubic-bezier(.6, 0, .4, 1) .4s infinite;
 }
 .kc-tomoe{
     position: absolute;
@@ -744,6 +762,29 @@ const rerackCups = computed(() => {
     100%{ height: 120px; translate: 0 -80px; }
 }
 /* Schneise: Strahl fegt durch die Luecke */
+/* Merkel-Route: Raute zeichnet sich um die Becher und pulsiert */
+.kc-diamond{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+.kc-diamond polygon{
+    fill: rgba(255, 255, 255, .12);
+    stroke: white;
+    stroke-width: 8;
+    stroke-linejoin: round;
+    stroke-dasharray: 520;
+    stroke-dashoffset: 520;
+    filter: drop-shadow(0 0 10px var(--kc-color));
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: kc-stripe-draw .8s ease-out .5s forwards, kc-diamond-pulse 1.1s ease-in-out 1.3s infinite;
+}
+@keyframes kc-diamond-pulse{
+    50%{ transform: scale(1.06); }
+}
 .kc-stripe-line{
     position: absolute;
     inset: 0;
@@ -775,7 +816,7 @@ const rerackCups = computed(() => {
 }
 
 @media (prefers-reduced-motion: reduce){
-    .kc-stripes, .kc-ring, .kc-particle, .kc-ball, .kc-rack, .kc-wall, .kc-fire-ring, .kc-sharingan{ display: none; }
+    .kc-stripes, .kc-ring, .kc-particle, .kc-ball, .kc-rack, .kc-wall, .kc-donut, .kc-sharingan, .kc-diamond{ display: none; }
     .kc-formation--spin{ animation: none; }
     .kc-fcup{ animation: none !important; }
     .kc-content, .kc-icon, .kc-subtitle, .kc--on-fire .kc-title{ animation: none; }

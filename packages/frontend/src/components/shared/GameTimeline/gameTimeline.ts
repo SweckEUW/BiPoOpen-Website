@@ -44,7 +44,7 @@ export type GameSession = {
 export type GameSinglesDay = {
     kind: 'singles';
     key: string;
-    day: Date | null;            // Tag, an dem gespielt wurde, null bei Spielen ohne Zeit
+    day: Date | null;            // Tag, an dem gespielt wurde (siehe splitEveningByDay), null bei Spielen ohne Zeit
     games: Match[];              // chronologisch
 };
 
@@ -65,13 +65,36 @@ const getCalendarDate = (time: number) => {
 // Abend eines Spiels: Spiele vor DAY_CUTOFF_HOURS Uhr zaehlen zum Vortag
 const getEveningDate = (time: number) => getCalendarDate(time - DAY_CUTOFF_HOURS * 3600 * 1000);
 
-// Verschiedene Personen in den Spielen (Liga-Teams ueber resolveParticipant auf ihren Spieler zurueckgefuehrt)
-export const getParticipantCount = (games: Match[], resolveParticipant?: ResolveParticipant) => {
-    const people = new Set<string>();
-    games.forEach(match => [match.team1, match.team2].forEach(team => team.players.forEach((player) => {
-        people.add((resolveParticipant?.(player.name, match).person ?? player.name).trim().toLocaleLowerCase());
-    })));
-    return people.size;
+// Personen eines Spiels (Liga-Teams ueber resolveParticipant auf ihren Spieler zurueckgefuehrt)
+const getPeople = (match: Match, resolveParticipant?: ResolveParticipant) =>
+    [match.team1, match.team2].flatMap(team => team.players.map(player =>
+        (resolveParticipant?.(player.name, match).person ?? player.name).trim().toLocaleLowerCase()));
+
+// Verschiedene Personen in den Spielen
+export const getParticipantCount = (games: Match[], resolveParticipant?: ResolveParticipant) =>
+    new Set(games.flatMap(match => getPeople(match, resolveParticipant))).size;
+
+// Einzelspiele eines Abends je Tag. Spiele nach Mitternacht gehoeren noch zum Abend, wenn jemand aus dem Spiel
+// an dem Abend schon gespielt hat (22.11.2026 00:25 Uhr 4Fisch gegen Schaufautomat, beide am 21.11. schon dran).
+// Sonst zaehlt der Kalendertag (31.10.2026 00:24 Uhr ohne Spiele am Vorabend gehoert zum 31.10.).
+const splitEveningByDay = (eveningDay: Date, games: Match[], resolveParticipant?: ResolveParticipant) => {
+    const eveningPeople = new Set<string>();
+    const eveningGames: Match[] = [];
+    const nextDayGames: Match[] = [];
+    games.forEach((match) => {
+        const people = getPeople(match, resolveParticipant);
+        const beforeMidnight = getCalendarDate(match.time!).getTime() === eveningDay.getTime();
+        if (beforeMidnight || people.some(person => eveningPeople.has(person))) {
+            eveningGames.push(match);
+            people.forEach(person => eveningPeople.add(person));
+        } else {
+            nextDayGames.push(match);
+        }
+    });
+    return [
+        { day: eveningDay, games: eveningGames },
+        { day: getCalendarDate(nextDayGames[0]?.time ?? 0), games: nextDayGames },
+    ].filter(group => group.games.length);
 };
 
 // Bilanz je Spieler, im Doppel zaehlt das Ergebnis fuer beide. Beste zuerst.
@@ -154,14 +177,14 @@ export const buildGameTimeline = (
             return;
         }
 
-        // Einzelspiele je Kalendertag, an dem sie gespielt wurden (00:24 Uhr am 31.10. gehoert zum 31.10.)
-        evening.games.forEach((match) => {
-            const day = match.time ? getCalendarDate(match.time) : null;
+        // Einzelspiele je Tag (siehe splitEveningByDay), Spiele ohne Zeit als eigener Tag
+        const groups = evening.day ? splitEveningByDay(evening.day, evening.games, resolveParticipant) : [evening];
+        groups.forEach(({ day, games: dayGames }) => {
             const lastEntry = entries.at(-1);
             if (lastEntry?.kind === 'singles' && lastEntry.day?.getTime() === day?.getTime())
-                lastEntry.games.push(match);
+                lastEntry.games.push(...dayGames);
             else
-                entries.push({ kind: 'singles', key: `singles-${match._id ?? match.time}`, day, games: [match] });
+                entries.push({ kind: 'singles', key: `singles-${dayGames[0]._id ?? dayGames[0].time}`, day, games: dayGames });
         });
     });
 

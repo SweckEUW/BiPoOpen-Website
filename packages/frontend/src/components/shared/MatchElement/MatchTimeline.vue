@@ -57,7 +57,7 @@
             </button>
         </div>
 
-        <!-- Spieler: zugeklappt Becher (gross), Elo und Auszeichnung. Antippen klappt Wuerfe, Quote, Wurfzeit
+        <!-- Spieler: zugeklappt Becher (gross), Elo und Titel. Antippen klappt Wuerfe, Quote, Wurfzeit
              und den Link zum Profil auf (immer nur ein Spieler offen). -->
         <div v-if="showNames && tab === 'players'" class="mtl-players">
             <div v-for="team in playerRows" :key="team.teamIndex" class="mtl-players-team" :style="{ '--mtl-team-color': getTeamColor(match, team.teamIndex) }">
@@ -72,7 +72,7 @@
                                 {{ row.elo.rating.toLocaleString('de-DE') }}
                                 <b :class="{ 'is-up': row.elo.delta > 0, 'is-down': row.elo.delta < 0 }">{{ formatEloDelta(row.elo.delta) }}</b>
                             </span>
-                            <!-- Auszeichnung: oben der Titel, darunter in einer Zeile, wofuer -->
+                            <!-- Titel nach dem Spiel: oben der Name, darunter in einer Zeile, wofuer -->
                             <span v-if="row.award" class="mtl-player-award" :title="row.award.detail">
                                 <b><span aria-hidden="true">{{ row.award.icon }}</span> {{ row.award.title }}</b>
                                 <span class="mtl-player-award-detail" v-fit-text>{{ row.award.detail }}</span>
@@ -157,8 +157,8 @@ import { computed, inject, nextTick, onBeforeUnmount, PropType, ref, watch } fro
 import Avatar from '@/components/shared/Avatar.vue';
 import GlossaryText from '@/components/shared/GlossaryText.vue';
 import KnechtIcon from '@/components/frontend/biPoKnecht/KnechtIcon.vue';
-import { TURN_ICONS, type KnechtIconName } from '@/components/frontend/biPoKnecht/knechtIcons';
-import { isHitTurnType } from '@/components/frontend/biPoKnecht/knechtEngine';
+import { getTurnIcon, type KnechtIconName } from '@/components/frontend/biPoKnecht/knechtIcons';
+import { isHitTurnType, isTrickshotAirball } from '@/components/frontend/biPoKnecht/knechtEngine';
 import { getAccuracy, getScoringTeam, getTurnCups, getTurnStats } from '@/components/frontend/biPoKnecht/knechtStats';
 import { getEloPlayerKey } from '@/components/frontend/worldRanking/eloRating';
 import { formatEdgeKind, formatHitEdge } from '@/components/frontend/biPoKnecht/knechtEdges';
@@ -174,7 +174,7 @@ import { getCupChartMoments } from './cupChart';
 
 const props = defineProps({
     match: { type: Object as PropType<Match>, required: true },
-    // Laufendes Spiel (Live-Ticker): noch keine Auszeichnungen, "Stand" statt "Endstand"
+    // Laufendes Spiel (Live-Ticker): noch keine Titel, "Stand" statt "Endstand"
     live: { type: Boolean, default: false },
 });
 
@@ -199,7 +199,7 @@ const SHORT_LABELS: Partial<Record<Turn['type'], string>> = {
     lastCup: 'Letzter Becher',
     deathcup: 'Deathcup',
     owncup: 'Eigener Becher',
-    penalty: 'Strafbecher',
+    penalty: 'Strafbier',
 };
 
 type Row = {
@@ -227,7 +227,7 @@ const QUIET_LABELS: Partial<Record<Turn['type'], string>> = {
     miss: 'Nullwurf',
     airball: 'Airball',
     trickshot: 'Trickshot-Fang',
-    penalty: 'Gelbe Karte',
+    penalty: 'Verwarnung',
 };
 
 const HIT_FOLLOW_UPS = new Set<Turn['type']>(['hit', 'ballsback', 'onfire', 'bouncer']);
@@ -236,6 +236,7 @@ const getLabel = (turn: Turn, previous: Turn | undefined, cups: number) => {
     const data = getData(turn);
     // Kante ohne Becher-Nummer: welcher Becher, ist fuer die Wurfliste egal
     if (turn.type === 'miss' && data.edge) return formatEdgeKind(data.edge as EdgeHit);
+    if (isTrickshotAirball(turn, previous)) return 'Airball (Trickshot, zählt nicht)';
     if (!cups && !isHitTurnType(turn.type)) return QUIET_LABELS[turn.type] ?? 'Verfehlt';
     const kinds = [
         SHORT_LABELS[turn.type],
@@ -280,7 +281,7 @@ const rows = computed<Row[]>(() => {
             key: index,
             teamIndex: turn.teamIndex,
             scoringTeam: cups ? scoringTeam : -1,
-            icon: turn.type === 'hit' && isTrickshotHit(turn, turns.value[index - 1]) ? 'trickshot' : TURN_ICONS[turn.type],
+            icon: getTurnIcon(turn, turns.value[index - 1]),
             label: getLabel(turn, turns.value[index - 1], cups),
             action: getAction(getLabel(turn, turns.value[index - 1], cups)),
             name: getRowName(turn),
@@ -389,7 +390,7 @@ loadEloRatings();
 const openPlayer = ref<string | null>(null);
 const togglePlayer = (key: string) => { openPlayer.value = openPlayer.value === key ? null : key; };
 
-// Je Spieler: Elo (sobald geladen und das Spiel gewertet ist), Becher, Trefferquote, Auszeichnung und Wurfzeit
+// Je Spieler: Elo (sobald geladen und das Spiel gewertet ist), Becher, Trefferquote, Titel und Wurfzeit
 const playerRows = computed(() => {
     const sides = getMatchElo(props.match);
     const stats = playerStats.value;

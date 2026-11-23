@@ -28,6 +28,17 @@ describe('buildGameTimeline', () => {
         expect((timeline[0] as GameSession).day.getDate()).toBe(19);
     });
 
+    it('erkennt den Spieler hinter seinem Liga-Team beim Spiel nach Mitternacht', () => {
+        const games = [
+            game('2026-11-21T22:00', ['Jonas Weck'], 10, ['Simon Weck'], 8),
+            game('2026-11-22T00:25', ['Hopfenstreife'], 10, ['Sgt. Insane'], 8),
+        ];
+        const resolve = (name: string) => name === 'Hopfenstreife' ? { person: 'Jonas Weck', alias: 'Liga' } : { person: name };
+
+        expect(buildGameTimeline(games, { resolveParticipant: resolve })).toMatchObject([{ kind: 'singles', games: { length: 2 } }]);
+        expect(buildGameTimeline(games).map(entry => entry.day?.getDate())).toEqual([22, 21]);
+    });
+
     it('wertet im Doppel das Ergebnis fuer beide Spieler', () => {
         const games = [20, 21, 22, 23].map(hour => game(`2026-11-19T${hour}:00`, ['A', 'B'], 10, ['C', 'D'], 8));
         games.push(game('2026-11-19T23:30', ['C', 'D'], 10, ['A', 'B'], 9));

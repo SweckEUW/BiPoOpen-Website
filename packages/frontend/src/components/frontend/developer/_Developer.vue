@@ -75,6 +75,7 @@
 
                 <div v-if="selected" class="dv-push-status">
                     <template v-if="selected.draft">Entwurf: kein Push. Verschickt wird er, sobald bei v{{ selected.version }} in releases.json „draft“ entfernt und gemergt wird.</template>
+                    <template v-else-if="selected.push === false">Ohne Push veröffentlicht („push“: false in releases.json).</template>
                     <template v-else-if="selected.version === latestPublished?.version">Wird beim nächsten Deploy einmal verschickt (falls noch nicht geschehen).</template>
                     <template v-else>Ältere Version – wurde bereits angekündigt oder wird übersprungen.</template>
                 </div>

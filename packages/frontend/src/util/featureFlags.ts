@@ -16,7 +16,8 @@ import { isDemoMode } from '@/util/demoGames';
 // Vorschlag fuer die naechste Nummer aus den Commits seit der letzten Version: npm run version:next
 
 // notes: das Wichtige (immer sichtbar, die ersten drei kommen in den Update-Push), details: Kleinigkeiten zum Aufklappen
-export type Release = { version: string; date: string; title: string; notes: string[]; details?: string[]; draft?: boolean };
+// push: false = Version wird veroeffentlicht (Neuigkeiten, Features frei), aber ohne Update-Push. Fehlt es, gibt es den Push.
+export type Release = { version: string; date: string; title: string; notes: string[]; details?: string[]; draft?: boolean; push?: boolean };
 
 export const FEATURES = {
     live: {

@@ -63,6 +63,34 @@
         ]
     },
     {
+        "version": "2.0.3",
+        "date": "2026-11-23",
+        "push": false,
+        "title": "Donut, Merkel-Route & ein Titel für jeden",
+        "notes": [
+            "BiPo Knecht: Knecht Pro mit Lupe. Finger halten und den Ball genau ablegen, auch Kante, Doppelkante und Bouncer",
+            "BiPo Knecht: jeder Spieler bekommt nach dem Spiel einen Titel",
+            "BiPo Knecht: Sonderaktionen über die rote Fahne am Spielfeld: Strafbier, Verwarnung, eigene Becher, Deathcup",
+            "BiPo Knecht: der Schiri-Modus im Hochformat steht nicht mehr auf dem Kopf",
+            "BiPo Knecht: neue Formation Merkel-Route, aus Ring of Fire wird der Donut"
+        ],
+        "details": [
+            "BiPo Knecht: Knecht Pro ist jetzt auch im Schiri-Modus erst einmal aus und lässt sich im Menü einschalten",
+            "BiPo League & Ergebnisse: Spiele nach Mitternacht zählen zum Spieleabend davor",
+            "BiPo Knecht: Schiri-Modus im Querformat aufgeräumt, die Dreiecke stehen sich mittig gegenüber",
+            "BiPo Knecht: der letzte Becher rückt erst im nächsten Zug nach vorne",
+            "BiPo Knecht: Rückgängig spielt keine Animation doppelt",
+            "BiPo Knecht: die Bilder der Werfer bleiben auf den Bechern, auch nach einem Re-Rack",
+            "BiPo Knecht: ein Airball nach einem Trickshot-Fang zählt nicht",
+            "Spielverlauf: Formationen und Re-Rack als Fahnen, Team-Logos in der Legende",
+            "Spielverlauf: alle Treffer eines Zugs stehen in der Grafik genau übereinander",
+            "Spielerprofil: „Wo du triffst“ auch für ältere Knecht-Spiele",
+            "BiPo League: größere Logos in der Tabelle, im Teamprofil antippen zeigt sie groß",
+            "BiPo League: Leo Straub jetzt korrekt mit Walter Frosch Gedächtniskapelle e.V. Profil verlinkt",
+            "Verwaltung: alle Spiele durchsuchen, bearbeiten, löschen oder in eine andere Spielart übertragen"
+        ]
+    },
+    {
         "version": "2.1.0",
         "date": "2026-11-15",
         "title": "Live-Ticker & jeder mit eigenem Handy",

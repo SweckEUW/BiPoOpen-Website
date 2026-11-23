@@ -49,7 +49,7 @@ import { computed, ref, watch } from 'vue';
 import Avatar from '@/components/shared/Avatar.vue';
 import GlossaryWord from '@/components/shared/GlossaryWord.vue';
 import KnechtIcon from './KnechtIcon.vue';
-import { getBallNumber, getFinalPlayerPoints, getTeamPoints, isOnFireEnabled } from './knechtEngine';
+import { countAirballs, getBallNumber, getFinalPlayerPoints, getTeamPoints, isOnFireEnabled } from './knechtEngine';
 import { getTeamColor, formatPoints, getTeam, getTeamName } from './KnechtUtilFunctions';
 import type { BiPoKnechtGame } from './useBiPoKnecht';
 
@@ -98,7 +98,7 @@ const getFire = (playerIndex: number) => {
     return streak >= 3 ? 'on-fire' : streak === 2 ? 'heating-up' : 'normal';
 };
 
-const airballsTowardsShot = computed(() => state.value.turns.filter(turn => turn.type === 'airball' && turn.teamIndex === props.teamIndex).length % 3);
+const airballsTowardsShot = computed(() => countAirballs(state.value.turns, props.teamIndex) % 3);
 
 const hotPlayers = computed(() => team.value.players
     .map((player, playerIndex) => ({ playerIndex, name: player.name, fire: getFire(playerIndex) }))
@@ -131,6 +131,7 @@ const getPlayerLine = (playerIndex: number) => {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    container-type: inline-size;
     padding: 8px 10px 10px;
     background: var(--bp-surface);
     transition: opacity .25s ease, filter .25s ease;
@@ -314,6 +315,28 @@ const getPlayerLine = (playerIndex: number) => {
     white-space: nowrap;
     font-size: 11px;
     color: var(--bp-text-muted);
+}
+
+/* Schmal (z.B. werfendes Team auf dem kleinen Tisch im Schiri-Modus): alles in einer flachen Leiste, damit das
+   Spielfeld gross bleibt. Kopf in einer Zeile (Teamname, Am Zug, Punkte), Karten nebeneinander ohne Profilbild.
+   Heaten Up / On Fire steht dann an der Karte, nicht doppelt im Kopf. Nichts wird uebereinandergeschoben. */
+@container (max-width: 420px){
+    .KnechtPlayers{ gap: 4px; padding: 5px 8px 6px; }
+    .kn-players-header{ gap: 5px; min-height: 18px; }
+    .KnechtPlayers:not(.kn-players--compact) .kn-fire-pill{ display: none; }
+    .kn-fire-pill{ max-width: 100%; }
+    .kn-fire-pill > span{ white-space: normal; overflow-wrap: anywhere; }
+    .kn-turn-badge{ padding: 1px 6px; font-size: 9px; letter-spacing: .02em; }
+    .kn-team-score{ font-size: 14px; }
+    .kn-team-score small{ display: none; }
+    .kn-player-list{ gap: 4px; }
+    .kn-player{ padding: 3px 7px; border-radius: 9px; }
+    .kn-player-avatar{ display: none !important; }
+    .kn-player-name{ font-size: 13px; }
+    .kn-player-stats{ font-size: 10px; }
+    .kn-thrower-hint{ display: none; }
+    /* 1 gegen 1: der Name steht schon im Kopf, umschalten kann man nicht */
+    .kn-player-list--single{ display: none; }
 }
 
 /* Kompakt: wartendes Team im Spielermodus */

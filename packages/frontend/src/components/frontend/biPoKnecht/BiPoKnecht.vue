@@ -1,5 +1,5 @@
 <template>
-    <div class="BiPoKnecht" :class="[`kn--${mode}`, { 'kn--rotate': rotateBoard }]">
+    <div class="BiPoKnecht" :class="[`kn--${mode}`, { 'kn--upright': uprightField }]">
         <div class="kn-board">
             <!-- Schwebendes Menue (drei Punkte), das Spielfeld bleibt in voller Breite -->
             <KnechtSideBar
@@ -9,13 +9,15 @@
                 @scoreboard="sheet = 'scoreboard'"
                 @timeline="sheet = 'timeline'"
                 @menu="sheet = 'menu'"
+                @special="sheet = 'special'"
             />
 
             <!-- Spielermodus: Handy liegt auf dem Tisch, jedes Team tippt an seinem Tischende.
                  Zwei Handys: gleiche Ansicht, das eigene Team immer unten und nichts gedreht (jedes Handy liest nur
-                 ein Team). Ist das andere Team dran, sieht man den Stand, die Eingabe ist aber gesperrt. -->
-            <div v-if="mode === 'player'" class="kn-field kn-field--player">
-                <KnechtPlayers :game="game" :teamIndex="topTeam" :rotated="!twoPhone" :compact="!isThrowing(topTeam)" />
+                 ein Team). Ist das andere Team dran, sieht man den Stand, die Eingabe ist aber gesperrt.
+                 Schiri im Hochformat: gleiche Aufteilung oben/unten, aber nichts gedreht (eine Person traegt fuer alle ein). -->
+            <div v-if="mode === 'player' || uprightField" class="kn-field kn-field--player">
+                <KnechtPlayers :game="game" :teamIndex="topTeam" :rotated="!twoPhone && !uprightField" :compact="!isThrowing(topTeam)" />
                 <div class="kn-end" :class="{ 'kn-end--target': isTarget(topTeam) }">
                     <KnechtRack :game="game" :teamIndex="topTeam" direction="up" :isTarget="isTarget(topTeam) && !waitingForOther" :pro="proActive" :owners="cupOwners.racks[topTeam]" :showDrinkers="!twoPhone">
                         <template #front><KnechtControls v-if="(isTarget(topTeam) && !waitingForOther)" :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === 1 - topTeam" @trickshot="openTrickshot" /></template>
@@ -26,7 +28,7 @@
                     <transition name="kn-myturn">
                         <div v-if="showMyTurn" class="kn-myturn">🎯 Du bist dran!</div>
                     </transition>
-                    <KnechtRack :game="game" :teamIndex="bottomTeam" :direction="isTarget(bottomTeam) && !twoPhone ? 'up' : 'down'" :isTarget="isTarget(bottomTeam) && !waitingForOther" :rotated="isTarget(bottomTeam) && !twoPhone" :pro="proActive" :owners="cupOwners.racks[bottomTeam]" showDrinkers>
+                    <KnechtRack :game="game" :teamIndex="bottomTeam" :direction="isTarget(bottomTeam) && flipsForThrower ? 'up' : 'down'" :isTarget="isTarget(bottomTeam) && !waitingForOther" :rotated="isTarget(bottomTeam) && flipsForThrower" :pro="proActive" :owners="cupOwners.racks[bottomTeam]" showDrinkers>
                         <template #front><KnechtControls v-if="(isTarget(bottomTeam) && !waitingForOther)" :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === 1 - bottomTeam" @trickshot="openTrickshot" /></template>
                     </KnechtRack>
                 </div>
@@ -42,12 +44,16 @@
             </div>
 
             <!-- Schiedsrichter: Tisch von der Seite, quer -->
-            <div v-else class="kn-field kn-field--referee">
+            <!-- Beide Tische in voller Hoehe, die Dreiecke stehen sich mittig gegenueber. Namen und Stand liegen oben als Leiste darueber. -->
+            <div v-else class="kn-field kn-field--referee" :style="{ gridTemplateColumns: `minmax(0, ${isTarget(leftTeam) ? 3 : 2}fr) minmax(0, ${isTarget(rightTeam) ? 3 : 2}fr)` }">
                 <div v-for="teamIndex in [leftTeam, rightTeam]" :key="teamIndex" class="kn-end" :class="{ 'kn-end--target': isTarget(teamIndex) }">
                     <div class="kn-end-rack">
-                        <KnechtRack :game="game" :teamIndex="teamIndex" :direction="teamIndex === leftTeam ? 'left' : 'right'" :isTarget="isTarget(teamIndex)" :pro="proActive" :owners="cupOwners.racks[teamIndex]" showDrinkers>
-                            <template #front><KnechtControls v-if="isTarget(teamIndex)" :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === 1 - teamIndex" @trickshot="openTrickshot" /></template>
-                        </KnechtRack>
+                        <KnechtRack :game="game" :teamIndex="teamIndex" :direction="teamIndex === leftTeam ? 'left' : 'right'" :isTarget="isTarget(teamIndex)" :pro="proActive" :owners="cupOwners.racks[teamIndex]" showDrinkers />
+                        <!-- Re-Rack, Bouncer, Trickshot beim werfenden Team, am Rand zum Ziel-Tisch (ueber dem ausgegrauten Dreieck):
+                             das Ziel-Dreieck bleibt gross -->
+                        <div v-if="isTarget(1 - teamIndex)" class="kn-end-controls" :class="teamIndex === leftTeam ? 'kn-end-controls--right' : 'kn-end-controls--left'">
+                            <KnechtControls :game="game" :trickshotActive="sheet === 'trickshot'" :pro="proActive" :catchReady="catchWindow?.team === teamIndex" @trickshot="openTrickshot" />
+                        </div>
                     </div>
                     <KnechtPlayers :game="game" :teamIndex="teamIndex" :compact="!isThrowing(teamIndex)" />
                 </div>
@@ -176,8 +182,34 @@
                 </div>
             </KnechtSheet>
 
-            <KnechtSheet :visible="sheet === 'elbow'" title="Ellenbogen-Call" subtitle="Wer war mit dem Ellenbogen über der Tischkante?" :flipped="sheetFlipped" @update:visible="sheet = null">
-                <KnechtElbow :game="game" @done="sheet = null" />
+            <!-- Sonderaktionen: alles, was man im Spiel eintragen muss, direkt vom Spielfeld (Knopf mit der Fahne) -->
+            <KnechtSheet :visible="sheet === 'special'" title="Sonderaktion" subtitle="Was ist passiert?" :flipped="sheetFlipped" @update:visible="sheet = null">
+                <div class="kn-menu-list">
+                    <!-- Verwarnung gibt nur der Schiri -->
+                    <button v-if="mode === 'referee'" type="button" class="kn-menu-button kn-special-button" @click="sheet = 'warning'">
+                        <KnechtIcon name="penalty" />
+                        <span>Verwarnung <small>z. B. Ellenbogen-Call · kostet keinen Becher</small></span>
+                    </button>
+                    <button type="button" class="kn-menu-button kn-special-button" @click="sheet = 'penaltyCup'">
+                        <KnechtIcon name="penalty" />
+                        <span>Strafbier <small>z. B. Ellenbogen-Call, irregulärer Eingriff · ein eigener Becher vom Tisch</small></span>
+                    </button>
+                    <button type="button" class="kn-menu-button kn-special-button" @click="sheet = 'ownCup'">
+                        <KnechtIcon name="owncup" />
+                        <span>Eigene Becher umgeworfen <small>Zählen für den Gegner</small></span>
+                    </button>
+                    <button type="button" class="kn-menu-button kn-menu-button--danger kn-special-button" @click="confirmDeathcup">
+                        <KnechtIcon name="deathcup" />
+                        <span>Deathcup von {{ throwerName }} <small>Spiel endet sofort</small></span>
+                    </button>
+                </div>
+            </KnechtSheet>
+
+            <KnechtSheet :visible="sheet === 'warning'" title="Verwarnung" :flipped="sheetFlipped" @update:visible="sheet = null">
+                <KnechtElbow v-if="sheet === 'warning'" :game="game" card="yellow" @done="sheet = null" />
+            </KnechtSheet>
+            <KnechtSheet :visible="sheet === 'penaltyCup'" title="Strafbier" :flipped="sheetFlipped" @update:visible="sheet = null">
+                <KnechtElbow v-if="sheet === 'penaltyCup'" :game="game" card="red" @done="sheet = null" />
             </KnechtSheet>
 
             <KnechtSheet :visible="sheet === 'ownCup'" title="Eigene Becher runter" :flipped="sheetFlipped" @update:visible="sheet = null">
@@ -188,13 +220,14 @@
                 <KnechtLivePanel :live="live ?? null" :match="game.match" :referee="mode === 'referee'" @action="onLiveAction" />
             </KnechtSheet>
 
-            <KnechtSheet :visible="sheet === 'menu'" title="Einstellungen & Sonderfälle" :flipped="sheetFlipped" @update:visible="sheet = null">
+            <KnechtSheet :visible="sheet === 'menu'" title="Einstellungen" :flipped="sheetFlipped" @update:visible="sheet = null">
                 <div class="kn-menu-list">
                     <!-- Einheitlich: Auswahl als Segmente, An/Aus als Schalter (Zustand immer sichtbar), Aktionen als Knoepfe -->
                     <div class="kn-menu-label">Modus</div>
                     <SelectButton :modelValue="twoPhone ? 'player' : modeSetting" :options="MODE_OPTIONS" optionLabel="label" optionValue="value" :allowEmpty="false" :disabled="twoPhone" fluid @update:modelValue="setMode" />
                     <div v-if="twoPhone" class="kn-menu-hint">Mit mehreren Handys immer Spieler-Modus – außer dieses Handy trägt für alle ein (unten)</div>
                     <div v-else-if="modeSetting === 'auto'" class="kn-menu-hint">Hochkant = Spieler, quer = Schiedsrichter</div>
+                    <div v-else-if="modeSetting === 'referee'" class="kn-menu-hint">Quer: Tisch von der Seite · hochkant: Feld oben/unten, alles richtig herum</div>
 
                     <div class="kn-menu-label">Anzeige & Rückmeldung</div>
                     <button v-if="fullscreenSupported" type="button" role="switch" class="kn-menu-toggle" :aria-checked="fullscreen" @click="toggleFullscreen">
@@ -219,7 +252,7 @@
                     <div class="kn-menu-hint">{{ animationLevel === 'all' ? 'Bei jeder Aktion' : animationLevel === 'special' ? 'Nur Bombe, Bouncer, Trickshot, Balls Back, Heaten Up, On Fire & Formationen' : 'Keine großen Animationen' }}</div>
                     <button v-if="proAvailable" type="button" role="switch" class="kn-menu-toggle" :aria-checked="proEnabled" @click="toggleProMode">
                         <KnechtIcon name="miss" />
-                        <span class="kn-menu-toggle-text">Knecht Pro <small>„Zug starten“ = Bälle in der Hand, ab da läuft die Wurfzeit · Kante: Fehlwurf knapp neben den Becher tippen, dann jede Kantenberührung, rein = Treffer, „rein und wieder raus“</small></span>
+                        <span class="kn-menu-toggle-text">Knecht Pro <small>„Zug starten“ = Bälle in der Hand, ab da läuft die Wurfzeit · Finger halten: Lupe, Ball genau auf Kante, Becher oder Tisch ablegen. Mehrere Bälle zeigen den Weg (z. B. Kante, dann Becher), „Eintragen“ – es zählt der letzte Ball</small></span>
                         <span class="kn-menu-switch" aria-hidden="true"></span>
                     </button>
 
@@ -233,10 +266,6 @@
                     </button>
                     <div v-if="!twoPhone" class="kn-menu-hint">{{ mode === 'player' ? 'Oder einfach das Handy auf dem Tisch umdrehen' : 'Oder das Handy umdrehen, wenn du auf die andere Tischseite gehst' }}</div>
 
-                    <div class="kn-menu-label">Sonderfälle</div>
-                    <button type="button" class="kn-menu-button" @click="sheet = 'ownCup'"><KnechtIcon name="owncup" /> Eigene Becher runtergeworfen</button>
-                    <button v-if="mode === 'referee'" type="button" class="kn-menu-button" @click="sheet = 'elbow'"><KnechtIcon name="penalty" /> Ellenbogen-Call</button>
-                    <button type="button" class="kn-menu-button kn-menu-button--danger" @click="confirmDeathcup"><KnechtIcon name="deathcup" /> Deathcup von {{ throwerName }}</button>
 
                     <!-- Fuer alle eintragen: dieses Handy uebernimmt den ganzen Tisch (auch Schiri-Modus), die anderen sehen das -->
                     <template v-if="multiDevice">
@@ -310,14 +339,14 @@ import { useProfile } from '../multiplayer/useProfile';
 import KnechtGameOver from './KnechtGameOver.vue';
 import KnechtIcon from './KnechtIcon.vue';
 import type { KnechtIconName } from './knechtIcons';
-import { getHittableCups, getTeamPoints, type KnechtAction } from './knechtEngine';
+import { countAirballs, getHittableCups, getTeamPoints, type KnechtAction } from './knechtEngine';
 import { formatPoints, getPlayerName, getTeam, getTeamColor, getTeamName, swapCupColors } from './KnechtUtilFunctions';
 import { useBiPoKnecht, type KnechtMode } from './useBiPoKnecht';
 import KnechtEdgeZoom from './KnechtEdgeZoom.vue';
 import { addShots } from '@/components/frontend/shots/shots';
 import { isVibrationSupported, toggleVibration, vibrationEnabled } from './knechtHaptics';
 import { ANIMATION_OPTIONS, animationLevel, animationMode, setAnimationLevel } from './knechtAnimations';
-import { enterFullscreen, exitFullscreen, isFullscreen, isFullscreenSupported, lockLandscape, releaseWakeLock, requestWakeLock, unlockOrientation } from './knechtScreen';
+import { enterFullscreen, exitFullscreen, isFullscreen, isFullscreenSupported, releaseWakeLock, requestWakeLock, unlockOrientation } from './knechtScreen';
 
 const props = defineProps<{
     match: Match;
@@ -366,7 +395,7 @@ const paused = ref(!!props.initialPaused && props.startTeamIndex !== null);
 const pauseReady = ref<string[]>([]);       // mehrere Handys: wer nach der Pause bereit ist
 const pausedBy = ref<string | null>(null);    // mehrere Handys: wer pausiert hat
 const { profileName } = useProfile();
-const sheet = ref<'scoreboard' | 'timeline' | 'edit' | 'live' | 'menu' | 'trickshot' | 'ownCup' | 'elbow' | null>(null);
+const sheet = ref<'scoreboard' | 'timeline' | 'edit' | 'live' | 'menu' | 'special' | 'trickshot' | 'ownCup' | 'warning' | 'penaltyCup' | null>(null);
 const editTurn = ref<number | null>(null);
 const openTurnEditor = (turnIndex: number) => {
     editTurn.value = turnIndex;
@@ -376,9 +405,8 @@ const openTurnEditor = (turnIndex: number) => {
 const setMode = (value: ModeSetting) => {
     modeSetting.value = value;
     localStorage.setItem(MODE_KEY, value);
-    // Fest Schiedsrichter: Querformat sperren. Auto darf nicht sperren, sonst kaeme man nicht mehr zurueck.
-    if (value === 'referee') lockLandscape();
-    else unlockOrientation();
+    // Keine Sperre mehr: Schiri geht quer und hochkant (hochkant: Feld oben/unten, nichts gedreht)
+    unlockOrientation();
     // Menue bleibt offen: Schalter wie Knecht Pro (nur Schiri) erscheinen sofort sichtbar
 };
 
@@ -461,7 +489,10 @@ const onOrientationChange = (event: MediaQueryListEvent) => { isPortrait.value =
 const mode = computed<KnechtMode>(() => twoPhone.value ? 'player' : modeSetting.value === 'auto' ? (isPortrait.value ? 'player' : 'referee') : modeSetting.value);
 // Animationen sind je Modus eingestellt (Spieler: alle, Schiri: nur besondere)
 watch(mode, value => { animationMode.value = value; }, { immediate: true });
-const rotateBoard = computed(() => mode.value === 'referee' && isPortrait.value);
+// Schiri im Hochformat: Feld oben/unten, nichts gedreht (frueher wurde das Querformat-Feld um 90 Grad gedreht)
+const uprightField = computed(() => mode.value === 'referee' && isPortrait.value);
+// Spielermodus auf einem gemeinsamen Handy: das werfende Team unten liest sein Feld von der anderen Tischseite
+const flipsForThrower = computed(() => !twoPhone.value && !uprightField.value);
 // Schiedsrichter-Modus genutzt: am Ende nach dem Namen fragen
 watch(mode, value => { if (value === 'referee') refereeUsed.value = true; }, { immediate: true });
 
@@ -590,7 +621,7 @@ const showsShot = (team: number) => !multiDevice.value || getTeamDevice(devices.
 
 
 // ─── Knecht Pro: Wurfzeiten ("Zug starten") und genaue Kanten nach einem Kanten-Nullwurf ───
-// Je Modus und Handy eingestellt (wie die Animationen): im Schiri-Modus standardmaessig an, im Spieler-Modus aus.
+// Je Modus und Handy eingestellt (wie die Animationen): in beiden Modi standardmaessig aus.
 // Nur wenn dieses Handy den ganzen Tisch eintraegt (ein Handy, oder "fuer alle eintragen").
 const PRO_KEYS: Record<KnechtMode, string> = { referee: 'bipo_knecht_pro', player: 'bipo_knecht_pro_player' };
 const readPro = (key: string, fallback: boolean) => {
@@ -601,7 +632,8 @@ const readPro = (key: string, fallback: boolean) => {
         return fallback;
     }
 };
-const proSettings = ref<Record<KnechtMode, boolean>>({ referee: readPro(PRO_KEYS.referee, true), player: readPro(PRO_KEYS.player, false) });
+// Gespeichert wird nur ein eigener Schalter-Tipp. Ohne gespeicherten Wert gilt "aus", auch fuer Schiris, die Pro frueher nur per Voreinstellung hatten
+const proSettings = ref<Record<KnechtMode, boolean>>({ referee: readPro(PRO_KEYS.referee, false), player: readPro(PRO_KEYS.player, false) });
 const proAvailable = computed(() => !twoPhone.value);
 const proEnabled = computed(() => proSettings.value[mode.value]);
 const proActive = computed(() => proEnabled.value && proAvailable.value);
@@ -623,7 +655,8 @@ const restartEdgeTimer = () => {
 };
 watch(() => game.actions.value.length, (length, previous) => {
     const last = game.actions.value[length - 1];
-    if (!proActive.value || length <= (previous ?? 0) || last?.type !== 'throw' || !last.edge) {
+    // Ballweg (Halten mit Lupe) bringt die Kontaktstellen schon mit: dann keine Nahansicht
+    if (!proActive.value || length <= (previous ?? 0) || last?.type !== 'throw' || !last.edge || last.edge.contacts?.length) {
         if (length < (previous ?? 0)) edgePrompt.value = null;
         return;
     }
@@ -698,7 +731,7 @@ const loadShots = (): number[] => {
     }
 };
 const shotsConfirmed = ref<number[]>(loadShots());
-const airballs = computed(() => [0, 1].map(teamIndex => state.value.turns.filter(turn => turn.type === 'airball' && turn.teamIndex === teamIndex).length));
+const airballs = computed(() => [0, 1].map(teamIndex => countAirballs(state.value.turns, teamIndex)));
 const shotTeam = computed(() => {
     const due = [0, 1].find(teamIndex => Math.floor(airballs.value[teamIndex] / SHOT_EVERY_AIRBALLS) > (shotsConfirmed.value[teamIndex] ?? 0));
     return due ?? null;
@@ -812,7 +845,6 @@ const startGame = (teamIndex: number) => {
     game.start(teamIndex);
     enterFullscreen();
     requestWakeLock();
-    if (modeSetting.value === 'referee') lockLandscape();
 };
 
 // ─── Start aus der Anstoss-Lobby: kein "Wer faengt an?", nur Schnick-Schnack-Schnuck als Popup ueber dem Feld ───
@@ -912,16 +944,6 @@ onUnmounted(() => {
 }
 
 /* Schiedsrichter im Hochformat: Feld um 90 Grad gedreht */
-.kn--rotate .kn-board{
-    inset: auto;
-    top: 0;
-    left: 100dvw;
-    width: 100dvh;
-    height: 100dvw;
-    transform: rotate(90deg);
-    transform-origin: top left;
-}
-
 .kn-field{
     position: relative;
     display: flex;
@@ -930,7 +952,42 @@ onUnmounted(() => {
     min-height: 0;
 }
 .kn-field--player{ flex-direction: column; }
-.kn-field--referee{ flex-direction: row; }
+.kn-field--referee{
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    transition: grid-template-columns .35s cubic-bezier(.4, 0, .2, 1);
+}
+/* Becher und Spieler beider Tische liegen im selben Raster: die Spielerleiste ist links und rechts gleich hoch */
+.kn-field--referee .kn-end{ display: contents; }
+.kn-field--referee .kn-end > *{ grid-column: 1; min-width: 0; }
+.kn-field--referee .kn-end + .kn-end > *{ grid-column: 2; border-left: 2px solid var(--bp-surface); }
+.kn-field--referee .kn-end > *{ grid-row: 1; }
+.kn-field--referee .kn-end-rack{ position: relative; }
+.kn-end-controls{
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: min(150px, calc(100% - 16px));
+    transform: translateY(-50%);
+}
+/* Am Rand zum Ziel-Tisch, untereinander (ausgegraute Becher duerfen verdeckt sein) */
+.kn-end-controls--left{ left: 8px; }
+.kn-end-controls--right{ right: 8px; }
+.kn-end-controls :deep(.KnechtControls){ width: 100%; }
+/* Laengere Texte (z.B. "Bouncer: wo kam er auf?") brechen im Knopf um, statt herauszulaufen */
+.kn-end-controls :deep(.kn-control){ height: auto; min-height: 40px; padding: 4px 8px; font-size: 13px; line-height: 1.15; }
+/* Gesperrt: nicht durchsichtig, sonst scheinen die Becher darunter durch */
+.kn-end-controls :deep(.kn-control:disabled){ opacity: 1; color: var(--bp-text-subtle); box-shadow: none; }
+/* Namensleiste oben ueber dem Tisch (beim werfenden Team ueber dem ausgegrauten Dreieck) */
+.kn-field--referee .KnechtPlayers{
+    position: relative;
+    z-index: 2;
+    align-self: start;
+    background: color-mix(in srgb, var(--bp-surface) 82%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 1px 0 rgba(31, 35, 40, .08);
+}
 /* Zwei Handys, das andere Team ist dran: Stand bleibt lesbar, Eingabe gesperrt */
 .kn-field--player{ position: relative; }
 .kn-wait{
@@ -969,9 +1026,6 @@ onUnmounted(() => {
 .kn-end-rack{
     flex: 1;
     min-height: 0;
-}
-.kn-field--referee .kn-end + .kn-end{
-    border-left: 2px solid var(--bp-surface);
 }
 .kn-field--player .kn-end + .kn-end{
     border-top: 2px solid var(--bp-surface);
@@ -1132,6 +1186,19 @@ onUnmounted(() => {
 /* Schwebendes Menue (Rueckgaengig, Menue) bleibt bei der Sperre bedienbar */
 .KnechtSideBar{
     z-index: 25;
+}
+/* Schiri: Rueckgaengig, Menue und Verlauf unten mittig am Rand, nebeneinander. Dort liegt immer der Ziel-Tisch
+   neben seinem Hinweis, nicht ueber Bechern, Namen oder den Knoepfen des werfenden Teams. */
+.kn--referee .KnechtSideBar{
+    top: auto;
+    right: auto;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.kn--referee .KnechtSideBar :deep(.kn-fab-menu){
+    flex-direction: row;
+    gap: 8px;
 }
 .kn-turn-start{
     display: flex;
@@ -1358,6 +1425,21 @@ onUnmounted(() => {
 }
 .kn-menu-button:active{
     background: var(--page-gray);
+}
+/* Sonderaktion: grosse Knoepfe mit kurzer Erklaerung darunter */
+.kn-special-button{
+    min-height: 60px;
+    padding: 10px 14px;
+}
+.kn-special-button > span{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.kn-special-button small{
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bp-text-muted);
 }
 .kn-menu-button--primary{
     justify-content: center;

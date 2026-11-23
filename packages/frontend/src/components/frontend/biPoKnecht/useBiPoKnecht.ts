@@ -21,6 +21,7 @@ export type CupPick = {
     needed: number;
     candidates: number[];
     chosen: number[];
+    edge?: EdgeHit;             // Knecht Pro (Ballweg): der Ball war vorher an der Kante
 };
 
 const BANNER_DURATION = 1800;
@@ -34,7 +35,8 @@ export type KnechtCelebrationKind =
     | 'bouncer' | 'rerack' | 'trickshot' | 'trickshot-hit' | 'lastcup' | 'formation' | 'yellow-card' | 'red-card' | 'hit'
     | 'airball' | 'equalizer' | 'miss' | 'owncup';
 // teamIndex: wem die Animation zugewandt ist (bei Formationen das Team, das auf diese Becher wirft)
-export type KnechtCelebration = { id: number; kind: KnechtCelebrationKind; player: string; teamIndex: number; formation?: KnechtFormation };
+// note: Zusatz unter dem Namen (z.B. Grund einer Verwarnung)
+export type KnechtCelebration = { id: number; kind: KnechtCelebrationKind; player: string; teamIndex: number; formation?: KnechtFormation; note?: string };
 
 // Neue benannte Formation der stehenden Becher, je Rack (Team, dem die Becher gehoeren)
 export const getNewFormations = (before: KnechtState, next: KnechtState) => [0, 1].flatMap(rackIndex => {
@@ -78,8 +80,10 @@ export const getCelebrations = (before: KnechtState, next: KnechtState, action: 
         throwKinds.push('equalizer');
     }
     const followUps = next.events.filter(event => (FOLLOW_UP_EVENTS as string[]).includes(event)) as KnechtCelebrationKind[];
-    // Verlaengerung: neu aufgestellte Becher sind keine geworfene Formation
-    const formations = followUps.includes('overtime') ? [] : getNewFormations(before, next);
+    // Verlaengerung: neu aufgestellte Becher sind keine geworfene Formation. Re-Rack: nur Formationen, die
+    // auch so aufgestellt gelten duerfen (nicht z.B. die Merkel-Route)
+    const formations = followUps.includes('overtime') ? []
+        : getNewFormations(before, next).filter(entry => action.type !== 'reRack' || !entry.formation.onlyByThrows);
     return { throwKinds, formations, followUps };
 };
 
@@ -194,6 +198,20 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
         const duration = celebration.value && QUICK_KINDS.includes(celebration.value.kind) ? HIT_DURATION : CELEBRATION_DURATION;
         celebrationTimer = celebration.value ? setTimeout(showNextCelebration, duration) : null;
     };
+    // Schon gezeigte Aktionen (Stelle im Spiel + Inhalt ohne Zeit). Rueckgaengig und danach derselbe Wurf, ein
+    // zurueckgenommener Wurf, der ueber den Abgleich wiederkommt, oder die eigenen Wuerfe nach dem Zusammenfuehren
+    // mit einem anderen Handy spielen ihre Animationen und Toene nicht noch einmal ab.
+    const celebrated = new Set<string>();
+    const actionKey = (action: KnechtAction, index: number) => `${index}:${JSON.stringify({ ...action, time: undefined })}`;
+    // true, wenn die Aktion an dieser Stelle zum ersten Mal vorkommt (und merkt sie sich)
+    const isFresh = (action: KnechtAction, index: number) => {
+        const key = actionKey(action, index);
+        if (celebrated.has(key)) return false;
+        celebrated.add(key);
+        return true;
+    };
+    actions.value.forEach(isFresh);
+
     const celebrate = (all: Omit<KnechtCelebration, 'id'>[]) => {
         // Einstellung im Menue: alle, nur besondere (ohne normale Treffer und Airballs) oder keine Animationen
         const list = animationLevel.value === 'off' ? [] : animationLevel.value === 'special' ? all.filter(entry => SPECIAL_KINDS.includes(entry.kind)) : all;
@@ -249,7 +267,8 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
         // Bombe/Bouncer lief schon vor der Becherwahl: nicht noch einmal zeigen
         const list = celebrationsFor(before, next, action, newActions[newActions.length - 2]).filter(entry => entry.kind !== shownBeforePick);
         shownBeforePick = null;
-        celebrate(list);
+        // Nach Rueckgaengig derselbe Wurf noch einmal: nur der Ton, keine grossen Animationen
+        if (isFresh(action, newActions.length - 1)) celebrate(list);
         return true;
     };
 
@@ -262,8 +281,9 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
         const name = playerIndex === null ? '' : (nameTeam === 0 ? match.team1 : match.team2).players[playerIndex]?.name ?? '';
         const { throwKinds, formations, followUps } = getCelebrations(before, next, action, previous);
         const facing = action.type === 'elbow' ? 1 - action.team : action.type === 'ownCup' ? action.team : throwingTeam;
+        const note = action.type === 'elbow' ? action.reason : undefined;
         return [
-            ...throwKinds.map(kind => ({ kind, player: name, teamIndex: facing })),
+            ...throwKinds.map(kind => ({ kind, player: name, teamIndex: facing, ...(note && { note }) })),
             ...formations.map(({ rackIndex, formation }) => ({ kind: 'formation' as const, player: '', teamIndex: 1 - rackIndex, formation })),
             ...followUps.map(kind => ({ kind, player: name, teamIndex: facing })),
         ];
@@ -276,12 +296,16 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
         const appended = remote.length > current.length && current.every((action, index) => JSON.stringify(action) === JSON.stringify(remote[index]));
         const error = replaceActions(remote);
         // Nach laengerer Pause (z.B. Handy neu geladen) nicht alle verpassten Wuerfe nachspielen
-        if (error || !appended || remote.length - current.length > 3) return error;
-        const list = remote.slice(current.length).flatMap((action, offset) => {
-            const index = current.length + offset;
-            return celebrationsFor(getStateAfter(index), getStateAfter(index + 1), action, remote[index - 1]);
-        });
-        playFeedback(state.value, remote[remote.length - 1]);
+        if (error) return error;
+        // Das andere Handy hat zurueckgenommen: laufende Animation des zurueckgenommenen Wurfs beenden
+        if (remote.length < current.length) { banner.value = null; clearCelebrations(); }
+        // Alle uebernommenen Aktionen als gesehen merken, gefeiert werden nur neu angehaengte
+        const fresh = remote.map((action, index) => ({ action, index })).filter(({ action, index }) => isFresh(action, index) && index >= current.length);
+        // Nach laengerer Pause (z.B. Handy neu geladen) nicht alle verpassten Wuerfe nachspielen
+        if (!appended || remote.length - current.length > 3 || !fresh.length) return null;
+        const list = fresh.flatMap(({ action, index }) => celebrationsFor(getStateAfter(index), getStateAfter(index + 1), action, remote[index - 1]));
+        const last = fresh[fresh.length - 1];
+        playFeedback(getStateAfter(last.index + 1), last.action);
         celebrate(list);
         return null;
     };
@@ -307,24 +331,28 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
         bounceSpot.value = null;
     };
 
-    const throwHit = (cup: number, bouncer: boolean, extraCups: number[] = []) => {
+    const throwHit = (cup: number, bouncer: boolean, extraCups: number[] = [], edge?: EdgeHit) => {
         const spot = bouncer ? bounceSpot.value : null;
-        return dispatch({ type: 'throw', player: selectedPlayer.value, outcome: 'hit', cup, bouncer, extraCups, time: now(), ...(spot && { spot: { ...spot } }) });
+        return dispatch({
+            type: 'throw', player: selectedPlayer.value, outcome: 'hit', cup, bouncer, extraCups, time: now(),
+            ...(spot && { spot: { ...spot } }), ...(edge && { edge: JSON.parse(JSON.stringify(edge)) as EdgeHit }),
+        });
     };
 
     // Becher angetippt: Treffer, oder Zusatzbecher waehrend der Auswahl. true, wenn ein Wurf eingetragen wurde.
-    const tapCup = (cup: number): boolean => {
+    // edge (Knecht Pro, Ballweg): der Ball war vorher an der Kante
+    const tapCup = (cup: number, edge?: EdgeHit): boolean => {
         const current = pick.value;
         if (current) {
             if (!current.candidates.includes(cup)) return false;
             current.chosen = current.chosen.includes(cup) ? current.chosen.filter(other => other !== cup) : [...current.chosen, cup];
-            return current.chosen.length === current.needed && throwHit(current.cup, current.bouncer, current.chosen);
+            return current.chosen.length === current.needed && throwHit(current.cup, current.bouncer, current.chosen, current.edge);
         }
         if (!hittableCups.value.has(cup)) return false;
 
         const preview = previewHit(state.value, cup, bouncerArmed.value, selectedPlayer.value);
-        if (preview.extrasNeeded === 0) return throwHit(cup, bouncerArmed.value);
-        pick.value = { cup, bouncer: bouncerArmed.value, type: preview.type, needed: preview.extrasNeeded, candidates: preview.extraCandidates, chosen: [] };
+        if (preview.extrasNeeded === 0) return throwHit(cup, bouncerArmed.value, [], edge);
+        pick.value = { cup, bouncer: bouncerArmed.value, type: preview.type, needed: preview.extrasNeeded, candidates: preview.extraCandidates, chosen: [], ...(edge && { edge }) };
         // Wie am Tisch: erst die Bombe bzw. der Bouncer, dann die Zusatzbecher waehlen
         shownBeforePick = preview.type === 'bomb' ? 'bomb' : 'bouncer';
         const team = state.value.activeTeamIndex;
@@ -358,7 +386,9 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
     });
     const deathcup = () => dispatch({ type: 'deathcup', player: selectedPlayer.value, time: now() });
     const ownCup = (team: number, player: number, cups: number[]) => dispatch({ type: 'ownCup', team, player, cups, time: now() });
-    const elbow = (team: number, player: number, cups: number[]) => dispatch({ type: 'elbow', team, player, cups, time: now() });
+    // Verwarnung (gelb, ohne Becher) oder Strafbier (rot, ein eigener Becher), mit Grund
+    const elbow = (team: number, player: number, cups: number[], card?: 'yellow' | 'red', reason?: string) =>
+        dispatch({ type: 'elbow', team, player, cups, time: now(), ...(card && { card }), ...(reason && { reason }) });
 
     const canUndo = computed(() => !!pick.value || actions.value.length > 0);
 
@@ -396,6 +426,7 @@ export const useBiPoKnecht = (match: Match, initialStartTeamIndex: number | null
     const start = (teamIndex: number) => {
         startTeamIndex.value = teamIndex;
         actions.value = [];
+        celebrated.clear();
     };
 
 

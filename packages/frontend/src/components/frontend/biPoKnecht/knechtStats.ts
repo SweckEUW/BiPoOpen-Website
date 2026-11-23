@@ -1,4 +1,4 @@
-import { isHitTurnType } from './knechtEngine';
+import { isHitTurnType, isTrickshotAirball } from './knechtEngine';
 
 // Statistik aus dem Wurfverlauf (Turns) eines Spiels: fuer den Spielende-Bildschirm und das Spielerprofil.
 // Rein, ohne Vue und ohne Netzwerk.
@@ -22,6 +22,7 @@ export type KnechtPlayerStats = {
     deathcups: number;
     ownCups: number;
     bestStreak: number;
+    longestDrought: number; // laengste Serie eigener Wuerfe ohne Treffer
     edges: number;          // Nullwuerfe an die Kante (seit der Kanten-Erkennung)
     penalties: number;      // Ellenbogen-Calls (gelb und rot)
 };
@@ -31,15 +32,23 @@ export const getTurnStats = (match: Match, turns: Turn[], points: number[][]): K
     const stats = [match.team1, match.team2].flatMap((team, teamIndex) => team.players.map((player, playerIndex) => ({
         teamIndex, playerIndex, name: player.name, points: points[teamIndex]?.[playerIndex] ?? 0,
         throws: 0, hits: 0, misses: 0, airballs: 0, bouncers: 0, bombs: 0, ballsBacks: 0, onFires: 0,
-        trickshotCatches: 0, trickshotHits: 0, lastCups: 0, deathcups: 0, ownCups: 0, bestStreak: 0, edges: 0, penalties: 0,
+        trickshotCatches: 0, trickshotHits: 0, lastCups: 0, deathcups: 0, ownCups: 0, bestStreak: 0, longestDrought: 0, edges: 0, penalties: 0,
     })));
     const find = (teamIndex: number, playerIndex: number) => stats.find(entry => entry.teamIndex === teamIndex && entry.playerIndex === playerIndex);
     const streaks = new Map<KnechtPlayerStats, number>();
+    const droughts = new Map<KnechtPlayerStats, number>();
+    const missed = (entry: KnechtPlayerStats) => {
+        const drought = (droughts.get(entry) ?? 0) + 1;
+        droughts.set(entry, drought);
+        entry.longestDrought = Math.max(entry.longestDrought, drought);
+    };
     let pendingTrickshot: number | null = null;
 
-    turns.forEach(turn => {
+    turns.forEach((turn, index) => {
         const entry = find(turn.teamIndex, turn.playerIndex);
         if (!entry) return;
+        // Airball beim Trickshot zaehlt nicht als Wurf
+        if (isTrickshotAirball(turn, turns[index - 1])) { pendingTrickshot = null; return; }
         // Alte Knecht-Spiele speichern Nullwurf, Airball und Trickshot ohne data
         const data = (turn.data ?? {}) as Record<string, unknown>;
 
@@ -50,6 +59,7 @@ export const getTurnStats = (match: Match, turns: Turn[], points: number[][]): K
             entry.throws++;
             entry.misses++;
             streaks.set(entry, 0);
+            missed(entry);
             const catcher = find(turn.teamIndex, data.catcherIndex as number);
             if (catcher) {
                 catcher.trickshotCatches++;
@@ -66,7 +76,9 @@ export const getTurnStats = (match: Match, turns: Turn[], points: number[][]): K
             const streak = (streaks.get(entry) ?? 0) + 1;
             streaks.set(entry, streak);
             entry.bestStreak = Math.max(entry.bestStreak, streak);
+            droughts.set(entry, 0);
         } else {
+            missed(entry);
             if (turn.type === 'airball') entry.airballs++;
             else entry.misses++;
             if (turn.type === 'miss' && data.edge) entry.edges++;
@@ -115,7 +127,7 @@ export const getKnechtCareerStats = (matches: Match[], playerName: string): Knec
     const nameLower = playerName.toLowerCase();
     const career: KnechtCareerStats = {
         games: 0, wins: 0, points: 0, throws: 0, hits: 0, misses: 0, airballs: 0, bouncers: 0, bombs: 0, ballsBacks: 0, onFires: 0,
-        trickshotCatches: 0, trickshotHits: 0, lastCups: 0, deathcups: 0, ownCups: 0, bestStreak: 0, edges: 0, penalties: 0,
+        trickshotCatches: 0, trickshotHits: 0, lastCups: 0, deathcups: 0, ownCups: 0, bestStreak: 0, longestDrought: 0, edges: 0, penalties: 0,
     };
 
     matches.forEach(match => {
@@ -139,7 +151,7 @@ export const getKnechtCareerStats = (matches: Match[], playerName: string): Knec
         if (teamScore(teams[teamIndex]) > teamScore(teams[1 - teamIndex])) career.wins++;
         (Object.keys(career) as (keyof KnechtCareerStats)[]).forEach(key => {
             if (key === 'games' || key === 'wins') return;
-            career[key] = key === 'bestStreak' ? Math.max(career[key], stats[key]) : career[key] + stats[key];
+            career[key] = key === 'bestStreak' || key === 'longestDrought' ? Math.max(career[key], stats[key]) : career[key] + stats[key];
         });
     });
 

@@ -57,6 +57,35 @@ describe('getMatchdayTimeline', () => {
         expect(singles.day?.getDate()).toBe(31);
     });
 
+    it('zaehlt Einzelspiele nach Mitternacht zum Vortag, wenn ein Team dort schon gespielt hat', () => {
+        // 1. Liga 21.11.2026: 4Fisch gegen Schaufautomat um 00:25 Uhr, beide haben am Abend schon gespielt
+        const games = [
+            game('2026-11-21T21:59', 'Schaufautomat', 10, 'Hopfenstreife', 8),
+            game('2026-11-21T22:45', '4Fisch', 10, 'SallyWin All-in', 8),
+            game('2026-11-22T00:25', '4Fisch', 10, 'Schaufautomat', 8),
+        ];
+
+        const timeline = getMatchdayTimeline(newestFirst(games), 0) as GameSinglesDay[];
+        expect(timeline).toHaveLength(1);
+        expect(timeline[0].games).toHaveLength(3);
+        expect(timeline[0].day?.getDate()).toBe(21);
+    });
+
+    it('laesst Spiele nach Mitternacht ohne Teams vom Abend beim Kalendertag', () => {
+        const games = [
+            game('2026-11-21T21:00', 'A', 10, 'B', 8),
+            game('2026-11-22T00:30', 'C', 10, 'D', 8),
+            // C hat gerade gespielt: gehoert mit zum 22.
+            game('2026-11-22T01:00', 'C', 10, 'E', 8),
+            // B war am Abend dabei: gehoert zum 21.
+            game('2026-11-22T01:30', 'B', 10, 'F', 8),
+        ];
+
+        const timeline = getMatchdayTimeline(newestFirst(games), 0) as GameSinglesDay[];
+        expect(timeline.map(entry => [entry.day?.getDate(), entry.games.map(match => match.team1.players[0].name)]))
+            .toEqual([[22, ['C', 'C']], [21, ['A', 'B']]]);
+    });
+
     it('wertet 4 Spiele an einem Abend als Spiele zwischendurch', () => {
         // 14.11.2026: 4 Spiele mit 6 Teams waren kein Spieltag
         const games = ['A', 'B', 'C', 'D'].map((team, index) => game(`2026-11-14T1${index}:00`, team, 10, 'E', 3));

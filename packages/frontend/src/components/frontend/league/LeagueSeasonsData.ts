@@ -116,7 +116,7 @@ export const LEAGUE_SEASONS: LeagueSeason[] = [
                     { teamName: 'Laufbier-Legende', playerName: 'Dana Pohlmann', logo: teamLogo('Laufbier-Legende.webp') },
                     { teamName: 'Die Bierpong-Pädagogin', playerName: 'Michelle Langer', logo: teamLogo('Die-Bierpong-Pädagogin.webp') },
                     { teamName: 'Trinkerbell', playerName: 'Annabell Kramme', logo: teamLogo('Trinkerbell.webp') },
-                    { teamName: 'Walter Frosch Gedächtniskapelle e.V.', shortName: '1. WFGK', playerName: 'Leoni Straub', logo: teamLogo('Walter-Frosch-GK.webp') },
+                    { teamName: 'Walter Frosch Gedächtniskapelle e.V.', shortName: '1. WFGK', playerName: 'Leo Straub', logo: teamLogo('Walter-Frosch-GK.webp') },
                     { teamName: 'Michael Weck', playerName: 'Michael Weck', logo: teamLogo('BiPo-League-Logo.webp') },
                 ],
             },
